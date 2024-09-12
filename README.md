@@ -4,7 +4,7 @@
 
 A Python library for signal decomposition algorithms
 
-<center><img src=".\images\Logo_sd.png" alt="Logo_sd" style="zoom:12%;" /></center>
+<center><img src=".\images\Logo_sd.png" alt="Logo_sd" style="zoom:6%;" /></center>
 
 ## Installation
 
@@ -67,5 +67,5 @@ from pysdkit.plot import plot_IMFs_amplitude_spectra
 plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 ~~~
 
-![frequency_example](D:\智能项目学习\PySDKit-main\images\frequency_example.jpg)
+![frequency_example](.\images\frequency_example.jpg)
 
