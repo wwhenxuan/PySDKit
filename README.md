@@ -38,7 +38,7 @@ IMFs = emd.fit_transform(signal, max_imf=2)
 plot_IMFs(signal, IMFs)
 ~~~
 
-![example](.\images\example.jpg)
+![example](images\example.jpg)
 
 The EMD in the above example is the most classic `empirical mode decomposition` algorithm in signal decomposition. For more complex signals, you can try other algorithms such as variational mode decomposition ([`VMD`](https://ieeexplore.ieee.org/abstract/document/6655981)).
 
@@ -56,7 +56,7 @@ print(IMFs.shape)
 vmd.plot_IMFs(save_figure=True)
 ~~~
 
-![vmd_example](.\images\vmd_example.jpg)
+![vmd_example](images\vmd_example.jpg)
 
 Better observe the characteristics of the decomposed intrinsic mode function in the frequency domain.
 
@@ -67,5 +67,5 @@ from pysdkit.plot import plot_IMFs_amplitude_spectra
 plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 ~~~
 
-![frequency_example](.\images\frequency_example.jpg)
+![frequency_example](images\frequency_example.jpg)
 
