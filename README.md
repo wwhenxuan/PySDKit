@@ -1,6 +1,7 @@
 # PySDKit: signal decomposition in Python
 
-[![PyPI version](https://badge.fury.io/py/PySDKit.svg)](https://pypi.org/project/PySDKit/) ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit) [![codecov](https://codecov.io/gh/wwhenxuan/PySDKit/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/wwhenxuan/PySDKit) [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-brightgreen.svg)](https://arxiv.org/abs/1234.56789) ![GitHub stars](https://img.shields.io/github/stars/wwhenxuan/PySDKit?style=social)
+[![PyPI version](https://badge.fury.io/py/PySDKit.svg)](https://pypi.org/project/PySDKit/) ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit) [![codecov](https://codecov.io/gh/wwhenxuan/PySDKit/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/wwhenxuan/PySDKit) [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-brightgreen.svg)](https://arxiv.org/abs/1234.56789) [![Downloads](https://pepy.tech/badge/pysdkit)](https://pepy.tech/project/pysdkit) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Fimg.shields.io%2Fbadge%2Fjust%2520the%2520message--8A2BE2?logo=appveyor&logoColor=royalblue&label=NumPy&link=https%3A%2F%2Fnumpy.org%2Fdoc%2Fstable%2F) ![Static Badge](https://img.shields.io/badge/https%3A%2F%2Fimg.shields.io%2Fbadge%2Fjust%2520the%2520message--8A2BE2?logo=appveyor&logoColor=violet&label=SciPy&link=https%3A%2F%2Fdocs.scipy.org%2Fdoc%2Fscipy%2F)
+
 
 A Python library for signal decomposition algorithms
 
