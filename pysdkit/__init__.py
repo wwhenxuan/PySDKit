@@ -11,4 +11,4 @@ from .vmd import MVMD
 from .vncmd import VNCMD
 
 # 经验小波变换
-from .ewt import EWT1D
+from .ewt import ewt, EWT
