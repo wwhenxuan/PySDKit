@@ -43,7 +43,10 @@ class EWT(object):
         self.lengthFilter = lengthFilter
         self.sigmaFilter = sigmaFilter
 
-    def fit_transform(self, signal: np.ndarray, N: Optional[int] = None, return_all: Optional[bool] = False):
+    def fit_transform(self,
+                      signal: np.ndarray,
+                      N: Optional[int] = None,
+                      return_all: Optional[bool] = False):
         """
         Perform Empirical Wavelet Transform on the input signal.
 

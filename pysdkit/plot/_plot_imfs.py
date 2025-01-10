@@ -12,12 +12,20 @@ from typing import Optional, List
 from ._functions import generate_random_hex_color
 from ._functions import set_themes
 
-set_themes(choice="plot_imfs")
+# set_themes(choice="plot_imfs")
 
 
-def plot_IMFs(signal: np.ndarray, IMFs: np.ndarray, max_imf: int = -1, colors: Optional[List] = None,
-              save_figure: bool = False, return_figure: bool = False, dpi: int = 500, fontsize: float = 14,
-              spine_width: float = 2, labelpad: float = 10, save_name: Optional[str] = None) -> Optional[plt.figure]:
+def plot_IMFs(signal: np.ndarray,
+              IMFs: np.ndarray,
+              max_imf: int = -1,
+              colors: Optional[List] = None,
+              save_figure: bool = False,
+              return_figure: bool = False,
+              dpi: int = 500,
+              fontsize: float = 14,
+              spine_width: float = 2,
+              labelpad: float = 10,
+              save_name: Optional[str] = None) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
@@ -34,6 +42,8 @@ def plot_IMFs(signal: np.ndarray, IMFs: np.ndarray, max_imf: int = -1, colors: O
     :param save_name: The name of the saved image file
     :return: The figure object for the plot
     """
+    # Set the matplotlib configs
+    set_themes(choice="plot_imfs")
 
     # Determine the number of rows
     if max_imf == -1:
