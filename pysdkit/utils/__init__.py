@@ -33,3 +33,10 @@ from ._function import log_transformation  # 对数变换
 # Decimal scaling normalization
 from ._function import decimal_scaling_normalization  # 小数定标标准化
 
+# 寻找一位输入信号的瞬时振幅和瞬时频率
+from .instantaneous import inst_freq_local
+# 将输入的一维信号分解为两个本征模态函数的形式
+from .instantaneous import divide2exp
+
+# Any pair of IMFs is locally orthogonal
+from ._Index_of_Orthogonality import index_of_orthogonality

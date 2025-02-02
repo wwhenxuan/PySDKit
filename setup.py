@@ -11,7 +11,7 @@ setuptools.setup(
     url='https://github.com/wwhenxuan/PySDKit',  # 项目的地址通常来说是github
     author='whenxuan',
     author_email='wwhenxuan@gmail.com',
-    keywords=['signal', 'decomposition'],  # 在PyPI上搜索的相应的关键词
+    keywords=['signal decomposition', 'signal processing', 'machine learning'],  # 在PyPI上搜索的相应的关键词
     long_description=long_description,  # 这个会将README.md文件的描述放在PyPI网页中
     long_description_content_type="text/markdown",
     classifiers=[
@@ -32,5 +32,7 @@ setuptools.setup(
         'numpy>=1.24.3,<=1.26.4',
         'scipy>=1.11.1,<=1.13.1',
         'matplotlib>=3.7.2,<=3.8.4'
-    ]  # 手动指定依赖的Python以及最低的版本
+    ],  # 手动指定依赖的Python以及最低的版本
+    package_data={'': ['*.txt']},  # 连同数据一起打包
+    include_package_data=True
 )

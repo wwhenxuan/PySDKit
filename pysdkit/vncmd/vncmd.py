@@ -83,9 +83,9 @@ class VNCMD(Base):
         :param N: The size of the matrix.
         :return: The second-order difference matrix.
         """
-        # Create an N-element column vector filled with ones
+        # Create an K-element column vector filled with ones
         e = np.ones(N, dtype=self.DTYPE)
-        # Create an N-element column vector filled with -2
+        # Create an K-element column vector filled with -2
         e2 = -2 * np.ones(N, dtype=self.DTYPE)
         # Set the first element of e2 to -1
         e2[0] = -1

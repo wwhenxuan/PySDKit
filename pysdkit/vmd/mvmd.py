@@ -5,7 +5,7 @@ Created on 2024/6/1 18:44
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from typing import Optional
+from typing import Optional, Tuple
 from .base import Base
 
 
@@ -14,10 +14,12 @@ class MVMD(Base):
     Multivariate Variational mode decomposition, object-oriented interface.
     ur Rehman, Naveed and Aftab, Hania (2019) 'Multivariate Variational Mode Decomposition',
     IEEE Transactions on Signal Processing, 67(23), pp. 6039–6052.
+    Python code: https://github.com/yunyueye/MVMD
+    MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/72814-multivariate-variational-mode-decomposition-mvmd
     """
 
     def __init__(self, alpha: float, K: int, tau: float, init: str = "zero", DC: bool = False,
-                 tol: float = 1e-7, max_iter: int = 100):
+                 tol: float = 1e-7, max_iter: int = 100) -> None:
         """
         Multivariate Variational Mode Decomposition (MVMD) algorithm.
         :param alpha: float
@@ -77,7 +79,8 @@ class MVMD(Base):
             omega_plus[0, 0] = 0
         return omega_plus
 
-    def fit_transform(self, signal: np.ndarray, return_all: bool = False) -> Optional[np.ndarray]:
+    def fit_transform(self, signal: np.ndarray,
+                      return_all: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Multivariate signal decomposition using MVMD algorithm
         :param signal: the time domain signal (ndarray) to be decomposed

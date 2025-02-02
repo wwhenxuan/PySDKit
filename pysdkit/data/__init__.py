@@ -18,3 +18,6 @@ from ._generator import plot_generate_signal
 
 # add Gaussian noise
 from ._add_noise import add_noise
+
+# 加载二维灰度图像的测试案例
+from .image import test_grayscale

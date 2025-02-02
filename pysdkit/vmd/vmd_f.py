@@ -3,17 +3,18 @@
 Created on Sat Mar 4 11:59:21 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
-Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
-IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
 """
 import numpy as np
-from ..utils import fft, ifft, fftshift, ifftshift, fmirror
+from typing import Tuple
+from pysdkit.utils import fft, ifft, fftshift, ifftshift, fmirror
 
 
 def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform', DC: bool = False,
-        max_iter: int = 500, tol: float = 1e-6):
+        max_iter: int = 500, tol: float = 1e-6) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Variational mode decomposition, object-oriented interface.
+    Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
+    IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
     :param signal: the time domain signal (1D numpy array)  to be decomposed
     :param alpha: the balancing parameter of the data-fidelity constraint
     :param K: the number of modes to be recovered

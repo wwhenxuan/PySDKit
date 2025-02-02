@@ -24,7 +24,7 @@ class SVMD(Base):
                  max_alpha: int = 20000,
                  tau: float = 0.0,
                  tol: float = 1e-6,
-                 stopc: int = 4,
+                 stopc: Optional[int] = 4,
                  init_omega: int = 0,
                  max_iter: int = 300,
                  poly_order: Optional[int] = 8,
@@ -151,21 +151,21 @@ class SVMD(Base):
         lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
 
         # Keeping changes of mode spectrum
-        u_hat_L = np.zeros(self.max_iter, len(omega_freqs))
+        u_hat_L = np.zeros([self.max_iter, len(omega_freqs)])
 
         # Main loop counter
         n = 0  # TODO: 注意这里是从0还是从1开始
 
         m = 0  # iteration counter for increasing alpha
         SC2 = 0  # main stopping criteria index
-        l = 1  # the initial number of modes
+        l = 0  # the initial number of modes  TODO: 注意这里应该是0还是1
         bf = 0  # bit flag to increase alpha
         BIC = np.zeros(1)
 
         # Initialization of filter matrix
         h_hat_Temp = np.zeros([2, len(omega_freqs)])
         u_hat_Temp = np.zeros(len(omega_freqs))  # matrix 1 of modes  TODO:这里要注意
-        u_hat_i = np.zeros([len(omega_freqs)])  # matrix 2 of modes
+        u_hat_i = np.zeros([1, len(omega_freqs)])  # matrix 2 of modes
 
         # Counter for initializing omega_L
         n2 = 0
@@ -193,45 +193,132 @@ class SVMD(Base):
                     # update lambda dual ascent
                     lambda_vector[n + 1, :] = lambda_vector[n, :] + self.tau * (f_hat_onesided - (u_hat_L[n + 1, :] + (
                             (Alpha ** 2) * (omega_freqs - omega_L[n]) ** 4 * (
-                                f_hat_onesided - u_hat_L[n + 1, :] - np.sum(u_hat_i) + lambda_vector[n,
-                                                                                       :] / 2) - np.sum(u_hat_i))))
+                            f_hat_onesided - u_hat_L[n + 1, :] - np.sum(u_hat_i) + lambda_vector[n,
+                                                                                   :] / 2) - np.sum(u_hat_i))))
 
                     udiff = self.eps
 
                     # 1st loop criterion
-                    udiff = udiff + (1 / T * (u_hat_L[n + 1, :] - u_hat_L[n, :]) * np.conj((u_hat_L[n + 1, :] - u_hat_L[n, :]).T)) / (1 / T * (u_hat_L[n, :]) * np.conj((u_hat_L[n, :])).T)
+                    udiff = udiff + (1 / T * (u_hat_L[n + 1, :] - u_hat_L[n, :]) * np.conj(
+                        (u_hat_L[n + 1, :] - u_hat_L[n, :]).T)) / (1 / T * (u_hat_L[n, :]) * np.conj((u_hat_L[n, :])).T)
 
                     udiff = np.abs(udiff)
+                    n += 1
 
-                # TODO: Part 3---Increasing Alpha to achieve a pure mode
-                if np.abs(m - np.log(self.max_alpha)) > 1:
-                    m = m + 1
+            # TODO: Part 3---Increasing Alpha to achieve a pure mode
+            if np.abs(m - np.log(self.max_alpha)) > 1:
+                m = m + 1
+            else:
+                m = m + 0.05
+                bf = bf + 1
+
+            if bf > 2:
+                Alpha = Alpha + 1
+
+            if Alpha <= (self.max_alpha - 1):  # exp(SC1) <= (max_alpha)
+                if bf == 1:
+                    Alpha = self.max_alpha - 1
                 else:
-                    m = m + 0.05
-                    bf = bf + 1
+                    Alpha = np.exp(m)
 
-                if bf > 2:
-                    Alpha = Alpha + 1
+                omega_L = omega_L[n]
 
-                if Alpha <= (self.max_alpha - 1):  # exp(SC1) <= (max_alpha)
-                    if bf == 1:
-                        Alpha = self.max_alpha - 1
-                    else:
-                        Alpha = np.exp(m)
+                # Initializing
+                udiff = self.tol + self.eps  # update step
+                temp_ud = u_hat_L[n, :]  # keeping the last update of the obtained mode
 
-                    omega_L = omega_L[n]
+                n = 0  # loop counter  TODO: 注意这里是1还是0
 
-                    # Initializing
-                    udiff = self.tol + self.eps  # update step
-                    temp_ud = u_hat_L[n, :]  # keeping the last update of the obtained mode
+                lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
+                u_hat_L = np.zeros([self.max_iter, len(omega_freqs)])
+                u_hat_L[n, :] = temp_ud
 
-                    n = 0  # loop counter  TODO: 注意这里是1还是0
+        # TODO: Part 4---Saving the Modes and Center Frequencies
+        omega_L = omega_L[omega_L > 0]
+        u_hat_Temp = u_hat_L[n, :]
+        omega_d_Temp[l] = omega_L[n - 1, 0]
 
-                    lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
-                    u_hat_L = np.zeros([self.max_iter, len(omega_freqs)])
-                    u_hat_L[n, :] = temp_ud
+        alpha[l] = Alpha
+        Alpha = min_alpha
+        bf = 0
 
-            # TODO: Part 4---Saving the Modes and Center Frequencies
-            omega_L = omega_L[omega_L > 0]
-            u_hat_Temp[]
+        # Initializing omega_L
+        if self.init_omega > 0:
+            ii = 0
+            while ii < 1 and n2 < 300:
+
+                omega_L = np.sort(np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()))
+
+                checkp = np.abs(omega_d_Temp - omega_L)
+
+                if len(np.where(checkp < 0.02)[1]) <= 0:
+                    # It will continue if difference between previous vector of omega_d and the current random omega_plus is about 2Hz
+                    ii = 1
+                n2 += 1
+        else:
+            omega_L = 0
+
+        # Update step
+        udiff = self.tol + self.eps
+
+        lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
+
+        gamma[l] = 1
+
+        h_hat_Temp[l, :] = gamma[l] / ((alpha[l] ** 2) * (omega_freqs - omega_d_Temp[l]) ** 4)
+
+        # Keeping the last desired mode as one of the extracted modes
+        u_hat_i[l, :] = u_hat_Temp
+
+        # TODO: Part 5---Stopping Criteria
+        if self.stopc is not None:
+            # Checking the stopping criteria
+
+            if self.stopc == 1:
+                # In the presence of noise
+                if u_hat_i.shape[0] == 1:
+                    sigerror[l] = norm((f_hat_onesided - u_hat_L), ord=2) ** 2
+                else:
+                    sigerror[l] = norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+
+                if n2 >= 300 or sigerror[l] <= np.round(noisepe):
+                    SC2 = 1
+
+            elif self.stopc == 2:
+                # Exact Reconstruction
+                sum_u = np.sum(u_hat_Temp[0, :])  # sum of current obtained modes
+                normind[l] = (1 / T) * (norm(sum_u - f_hat_onesided, ord=2) ** 2) / ((1 / T) * norm(f_hat_n_onesided, ord=2) ** 2)
+                if n2 >= 300 or normind[l] < 0.005:
+                    SC2 = 1
+
+            elif self.stopc == 3:
+                # Bayesian Method
+                if u_hat_i.shape[0] == 1:
+                    sigerror[l] = norm((f_hat_onesided - u_hat_i), ord=2) ** 2
+                else:
+                    sigerror[l] = norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+
+                BIC[l] = 2 * T * np.log(sigerror[l]) + (3 * (l + 1)) * np.log(2 * T)
+
+                if l > 0:
+                    if BIC[l] > BIC[l - 1]:
+                        SC2 = 1
+
+            elif self.stopc == 4:
+                # Power of the last mode
+                if l < 1:
+                    polm[l] = norm((4 * Alpha * u_hat_i[l, :] / (1 + 2 * Alpha * (omega_freqs - omega_d_Temp[l, :]) ** 2)) * u_hat_i[l, :].T, ord=2)
+                    polm_temp = polm[l]
+                    polm[l] = polm[l] / np.max(polm_temp)
+                else:
+                    polm[l] = norm((4 * Alpha * u_hat_i[l, :] / (1 + 2 * Alpha * ())))
+
+
+
+
+
+
+
+
+
 

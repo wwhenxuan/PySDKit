@@ -3,21 +3,25 @@
 Created on Sat Mar 4 11:59:21 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
-Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
-IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
 """
 import numpy as np
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from .base import Base
-from ..plot import plot_IMFs
+from pysdkit.plot import plot_IMFs
 
 
 class VMD(Base):
-    """Variational mode decomposition, object-oriented interface."""
+    """
+    Variational mode decomposition, object-oriented interface.
+    Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
+    IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
+    Python code: https://github.com/vrcarva/vmdpy
+    MATLAB code: https://www.mathworks.com/help/wavelet/ref/vmd.html
+    """
 
     def __init__(self, alpha: int, K: int, tau: float, init: str = 'uniform', DC: bool = False,
-                 max_iter: int = 500, tol: float = 1e-6):
+                 max_iter: int = 500, tol: float = 1e-6) -> None:
         """
         :param alpha: the balancing parameter of the data-fidelity constraint
         :param K: the number of modes to be recovered
@@ -65,7 +69,7 @@ class VMD(Base):
 
     def plot_IMFs(self, max_imf: int = -1, colors: Optional[List] = None, save_figure: bool = False,
                   return_figure: bool = False, dpi: int = 500, fontsize: float = 14,
-                  spine_width: float = 2, labelpad: float = 10, save_name: Optional[str] = None):
+                  spine_width: float = 2, labelpad: float = 10, save_name: Optional[str] = None) -> None:
         """
         An easy way to visualize signal decomposition results
         :param max_imf: The number of decomposition modes to be plotted
@@ -86,7 +90,8 @@ class VMD(Base):
         else:
             raise ValueError
 
-    def fit_transform(self, signal: np.ndarray, return_all: bool = False) -> Optional[np.ndarray]:
+    def fit_transform(self, signal: np.ndarray,
+                      return_all: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using VMD algorithm
         :param signal: the time domain signal (1D numpy array)  to be decomposed

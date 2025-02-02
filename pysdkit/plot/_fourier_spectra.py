@@ -13,7 +13,7 @@ from ._functions import generate_random_hex_color
 from ..utils import simple_moving_average, weighted_moving_average
 from ..utils import gaussian_smoothing, savgol_smoothing, exponential_smoothing
 
-set_themes(choice='classic')
+# set_themes(choice='classic')
 
 
 def max_min_normalization(x: np.ndarray) -> np.ndarray:
@@ -43,6 +43,7 @@ def plot_IMFs_amplitude_spectra(IMFs: np.ndarray, norm: Optional[bool] = True, s
     :param save_name: Name to save the figure
     :return: Figure object (if return_figure is True)
     """
+    set_themes(choice='classic')
 
     def get_inputs(x):
         """Return the input as is without any changes"""

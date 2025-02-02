@@ -1,4 +1,14 @@
-from ._vmd_f import vmd
-from ._vmd_c import VMD
+# -*- coding: utf-8 -*-
+"""
+Created on 2024/7/12 13:41
+@author: Whenxuan Wang
+@email: wwhenxuan@gmail.com
+"""
 
-from ._mvmd import MVMD
+from .vmd_f import vmd
+
+from .vmd_c import VMD
+
+from .mvmd import MVMD
+
+from .acmd import ACMD
