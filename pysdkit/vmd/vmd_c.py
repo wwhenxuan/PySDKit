@@ -16,6 +16,23 @@ class VMD(Base):
     Variational mode decomposition, object-oriented interface.
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
     IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
+
+    The goal of VMD is to decompose the input signal into a series of modes with sparse characteristics.
+    The sparse characteristics here refer to the fact that all modes are narrowband signals concentrated near their respective center frequencies.
+    To achieve this goal, VMD constructs a constrained variational optimization problem,
+    in which the objective function is to minimize the bandwidth of all modes,
+    and the constraint condition is that the decomposed modes can completely reconstruct the input signal.
+    The construction of the VMD objective function is divided into three steps:
+    1) Perform Hilbert transform on each mode to obtain its analytical signal;
+    2) Shift the spectrum of the analytical signal to zero intermediate frequency to obtain the baseband signal;
+    3) Use Gaussian smoothness to estimate the baseband signal bandwidth of each mode, and minimize the sum of these bandwidths as the objective function.
+    The optimization problem established by VMD can be solved in the frequency domain by the alternating direction multiplier method,
+    and finally the modes contained in the input signal and the corresponding center frequencies are obtained.
+
+    Compared with previous empirical mode decomposition algorithms,
+    VMD abandons the iterative strategy and transforms the decomposition into an optimization problem.
+
+    Our code: https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/vmd/vmd_c.py
     Python code: https://github.com/vrcarva/vmdpy
     MATLAB code: https://www.mathworks.com/help/wavelet/ref/vmd.html
     """
@@ -84,9 +101,9 @@ class VMD(Base):
         :return: The figure object for the plot
         """
         if self.u is not None and self.signal is not None:
-            plot_IMFs(signal=self.signal, IMFs=self.u, max_imf=max_imf, colors=colors, save_figure=save_figure,
-                      return_figure=return_figure, dpi=dpi, fontsize=fontsize,
-                      spine_width=spine_width, labelpad=labelpad, save_name=save_name)
+            plot_IMFs(signal=self.signal, IMFs=self.u, max_imfs=max_imf, colors=colors, save_figure=save_figure,
+                      return_figure=return_figure, dpi=dpi, fontsize=fontsize, spine_width=spine_width,
+                      labelpad=labelpad, save_name=save_name)
         else:
             raise ValueError
 

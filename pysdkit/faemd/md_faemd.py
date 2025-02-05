@@ -7,7 +7,7 @@ Created on 2025/02/01 22:33:51
 import numpy
 
 
-class MV_FAEMD(object):
+class MD_FAEMD(object):
     """
     Multidimensional Fast and Adaptive Empirical Mode Decomposition
     Thirumalaisamy, Mruthun R., and Phillip J. Ansell.

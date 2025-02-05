@@ -13,29 +13,29 @@ from typing import Tuple
 FindExtremaOutput = Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]
 
 
-def find_extrema_parabol(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
+def find_extrema_parabol(time: np.ndarray, signal: np.ndarray) -> FindExtremaOutput:
     """
     Performs parabolic estimation of extremum in a one-dimensional signal array S.
     This method not only identifies the positions and values of local maxima and minima
     by fitting a parabola to three consecutive points (where the middle point is the vertex of the parabola),
     but also provides zero crossing points which are essential for signal analysis.
 
-    :param T: Array representing the time or sequence indices.
-    :param S: One-dimensional array representing the signal values.
+    :param time: Array representing the time or sequence indices.
+    :param signal: One-dimensional array representing the signal values.
     :return: Positions and values of local maxima and minima, and positions of zero crossings.
     """
 
     # Detect zero crossings by comparing adjacent signal points
-    indzer = find_zero_crossings(S=S)
+    indzer = find_zero_crossings(signal=signal)
 
     # Handling duplicate values which are crucial for accurate parabolic fitting
-    idx = not_duplicate(S)
-    T = T[idx]
-    S = S[idx]
+    idx = not_duplicate(signal)
+    time = time[idx]
+    signal = signal[idx]
 
     # Initialize variables for parabolic fitting
-    Tp, T0, Tn = T[:-2], T[1:-1], T[2:]
-    Sp, S0, Sn = S[:-2], S[1:-1], S[2:]
+    Tp, T0, Tn = time[:-2], time[1:-1], time[2:]
+    Sp, S0, Sn = signal[:-2], signal[1:-1], signal[2:]
     TnTp, T0Tn, TpT0 = Tn - Tp, T0 - Tn, Tp - T0
     scale = Tp * Tn * Tn + Tp * Tp * T0 + T0 * T0 * Tn - Tp * Tp * Tn - Tp * T0 * T0 - T0 * Tn * Tn
 
@@ -62,22 +62,22 @@ def find_extrema_parabol(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
     return local_max_pos, local_max_val, local_min_pos, local_min_val, indzer
 
 
-def find_extrema_simple(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
+def find_extrema_simple(time: np.ndarray, signal: np.ndarray) -> FindExtremaOutput:
     """
     Performs extrema detection in a given one-dimensional signal array S.
     This method identifies local maxima and minima by analyzing the first differences of the signal.
     The approach is straightforward and computationally efficient, making it suitable for signal processing applications
     where quick identification of critical turning points in the signal is required.
-    :param T: Array representing the time or sequence indices.
-    :param S: One-dimensional array representing the signal values.
+    :param time: Array representing the time or sequence indices.
+    :param signal: One-dimensional array representing the signal values.
     :return: Positions and corresponding values of local maxima and minima, and the positions of zero crossings.
     """
 
     # Finds indexes of zero-crossings
-    indzer = find_zero_crossings(S=S)
+    indzer = find_zero_crossings(signal=signal)
 
     # Finding local extrema points by using first differences
-    d = np.diff(S)
+    d = np.diff(signal)
 
     # Constructing arrays of previous and next difference values
     # d1 * d2 < 0 checks for sign changes in differences (product being negative),
@@ -101,7 +101,7 @@ def find_extrema_simple(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
                 debs, fins = [], []
 
         if len(debs) > 0:
-            if fins[-1] == len(S) - 1:
+            if fins[-1] == len(signal) - 1:
                 if len(debs) > 1:
                     debs, fins = debs[:-1], fins[:-1]
                 else:
@@ -129,9 +129,9 @@ def find_extrema_simple(T: np.ndarray, S: np.ndarray) -> FindExtremaOutput:
                 indmin.append(int(x))
             indmin.sort()
 
-    local_max_pos = T[indmax]
-    local_max_val = S[indmax]
-    local_min_pos = T[indmin]
-    local_min_val = S[indmin]
+    local_max_pos = time[indmax]
+    local_max_val = signal[indmax]
+    local_min_pos = time[indmin]
+    local_min_val = signal[indmin]
 
     return local_max_pos, local_max_val, local_min_pos, local_min_val, indzer

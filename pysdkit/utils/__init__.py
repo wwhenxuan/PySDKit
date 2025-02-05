@@ -1,5 +1,6 @@
 # Fourier Transform
 from ._fft import fft, ifft, fftshift, ifftshift  # 傅里叶变换的正变换、逆变换、频谱移动和逆移动
+from ._fft import fft2d, ifft2d  # 对二维图像数据进行快速傅里叶变换
 
 # Signal mirroring extension
 from .mirror import fmirror  # 信号的镜像扩展

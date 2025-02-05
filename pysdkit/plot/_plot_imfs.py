@@ -17,7 +17,7 @@ from ._functions import set_themes
 
 def plot_IMFs(signal: np.ndarray,
               IMFs: np.ndarray,
-              max_imf: int = -1,
+              max_imfs: int = -1,
               colors: Optional[List] = None,
               save_figure: bool = False,
               return_figure: bool = False,
@@ -31,7 +31,7 @@ def plot_IMFs(signal: np.ndarray,
     Can be used as a generic interface for plotting.
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
-    :param max_imf: The number of decomposition modes to be plotted
+    :param max_imfs: The number of decomposition modes to be plotted
     :param colors: List of color strings for plotting
     :param save_figure: Whether to save the figure as an image
     :param return_figure: Whether to return the figure object
@@ -46,10 +46,10 @@ def plot_IMFs(signal: np.ndarray,
     set_themes(choice="plot_imfs")
 
     # Determine the number of rows
-    if max_imf == -1:
+    if max_imfs == -1:
         nrows = IMFs.shape[0] + 1
     else:
-        nrows = min(max_imf, IMFs.shape[0]) + 1
+        nrows = min(max_imfs, IMFs.shape[0]) + 1
 
     # The length of the signal
     length = IMFs.shape[1]

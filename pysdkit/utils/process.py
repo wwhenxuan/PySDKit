@@ -110,27 +110,27 @@ def not_duplicate(ts: np.ndarray) -> np.ndarray:
     return idx
 
 
-def find_zero_crossings(S: np.ndarray) -> np.ndarray:
+def find_zero_crossings(signal: np.ndarray) -> np.ndarray:
     """
     Detects zero crossings in a given signal. A zero crossing occurs when two consecutive signal points have opposite signs,
     indicating a transition from positive to negative values or vice versa. This function also considers signal points
     that are exactly zero as zero crossings.
 
-    :param S: The input signal as a NumPy array.
+    :param signal: The input signal as a NumPy array.
     :return: An array of indices where zero crossings occur.
     """
     # Finds indexes of zero-crossings based on sign changes between consecutive elements
-    S1, S2 = S[:-1], S[1:]
+    S1, S2 = signal[:-1], signal[1:]
     indzer = np.nonzero(S1 * S2 < 0)[0]
     # print(indzer)
 
     # Detect exact zeros in the signal as zero crossings
-    if np.any(S == 0):
-        indz = np.nonzero(S == 0)[0]
+    if np.any(signal == 0):
+        indz = np.nonzero(signal == 0)[0]
 
         # If multiple consecutive zeros exist, identify the start and end points of these flat (zero) regions
         if np.any(np.diff(indz) == 1):
-            zer = S == 0
+            zer = signal == 0
             dz = np.diff(np.append(np.append(0, zer), 0))
             debz = np.nonzero(dz == 1)[0]
             finz = np.nonzero(dz == -1)[0] - 1

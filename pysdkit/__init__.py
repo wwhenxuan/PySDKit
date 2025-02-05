@@ -1,6 +1,12 @@
 # 经验模态分解算法
 from .emd import EMD
 
+# 集成经验模态分解算法
+from .emd import EEMD
+
+# 具有自适应噪声的完全集合经验模态分解
+from .emd import CEEMDAN
+
 # 基于时变滤波器的经验模态分解
 from .tvf_emd import TVF_EMD
 
@@ -12,6 +18,9 @@ from .vmd import ACMD
 
 # 多元变分模态分解算法
 from .vmd import MVMD
+
+# 适用于二维图像的变分模态分解算法
+from .vmd2d import VMD2D
 
 # 非线性啁啾模式分解
 from .vncmd import VNCMD

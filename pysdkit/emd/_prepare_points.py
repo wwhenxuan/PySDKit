@@ -10,23 +10,17 @@ import numpy as np
 from typing import Tuple, Optional
 
 
-def prepare_points_parabol(T, S, max_pos, max_val, min_pos, min_val, nbsym, DTYPE = np.float64) -> Tuple[np.ndarray, np.ndarray]:
+def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, max_val: np.ndarray,
+                           min_pos: np.ndarray, min_val: np.ndarray, nbsym: int,
+                           DTYPE=np.float64) -> Tuple[np.ndarray, np.ndarray]:
     """
     Performs mirroring on signal which extrema do not necessarily
     belong on the position array.
-
-    See :meth:`EMD.prepare_points`.
-    """
-
-    """
-    T: 时间或位置数组。
-    S: 信号数据数组。
-    max_pos, max_val: 局部最大值的位置和对应的值。
-    min_pos, min_val: 局部最小值的位置和对应的值。
-    
-    用于在信号的极值点处执行镜像操作，以便构建信号的上下包络线时能够得到更为平滑和完整的边界。
-    这种处理尤其在信号的起始和结束边缘部分很重要，因为这些区域可能缺乏足够的数据点来准确估计极值。
-    镜像操作有助于提供足够的数据点，使得插值（如样条插值）更加准确和自然。
+    max_pos, max_val: the position and corresponding value of the local maximum.
+    min_pos, min_val: the position and corresponding value of the local minimum.
+    Used to perform a mirror operation at the extreme points of the signal so that smoother and more complete boundaries can be obtained when constructing the upper and lower envelopes of the signal.
+    This processing is especially important at the beginning and end edges of the signal, because these areas may lack enough data points to accurately estimate the extreme values.
+    The mirror operation helps provide enough data points to make interpolation (such as spline interpolation) more accurate and natural.
     """
 
     # Need at least two extrema to perform mirroring
@@ -39,7 +33,6 @@ def prepare_points_parabol(T, S, max_pos, max_val, min_pos, min_val, nbsym, DTYP
     # Local variables
     end_min, end_max = len(min_pos), len(max_pos)
 
-    ####################################
     # Left bound
     d_pos = max_pos[0] - min_pos[0]
     left_ext_max_type = d_pos < 0  # True -> max, else min
@@ -82,7 +75,6 @@ def prepare_points_parabol(T, S, max_pos, max_val, min_pos, min_val, nbsym, DTYP
     expand_left_min = np.vstack((expand_left_min_pos[::-1], expand_left_min_val[::-1]))
     expand_left_max = np.vstack((expand_left_max_pos[::-1], expand_left_max_val[::-1]))
 
-    ####################################
     # Right bound
     d_pos = max_pos[-1] - min_pos[-1]
     right_ext_max_type = d_pos > 0
@@ -139,21 +131,11 @@ def prepare_points_parabol(T, S, max_pos, max_val, min_pos, min_val, nbsym, DTYP
     return max_extrema, min_extrema
 
 
-def prepare_points_simple(
-        T: np.ndarray,
-        S: np.ndarray,
-        max_pos: np.ndarray,
-        max_val: Optional[np.ndarray],
-        min_pos: np.ndarray,
-        min_val: Optional[np.ndarray],
-        nbsym
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Performs mirroring on signal which extrema can be indexed on
-    the position array.
-
-    See :meth:`EMD.prepare_points`.
-    """
+def prepare_points_simple(T: np.ndarray, S: np.ndarray,
+                          max_pos: np.ndarray, max_val: Optional[np.ndarray],
+                          min_pos: np.ndarray, min_val: Optional[np.ndarray], nbsym: int) -> Tuple[
+    np.ndarray, np.ndarray]:
+    """Performs mirroring on signal which extrema can be indexed on the position array"""
 
     # Find indexes of pass
     ind_min = min_pos.astype(int)
@@ -162,7 +144,6 @@ def prepare_points_simple(
     # Local variables
     end_min, end_max = len(min_pos), len(max_pos)
 
-    ####################################
     # Left bound - mirror nbsym points to the left
     if ind_max[0] < ind_min[0]:
         if S[0] > S[ind_min[0]]:
@@ -183,7 +164,6 @@ def prepare_points_simple(
             lmin = ind_min[0: min(end_min, nbsym)][::-1]
             lsym = 0
 
-    ####################################
     # Right bound - mirror nbsym points to the right
     if ind_max[-1] < ind_min[-1]:
         if S[-1] < S[ind_max[-1]]:
@@ -267,4 +247,3 @@ def prepare_points_simple(
     min_extrema = np.delete(min_extrema, min_dup_idx, axis=1)
 
     return max_extrema, min_extrema
-

@@ -102,3 +102,5 @@ if __name__ == '__main__':
     frequency = 5  # 5 Hz cosine wave
     cosine_signal = np.cos(2 * np.pi * frequency * t)
     plot_hilbert(signal=cosine_signal, analytical_signal=None)
+
+    plt.show()

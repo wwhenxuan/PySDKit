@@ -4,7 +4,6 @@ Created on Sat Mar 5 22:09:45 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 The following code is mainly used to find extreme points in the EMD algorithm
-Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 import numpy as np
 from scipy.interpolate import Akima1DInterpolator, CubicHermiteSpline, CubicSpline, PchipInterpolator
@@ -12,12 +11,15 @@ from scipy.interpolate import Akima1DInterpolator, CubicHermiteSpline, CubicSpli
 
 def cubic_spline_3pts(x, y, T):
     """
-    Apparently scipy.interpolate.interp1d does not support
-    cubic spline for less than 4 points.
-    :param x: The abscissa of a data point of length 3
-    :param y: The ordinate of the data with length 3
-    :param T: Array of x-coordinate points you wish to interpolate
-    :return: The interpolated abscissa t and ordinate q
+    Custom Cubic Spline Interpolation for 3 Data Points.
+    This function implements a cubic spline interpolation specifically for 3 data points.
+    Scipy's interp1d does not support cubic spline interpolation for less than 4 points.
+    The function calculates the interpolated values at specified points T.
+
+    :param x: Array-like, the x-coordinates of the 3 data points.
+    :param y: Array-like, the y-coordinates of the 3 data points.
+    :param T: Array-like, the x-coordinates where interpolation is desired.
+    :return: Tuple (t, q), where t is the interpolated x-coordinates and q is the interpolated y-coordinates.
     """
     x0, x1, x2 = x
     y0, y1, y2 = y
@@ -56,41 +58,61 @@ def cubic_spline_3pts(x, y, T):
 
 
 def akima(X, Y, x):
+    """
+    Akima Interpolation.
+    This function uses the Akima interpolation method to interpolate values at specified points x.
+    Akima interpolation is known for its smoothness and is suitable for curves with rapid changes.
+
+    :param X: Array-like, the x-coordinates of the data points.
+    :param Y: Array-like, the y-coordinates of the data points.
+    :param x: Array-like, the x-coordinates where interpolation is desired.
+    :return: Array-like, the interpolated y-coordinates.
+    """
     spl = Akima1DInterpolator(X, Y)
     return spl(x)
 
 
 def cubic_hermite(X, Y, x):
+    """
+    Cubic Hermite Spline Interpolation.
+    This function uses the Cubic Hermite Spline interpolation method to interpolate values at specified points x.
+    Cubic Hermite Spline interpolation ensures that the first derivatives are continuous.
+
+    :param X: Array-like, the x-coordinates of the data points.
+    :param Y: Array-like, the y-coordinates of the data points.
+    :param x: Array-like, the x-coordinates where interpolation is desired.
+    :return: Array-like, the interpolated y-coordinates.
+    """
     dydx = np.gradient(Y, X)
     spl = CubicHermiteSpline(X, Y, dydx)
     return spl(x)
 
 
 def cubic(X, Y, x):
+    """
+    Cubic Spline Interpolation.
+    This function uses the Cubic Spline interpolation method to interpolate values at specified points x.
+    Cubic Spline interpolation ensures that the second derivatives are continuous, resulting in a smooth curve.
+
+    :param X: Array-like, the x-coordinates of the data points.
+    :param Y: Array-like, the y-coordinates of the data points.
+    :param x: Array-like, the x-coordinates where interpolation is desired.
+    :return: Array-like, the interpolated y-coordinates.
+    """
     spl = CubicSpline(X, Y)
     return spl(x)
 
 
 def pchip(X, Y, x):
+    """
+    Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) Interpolation.
+    This function uses the PCHIP interpolation method to interpolate values at specified points x.
+    PCHIP interpolation ensures that the interpolated curve is monotonic in regions where the data is monotonic.
+
+    :param X: Array-like, the x-coordinates of the data points.
+    :param Y: Array-like, the y-coordinates of the data points.
+    :param x: Array-like, the x-coordinates where interpolation is desired.
+    :return: Array-like, the interpolated y-coordinates.
+    """
     spl = PchipInterpolator(X, Y)
     return spl(x)
-
-
-if __name__ == '__main__':
-    from matplotlib import pyplot as plt
-
-    x = np.array([1, 3, 5])
-    y = np.array([2, 3, 5])
-    T = np.linspace(1, 5, 100)
-
-    t, q = cubic_spline_3pts(x, y, T)
-
-    plt.figure(figsize=(8, 6))
-    plt.plot(x, y, 'o', label='Data Points')
-    plt.plot(t, q, label='Cubic Spline Interpolation')
-    plt.title('Cubic Spline Interpolation for 3 Points')
-    plt.xlabel('x')
-    plt.ylabel('y')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
