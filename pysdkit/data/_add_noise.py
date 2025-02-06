@@ -27,7 +27,7 @@ def add_noise(N: int, Mean: float, STD: float) -> np.ndarray:
     return y
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     N = 1000
     Mean = 0
     STD = 1

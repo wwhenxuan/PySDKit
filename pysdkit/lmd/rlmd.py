@@ -16,7 +16,9 @@ class RLMD(object):
     MATLAB Link: https://www.mathworks.com/matlabcentral/fileexchange/66935-robust-local-mean-decomposition-rlmd
     """
 
-    def __init__(self, ):
+    def __init__(
+        self,
+    ):
         pass
 
     def fit_transform(self, signal: np.ndarray):

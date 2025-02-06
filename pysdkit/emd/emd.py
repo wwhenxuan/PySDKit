@@ -35,11 +35,20 @@ class EMD(object):
     R code: https://rdrr.io/github/PierreMasselot/Library--emdr/f/README.md
     """
 
-    def __init__(self, spline_kind: str = "cubic", energy_ratio_thr: Optional[float] = 0.2, nbsym: int = 2,
-                 std_thr: Optional[float] = 0.2, svar_thr: Optional[float] = 0.001,
-                 total_power_thr: Optional[float] = 0.005,
-                 range_thr: Optional[float] = 0.001, extrema_detection: Optional[str] = "simple",
-                 max_imfs: Optional[int] = -1, max_iteration: int = 1000, **kwargs) -> None:
+    def __init__(
+        self,
+        spline_kind: str = "cubic",
+        energy_ratio_thr: Optional[float] = 0.2,
+        nbsym: int = 2,
+        std_thr: Optional[float] = 0.2,
+        svar_thr: Optional[float] = 0.001,
+        total_power_thr: Optional[float] = 0.005,
+        range_thr: Optional[float] = 0.001,
+        extrema_detection: Optional[str] = "simple",
+        max_imfs: Optional[int] = -1,
+        max_iteration: int = 1000,
+        **kwargs,
+    ) -> None:
         """
         Configuration, such as threshold values, can be passed as kwargs (keyword arguments).
         :param spline_kind: The specific interpolation algorithm used to construct the upper and lower envelope spectra, optional:
@@ -85,16 +94,21 @@ class EMD(object):
     def _check_length(signal: np.ndarray, time: Optional[np.ndarray] = None):
         """Check input timing and signal length are equal"""
         if time is not None and len(signal) != len(time):
-            raise ValueError(f"Signal have different size: len(signal)={len(signal)}, len(time)={len(time)}")
+            raise ValueError(
+                f"Signal have different size: len(signal)={len(signal)}, len(time)={len(time)}"
+            )
 
     @staticmethod
     def _check_shape(signal: np.ndarray, time: np.ndarray) -> None:
         """Check input timing and signal shape are equal"""
         if signal.shape != time.shape:
-            raise ValueError("Position or time array should be the same size as signal.")
+            raise ValueError(
+                "Position or time array should be the same size as signal."
+            )
 
-    def find_extrema(self, time: np.ndarray, signal: np.ndarray) -> Tuple[
-        np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def find_extrema(
+        self, time: np.ndarray, signal: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Returns extrema (minima and maxima) for given signal S.
         Detection and definition of the extrema depends on
@@ -112,10 +126,19 @@ class EMD(object):
             # use the simple extrema detection
             return find_extrema_simple(time=time, signal=signal)
         else:
-            raise ValueError("Incorrect extrema detection type. Please try: 'simple' or 'parabol'.")
+            raise ValueError(
+                "Incorrect extrema detection type. Please try: 'simple' or 'parabol'."
+            )
 
-    def prepare_points(self, time: np.ndarray, signal: np.ndarray,
-                       max_pos: np.ndarray, max_val: np.ndarray, min_pos: np.ndarray, min_val: np.ndarray):
+    def prepare_points(
+        self,
+        time: np.ndarray,
+        signal: np.ndarray,
+        max_pos: np.ndarray,
+        max_val: np.ndarray,
+        min_pos: np.ndarray,
+        min_val: np.ndarray,
+    ):
         """
         Further processing of the maximum and minimum points of the input signal makes the upper and lower envelope spectra smoother.
         :param time: position or time array of numpy
@@ -127,14 +150,28 @@ class EMD(object):
         :return: max_extrema and min_extrema for input signal in numpy ndarray
         """
         if self.extrema_detection == "parabol":
-            return prepare_points_parabol(time, signal, max_pos, max_val, min_pos, min_val, self.nbsym,
-                                          DTYPE=self.DTYPE)
+            return prepare_points_parabol(
+                time,
+                signal,
+                max_pos,
+                max_val,
+                min_pos,
+                min_val,
+                self.nbsym,
+                DTYPE=self.DTYPE,
+            )
         elif self.extrema_detection == "simple":
-            return prepare_points_simple(time, signal, max_pos, max_val, min_pos, min_val, self.nbsym)
+            return prepare_points_simple(
+                time, signal, max_pos, max_val, min_pos, min_val, self.nbsym
+            )
         else:
-            raise ValueError("Incorrect extrema detection type. Please try: 'simple' or 'parabol'.")
+            raise ValueError(
+                "Incorrect extrema detection type. Please try: 'simple' or 'parabol'."
+            )
 
-    def spline_points(self, time: np.ndarray, extrema: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def spline_points(
+        self, time: np.ndarray, extrema: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Constructs spline over given points.
         Generates spline curves using different interpolation methods (depending on the spline_kind parameter) for given extreme points.
@@ -170,13 +207,16 @@ class EMD(object):
 
         elif kind in ["slinear", "quadratic", "linear"]:
             # Simple linear interpolation
-            return time, interp1d(extrema[0], extrema[1], kind=kind)(t).astype(self.DTYPE)
+            return time, interp1d(extrema[0], extrema[1], kind=kind)(t).astype(
+                self.DTYPE
+            )
 
         else:
             raise ValueError("No such interpolation method!")
 
-    def extract_max_min_spline(self, time: np.ndarray, signal: np.ndarray
-                               ) -> list[int] | tuple[ndarray, ndarray, ndarray, ndarray]:
+    def extract_max_min_spline(
+        self, time: np.ndarray, signal: np.ndarray
+    ) -> list[int] | tuple[ndarray, ndarray, ndarray, ndarray]:
         """
         Extracts top and bottom envelopes based on the signal,
         which are constructed based on maxima and minima, respectively.
@@ -206,7 +246,9 @@ class EMD(object):
             return [-1] * 4
 
         # Extrapolation of signal (over boundaries)
-        max_extrema, min_extrema = self.prepare_points(time, signal, max_pos, max_val, min_pos, min_val)
+        max_extrema, min_extrema = self.prepare_points(
+            time, signal, max_pos, max_val, min_pos, min_val
+        )
 
         # The processed extreme points are interpolated using the spline_points method to construct the upper and lower envelopes.
         # These envelopes are used in the subsequent IMF extraction process, especially to calculate the difference between each IMF and the signal mean.
@@ -215,7 +257,13 @@ class EMD(object):
 
         return max_spline, min_spline, max_extrema, min_extrema
 
-    def check_imf(self, imf_new: np.ndarray, imf_old: np.ndarray, eMax: np.ndarray, eMin: np.ndarray) -> bool:
+    def check_imf(
+        self,
+        imf_new: np.ndarray,
+        imf_old: np.ndarray,
+        eMax: np.ndarray,
+        eMin: np.ndarray,
+    ) -> bool:
         """
         Evaluate if the current IMF (Intrinsic Mode Function) satisfies the end condition
         based on Huang's criteria, similar to the Cauchy convergence test.
@@ -237,7 +285,7 @@ class EMD(object):
             return False
 
         # Convergence check based on the energy of the new IMF
-        if np.sum(imf_new ** 2) < 1e-10:
+        if np.sum(imf_new**2) < 1e-10:
             return False
 
         # Precompute differences between the new and old IMF
@@ -295,7 +343,9 @@ class EMD(object):
         """
         if self.imfs is None or self.residue is None:
             # If the algorithm has not been executed yet, there is no result for this decomposition.
-            raise ValueError("No IMF found. Please, run `fit_transform` method or its variant first.")
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
         return self.imfs, self.residue
 
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -308,7 +358,9 @@ class EMD(object):
         """
         if self.imfs is None or self.residue is None:
             # There is no decomposition result for this storage yet
-            raise ValueError("No IMF found. Please, run `fit_transform` method or its variant first.")
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
 
         # Get the intrinsic mode function and residual respectively
         imfs, residue = self.get_imfs_and_residue()
@@ -317,7 +369,12 @@ class EMD(object):
         else:
             return imfs, residue
 
-    def fit_transform(self, signal: np.ndarray, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None) -> np.ndarray:
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = None,
+    ) -> np.ndarray:
 
         # Define the length of signal
         N = len(signal)
@@ -373,7 +430,9 @@ class EMD(object):
                 extNo = len(min_pos) + len(max_pos)
 
                 if extNo > 2:
-                    max_env, min_env, eMax, eMin = self.extract_max_min_spline(time, imf)
+                    max_env, min_env, eMax, eMin = self.extract_max_min_spline(
+                        time, imf
+                    )
                     mean[:] = 0.5 * (max_env + min_env)
 
                     imf_old = imf.copy()
@@ -390,7 +449,8 @@ class EMD(object):
                         max_pos, min_pos, ind_zer = (
                             tmp_residue[0],
                             tmp_residue[2],
-                            tmp_residue[4])
+                            tmp_residue[4],
+                        )
                         extNo = len(max_pos) + len(min_pos)
                         nzm = len(ind_zer)
 

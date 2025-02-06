@@ -45,17 +45,23 @@ def smallest_inclusive_dtype(ref_dtype: np.dtype, ref_value) -> np.dtype:
             if ref_value < np.iinfo(dtype).max:
                 return dtype
         max_val = np.iinfo(np.uint64).max
-        raise ValueError(f"Requested too large integer range. Exceeds max(uint64) == {max_val}.")
+        raise ValueError(
+            f"Requested too large integer range. Exceeds max(uint64) == {max_val}."
+        )
 
     elif np.issubdtype(ref_dtype, np.floating):
         for dtype in [np.float16, np.float32, np.float64]:
             if ref_value < np.finfo(dtype).max:
                 return dtype
         max_val = np.finfo(np.float64).max
-        raise ValueError(f"Requested too large float range. Exceeds max(float64) == {max_val}.")
+        raise ValueError(
+            f"Requested too large float range. Exceeds max(float64) == {max_val}."
+        )
 
     else:
-        raise ValueError(f"Unsupported dtype '{ref_dtype}'. Only intX and floatX are supported.")
+        raise ValueError(
+            f"Unsupported dtype '{ref_dtype}'. Only intX and floatX are supported."
+        )
 
 
 def normalize_signal(t: np.ndarray) -> np.ndarray:

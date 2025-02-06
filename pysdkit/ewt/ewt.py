@@ -25,14 +25,16 @@ class EWT(object):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/42141-empirical-wavelet-transforms
     """
 
-    def __init__(self,
-                 K: Optional[int] = 5,
-                 log: Optional[float] = 0,
-                 detect: Optional[str] = "locmax",
-                 completion: Optional[float] = 0,
-                 reg: Optional[str] = 'average',
-                 lengthFilter: Optional[float] = 10,
-                 sigmaFilter: Optional[float] = 5) -> None:
+    def __init__(
+        self,
+        K: Optional[int] = 5,
+        log: Optional[float] = 0,
+        detect: Optional[str] = "locmax",
+        completion: Optional[float] = 0,
+        reg: Optional[str] = "average",
+        lengthFilter: Optional[float] = 10,
+        sigmaFilter: Optional[float] = 5,
+    ) -> None:
         """
         :param K: Maximum number of modes (signal components) to detect and extract.
         :param log: Set to 0 or 1 to indicate whether to operate in the logarithmic spectrum.
@@ -50,13 +52,21 @@ class EWT(object):
         self.lengthFilter = lengthFilter
         self.sigmaFilter = sigmaFilter
 
-    def __call__(self, signal: np.ndarray, N: Optional[int] = None,
-                 return_all: Optional[bool] = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def __call__(
+        self,
+        signal: np.ndarray,
+        N: Optional[int] = None,
+        return_all: Optional[bool] = False,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, N=N, return_all=return_all)
 
-    def fit_transform(self, signal: np.ndarray, N: Optional[int] = None,
-                      return_all: Optional[bool] = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        N: Optional[int] = None,
+        return_all: Optional[bool] = False,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Perform Empirical Wavelet Transform on the input signal.
 
@@ -73,11 +83,20 @@ class EWT(object):
         N = self.K if N is None else N
         # Compute the one-sided magnitude of the signal's Fourier transform
         signal_ff = np.fft.fft(signal)
-        signal_ff = abs(signal_ff[0:int(np.ceil(signal_ff.size / 2))])  # one-sided magnitude
+        signal_ff = abs(
+            signal_ff[0 : int(np.ceil(signal_ff.size / 2))]
+        )  # one-sided magnitude
 
         # Detect boundaries in the Fourier domain
-        boundaries = EWT_Boundaries_Detect(signal_ff, self.log, self.detect, N, self.reg,
-                                           self.lengthFilter, self.sigmaFilter)
+        boundaries = EWT_Boundaries_Detect(
+            signal_ff,
+            self.log,
+            self.detect,
+            N,
+            self.reg,
+            self.lengthFilter,
+            self.sigmaFilter,
+        )
         boundaries = boundaries * np.pi / round(signal_ff.size)
 
         # If fewer boundaries are detected, complete to reach K-1 if completion is enabled
@@ -96,7 +115,7 @@ class EWT(object):
         ewt = np.zeros(mfb.shape)
         for k in range(mfb.shape[1]):
             ewt[:, k] = np.real(np.fft.ifft(np.conjugate(mfb[:, k]) * ffMirr))
-        ewt = ewt[ltemp - 1:-ltemp, :].T
+        ewt = ewt[ltemp - 1 : -ltemp, :].T
 
         # Return the requested data
         if return_all is True:
@@ -105,14 +124,17 @@ class EWT(object):
             return ewt
 
 
-def ewt(signal, K: Optional[int] = 5,
-        log: Optional[float] = 0,
-        detect: Optional[str] = "locmax",
-        completion: Optional[float] = 0,
-        reg: Optional[str] = 'average',
-        lengthFilter: Optional[float] = 10,
-        sigmaFilter: Optional[float] = 5,
-        return_all: Optional[bool] = False):
+def ewt(
+    signal,
+    K: Optional[int] = 5,
+    log: Optional[float] = 0,
+    detect: Optional[str] = "locmax",
+    completion: Optional[float] = 0,
+    reg: Optional[str] = "average",
+    lengthFilter: Optional[float] = 10,
+    sigmaFilter: Optional[float] = 5,
+    return_all: Optional[bool] = False,
+):
     """
     Empirical Wavelet Transform with Function Interface.
     :param signal: The input signal to be decomposed.
@@ -133,10 +155,12 @@ def ewt(signal, K: Optional[int] = 5,
     """
     # Compute the one-sided magnitude of the signal's Fourier transform
     ff = np.fft.fft(signal)
-    ff = abs(ff[0:int(np.ceil(ff.size / 2))])  # one-sided magnitude
+    ff = abs(ff[0 : int(np.ceil(ff.size / 2))])  # one-sided magnitude
 
     # Detect boundaries in the Fourier domain
-    boundaries = EWT_Boundaries_Detect(ff, log, detect, K, reg, lengthFilter, sigmaFilter)
+    boundaries = EWT_Boundaries_Detect(
+        ff, log, detect, K, reg, lengthFilter, sigmaFilter
+    )
     boundaries = boundaries * np.pi / round(ff.size)
 
     # If fewer boundaries are detected, complete to reach K-1 if completion is enabled
@@ -155,7 +179,7 @@ def ewt(signal, K: Optional[int] = 5,
     ewt = np.zeros(mfb.shape)
     for k in range(mfb.shape[1]):
         ewt[:, k] = np.real(np.fft.ifft(np.conjugate(mfb[:, k]) * ffMirr))
-    ewt = ewt[ltemp - 1:-ltemp, :].T
+    ewt = ewt[ltemp - 1 : -ltemp, :].T
 
     # Return the requested data
     if return_all is True:
@@ -166,13 +190,20 @@ def ewt(signal, K: Optional[int] = 5,
 
 def fmirror(ts: np.ndarray, sym: int, end: int) -> np.ndarray:
     """Implements a signal mirroring expansion function."""
-    fMirr = np.append(np.flip(ts[0:sym - end], axis=0), ts)
-    fMirr = np.append(fMirr, np.flip(ts[-sym - end:-end], axis=0))
+    fMirr = np.append(np.flip(ts[0 : sym - end], axis=0), ts)
+    fMirr = np.append(fMirr, np.flip(ts[-sym - end : -end], axis=0))
     return fMirr
 
 
-def EWT_Boundaries_Detect(ff: np.ndarray, log: Optional[int], detect: Optional[str], N: int, reg: Optional[str],
-                          lengthFilter: Optional[float], sigmaFilter: Optional[float]) -> np.ndarray:
+def EWT_Boundaries_Detect(
+    ff: np.ndarray,
+    log: Optional[int],
+    detect: Optional[str],
+    N: int,
+    reg: Optional[str],
+    lengthFilter: Optional[float],
+    sigmaFilter: Optional[float],
+) -> np.ndarray:
     """
     Segments the input function `ff` into a certain number of supports (frequency bands)
     using different techniques for boundary detection and regularization.
@@ -208,14 +239,18 @@ def EWT_Boundaries_Detect(ff: np.ndarray, log: Optional[int], detect: Optional[s
         ff = np.log(ff)
 
     # Apply regularization if needed
-    if reg == 'average':
+    if reg == "average":
         regFilter = np.ones(lengthFilter) / lengthFilter
-        presig = np.convolve(ff, regFilter, mode='same')  # Averaging filter
+        presig = np.convolve(ff, regFilter, mode="same")  # Averaging filter
 
-    elif reg == 'gaussian':
+    elif reg == "gaussian":
         regFilter = np.zeros(lengthFilter)
-        regFilter[regFilter.size // 2] = 1  # Ensure center is set for Gaussian filtering
-        presig = np.convolve(ff, gaussian_filter(regFilter, sigmaFilter), mode='same')  # Gaussian filter
+        regFilter[regFilter.size // 2] = (
+            1  # Ensure center is set for Gaussian filtering
+        )
+        presig = np.convolve(
+            ff, gaussian_filter(regFilter, sigmaFilter), mode="same"
+        )  # Gaussian filter
     else:
         presig = ff  # No regularization applied
 
@@ -224,11 +259,14 @@ def EWT_Boundaries_Detect(ff: np.ndarray, log: Optional[int], detect: Optional[s
         boundaries = LocalMax(presig, N)  # Mid-point between consecutive local maxima
 
     elif detect == "locmaxmin":
-        boundaries = LocalMaxMin(presig, N)  # Lowest local minima between selected maxima
+        boundaries = LocalMaxMin(
+            presig, N
+        )  # Lowest local minima between selected maxima
 
     elif detect == "locmaxminf":
-        boundaries = LocalMaxMin(presig, N,
-                                 fm=ff)  # Minima on the original spectrum between maxima on regularized spectrum
+        boundaries = LocalMaxMin(
+            presig, N, fm=ff
+        )  # Minima on the original spectrum between maxima on regularized spectrum
 
     else:
         raise ValueError("Invalid detection method provided.")
@@ -334,8 +372,8 @@ def LocalMaxMin(f: np.ndarray, N: int, fm: Optional[int] = 0) -> np.ndarray:
                 a = Imax[i - 1]
 
             # Sort minima between the current and previous maxima
-            lmin = np.sort(locmin[a:Imax[i]])
-            ind = np.argsort(locmin[a:Imax[i]])
+            lmin = np.sort(locmin[a : Imax[i]])
+            ind = np.argsort(locmin[a : Imax[i]])
 
             # Find the true minimum
             tmpp = lmin[0]
@@ -421,19 +459,21 @@ def EWT_Meyer_FilterBank(boundaries: int, Nsig: int) -> np.ndarray:
 
     # EWT_Meyer_Scaling - Generate the scaling function
     Mi = int(np.floor(Nsig / 2))  # Half the signal length
-    w = np.fft.fftshift(np.linspace(0, 2 * np.pi - 2 * np.pi / Nsig, num=Nsig))  # Frequency grid
+    w = np.fft.fftshift(
+        np.linspace(0, 2 * np.pi - 2 * np.pi / Nsig, num=Nsig)
+    )  # Frequency grid
     w[0:Mi] = -2 * np.pi + w[0:Mi]  # Shift the negative frequencies
     aw = abs(w)  # Absolute frequency values
     yms = np.zeros(Nsig)  # Initialize the scaling function
-    an = 1. / (2 * gamma * boundaries[0])
-    pbn = (1. + gamma) * boundaries[0]
-    mbn = (1. - gamma) * boundaries[0]
+    an = 1.0 / (2 * gamma * boundaries[0])
+    pbn = (1.0 + gamma) * boundaries[0]
+    mbn = (1.0 - gamma) * boundaries[0]
 
     # Generate the scaling function based on the first boundary
     for k in range(Nsig):
         if aw[k] <= mbn:
             yms[k] = 1
-        elif ((aw[k] >= mbn) and (aw[k] <= pbn)):
+        elif (aw[k] >= mbn) and (aw[k] <= pbn):
             yms[k] = np.cos(np.pi * EWT_beta(an * (aw[k] - mbn)) / 2)
 
     yms = np.fft.ifftshift(yms)  # Shift the scaling function back
@@ -459,7 +499,7 @@ def EWT_beta(x: float) -> float:
     elif x > 1:
         bm = 1
     else:
-        bm = (x ** 4) * (35. - 84. * x + 70. * (x ** 2) - 20. * (x ** 3))
+        bm = (x**4) * (35.0 - 84.0 * x + 70.0 * (x**2) - 20.0 * (x**3))
     return bm
 
 
@@ -482,7 +522,9 @@ def EWT_Meyer_Wavelet(wn: float, wm: float, gamma: float, Nsig: int) -> np.ndarr
     """
     # Compute the frequency grid
     Mi = int(np.floor(Nsig / 2))  # Half the signal length
-    w = np.fft.fftshift(np.linspace(0, 2 * np.pi - 2 * np.pi / Nsig, num=Nsig))  # Frequency grid
+    w = np.fft.fftshift(
+        np.linspace(0, 2 * np.pi - 2 * np.pi / Nsig, num=Nsig)
+    )  # Frequency grid
     w[0:Mi] = -2 * np.pi + w[0:Mi]  # Shift the negative frequencies
     aw = abs(w)  # Absolute frequency values
 
@@ -490,12 +532,12 @@ def EWT_Meyer_Wavelet(wn: float, wm: float, gamma: float, Nsig: int) -> np.ndarr
     ymw = np.zeros(Nsig)
 
     # Parameters for the Meyer wavelet transitions
-    an = 1. / (2 * gamma * wn)
-    am = 1. / (2 * gamma * wm)
-    pbn = (1. + gamma) * wn
-    mbn = (1. - gamma) * wn
-    pbm = (1. + gamma) * wm
-    mbm = (1. - gamma) * wm
+    an = 1.0 / (2 * gamma * wn)
+    am = 1.0 / (2 * gamma * wm)
+    pbn = (1.0 + gamma) * wn
+    mbn = (1.0 - gamma) * wn
+    pbm = (1.0 + gamma) * wm
+    mbm = (1.0 - gamma) * wm
 
     # Construct the wavelet in the Fourier domain based on the segment boundaries
     for k in range(Nsig):

@@ -7,7 +7,11 @@ Created on 2024/7/22 22:56
 
 # A series of functions for generating 1D NumPy signals
 from ._generator import generate_sin_signal, generate_cos_signal
-from ._generator import generate_square_wave, generate_triangle_wave, generate_sawtooth_wave
+from ._generator import (
+    generate_square_wave,
+    generate_triangle_wave,
+    generate_sawtooth_wave,
+)
 from ._generator import generate_am_signal, generate_exponential_signal
 
 # Generates the main test sample signal

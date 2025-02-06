@@ -10,3 +10,5 @@ from .emd import EMD
 from .eemd import EEMD
 
 from .ceemdan import CEEMDAN
+
+from .memd import MEMD

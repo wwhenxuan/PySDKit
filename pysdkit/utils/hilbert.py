@@ -31,8 +31,11 @@ def hilbert_imaginary(signal: np.ndarray) -> np.ndarray:
     return np.imag(signal)
 
 
-def plot_hilbert(signal: np.ndarray, analytical_signal: Optional[np.ndarray] = None,
-                 return_figure: bool = False) -> Optional[plt.figure]:
+def plot_hilbert(
+    signal: np.ndarray,
+    analytical_signal: Optional[np.ndarray] = None,
+    return_figure: bool = False,
+) -> Optional[plt.figure]:
     """
     Plot the Hilbert transform of a signal
     :param signal: Original NumPy signal.
@@ -51,22 +54,24 @@ def plot_hilbert(signal: np.ndarray, analytical_signal: Optional[np.ndarray] = N
     fig, axes = plt.subplots(2, 1, figsize=(13, 6))
 
     # plot original signal
-    axes[0].plot(signal, color='k')
+    axes[0].plot(signal, color="k")
     axes[0].set_title("Original Signal")
-    axes[0].grid(which='major', color='gray', linestyle='--', lw=0.5, alpha=0.8)
+    axes[0].grid(which="major", color="gray", linestyle="--", lw=0.5, alpha=0.8)
 
     # plot real and imaginary parts of hilbert transform
-    axes[1].plot(real_part, label='Real Part')
-    axes[1].plot(imaginary_part, label='Imaginary Part')
+    axes[1].plot(real_part, label="Real Part")
+    axes[1].plot(imaginary_part, label="Imaginary Part")
     axes[1].set_title("Hilbert Transform")
-    axes[1].grid(which='major', color='gray', linestyle='--', lw=0.5, alpha=0.8)
+    axes[1].grid(which="major", color="gray", linestyle="--", lw=0.5, alpha=0.8)
     axes[1].legend()
 
     if return_figure is True:
         return fig
 
 
-def plot_hilbert_complex_plane(analytical_signal: np.ndarray, return_figure: bool = False) -> plt.figure:
+def plot_hilbert_complex_plane(
+    analytical_signal: np.ndarray, return_figure: bool = False
+) -> plt.figure:
     """
     Plot the Hilbert transform of a signal on the complex plane.
     :param analytical_signal: NumPy array containing the analytical signal (Hilbert transform of the original).
@@ -80,22 +85,27 @@ def plot_hilbert_complex_plane(analytical_signal: np.ndarray, return_figure: boo
     # Plotting on the complex plane
     fig, ax = plt.subplots(figsize=(10, 6))
     plt.figure(figsize=(10, 6))
-    ax.plot(real_part, imaginary_part, 'royalblue', label='Analytical Signal (Hilbert Transform)')
+    ax.plot(
+        real_part,
+        imaginary_part,
+        "royalblue",
+        label="Analytical Signal (Hilbert Transform)",
+    )
     # Mark some points to see the trend
-    ax.scatter(real_part[::50], imaginary_part[::50], color='tomato')
-    ax.set_title('Hilbert Transform on the Complex Plane')
-    ax.set_xlabel('Real Part')
-    ax.set_ylabel('Imaginary Part')
-    ax.grid(which='major', color='gray', linestyle='--', lw=0.5, alpha=0.8)
+    ax.scatter(real_part[::50], imaginary_part[::50], color="tomato")
+    ax.set_title("Hilbert Transform on the Complex Plane")
+    ax.set_xlabel("Real Part")
+    ax.set_ylabel("Imaginary Part")
+    ax.grid(which="major", color="gray", linestyle="--", lw=0.5, alpha=0.8)
     # Ensure the scale of both axes is the same
-    ax.axis('equal')
+    ax.axis("equal")
     ax.legend()
 
     if return_figure is True:
         return fig
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """Demo"""
     # 1 second duration, 500 samples
     t = np.linspace(0, 1, 500, endpoint=False)

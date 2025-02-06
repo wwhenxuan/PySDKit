@@ -13,8 +13,12 @@ from matplotlib import pyplot as plt
 from typing import Optional, Tuple
 
 
-def plot_grayscale(img: np.ndarray, figsize: Optional[Tuple] = (5, 5), dpi: Optional[int] = 100,
-                   cmap: Optional[str] = "gray") -> Tuple[plt.Figure, plt.Axes]:
+def plot_grayscale(
+    img: np.ndarray,
+    figsize: Optional[Tuple] = (5, 5),
+    dpi: Optional[int] = 100,
+    cmap: Optional[str] = "gray",
+) -> Tuple[plt.Figure, plt.Axes]:
     """
     对二维灰度图像数据进行可视化
     :param img: 输入的numpy中的二维ndarray矩阵
@@ -26,12 +30,16 @@ def plot_grayscale(img: np.ndarray, figsize: Optional[Tuple] = (5, 5), dpi: Opti
     # 创建绘图对象
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.imshow(img, cmap=cmap)  # 可视化图像
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     return fig, ax
 
 
-def plot_grayscale_spectrum(img: np.ndarray, figsize: Optional[Tuple] = (5, 5), dpi: Optional[int] = 100,
-                            cmap: Optional[str] = "gray") -> Tuple[plt.Figure, plt.Axes]:
+def plot_grayscale_spectrum(
+    img: np.ndarray,
+    figsize: Optional[Tuple] = (5, 5),
+    dpi: Optional[int] = 100,
+    cmap: Optional[str] = "gray",
+) -> Tuple[plt.Figure, plt.Axes]:
     """
     绘制二维灰度图像的频谱分布
     :param img: 输入的numpy中的二维ndarray矩阵
@@ -45,5 +53,5 @@ def plot_grayscale_spectrum(img: np.ndarray, figsize: Optional[Tuple] = (5, 5), 
     # 对输入图像进行二维快速傅里叶变换
     spectrum = np.abs(fft.fftshift(fft.fft2(img)))  # 获得功率谱
     ax.imshow(spectrum, cmap=cmap)  # 可视化图像
-    ax.set_aspect('equal')
+    ax.set_aspect("equal")
     return fig, ax

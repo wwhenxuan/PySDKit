@@ -19,9 +19,16 @@ class LMD(object):
     MATLAB Link: https://www.mathworks.com/matlabcentral/fileexchange/107829-local-mean-decomposition?s_tid=srchtitle
     """
 
-    def __init__(self, K: int = 5, endpoints: bool = True, max_smooth_iter: int = 15, max_envelope_iter: int = 200,
-                 envelope_epsilon: float = 0.01, convergence_epsilon: float = 0.01,
-                 min_extrema: int = 5) -> None:
+    def __init__(
+        self,
+        K: int = 5,
+        endpoints: bool = True,
+        max_smooth_iter: int = 15,
+        max_envelope_iter: int = 200,
+        envelope_epsilon: float = 0.01,
+        convergence_epsilon: float = 0.01,
+        min_extrema: int = 5,
+    ) -> None:
         """
         :param K: the maximum number of IFMs to be decomposed
         :param endpoints: whether to treat the endpoint of the signal as a pseudo-extreme point
@@ -51,7 +58,9 @@ class LMD(object):
             return True  # 调试错误
         else:
             # 返回是否单调的测试
-            return self.is_monotonous_increase(signal) or self.is_monotonous_decrease(signal)
+            return self.is_monotonous_increase(signal) or self.is_monotonous_decrease(
+                signal
+            )
 
     @staticmethod
     def is_monotonous_increase(signal: np.ndarray) -> bool:
@@ -81,7 +90,9 @@ class LMD(object):
         n = len(signal)
 
         # 通过scipy的argrelextrema方法确定输入序列中的极值点
-        extrema = np.append(argrelextrema(signal, np.greater)[0], argrelextrema(signal, np.less)[0])
+        extrema = np.append(
+            argrelextrema(signal, np.greater)[0], argrelextrema(signal, np.less)[0]
+        )
         extrema.sort()  # 对极值点进行排序
         if self.endpoints:
             # 是否要将输入信号的两个端点看作极值点
@@ -109,7 +120,7 @@ class LMD(object):
 
         # 初始化滑动平均分解的参数
         weight = np.array(list(range(1, half + 2)) + list(range(half, 0, -1)))
-        assert (len(weight) == window)  # 确保参数长度为窗口的大小
+        assert len(weight) == window  # 确保参数长度为窗口的大小
 
         smoothed = signal
         # 开始迭代
@@ -119,18 +130,31 @@ class LMD(object):
             w_num = half
             for i in range(half):
                 # 分别处理头部和尾部
-                head.append(np.array([smoothed[j] for j in range(i - (half - w_num), i + half + 1)]))
-                tail.append(np.flip([smoothed[-(j + 1)] for j in range(i - (half - w_num), i + half + 1)]))
+                head.append(
+                    np.array(
+                        [smoothed[j] for j in range(i - (half - w_num), i + half + 1)]
+                    )
+                )
+                tail.append(
+                    np.flip(
+                        [
+                            smoothed[-(j + 1)]
+                            for j in range(i - (half - w_num), i + half + 1)
+                        ]
+                    )
+                )
                 w_num -= 1
 
             # 通过卷积运算实现平滑
-            smoothed = np.convolve(smoothed, weight, mode='same')
-            smoothed[half: - half] = smoothed[half: - half] / sum(weight)
+            smoothed = np.convolve(smoothed, weight, mode="same")
+            smoothed[half:-half] = smoothed[half:-half] / sum(weight)
 
             w_num = half
             for i in range(half):
                 smoothed[i] = sum(head[i] * weight[w_num:]) / sum(weight[w_num:])
-                smoothed[-(i + 1)] = sum(tail[i] * weight[: - w_num]) / sum(weight[: - w_num])
+                smoothed[-(i + 1)] = sum(tail[i] * weight[:-w_num]) / sum(
+                    weight[:-w_num]
+                )
                 w_num -= 1
             if self.is_smooth(smoothed, n):
                 # 当信号已经处理到平滑状态则停止迭代
@@ -150,7 +174,7 @@ class LMD(object):
         """Calculate the local mean function and local envelope function according to the location of the extreme points"""
         n = len(signal)
         k = len(extrema)
-        assert (1 < k <= n)
+        assert 1 < k <= n
         # construct square signal
         mean = []
         enve = []
@@ -173,8 +197,12 @@ class LMD(object):
                 enve.append(prev_enve)
         # smooth square signal
         window = max(np.diff(extrema)) // 3
-        return np.array(mean), self.moving_average_smooth(mean, window), \
-            np.array(enve), self.moving_average_smooth(enve, window)
+        return (
+            np.array(mean),
+            self.moving_average_smooth(mean, window),
+            np.array(enve),
+            self.moving_average_smooth(enve, window),
+        )
 
     def extract_product_function(self, signal: np.ndarray) -> np.ndarray:
         """执行一次局部均值分解算法"""

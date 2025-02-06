@@ -63,8 +63,16 @@ class Base(object):
         at both the start and the end of each channel. The output is twice the original length of 'T'
         to accommodate the mirrored sections at both ends along with the original time series.
         """
-        fMirr = np.zeros(shape=(C, 2 * T))  # Initialize the output array with zeros of shape (C, 2 * T)
-        fMirr[:, 0: T // 2] = np.flip(ts[:, 0: T // 2], axis=1)  # Mirror the first T//2 elements at the beginning
-        fMirr[:, T // 2: 3 * T // 2] = ts  # Include the original time series in the middle
-        fMirr[:, 3 * T // 2: 2 * T] = np.flip(ts[:, T // 2:], axis=1)  # Mirror the last T//2 elements at the end
+        fMirr = np.zeros(
+            shape=(C, 2 * T)
+        )  # Initialize the output array with zeros of shape (C, 2 * T)
+        fMirr[:, 0 : T // 2] = np.flip(
+            ts[:, 0 : T // 2], axis=1
+        )  # Mirror the first T//2 elements at the beginning
+        fMirr[:, T // 2 : 3 * T // 2] = (
+            ts  # Include the original time series in the middle
+        )
+        fMirr[:, 3 * T // 2 : 2 * T] = np.flip(
+            ts[:, T // 2 :], axis=1
+        )  # Mirror the last T//2 elements at the end
         return fMirr

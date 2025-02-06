@@ -1,21 +1,26 @@
-# PySDKit: signal decomposition in Python 
+# PySDKit: signal decomposition in Python
 
 <div align="center">
 
 [![PyPI version](https://badge.fury.io/py/PySDKit.svg)](https://pypi.org/project/PySDKit/) 
 ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit)
-[![codecov](https://codecov.io/gh/wwhenxuan/PySDKit/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/wwhenxuan/PySDKit)
-[![arXiv](https://img.shields.io/badge/arXiv-1234.56789-brightgreen.svg)](https://arxiv.org/abs/1234.56789) 
+[![Python](https://img.shields.io/badge/python-3.8+-blue?logo=python)](https://www.python.org/)
 [![Downloads](https://pepy.tech/badge/pysdkit)](https://pepy.tech/project/pysdkit)
 ![Visits Badge](https://badges.pufler.dev/visits/ForestsKing/D3R)
+[![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A Python library for signal decomposition algorithms 🥳
+
+[Installation](#installation--a-idinstallationa) |
+[Example Script](#example-script--a-idexample-scripta) |
+[Target](#target--a-idtargeta) |
+[Acknowledgements](#acknowledgements--a-idacknowledgementsa)
 
 <img src="https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/Logo_sd.png" alt="Logo_sd" width="500"/>
 
 </div>
 
-## Installation 🚀
+## Installation 🚀 <a id="Installation"></a>
 
 You can install `PySDKit` through pip:
 
@@ -25,7 +30,7 @@ pip install pysdkit
 
 We only used [`NumPy`](https://numpy.org/), [`Scipy`](https://scipy.org/) and [`matplotlib`](https://matplotlib.org/) when developing the project.
 
-## Example script ✨
+## Example Script ✨ <a id="Example-Script"></a>
 
 This project integrates simple signal processing methods, signal decomposition and visualization, and builds a general interface similar to [`Scikit-learn`](https://scikit-learn.org/stable/). It is mainly divided into three steps:
 1. Import the signal decomposition method;
@@ -79,7 +84,7 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 
 ![frequency_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/frequency_example.jpg)
 
-## Target 🎯
+## Target 🎯 <a id="Target"></a>
 
 `PySDKit` is still under development. We are currently working on reproducing the signal decomposition algorithms in the table below, including not only common decomposition algorithms for `univariate signals` such as EMD and VMD, but also decomposition algorithms for `multivariate signals` such as MEMD and MVMD. We will also further reproduce the decomposition algorithms for `two-dimensional images` to make PySDKit not only suitable for signal processing, but also for image analysis and understanding.
 
@@ -97,6 +102,7 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 | [`FAEMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/faemd/faemd.py) (Fast and Adaptive EMD) |   [[paper]](https://ieeexplore.ieee.org/document/8447300)    | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd) |   ✖️   |
 |     [`MV_FAEMD`]() (Multivariate Fast and Adaptive EMD)      |   [[paper]](https://ieeexplore.ieee.org/document/8447300)    | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd) |   ✖️   |
 | [`MD_FAEMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/faemd/md_faemd.py) (Multidimensional Fast and Adaptive EMD) |   [[paper]](https://ieeexplore.ieee.org/document/8447300)    | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd) |   ✖️   |
+|         [`HVD`]() (Hilbert Vibration Decomposition)          | [[paper]](https://www.sciencedirect.com/science/article/pii/S0022460X06001556) | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/178804-hilbert-vibration-decomposition?s_tid=FX_rc1_behav) |   ✔️   |
 | [`ITD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/itd/itd.py) (Intrinsic Time-Scale Decomposition) | [[paper]](https://royalsocietypublishing.org/doi/10.1098/rspa.2006.1761) | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/69380-intrinsic-time-scale-decomposition-itd) |   ✔️   |
 | [`LMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/lmd/lmd.py) (Local Mean Decomposition) | [[paper]](https://www.sciencedirect.com/science/article/abs/pii/S1051200418308133?via%3Dihub) | [[code]](https://github.com/shownlin/PyLMD/blob/master/PyLMD/LMD.py) |   ✔️   |
 | [`RLMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/lmd/rlmd.py) (Robust Local Mean Decomposition) | [[paper]](https://www.sciencedirect.com/science/article/abs/pii/S0888327017301619) | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/66935-robust-local-mean-decomposition-rlmd) |   ✖️   |
@@ -116,6 +122,6 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 | [`MJMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/jmd/mjmd.py) (Multivariate Jump Plus AM-FM Mode Decomposition) |         [[paper]](https://arxiv.org/abs/2407.07800)          | [[code]](https://ms-intl.mathworks.com/matlabcentral/fileexchange/169393-multivariate-jump-plus-am-fm-mode-decomposition-mjmd?s_tid=FX_rc2_behav) |   ✖️   |
 |   [`ESMD`]() (Extreme-Point Symmetric Mode Decomposition)    |          [[paper]](https://arxiv.org/abs/1303.6540)          |         [[code]](https://github.com/WuShichao/esmd)          |   ✖️   |
 
-## Acknowledgements 🎖️
+## Acknowledgements 🎖️ <a id="Acknowledgements"></a>
 
 We would like to thank the researchers in signal processing for providing us with valuable algorithms and promoting the continuous progress in this field. However, since the main programming language used in `signal processing` is `Matlab`, and `Python` is the main battlefield of `machine learning` and `deep learning`, the usage of signal decomposition in machine learning and deep learning is far less extensive than `wavelet transformation`. In order to further promote the organic combination of signal decomposition and machine learning, we developed `PySDKit`. We would like to express our gratitude to [PyEMD](https://github.com/laszukdawid/PyEMD), [vmdpy](https://github.com/vrcarva/vmdpy),  [MEMD-Python-](https://github.com/mariogrune/MEMD-Python-),  [ewtpy](https://github.com/vrcarva/ewtpy), [EWT-Python](https://github.com/bhurat/EWT-Python), [PyLMD](https://github.com/shownlin/PyLMD), [pywt](https://github.com/PyWavelets/pywt), [SP_Lib](https://github.com/hustcxl/SP_Lib)and [dsatools](https://github.com/MVRonkin/dsatools).

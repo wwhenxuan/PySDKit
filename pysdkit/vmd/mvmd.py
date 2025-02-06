@@ -18,8 +18,16 @@ class MVMD(Base):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/72814-multivariate-variational-mode-decomposition-mvmd
     """
 
-    def __init__(self, alpha: float, K: int, tau: float, init: str = "zero", DC: bool = False,
-                 tol: float = 1e-7, max_iter: int = 100) -> None:
+    def __init__(
+        self,
+        alpha: float,
+        K: int,
+        tau: float,
+        init: str = "zero",
+        DC: bool = False,
+        tol: float = 1e-7,
+        max_iter: int = 100,
+    ) -> None:
         """
         Multivariate Variational Mode Decomposition (MVMD) algorithm.
         :param alpha: float
@@ -59,7 +67,9 @@ class MVMD(Base):
         self.max_iter = max_iter
         self.DTYPE = np.complex64
 
-    def __call__(self, signal: np.ndarray, return_all: bool = False) -> Optional[np.ndarray]:
+    def __call__(
+        self, signal: np.ndarray, return_all: bool = False
+    ) -> Optional[np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -70,8 +80,10 @@ class MVMD(Base):
             for i in range(1, self.K + 1):
                 omega_plus[0, i - 1] = (0.5 / self.K) * (i - 1)
         elif self.init == "random":
-            omega_plus[0, :] = np.sort(np.exp(np.log(fs)) +
-                                       (np.log(0.5) - np.log(fs)) * np.random.rand(1, self.K))
+            omega_plus[0, :] = np.sort(
+                np.exp(np.log(fs))
+                + (np.log(0.5) - np.log(fs)) * np.random.rand(1, self.K)
+            )
         else:
             omega_plus[0, :] = 0
         # Processing the DC component of the signal
@@ -79,8 +91,9 @@ class MVMD(Base):
             omega_plus[0, 0] = 0
         return omega_plus
 
-    def fit_transform(self, signal: np.ndarray,
-                      return_all: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def fit_transform(
+        self, signal: np.ndarray, return_all: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Multivariate signal decomposition using MVMD algorithm
         :param signal: the time domain signal (ndarray) to be decomposed
@@ -112,10 +125,12 @@ class MVMD(Base):
         # Construct and center f_hat
         f_hat = self.fftshift(ts=self.fft(ts=fMirr))
         f_hat_plus = f_hat
-        f_hat_plus[:, 0: int(T / 2)] = 0
+        f_hat_plus[:, 0 : int(T / 2)] = 0
 
         # matrix keeping track of every iterant // could be discarded for mem
-        u_hat_plus = np.zeros(shape=(self.max_iter, len(freqs), self.K, C), dtype=self.DTYPE)
+        u_hat_plus = np.zeros(
+            shape=(self.max_iter, len(freqs), self.K, C), dtype=self.DTYPE
+        )
 
         omega_plus = self.__init_omega(fs=fs)
 
@@ -133,38 +148,53 @@ class MVMD(Base):
         while uDiff > self.tol and n < self.max_iter - 1:
             # update first mode accumulator
             k = 1
-            sum_uk = u_hat_plus[n - 1, :, self.K - 1, :] + sum_uk - u_hat_plus[n - 1, :, 0, :]
+            sum_uk = (
+                u_hat_plus[n - 1, :, self.K - 1, :]
+                + sum_uk
+                - u_hat_plus[n - 1, :, 0, :]
+            )
 
             # update spectrum of first mode through Wiener filter of residuals
             for c in range(C):
-                u_hat_plus[n, :, k - 1, c] = (f_hat_plus[c, :] - sum_uk[:, c] - lambda_hat[n - 1, :, c] / 2) \
-                                             / (1 + Alpha[k - 1] * np.square(freqs - omega_plus[n - 1, k - 1]))
+                u_hat_plus[n, :, k - 1, c] = (
+                    f_hat_plus[c, :] - sum_uk[:, c] - lambda_hat[n - 1, :, c] / 2
+                ) / (1 + Alpha[k - 1] * np.square(freqs - omega_plus[n - 1, k - 1]))
 
             # update first omega if not held at 0
             if self.DC is False:
-                omega_plus[n, k - 1] = np.sum(np.matmul(np.expand_dims(freqs[T // 2: T], axis=0),
-                                                        np.square(np.abs(u_hat_plus[n, T // 2: T, k - 1, :])))) \
-                                       / np.sum(np.square(np.abs(u_hat_plus[n, T // 2: T, k - 1, :])))
+                omega_plus[n, k - 1] = np.sum(
+                    np.matmul(
+                        np.expand_dims(freqs[T // 2 : T], axis=0),
+                        np.square(np.abs(u_hat_plus[n, T // 2 : T, k - 1, :])),
+                    )
+                ) / np.sum(np.square(np.abs(u_hat_plus[n, T // 2 : T, k - 1, :])))
 
             for k in range(2, self.K + 1):
 
                 # update mode accumulator
                 print(n)
-                sum_uk = u_hat_plus[n, :, k - 2, :] + sum_uk - u_hat_plus[n - 1, :, k - 1, :]
+                sum_uk = (
+                    u_hat_plus[n, :, k - 2, :] + sum_uk - u_hat_plus[n - 1, :, k - 1, :]
+                )
 
                 # update mode spectrum
                 for c in range(C):
-                    u_hat_plus[n, :, k - 1, c] = (f_hat_plus[c, :] - sum_uk[:, c] -
-                                                  lambda_hat[n - 1, :, c] / 2) \
-                                                 / (1 + Alpha[k - 1] * np.square(freqs - omega_plus[n - 1, k - 1]))
+                    u_hat_plus[n, :, k - 1, c] = (
+                        f_hat_plus[c, :] - sum_uk[:, c] - lambda_hat[n - 1, :, c] / 2
+                    ) / (1 + Alpha[k - 1] * np.square(freqs - omega_plus[n - 1, k - 1]))
 
                 # center frequencies
-                omega_plus[n, k - 1] = np.sum(np.matmul(np.expand_dims(freqs[T // 2: T], axis=0),
-                                                        np.square(np.abs(u_hat_plus[n, T // 2: T, k - 1, :])))) \
-                                       / np.sum(np.square(np.abs(u_hat_plus[n, T // 2: T, k - 1, :])))
+                omega_plus[n, k - 1] = np.sum(
+                    np.matmul(
+                        np.expand_dims(freqs[T // 2 : T], axis=0),
+                        np.square(np.abs(u_hat_plus[n, T // 2 : T, k - 1, :])),
+                    )
+                ) / np.sum(np.square(np.abs(u_hat_plus[n, T // 2 : T, k - 1, :])))
 
             # Dual ascent
-            lambda_hat[n, :, :] = lambda_hat[n - 1, :, :] + self.tau * np.sum(u_hat_plus[n, :, :, :], axis=1)
+            lambda_hat[n, :, :] = lambda_hat[n - 1, :, :] + self.tau * np.sum(
+                u_hat_plus[n, :, :, :], axis=1
+            )
 
             # loop counter
             n = n + 1
@@ -174,21 +204,25 @@ class MVMD(Base):
             for i in range(1, self.K + 1):
                 uDiff = uDiff + 1 / float(T) * np.dot(
                     u_hat_plus[n - 1, :, i - 1, :] - u_hat_plus[n - 2, :, i - 1, :],
-                    np.conj(u_hat_plus[n - 1, :, i - 1, :] - u_hat_plus[n - 2, :, i - 1, :]).T
+                    np.conj(
+                        u_hat_plus[n - 1, :, i - 1, :] - u_hat_plus[n - 2, :, i - 1, :]
+                    ).T,
                 )
 
             uDiff = np.sum(np.abs(uDiff))
 
         N = min(n, self.max_iter)
-        omega = omega_plus[0: N, :]
+        omega = omega_plus[0:N, :]
 
         # Signal reconstruction
         u_hat = np.zeros(shape=(T, self.K, C), dtype=self.DTYPE)
         for c in range(C):
-            u_hat[T // 2: T, :, c] = np.squeeze(u_hat_plus[N - 1, T // 2: T, :, c])
+            u_hat[T // 2 : T, :, c] = np.squeeze(u_hat_plus[N - 1, T // 2 : T, :, c])
             second_index = list(range(1, T // 2 + 1))
             second_index.reverse()
-            u_hat[second_index, :, c] = np.squeeze(np.conj(u_hat_plus[N - 1, T // 2:T, :, c]))
+            u_hat[second_index, :, c] = np.squeeze(
+                np.conj(u_hat_plus[N - 1, T // 2 : T, :, c])
+            )
             u_hat[0, :, c] = np.conj(u_hat[-1, :, c])
 
         u = np.zeros(shape=(self.K, len(t), C), dtype=self.DTYPE)
@@ -198,14 +232,16 @@ class MVMD(Base):
                 u[k - 1, :, c] = (self.ifft(self.ifftshift(u_hat[:, k - 1, c]))).real
 
         # remove mirror part
-        u = u[:, T // 4: 3 * T // 4, :]
+        u = u[:, T // 4 : 3 * T // 4, :]
 
         # recompute spectrum
         u_hat = np.zeros(shape=(T // 2, self.K, C), dtype=self.DTYPE)
 
         for k in range(1, self.K + 1):
             for c in range(C):
-                u_hat[:, k - 1, c] = self.fftshift(ts=self.fft(ts=u[k - 1, :, c])).conj()
+                u_hat[:, k - 1, c] = self.fftshift(
+                    ts=self.fft(ts=u[k - 1, :, c])
+                ).conj()
 
         # ifftshift
         u = np.fft.ifftshift(u, axes=-1)

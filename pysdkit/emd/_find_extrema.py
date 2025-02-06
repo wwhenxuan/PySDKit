@@ -37,11 +37,18 @@ def find_extrema_parabol(time: np.ndarray, signal: np.ndarray) -> FindExtremaOut
     Tp, T0, Tn = time[:-2], time[1:-1], time[2:]
     Sp, S0, Sn = signal[:-2], signal[1:-1], signal[2:]
     TnTp, T0Tn, TpT0 = Tn - Tp, T0 - Tn, Tp - T0
-    scale = Tp * Tn * Tn + Tp * Tp * T0 + T0 * T0 * Tn - Tp * Tp * Tn - Tp * T0 * T0 - T0 * Tn * Tn
+    scale = (
+        Tp * Tn * Tn
+        + Tp * Tp * T0
+        + T0 * T0 * Tn
+        - Tp * Tp * Tn
+        - Tp * T0 * T0
+        - T0 * Tn * Tn
+    )
 
     # Compute coefficients of the parabola: y = ax^2 + bx + c
     a = T0Tn * Sp + TnTp * S0 + TpT0 * Sn
-    b = (S0 - Sn) * Tp ** 2 + (Sn - Sp) * T0 ** 2 + (Sp - S0) * Tn ** 2
+    b = (S0 - Sn) * Tp**2 + (Sn - Sp) * T0**2 + (Sp - S0) * Tn**2
     c = T0 * Tn * T0Tn * Sp + Tn * Tp * TnTp * S0 + Tp * T0 * TpT0 * Sn
 
     # Scale and adjust coefficients, and calculate vertex of parabola

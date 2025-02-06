@@ -30,7 +30,7 @@ class ITD(object):
         if counter > self.N_max:
             return True
 
-        Exx = np.sum(x ** 2)
+        Exx = np.sum(x**2)
         if Exx <= 0.01 * E_x:
             return True
 
@@ -79,8 +79,12 @@ class ITD(object):
 
         # Compute the LK points
         # 创建插值函数对象，使用线性插值
-        Max_line_interp = interp1d(idx_max, val_max, kind='linear', fill_value="extrapolate")
-        Min_line_interp = interp1d(idx_min, val_min, kind='linear', fill_value="extrapolate")
+        Max_line_interp = interp1d(
+            idx_max, val_max, kind="linear", fill_value="extrapolate"
+        )
+        Min_line_interp = interp1d(
+            idx_min, val_min, kind="linear", fill_value="extrapolate"
+        )
 
         # 计算插值点的值
         Max_line = Max_line_interp(t)
@@ -106,7 +110,9 @@ class ITD(object):
         L = np.zeros(length)
         for i in range(0, len(idx_Xk) - 1):
             for j in range(idx_Xk[i], idx_Xk[i + 1]):
-                kij = (LK[i + 1, 1] - LK[i, 1]) / (x[idx_Xk[i + 1]] - x[idx_Xk[i]])  # compute the slope K
+                kij = (LK[i + 1, 1] - LK[i, 1]) / (
+                    x[idx_Xk[i + 1]] - x[idx_Xk[i]]
+                )  # compute the slope K
                 L[j] = LK[i, 1] + kij * (x[j] - x[idx_Xk[i]])
 
         H = x - L
@@ -116,7 +122,7 @@ class ITD(object):
     def fit_transform(self, x: np.ndarray) -> np.ndarray:
         """Input x is a 1D numpy signal and return the decomposition results."""
         H = []
-        E_x = np.sum(x ** 2)
+        E_x = np.sum(x**2)
         counter = 0
 
         while True:
@@ -134,13 +140,13 @@ class ITD(object):
         return H
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     fs = 1000
     N = 3000
     t = np.arange(0, N) / fs
-    x1 = (2 + np.cos(2 * np.pi * 0.5 * t)) * np.cos(2 * np.pi * 5 * t + 15 * t ** 2)
+    x1 = (2 + np.cos(2 * np.pi * 0.5 * t)) * np.cos(2 * np.pi * 5 * t + 15 * t**2)
     x2 = np.cos(2 * np.pi * 2 * t)
 
     signal = x1 + x2

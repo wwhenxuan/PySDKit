@@ -22,8 +22,15 @@ class ACMD(Base):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/69128-adaptive-chirp-mode-decomposition
     """
 
-    def __init__(self, K: int, fs: Optional[int] = None, alpha0: float = 1e-3, beta: float = 1e-4,
-                 tol: float = 1e-8, max_iter: int = 300) -> None:
+    def __init__(
+        self,
+        K: int,
+        fs: Optional[int] = None,
+        alpha0: float = 1e-3,
+        beta: float = 1e-4,
+        tol: float = 1e-8,
+        max_iter: int = 300,
+    ) -> None:
         """
         :param K: the number of intrinsic mode functions obtained by decomposing the signal is also the number of decomposition rounds
         :param fs: sampling frequency of inputs signal.
@@ -45,7 +52,7 @@ class ACMD(Base):
     def init_IF1(signal: np.ndarray, SampFreq: int, N: int):
         """Initial instantaneous frequency (IF) time series of a certain signal mode,a row vector"""
         Spec = 2 * np.abs(np.fft.fft(signal)) / N  # 计算信号的 FFT
-        Spec = Spec[:len(Spec) // 2 + 1]  # 取频谱的前半部分
+        Spec = Spec[: len(Spec) // 2 + 1]  # 取频谱的前半部分
         Freqbin = np.linspace(0, SampFreq / 2, len(Spec))  # 生成频率轴
         # Component 1 extraction
         findex1 = np.argmax(Spec)
@@ -70,12 +77,19 @@ class ACMD(Base):
             ybar[i - 1] = (y[i + 1] - y[i - 1]) / (2 * delta)
 
         # Prepend and append the boundary differences
-        ybar = np.concatenate((np.array([(y[1] - y[0]) / delta], dtype=dtype),
-                               ybar, np.array([(y[-1] - y[-2]) / delta], dtype=dtype)))
+        ybar = np.concatenate(
+            (
+                np.array([(y[1] - y[0]) / delta], dtype=dtype),
+                ybar,
+                np.array([(y[-1] - y[-2]) / delta], dtype=dtype),
+            )
+        )
 
         return ybar
 
-    def iter(self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def iter(
+        self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Perform an algorithm decomposition"""
         # Initialize
         e = np.ones(N)
@@ -135,8 +149,8 @@ class ACMD(Base):
             Kerdoubm = Kerm.T @ Kerm
 
             # Update demodulated signals
-            A = (1 / alpha * phidoubm + Kerdoubm)
-            B = (Kerm.T * signal)
+            A = 1 / alpha * phidoubm + Kerdoubm
+            B = Kerm.T * signal
             # Solve A * x = B
             ym = spsolve(A, B)  # the demodulated target signal
             si = Kerm * ym  # the signal component
@@ -144,19 +158,25 @@ class ACMD(Base):
             ysetiter[n, :] = ym
 
             # Update the IFs
-            ycm, ysm = (ym[:N].copy()).T, (ym[N:].copy()).T  # the demodulated target signal
+            ycm, ysm = (ym[:N].copy()).T, (
+                ym[N:].copy()
+            ).T  # the demodulated target signal
             # Compute the derivatives of the functions
             ycmbar, ysmbar = self.differ(ycm, 1 / fs), self.differ(ysm, 1 / fs)
             # Obtain the frequency increment by arctangent demodulation
-            deltaIF = (ycm * ysmbar - ysm * ycmbar) / (ycm ** 2 + ysm ** 2) / (2 * pi)
+            deltaIF = (ycm * ysmbar - ysm * ycmbar) / (ycm**2 + ysm**2) / (2 * pi)
             # Smooth the frequency increment by low-pass filtering
-            deltaIF = spsolve((1 / self.beta * opedoub + eye(N, format='csr')), deltaIF.T)
+            deltaIF = spsolve(
+                (1 / self.beta * opedoub + eye(N, format="csr")), deltaIF.T
+            )
             eIF = eIF - deltaIF  # update the IF
             IFsetiter[n, :] = eIF
 
             # Compute the convergence index
             if n > 0:
-                sDif = (norm(ssetiter[n, :] - ssetiter[n - 1]) / norm(ssetiter[n - 1, :])) ** 2
+                sDif = (
+                    norm(ssetiter[n, :] - ssetiter[n - 1]) / norm(ssetiter[n - 1, :])
+                ) ** 2
 
             n = n + 1
 
@@ -169,12 +189,13 @@ class ACMD(Base):
         ycm = ysetiter[n, :N]
         ysm = ysetiter[n, N:]
         # Estimated IA
-        IAest = (np.sqrt(ycm ** 2 + ysm ** 2))
+        IAest = np.sqrt(ycm**2 + ysm**2)
 
         return sest, IFest, IAest
 
-    def fit_transform(self, signal: np.ndarray, return_all: Optional[bool] = False
-                      ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    def fit_transform(
+        self, signal: np.ndarray, return_all: Optional[bool] = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """Start the ACMD algorithm"""
         # Initialize
         N = len(signal)  # K is the number of samples
@@ -185,7 +206,11 @@ class ACMD(Base):
         t = np.arange(0, N) / fs  # Time
 
         # Initialize arrays to store the results of each iteration
-        IMFs, IFests, IAests = np.zeros([self.K, N]), np.zeros([self.K, N]), np.zeros([self.K, N])
+        IMFs, IFests, IAests = (
+            np.zeros([self.K, N]),
+            np.zeros([self.K, N]),
+            np.zeros([self.K, N]),
+        )
 
         # Begin iterative decomposition
         for ii in range(self.K):
@@ -198,7 +223,9 @@ class ACMD(Base):
             IFests[ii, :] = IFest
             IAests[ii, :] = IAest
             # Use the residual from this decomposition as the input for the next iteration
-            signal = signal - sest  # obtain the residual signal by extracting the component from the raw signal
+            signal = (
+                signal - sest
+            )  # obtain the residual signal by extracting the component from the raw signal
 
         if return_all is True:
             return IMFs, IFests, IAests

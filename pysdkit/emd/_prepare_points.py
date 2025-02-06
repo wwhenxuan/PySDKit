@@ -10,9 +10,16 @@ import numpy as np
 from typing import Tuple, Optional
 
 
-def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, max_val: np.ndarray,
-                           min_pos: np.ndarray, min_val: np.ndarray, nbsym: int,
-                           DTYPE=np.float64) -> Tuple[np.ndarray, np.ndarray]:
+def prepare_points_parabol(
+    T: np.ndarray,
+    S: np.ndarray,
+    max_pos: np.ndarray,
+    max_val: np.ndarray,
+    min_pos: np.ndarray,
+    min_val: np.ndarray,
+    nbsym: int,
+    DTYPE=np.float64,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Performs mirroring on signal which extrema do not necessarily
     belong on the position array.
@@ -41,30 +48,30 @@ def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, ma
     if left_ext_max_type:
         if (S[0] > min_val[0]) and (np.abs(d_pos) > (max_pos[0] - T[0])):
             # mirror signal to first extrema
-            expand_left_max_pos = 2 * max_pos[0] - max_pos[1: nbsym + 1]
+            expand_left_max_pos = 2 * max_pos[0] - max_pos[1 : nbsym + 1]
             expand_left_min_pos = 2 * max_pos[0] - min_pos[0:nbsym]
-            expand_left_max_val = max_val[1: nbsym + 1]
+            expand_left_max_val = max_val[1 : nbsym + 1]
             expand_left_min_val = min_val[0:nbsym]
         else:
             # mirror signal to beginning
             expand_left_max_pos = 2 * T[0] - max_pos[0:nbsym]
-            expand_left_min_pos = 2 * T[0] - np.append(T[0], min_pos[0: nbsym - 1])
+            expand_left_min_pos = 2 * T[0] - np.append(T[0], min_pos[0 : nbsym - 1])
             expand_left_max_val = max_val[0:nbsym]
-            expand_left_min_val = np.append(S[0], min_val[0: nbsym - 1])
+            expand_left_min_val = np.append(S[0], min_val[0 : nbsym - 1])
 
     # Left extremum is minimum
     else:
         if (S[0] < max_val[0]) and (np.abs(d_pos) > (min_pos[0] - T[0])):
             # mirror signal to first extrema
             expand_left_max_pos = 2 * min_pos[0] - max_pos[0:nbsym]
-            expand_left_min_pos = 2 * min_pos[0] - min_pos[1: nbsym + 1]
+            expand_left_min_pos = 2 * min_pos[0] - min_pos[1 : nbsym + 1]
             expand_left_max_val = max_val[0:nbsym]
-            expand_left_min_val = min_val[1: nbsym + 1]
+            expand_left_min_val = min_val[1 : nbsym + 1]
         else:
             # mirror signal to beginning
-            expand_left_max_pos = 2 * T[0] - np.append(T[0], max_pos[0: nbsym - 1])
+            expand_left_max_pos = 2 * T[0] - np.append(T[0], max_pos[0 : nbsym - 1])
             expand_left_min_pos = 2 * T[0] - min_pos[0:nbsym]
-            expand_left_max_val = np.append(S[0], max_val[0: nbsym - 1])
+            expand_left_max_val = np.append(S[0], max_val[0 : nbsym - 1])
             expand_left_min_val = min_val[0:nbsym]
 
     if not expand_left_min_pos.shape:
@@ -100,7 +107,11 @@ def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, ma
 
     # Right extremum is minimum
     else:
-        if (S[-1] > min_val[-1]) and len(max_pos) > 1 and (np.abs(d_pos) > (T[-1] - max_pos[-1])):
+        if (
+            (S[-1] > min_val[-1])
+            and len(max_pos) > 1
+            and (np.abs(d_pos) > (T[-1] - max_pos[-1]))
+        ):
             # mirror signal to last extremum
             idx_max = max(0, end_max - nbsym - 1)
             idx_min = max(0, end_min - nbsym)
@@ -122,8 +133,12 @@ def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, ma
     if not expand_right_max_pos.shape:
         expand_right_max_pos, expand_right_max_val = max_pos, max_val
 
-    expand_right_min = np.vstack((expand_right_min_pos[::-1], expand_right_min_val[::-1]))
-    expand_right_max = np.vstack((expand_right_max_pos[::-1], expand_right_max_val[::-1]))
+    expand_right_min = np.vstack(
+        (expand_right_min_pos[::-1], expand_right_min_val[::-1])
+    )
+    expand_right_max = np.vstack(
+        (expand_right_max_pos[::-1], expand_right_max_val[::-1])
+    )
 
     max_extrema = np.hstack((expand_left_max, max_extrema, expand_right_max))
     min_extrema = np.hstack((expand_left_min, min_extrema, expand_right_min))
@@ -131,10 +146,15 @@ def prepare_points_parabol(T: np.ndarray, S: np.ndarray, max_pos: np.ndarray, ma
     return max_extrema, min_extrema
 
 
-def prepare_points_simple(T: np.ndarray, S: np.ndarray,
-                          max_pos: np.ndarray, max_val: Optional[np.ndarray],
-                          min_pos: np.ndarray, min_val: Optional[np.ndarray], nbsym: int) -> Tuple[
-    np.ndarray, np.ndarray]:
+def prepare_points_simple(
+    T: np.ndarray,
+    S: np.ndarray,
+    max_pos: np.ndarray,
+    max_val: Optional[np.ndarray],
+    min_pos: np.ndarray,
+    min_val: Optional[np.ndarray],
+    nbsym: int,
+) -> Tuple[np.ndarray, np.ndarray]:
     """Performs mirroring on signal which extrema can be indexed on the position array"""
 
     # Find indexes of pass
@@ -147,41 +167,41 @@ def prepare_points_simple(T: np.ndarray, S: np.ndarray,
     # Left bound - mirror nbsym points to the left
     if ind_max[0] < ind_min[0]:
         if S[0] > S[ind_min[0]]:
-            lmax = ind_max[1: min(end_max, nbsym + 1)][::-1]
-            lmin = ind_min[0: min(end_min, nbsym + 0)][::-1]
+            lmax = ind_max[1 : min(end_max, nbsym + 1)][::-1]
+            lmin = ind_min[0 : min(end_min, nbsym + 0)][::-1]
             lsym = ind_max[0]
         else:
-            lmax = ind_max[0: min(end_max, nbsym)][::-1]
-            lmin = np.append(ind_min[0: min(end_min, nbsym - 1)][::-1], 0)
+            lmax = ind_max[0 : min(end_max, nbsym)][::-1]
+            lmin = np.append(ind_min[0 : min(end_min, nbsym - 1)][::-1], 0)
             lsym = 0
     else:
         if S[0] < S[ind_max[0]]:
-            lmax = ind_max[0: min(end_max, nbsym + 0)][::-1]
-            lmin = ind_min[1: min(end_min, nbsym + 1)][::-1]
+            lmax = ind_max[0 : min(end_max, nbsym + 0)][::-1]
+            lmin = ind_min[1 : min(end_min, nbsym + 1)][::-1]
             lsym = ind_min[0]
         else:
-            lmax = np.append(ind_max[0: min(end_max, nbsym - 1)][::-1], 0)
-            lmin = ind_min[0: min(end_min, nbsym)][::-1]
+            lmax = np.append(ind_max[0 : min(end_max, nbsym - 1)][::-1], 0)
+            lmin = ind_min[0 : min(end_min, nbsym)][::-1]
             lsym = 0
 
     # Right bound - mirror nbsym points to the right
     if ind_max[-1] < ind_min[-1]:
         if S[-1] < S[ind_max[-1]]:
-            rmax = ind_max[max(end_max - nbsym, 0):][::-1]
-            rmin = ind_min[max(end_min - nbsym - 1, 0): -1][::-1]
+            rmax = ind_max[max(end_max - nbsym, 0) :][::-1]
+            rmin = ind_min[max(end_min - nbsym - 1, 0) : -1][::-1]
             rsym = ind_min[-1]
         else:
-            rmax = np.append(ind_max[max(end_max - nbsym + 1, 0):], len(S) - 1)[::-1]
-            rmin = ind_min[max(end_min - nbsym, 0):][::-1]
+            rmax = np.append(ind_max[max(end_max - nbsym + 1, 0) :], len(S) - 1)[::-1]
+            rmin = ind_min[max(end_min - nbsym, 0) :][::-1]
             rsym = len(S) - 1
     else:
         if S[-1] > S[ind_min[-1]]:
-            rmax = ind_max[max(end_max - nbsym - 1, 0): -1][::-1]
-            rmin = ind_min[max(end_min - nbsym, 0):][::-1]
+            rmax = ind_max[max(end_max - nbsym - 1, 0) : -1][::-1]
+            rmin = ind_min[max(end_min - nbsym, 0) :][::-1]
             rsym = ind_max[-1]
         else:
-            rmax = ind_max[max(end_max - nbsym, 0):][::-1]
-            rmin = np.append(ind_min[max(end_min - nbsym + 1, 0):], len(S) - 1)[::-1]
+            rmax = ind_max[max(end_max - nbsym, 0) :][::-1]
+            rmin = np.append(ind_min[max(end_min - nbsym + 1, 0) :], len(S) - 1)[::-1]
             rsym = len(S) - 1
 
     # In case any array missing
@@ -203,9 +223,9 @@ def prepare_points_simple(T: np.ndarray, S: np.ndarray,
     # If mirrored points are not outside passed time range.
     if tlmin[0] > T[0] or tlmax[0] > T[0]:
         if lsym == ind_max[0]:
-            lmax = ind_max[0: min(end_max, nbsym)][::-1]
+            lmax = ind_max[0 : min(end_max, nbsym)][::-1]
         else:
-            lmin = ind_min[0: min(end_min, nbsym)][::-1]
+            lmin = ind_min[0 : min(end_min, nbsym)][::-1]
 
         if lsym == 0:
             raise Exception("Left edge BUG")
@@ -216,9 +236,9 @@ def prepare_points_simple(T: np.ndarray, S: np.ndarray,
 
     if trmin[-1] < T[-1] or trmax[-1] < T[-1]:
         if rsym == ind_max[-1]:
-            rmax = ind_max[max(end_max - nbsym, 0):][::-1]
+            rmax = ind_max[max(end_max - nbsym, 0) :][::-1]
         else:
-            rmin = ind_min[max(end_min - nbsym, 0):][::-1]
+            rmin = ind_min[max(end_min - nbsym, 0) :][::-1]
 
         if rsym == len(S) - 1:
             raise Exception("Right edge BUG")

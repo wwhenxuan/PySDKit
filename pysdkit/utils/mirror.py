@@ -18,8 +18,8 @@ def fmirror(ts: np.ndarray, sym: int) -> np.ndarray:
     :return: The array after mirror expansion, which will have a length equal to the original
               array length plus twice the 'sym'.
     examples:
-    >>> array = np.array([1, 2, 3, 4, 5])
-    >>> fmirror(array, 2)
+    # >>> array = np.array([1, 2, 3, 4, 5])
+    # >>> fmirror(array, 2)
     array([2, 1, 1, 2, 3, 4, 5, 5, 4])
     Note:
     If 'sym' exceeds half the length of the array,
@@ -28,3 +28,13 @@ def fmirror(ts: np.ndarray, sym: int) -> np.ndarray:
     fMirr = np.append(np.flip(ts[:sym], axis=0), ts)
     fMirr = np.append(fMirr, np.flip(ts[-sym:], axis=0))
     return fMirr
+
+
+if __name__ == '__main__':
+    x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 0])
+    sym = len(x) // 2
+    print(sym)
+    x_mirror = fmirror(x, sym)
+    print(x_mirror)
+
+    print(x_mirror[sym:-sym])

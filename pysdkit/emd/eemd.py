@@ -30,9 +30,19 @@ class EEMD(object):
     MATLAB code: https://www.mathworks.com/help/signal/ref/emd.html
     """
 
-    def __init__(self, ext_EMD=None, trials: int = 100, noise_width: float = 0.05, parallel: bool = False,
-                 separate_trends: bool = False, noise_kind: Optional[str] = "normal", processes: Optional[int] = None,
-                 max_imfs: Optional[int] = -1, max_iter: Optional[int] = 1000, random_seed: Optional[int] = 42) -> None:
+    def __init__(
+        self,
+        ext_EMD=None,
+        trials: int = 100,
+        noise_width: float = 0.05,
+        parallel: bool = False,
+        separate_trends: bool = False,
+        noise_kind: Optional[str] = "normal",
+        processes: Optional[int] = None,
+        max_imfs: Optional[int] = -1,
+        max_iter: Optional[int] = 1000,
+        random_seed: Optional[int] = 42,
+    ) -> None:
         """
         :param ext_EMD: pre-defined EMD algorithms to be integrated
         :param trials: number of trials or EMD performance with added noise
@@ -67,8 +77,11 @@ class EEMD(object):
         self.rng = np.random.RandomState(seed=random_seed)
 
         # Create the EMD algorithm to be integrated
-        self.EMD = EMD(max_imfs=max_imfs, random_seed=random_seed,
-                       max_iteration=self.max_iter) if ext_EMD is None else ext_EMD
+        self.EMD = (
+            EMD(max_imfs=max_imfs, random_seed=random_seed, max_iteration=self.max_iter)
+            if ext_EMD is None
+            else ext_EMD
+        )
 
         # Saving imfs and residue for external references
         self.imfs = None
@@ -78,12 +91,19 @@ class EEMD(object):
         # Used to update the trial
         self._signal, self._time, self._seq_len, self._scale = None, None, None, None
 
-    def __call__(self, signal: np.ndarray, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None,
-                 progress: Optional[bool] = False) -> np.ndarray:
+    def __call__(
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = None,
+        progress: Optional[bool] = False,
+    ) -> np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal, time, max_imfs, progress)
 
-    def generate_noise(self, scale: float, size: Union[int, Sequence[int]]) -> np.ndarray:
+    def generate_noise(
+        self, scale: float, size: Union[int, Sequence[int]]
+    ) -> np.ndarray:
         """
         Generate noise with specified standard deviation and size.
         The choice of noise is in ["normal", "uniform"],
@@ -111,7 +131,9 @@ class EEMD(object):
         noise = self.generate_noise(scale=self._scale, size=self._seq_len)
         # Obtain the intrinsic mode functions (IMFs) from the decomposition
         # Add noise to the original signal here
-        imfs = self._run_emd(signal=self._signal + noise, time=self._time, max_imfs=self.max_imfs)
+        imfs = self._run_emd(
+            signal=self._signal + noise, time=self._time, max_imfs=self.max_imfs
+        )
         # Whether to separate the trend
         trend = None
         if self.separate_trends:
@@ -119,7 +141,9 @@ class EEMD(object):
 
         return imfs, trend
 
-    def _run_emd(self, signal: np.ndarray, time: np.ndarray, max_imfs: Optional[int] = -1) -> np.ndarray:
+    def _run_emd(
+        self, signal: np.ndarray, time: np.ndarray, max_imfs: Optional[int] = -1
+    ) -> np.ndarray:
         """
         Vanilla Empirical Mode Decomposition method
         Perform the specified EMD algorithm to obtain the corresponding signal decomposition results
@@ -150,7 +174,9 @@ class EEMD(object):
         """
         if self.imfs is None or self.residue is None:
             # If the algorithm has not been executed yet, there is no result for this decomposition.
-            raise ValueError("No IMF found. Please, run `fit_transform` method or its variant first.")
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
         return self.imfs, self.residue
 
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -163,7 +189,9 @@ class EEMD(object):
         """
         if self.imfs is None or self.residue is None:
             # There is no decomposition result for this storage yet
-            raise ValueError("No IMF found. Please, run `fit_transform` method or its variant first.")
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
 
         # Get the intrinsic mode function and residual respectively
         imfs, residue = self.get_imfs_and_residue()
@@ -172,8 +200,13 @@ class EEMD(object):
         else:
             return imfs, residue
 
-    def fit_transform(self, signal: np.ndarray, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None,
-                      progress: Optional[bool] = False) -> np.ndarray:
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = None,
+        progress: Optional[bool] = False,
+    ) -> np.ndarray:
         """
         Perform Ensemble Empirical Mode Decomposition for the input signal
         :param signal: input ndarray signal to be decomposed

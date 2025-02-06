@@ -20,16 +20,18 @@ class SVMD(Base):
     Signal Processing 174 (2020) 107610.
     """
 
-    def __init__(self,
-                 max_alpha: int = 20000,
-                 tau: float = 0.0,
-                 tol: float = 1e-6,
-                 stopc: Optional[int] = 4,
-                 init_omega: int = 0,
-                 max_iter: int = 300,
-                 poly_order: Optional[int] = 8,
-                 window_length: Optional[int] = 25,
-                 random_seed: Optional[int] = 42) -> None:
+    def __init__(
+        self,
+        max_alpha: int = 20000,
+        tau: float = 0.0,
+        tol: float = 1e-6,
+        stopc: Optional[int] = 4,
+        init_omega: int = 0,
+        max_iter: int = 300,
+        poly_order: Optional[int] = 8,
+        window_length: Optional[int] = 25,
+        random_seed: Optional[int] = 42,
+    ) -> None:
         """
         Input and Parameters:
         :param max_alpha: the balancing parameter of the data-fidelity constraint (compactness of mode)
@@ -66,22 +68,28 @@ class SVMD(Base):
         self.rng = np.random.RandomState(seed=random_seed)
 
     # def fmirror
-    def sgolayfilt(self, signal: np.ndarray,
-                   poly_order: Optional[int] = None,
-                   window_length: Optional[int] = None) -> np.ndarray:
+    def sgolayfilt(
+        self,
+        signal: np.ndarray,
+        poly_order: Optional[int] = None,
+        window_length: Optional[int] = None,
+    ) -> np.ndarray:
         """Filtering the input to estimate the noise"""
         poly_order = self.poly_order if poly_order is None else poly_order
         window_length = self.window_length if window_length is None else window_length
-        return savgol_filter(x=signal, polyorder=poly_order, window_length=window_length)
+        return savgol_filter(
+            x=signal, polyorder=poly_order, window_length=window_length
+        )
 
     @staticmethod
-    def fmirror_signal_noise(signal: np.ndarray, signal_noise: np.ndarray,
-                             seq_len: int) -> Tuple[np.ndarray, np.ndarray]:
+    def fmirror_signal_noise(
+        signal: np.ndarray, signal_noise: np.ndarray, seq_len: int
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Mirroring the signal and noise part to extend"""
         f_mir = np.zeros(seq_len // 2)
         f_mir_noise = np.zeros(seq_len // 2)
-        f_mir[0: seq_len // 2] = signal[seq_len // 2 - 1::-1]
-        f_mir_noise[0:, seq_len / 2] = signal_noise[seq_len / 2 - 1::-1]
+        f_mir[0 : seq_len // 2] = signal[seq_len // 2 - 1 :: -1]
+        f_mir_noise[0:, seq_len / 2] = signal_noise[seq_len / 2 - 1 :: -1]
 
         f_mir = np.concatenate((f_mir, signal))
         f_mir_noise = np.concatenate((f_mir_noise, signal_noise))
@@ -101,25 +109,32 @@ class SVMD(Base):
         if self.init_omega == 0:
             omega_L[0] = 0
         elif self.init_omega == 1:
-            omega_L[0] = np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand())
+            omega_L[0] = np.exp(
+                np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()
+            )
         else:
             raise ValueError("the input param 'init_omega' must be 0 or 1!")
 
         return omega_L
 
-    def fit_transform(self, signal: np.ndarray,
-                      poly_order: Optional[int] = None,
-                      window_length: Optional[int] = None):
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        poly_order: Optional[int] = None,
+        window_length: Optional[int] = None,
+    ):
         """开始进行信号分解"""
         # TODO: Part1---Start initializing the input signal of size [num_channels, seq_len]
         seq_len = len(signal)
         if seq_len % 2 > 0:
             # Check the length of the signal
-            signal = signal[: -1]
+            signal = signal[:-1]
             seq_len = seq_len - 1
 
         # Estimating the noise
-        y = self.sgolayfilt(signal=signal, poly_order=poly_order, window_length=window_length)
+        y = self.sgolayfilt(
+            signal=signal, poly_order=poly_order, window_length=window_length
+        )
         signal_noise = signal - y
 
         fs = 1 / seq_len
@@ -139,10 +154,10 @@ class SVMD(Base):
         # FFT of signal(and Hilbert transform concept=making it one-sided)
         f_hat = self.fftshift(ts=self.fft(ts=f))
         f_hat_onesided = f_hat.copy()
-        f_hat_onesided[0: T // 2] = 0
+        f_hat_onesided[0 : T // 2] = 0
         f_hat_n = self.fftshift(ts=self.fft(fnoise))
         f_hat_n_onesided = f_hat_n.copy()
-        f_hat_n_onesided[0: T // 2] = 0
+        f_hat_n_onesided[0 : T // 2] = 0
 
         # Noise power estimation
         noisepe = norm(f_hat_n_onesided, ord=2) ** 2
@@ -173,7 +188,9 @@ class SVMD(Base):
 
         # Initialization of filter matrix
         h_hat_Temp = np.zeros([2, len(omega_freqs)])
-        u_hat_Temp = np.zeros(shape=(1, len(omega_freqs), 1))  # matrix 1 of modes  TODO:这里要注意
+        u_hat_Temp = np.zeros(
+            shape=(1, len(omega_freqs), 1)
+        )  # matrix 1 of modes  TODO:这里要注意
         u_hat_i = np.zeros([1, len(omega_freqs)])  # matrix 2 of modes
 
         # Counter for initializing omega_L
@@ -192,26 +209,53 @@ class SVMD(Base):
             while Alpha < self.max_alpha + 1:
                 while udiff > self.tol and n < self.max_iter:
                     # update u_L
-                    u_hat_L[n + 1, :] = (f_hat_onesided + ((Alpha ** 2) * (omega_freqs - omega_L[n]) ** 4)
-                                         * u_hat_L[n, :] + lambda_vector[n, :] / 2) / (
-                                                1 + (Alpha ** 2) * (omega_freqs - omega_L[n]) ** 4 * (
-                                            (1 + (2 * Alpha) * (omega_freqs - omega_L[n]) ** 2)) + np.sum(h_hat_Temp))
+                    u_hat_L[n + 1, :] = (
+                        f_hat_onesided
+                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4) * u_hat_L[n, :]
+                        + lambda_vector[n, :] / 2
+                    ) / (
+                        1
+                        + (Alpha**2)
+                        * (omega_freqs - omega_L[n]) ** 4
+                        * ((1 + (2 * Alpha) * (omega_freqs - omega_L[n]) ** 2))
+                        + np.sum(h_hat_Temp)
+                    )
 
                     # update omega_L
-                    omega_L[n + 1] = (omega_freqs[T // 2: T] * (np.abs(u_hat_L[n + 1, T // 2: T]) ** 2).T) / np.sum(
-                        np.abs(u_hat_L[n + 1, T // 2: T]) ** 2)
+                    omega_L[n + 1] = (
+                        omega_freqs[T // 2 : T]
+                        * (np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2).T
+                    ) / np.sum(np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2)
 
                     # update lambda dual ascent
-                    lambda_vector[n + 1, :] = lambda_vector[n, :] + self.tau * (f_hat_onesided - (u_hat_L[n + 1, :] + (
-                            (Alpha ** 2) * (omega_freqs - omega_L[n]) ** 4 * (
-                            f_hat_onesided - u_hat_L[n + 1, :] - np.sum(u_hat_i) + lambda_vector[n, :] / 2)
-                            - np.sum(u_hat_i)) / np.sum(np.abs(u_hat_L[n + 1, T // 2: T]) ** 2)))
+                    lambda_vector[n + 1, :] = lambda_vector[n, :] + self.tau * (
+                        f_hat_onesided
+                        - (
+                            u_hat_L[n + 1, :]
+                            + (
+                                (Alpha**2)
+                                * (omega_freqs - omega_L[n]) ** 4
+                                * (
+                                    f_hat_onesided
+                                    - u_hat_L[n + 1, :]
+                                    - np.sum(u_hat_i)
+                                    + lambda_vector[n, :] / 2
+                                )
+                                - np.sum(u_hat_i)
+                            )
+                            / np.sum(np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2)
+                        )
+                    )
 
                     udiff = self.eps
 
                     # 1st loop criterion
-                    udiff = udiff + (1 / T * (u_hat_L[n + 1, :] - u_hat_L[n, :]) * np.conj(
-                        (u_hat_L[n + 1, :] - u_hat_L[n, :]))).T / (1 / T * (u_hat_L[n, :]) * np.conj((u_hat_L[n, :])).T)
+                    udiff = udiff + (
+                        1
+                        / T
+                        * (u_hat_L[n + 1, :] - u_hat_L[n, :])
+                        * np.conj((u_hat_L[n + 1, :] - u_hat_L[n, :]))
+                    ).T / (1 / T * (u_hat_L[n, :]) * np.conj((u_hat_L[n, :])).T)
 
                     udiff = np.abs(udiff)
                     n += 1
@@ -237,7 +281,9 @@ class SVMD(Base):
 
                     # Initializing
                     udiff = self.tol + self.eps  # update step
-                    temp_ud = u_hat_L[n, :]  # keeping the last update of the obtained mode
+                    temp_ud = u_hat_L[
+                        n, :
+                    ]  # keeping the last update of the obtained mode
 
                     n = 0  # loop counter  TODO: 注意这里是1还是0
 
@@ -259,7 +305,11 @@ class SVMD(Base):
                 ii = 0
                 while ii < 1 and n2 < 300:
 
-                    omega_L = np.sort(np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()))
+                    omega_L = np.sort(
+                        np.exp(
+                            np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()
+                        )
+                    )
 
                     checkp = np.abs(omega_d_Temp - omega_L)
 
@@ -277,7 +327,9 @@ class SVMD(Base):
 
             gamma[l] = 1
 
-            h_hat_Temp[l, :] = gamma[l] / ((alpha[l] ** 2) * (omega_freqs - omega_d_Temp[l]) ** 4)
+            h_hat_Temp[l, :] = gamma[l] / (
+                (alpha[l] ** 2) * (omega_freqs - omega_d_Temp[l]) ** 4
+            )
 
             # Keeping the last desired mode as one of the extracted modes
             u_hat_i[l, :] = u_hat_Temp[0, :, l]
@@ -291,7 +343,9 @@ class SVMD(Base):
                     if u_hat_i.shape[0] == 1:
                         sigerror[l] = norm((f_hat_onesided - u_hat_L), ord=2) ** 2
                     else:
-                        sigerror[l] = norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+                        sigerror[l] = (
+                            norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+                        )
 
                     if n2 >= 300 or sigerror[l] <= np.round(noisepe):
                         SC2 = 1
@@ -299,8 +353,11 @@ class SVMD(Base):
                 elif self.stopc == 2:
                     # Exact Reconstruction
                     sum_u = np.sum(u_hat_Temp[0, :])  # sum of current obtained modes
-                    normind[l] = (1 / T) * (norm(sum_u - f_hat_onesided, ord=2) ** 2) / (
-                            (1 / T) * norm(f_hat_n_onesided, ord=2) ** 2)
+                    normind[l] = (
+                        (1 / T)
+                        * (norm(sum_u - f_hat_onesided, ord=2) ** 2)
+                        / ((1 / T) * norm(f_hat_n_onesided, ord=2) ** 2)
+                    )
                     if n2 >= 300 or normind[l] < 0.005:
                         SC2 = 1
 
@@ -309,7 +366,9 @@ class SVMD(Base):
                     if u_hat_i.shape[0] == 1:
                         sigerror[l] = norm((f_hat_onesided - u_hat_i), ord=2) ** 2
                     else:
-                        sigerror[l] = norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+                        sigerror[l] = (
+                            norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
+                        )
 
                     BIC[l] = 2 * T * np.log(sigerror[l]) + (3 * (l + 1)) * np.log(2 * T)
 
@@ -320,9 +379,24 @@ class SVMD(Base):
                 elif self.stopc == 4:
                     # Power of the last mode
                     if l < 1:
-                        polm[l] = norm((4 * Alpha * u_hat_i[l, :] / (
-                                1 + 2 * Alpha * (omega_freqs - omega_d_Temp[l, :]) ** 2)) * u_hat_i[l, :].T, ord=2)
+                        polm[l] = norm(
+                            (
+                                4
+                                * Alpha
+                                * u_hat_i[l, :]
+                                / (
+                                    1
+                                    + 2
+                                    * Alpha
+                                    * (omega_freqs - omega_d_Temp[l, :]) ** 2
+                                )
+                            )
+                            * u_hat_i[l, :].T,
+                            ord=2,
+                        )
                         polm_temp = polm[l]
                         polm[l] = polm[l] / np.max(polm_temp)
                     else:
-                        polm[l] = norm((4 * Alpha * u_hat_i[l, :] / (1 + 2 * Alpha * ())))
+                        polm[l] = norm(
+                            (4 * Alpha * u_hat_i[l, :] / (1 + 2 * Alpha * ()))
+                        )

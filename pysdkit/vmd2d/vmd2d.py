@@ -18,9 +18,17 @@ class VMD2D(object):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/45918-two-dimensional-variational-mode-decomposition?s_tid=srchtitle
     """
 
-    def __init__(self, K: int, alpha: int, tau: Optional[float] = 0.0, DC: Optional[bool] = False,
-                 init: Optional[str] = "zero", max_iter: Optional[int] = 3000,
-                 tol: Optional[float] = 1e-7, random_seed: Optional[int] = 42) -> None:
+    def __init__(
+        self,
+        K: int,
+        alpha: int,
+        tau: Optional[float] = 0.0,
+        DC: Optional[bool] = False,
+        init: Optional[str] = "zero",
+        max_iter: Optional[int] = 3000,
+        tol: Optional[float] = 1e-7,
+        random_seed: Optional[int] = 42,
+    ) -> None:
         """
         :param K: the number of modes to be recovered
         :param alpha: the balancing parameter for data fidelity constraint
@@ -63,8 +71,12 @@ class VMD2D(object):
             raise ValueError("init must be 'zero' or 'random'")
         return omega
 
-    def fit_transform(self, img: np.ndarray, K: Optional[int] = None,
-                      return_all: Optional[bool] = False) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def fit_transform(
+        self,
+        img: np.ndarray,
+        K: Optional[int] = None,
+        return_all: Optional[bool] = False,
+    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """开始执行算法"""
         K = K if K is not None else self.K
 
@@ -110,53 +122,76 @@ class VMD2D(object):
             k = 0
 
             # compute the halfplane mask for the 2D "analytic signal"
-            HilbertMask = (np.sign(freqs_1 * omega[n, 0, k] + freqs_2 * omega[n, 1, k]) + 1)
+            HilbertMask = (
+                np.sign(freqs_1 * omega[n, 0, k] + freqs_2 * omega[n, 1, k]) + 1
+            )
 
             # update first mode accumulator
             sum_uk = u_hat[:, :, -1] + sum_uk - u_hat[:, :, k]
 
             # update first mode's spectrum through wiener filter (on half plane)
             u_hat[:, :, k] = ((img_hat - sum_uk - mu_hat[:, :] / 2) * HilbertMask) / (
-                    1 + Alpha[k] * ((freqs_1 - omega[n, 0, k]) ** 2 + (freqs_2 - omega[n, 1, k]) ** 2))
+                1
+                + Alpha[k]
+                * ((freqs_1 - omega[n, 0, k]) ** 2 + (freqs_2 - omega[n, 1, k]) ** 2)
+            )
 
             # update first mode's central frequency as spectral center of gravity
             if self.DC is False:
-                omega[n + 1, 0, k] = np.sum(np.sum(freqs_1 * (np.abs(u_hat[:, :, k]) ** 2))) / np.sum(
-                    np.sum(np.abs(u_hat[:, :, k]) ** 2))
-                omega[n + 1, 1, k] = np.sum(np.sum(freqs_2 * (np.abs(u_hat[:, :, k]) ** 2))) / np.sum(
-                    np.sum(np.abs(u_hat[:, :, k]) ** 2))
+                omega[n + 1, 0, k] = np.sum(
+                    np.sum(freqs_1 * (np.abs(u_hat[:, :, k]) ** 2))
+                ) / np.sum(np.sum(np.abs(u_hat[:, :, k]) ** 2))
+                omega[n + 1, 1, k] = np.sum(
+                    np.sum(freqs_2 * (np.abs(u_hat[:, :, k]) ** 2))
+                ) / np.sum(np.sum(np.abs(u_hat[:, :, k]) ** 2))
 
                 # Keep omegas on same halfplane
                 if omega[n + 1, 1, k] < 0:
                     omega[n + 1, :, k] = -omega[n + 1, :, k]
 
             # recover full spectrum from analytic signal
-            u_hat[:, :, k] = fftshift(fft2d(np.real(ifft2d(ifftshift(np.squeeze(u_hat[:, :, k]))))))
+            u_hat[:, :, k] = fftshift(
+                fft2d(np.real(ifft2d(ifftshift(np.squeeze(u_hat[:, :, k])))))
+            )
 
             # work on other modes
             for k in range(1, K):
                 # recompute Hilbert mask
-                HilbertMask = (np.sign(freqs_1 * omega[n, 0, k] + freqs_2 * omega[n, 1, k]) + 1)
+                HilbertMask = (
+                    np.sign(freqs_1 * omega[n, 0, k] + freqs_2 * omega[n, 1, k]) + 1
+                )
 
                 # update accumulator
                 sum_uk = u_hat[:, :, k - 1] + sum_uk - u_hat[:, :, k]
 
                 # update signal spectrum
-                u_hat[:, :, k] = ((img_hat - sum_uk - mu_hat[:, :] / 2) * HilbertMask) / (
-                        1 + Alpha[k] * ((freqs_1 - omega[n, 0, k]) ** 2 + (freqs_2 - omega[n, 1, k]) ** 2))
+                u_hat[:, :, k] = (
+                    (img_hat - sum_uk - mu_hat[:, :] / 2) * HilbertMask
+                ) / (
+                    1
+                    + Alpha[k]
+                    * (
+                        (freqs_1 - omega[n, 0, k]) ** 2
+                        + (freqs_2 - omega[n, 1, k]) ** 2
+                    )
+                )
 
                 # update signal frequencies
-                omega[n + 1, 0, k] = np.sum(np.sum(freqs_1 * (np.abs(u_hat[:, :, k]) ** 2))) / np.sum(
-                    np.sum(np.abs(u_hat[:, :, k]) ** 2))
-                omega[n + 1, 1, k] = np.sum(np.sum(freqs_2 * (np.abs(u_hat[:, :, k]) ** 2))) / np.sum(
-                    np.sum(np.abs(u_hat[:, :, k]) ** 2))
+                omega[n + 1, 0, k] = np.sum(
+                    np.sum(freqs_1 * (np.abs(u_hat[:, :, k]) ** 2))
+                ) / np.sum(np.sum(np.abs(u_hat[:, :, k]) ** 2))
+                omega[n + 1, 1, k] = np.sum(
+                    np.sum(freqs_2 * (np.abs(u_hat[:, :, k]) ** 2))
+                ) / np.sum(np.sum(np.abs(u_hat[:, :, k]) ** 2))
 
                 # Keep omegas on same halfplane
                 if omega[n + 1, 1, k] < 0:
                     omega[n + 1, :, k] = -omega[n + 1, :, k]
 
                 # recover full spectrum from analytic signal
-                u_hat[:, :, k] = fftshift(fft2d(np.real(ifft2d(ifftshift(np.squeeze(u_hat[:, :, k]))))))
+                u_hat[:, :, k] = fftshift(
+                    fft2d(np.real(ifft2d(ifftshift(np.squeeze(u_hat[:, :, k])))))
+                )
 
             # Gradient ascent for augmented Lagrangian
             mu_hat[:, :] = mu_hat[:, :] + self.tau * (np.sum(u_hat, axis=2) - img_hat)
@@ -169,9 +204,17 @@ class VMD2D(object):
             omegaDiff = np.spacing(1)
 
             for k in range(0, K):
-                omegaDiff = omegaDiff + np.sum(np.sum(np.abs(omega[n, :, :] - omega[n - 1, :, :]) ** 2))
-                uDiff = uDiff + np.sum(np.sum(1 / (Hx * Hy) * (u_hat[:, :, k] - u_hat_old[:, :, k]) * np.conj(
-                    (u_hat[:, :, k] - u_hat_old[:, :, k]))))
+                omegaDiff = omegaDiff + np.sum(
+                    np.sum(np.abs(omega[n, :, :] - omega[n - 1, :, :]) ** 2)
+                )
+                uDiff = uDiff + np.sum(
+                    np.sum(
+                        1
+                        / (Hx * Hy)
+                        * (u_hat[:, :, k] - u_hat_old[:, :, k])
+                        * np.conj((u_hat[:, :, k] - u_hat_old[:, :, k]))
+                    )
+                )
 
             uDiff = np.abs(uDiff)
 
@@ -192,20 +235,22 @@ class VMD2D(object):
             return u
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pysdkit.data import test_grayscale
 
     img = test_grayscale()
 
-    vmd2d = VMD2D(K=5, alpha=5000, tau=0.25, DC=True, init="random", tol=1e-6, max_iter=3000)
+    vmd2d = VMD2D(
+        K=5, alpha=5000, tau=0.25, DC=True, init="random", tol=1e-6, max_iter=3000
+    )
     u = vmd2d.fit_transform(img)
     print(u.shape)
 
     from matplotlib import pyplot as plt
 
-    plt.imshow(img, cmap='gray')
+    plt.imshow(img, cmap="gray")
     plt.show()
 
     for i in range(u.shape[2]):
-        plt.imshow(u[:, :, i], cmap='gray')
+        plt.imshow(u[:, :, i], cmap="gray")
         plt.show()

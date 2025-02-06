@@ -6,7 +6,12 @@ Created on Sat Mar 5 22:09:45 2024
 The following code is mainly used to find extreme points in the EMD algorithm
 """
 import numpy as np
-from scipy.interpolate import Akima1DInterpolator, CubicHermiteSpline, CubicSpline, PchipInterpolator
+from scipy.interpolate import (
+    Akima1DInterpolator,
+    CubicHermiteSpline,
+    CubicSpline,
+    PchipInterpolator,
+)
 
 
 def cubic_spline_3pts(x, y, T):

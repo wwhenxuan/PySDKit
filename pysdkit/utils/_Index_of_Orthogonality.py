@@ -20,6 +20,7 @@ def index_of_orthogonality(signal: np.ndarray, IMFs: np.ndarray) -> float:
     :param IMFs: Intrinsic Mode Function after decomposition.
     :return: the value of index of orthogonality
     """
+
     def cum(x, y):
         # Helper functions
         return np.sum(np.abs(x * y))
@@ -34,7 +35,4 @@ def index_of_orthogonality(signal: np.ndarray, IMFs: np.ndarray) -> float:
             if i != j and i < j:
                 index += cum(IMFs[i, :], IMFs[j, :])
 
-    return index / np.sum(signal ** 2)
-
-
-
+    return index / np.sum(signal**2)

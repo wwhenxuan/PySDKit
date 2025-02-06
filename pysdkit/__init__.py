@@ -7,8 +7,14 @@ from .emd import EEMD
 # 具有自适应噪声的完全集合经验模态分解
 from .emd import CEEMDAN
 
+# 多元变分模态分解算法
+from .emd import MEMD
+
 # 基于时变滤波器的经验模态分解
 from .tvf_emd import TVF_EMD
+
+# 希尔伯特震动分解
+from .hvd import HVD
 
 # 变分模态分解算法
 from .vmd import vmd, VMD

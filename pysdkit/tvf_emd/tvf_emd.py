@@ -29,8 +29,14 @@ class TVF_EMD(object):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/63300-time-varying-filter-based-empirical-mode-decomposition-tvf-emd
     """
 
-    def __init__(self, max_imf: Optional[int] = 2, thresh_bwr: Optional[float] = 0.1,
-                 bsp_order: Optional[int] = 26, min_extrema: Optional[int] = 4, max_iter: Optional[int] = 100) -> None:
+    def __init__(
+        self,
+        max_imf: Optional[int] = 2,
+        thresh_bwr: Optional[float] = 0.1,
+        bsp_order: Optional[int] = 26,
+        min_extrema: Optional[int] = 4,
+        max_iter: Optional[int] = 100,
+    ) -> None:
         """
         :param max_imf: maximum number of imfs to be decomposed
         :param thresh_bwr: instantaneous bandwidth threshold
@@ -73,7 +79,7 @@ class TVF_EMD(object):
             imax, imin = np.array([], dtype=int), np.array([], dtype=int)
 
             # Mark the positions where the difference is zero in `diff`
-            bad = (diff == 0.0)
+            bad = diff == 0.0
 
             # Extend the array at both ends to handle the start and end
             c_bad = np.concatenate([[0], bad, [0]])
@@ -105,10 +111,14 @@ class TVF_EMD(object):
                 for k in range(len(debs)):
                     if diff[debs[k] - 1] > 0:
                         if diff[fins[k]] < 0:
-                            imax = np.concatenate([imax, [np.round((fins[k] + debs[k]) / 2)]])
+                            imax = np.concatenate(
+                                [imax, [np.round((fins[k] + debs[k]) / 2)]]
+                            )
                     else:
                         if diff[fins[k]] > 0:
-                            imin = np.concatenate([imin, [np.round((fins[k] + debs[k]) / 2)]])
+                            imin = np.concatenate(
+                                [imin, [np.round((fins[k] + debs[k]) / 2)]]
+                            )
 
             # Merge the final indices
             if len(imax) > 0:
@@ -118,8 +128,13 @@ class TVF_EMD(object):
 
         return indmin.astype(int), indmax.astype(int)
 
-    def _anti_mode_mixing(self, y: np.ndarray, bis_freq: np.ndarray, ind_remove_pad: np.ndarray,
-                          num_padding: int) -> None | int | float | complex | ndarray | Iterable:
+    def _anti_mode_mixing(
+        self,
+        y: np.ndarray,
+        bis_freq: np.ndarray,
+        ind_remove_pad: np.ndarray,
+        num_padding: int,
+    ) -> None | int | float | complex | ndarray | Iterable:
         """Remove unstable parts or 'noise' from the signal based on the extrema points of the input signal and certain rules, and smooth the signal through interpolation"""
         org_bis_freq = bis_freq.copy()
         flag_intermitt = 0
@@ -133,7 +148,9 @@ class TVF_EMD(object):
         # Handle intermittent changes in the input signal
         for i in range(1, len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i - 1], indmax_y[i + 1] + 1, dtype=int)
-            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(bis_freq[time_span]) > 0.25:
+            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(
+                bis_freq[time_span]
+            ) > 0.25:
                 # If the fluctuation value exceeds 0.25, it is considered an intermittent interval
                 zero_span = np.concatenate([zero_span, time_span])
         # The values in the intermittent intervals will be set to 0
@@ -143,14 +160,25 @@ class TVF_EMD(object):
         diff_bis_freq = np.zeros(bis_freq.shape)
         for i in range(len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i], indmax_y[i + 1] + 1, dtype=int)
-            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(bis_freq[time_span]) > 0.25:
+            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(
+                bis_freq[time_span]
+            ) > 0.25:
                 intermitt = np.concatenate([intermitt, [indmax_y[i]]])
-                diff_bis_freq[indmax_y[i]] = bis_freq[indmax_y[i + 1]] - bis_freq[indmax_y[i]]
+                diff_bis_freq[indmax_y[i]] = (
+                    bis_freq[indmax_y[i + 1]] - bis_freq[indmax_y[i]]
+                )
 
         # Smooth the signal and fill in
-        ind_remove_pad = np.delete(ind_remove_pad,
-                                   np.r_[np.s_[0:np.round(0.1 * len(ind_remove_pad)).astype(int)],
-                                   np.s_[np.round(0.9 * len(ind_remove_pad)).astype(int) - 1:len(ind_remove_pad)]])
+        ind_remove_pad = np.delete(
+            ind_remove_pad,
+            np.r_[
+                np.s_[0 : np.round(0.1 * len(ind_remove_pad)).astype(int)],
+                np.s_[
+                    np.round(0.9 * len(ind_remove_pad)).astype(int)
+                    - 1 : len(ind_remove_pad)
+                ],
+            ],
+        )
 
         inters = np.intersect1d(ind_remove_pad, intermitt)
         if len(inters) > 0:
@@ -161,15 +189,20 @@ class TVF_EMD(object):
             u2 = intermitt[i]
             u3 = intermitt[i + 1]
             if diff_bis_freq[u2] > 0:
-                bis_freq[u1:u2 + 1] = 0
+                bis_freq[u1 : u2 + 1] = 0
             if diff_bis_freq[u2] < 0:
-                bis_freq[u2:u3 + 1] = 0
+                bis_freq[u2 : u3 + 1] = 0
 
         temp_bis_freq = bis_freq.copy()
         temp_bis_freq[temp_bis_freq < 1e-9] = 0
         temp_bis_freq = temp_bis_freq[ind_remove_pad]
-        temp_bis_freq = np.concatenate([np.flip(temp_bis_freq[1:2 + num_padding - 1]), temp_bis_freq,
-                                        np.flip(temp_bis_freq[-num_padding - 1:-1])])
+        temp_bis_freq = np.concatenate(
+            [
+                np.flip(temp_bis_freq[1 : 2 + num_padding - 1]),
+                temp_bis_freq,
+                np.flip(temp_bis_freq[-num_padding - 1 : -1]),
+            ]
+        )
         flip_bis_freq = np.flip(bis_freq)
         id_t = np.where(temp_bis_freq > 1e-9)[0]
         id_f = np.where(flip_bis_freq > 1e-9)[0]
@@ -185,19 +218,26 @@ class TVF_EMD(object):
             return
 
         # Signal smoothing using the pchip interpolation algorithm
-        bis_freq = pchip_interpolate(t[np.where(bis_freq != 0)[0]],
-                                     bis_freq[np.where(bis_freq != 0)[0]], t)
+        bis_freq = pchip_interpolate(
+            t[np.where(bis_freq != 0)[0]], bis_freq[np.where(bis_freq != 0)[0]], t
+        )
         # Eliminate large fluctuations in frequency
         flip_bis_freq = np.flip(org_bis_freq)
-        if len(np.where(org_bis_freq > 1e-9)[0]) > 0 and len(np.where(flip_bis_freq > 1e-9)[0]) > 0:
+        if (
+            len(np.where(org_bis_freq > 1e-9)[0]) > 0
+            and len(np.where(flip_bis_freq > 1e-9)[0]) > 0
+        ):
             org_bis_freq[0] = org_bis_freq[np.where(org_bis_freq > 1e-9)[0][0]]
             org_bis_freq[-1] = flip_bis_freq[np.where(flip_bis_freq > 1e-9)[0][0]]
 
         org_bis_freq[np.where(org_bis_freq < 1e-9)[0]] = 0
         org_bis_freq[0] = bis_freq[0]
         org_bis_freq[-1] = bis_freq[-1]
-        org_bis_freq = pchip_interpolate(t[np.where(org_bis_freq != 0)[0]],
-                                         org_bis_freq[np.where(org_bis_freq != 0)[0]], t)
+        org_bis_freq = pchip_interpolate(
+            t[np.where(org_bis_freq != 0)[0]],
+            org_bis_freq[np.where(org_bis_freq != 0)[0]],
+            t,
+        )
 
         if flag_intermitt and np.max(temp_bis_freq[ind_remove_pad]) > 1e-9:
             output_cutoff = bis_freq.copy()
@@ -253,7 +293,13 @@ class TVF_EMD(object):
             ind_remove_pad = []
             for niter in range(self.max_iter):
                 # Mirror extend the input signal
-                y = np.concatenate([np.flip(y[1:2 + num_padding - 1]), y, np.flip(y[-num_padding - 1: -1])])
+                y = np.concatenate(
+                    [
+                        np.flip(y[1 : 2 + num_padding - 1]),
+                        y,
+                        np.flip(y[-num_padding - 1 : -1]),
+                    ]
+                )
                 ind_remove_pad = np.arange(num_padding, len(y) - num_padding, dtype=int)
 
                 # Get the extrema points of the mirrored signal
@@ -266,7 +312,9 @@ class TVF_EMD(object):
 
                 # Instantaneous amplitudes and frequencies, and bisecting frequency
                 # Low-High Frequency (LHF) and Low-Low Frequency (LLF) components
-                a1, f1, a2, f2, bis_freq, inst_bwr, avg_freq = divide2exp(y, inst_amp_0, inst_freq_0)
+                a1, f1, a2, f2, bis_freq, inst_bwr, avg_freq = divide2exp(
+                    y, inst_amp_0, inst_freq_0
+                )
 
                 inst_bwr_2 = inst_bwr.copy()
                 for j in range(0, len(index_c_y) - 2, 2):
@@ -277,32 +325,62 @@ class TVF_EMD(object):
                 bis_freq[bis_freq > 0.5] = 0.45
                 bis_freq[bis_freq <= 0] = 1e-12
 
-                bis_freq = self._anti_mode_mixing(y, bis_freq, ind_remove_pad, num_padding)
+                bis_freq = self._anti_mode_mixing(
+                    y, bis_freq, ind_remove_pad, num_padding
+                )
                 bis_freq = bis_freq[ind_remove_pad]
-                bis_freq = np.concatenate([np.flip(bis_freq[1:2 + num_padding - 1]),
-                                           bis_freq, np.flip(bis_freq[-num_padding - 1:-1])])
+                bis_freq = np.concatenate(
+                    [
+                        np.flip(bis_freq[1 : 2 + num_padding - 1]),
+                        bis_freq,
+                        np.flip(bis_freq[-num_padding - 1 : -1]),
+                    ]
+                )
 
-                bis_freq = self._anti_mode_mixing(y, bis_freq, ind_remove_pad, num_padding)
+                bis_freq = self._anti_mode_mixing(
+                    y, bis_freq, ind_remove_pad, num_padding
+                )
                 bis_freq = bis_freq[ind_remove_pad]
-                bis_freq = np.concatenate([np.flip(bis_freq[1:2 + num_padding - 1]),
-                                           bis_freq, np.flip(bis_freq[-num_padding - 1:-1])])
+                bis_freq = np.concatenate(
+                    [
+                        np.flip(bis_freq[1 : 2 + num_padding - 1]),
+                        bis_freq,
+                        np.flip(bis_freq[-num_padding - 1 : -1]),
+                    ]
+                )
 
                 temp_inst_bwr = inst_bwr_2[ind_remove_pad]
                 ind_start = np.round(len(temp_inst_bwr) * 0.05).astype(int) - 1
                 ind_end = np.round(len(temp_inst_bwr) * 0.95).astype(int) - 1
 
-                if (((niter >= 1) and
-                     (np.mean(temp_inst_bwr[ind_start:ind_end + 1]) < (
-                             self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1)))) or
-                        (niter >= 5) or
-                        ((n > 0) and
-                         (np.mean(temp_inst_bwr[ind_start:ind_end + 1]) < (
-                                 self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1))))):
+                if (
+                    (
+                        (niter >= 1)
+                        and (
+                            np.mean(temp_inst_bwr[ind_start : ind_end + 1])
+                            < (self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1))
+                        )
+                    )
+                    or (niter >= 5)
+                    or (
+                        (n > 0)
+                        and (
+                            np.mean(temp_inst_bwr[ind_start : ind_end + 1])
+                            < (self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1))
+                        )
+                    )
+                ):
                     stop = True
                     break
 
-                if (len(np.where(temp_inst_bwr[ind_start:ind_end + 1] > self.thresh_bwr)[0]) /
-                    len(inst_bwr_2[ind_remove_pad])) < 0.2:
+                if (
+                    len(
+                        np.where(
+                            temp_inst_bwr[ind_start : ind_end + 1] > self.thresh_bwr
+                        )[0]
+                    )
+                    / len(inst_bwr_2[ind_remove_pad])
+                ) < 0.2:
                     stop = True
                     break
 
@@ -316,13 +394,18 @@ class TVF_EMD(object):
                 index_c_knot = np.sort(np.concatenate([indmin_knot, indmax_knot]))
                 if len(index_c_knot) > 2:
                     # Obtaining the LLF component
-                    localmean = fit_spline(np.arange(0, len(y), dtype=int), y, index_c_knot, self.bsp_order)
+                    localmean = fit_spline(
+                        np.arange(0, len(y), dtype=int), y, index_c_knot, self.bsp_order
+                    )
                 else:
                     stop = True
                     break
 
-                if (np.max(np.abs(y[ind_remove_pad] - localmean[ind_remove_pad])) / np.min(
-                        np.abs(localmean[ind_remove_pad])) < 1e-3):
+                if (
+                    np.max(np.abs(y[ind_remove_pad] - localmean[ind_remove_pad]))
+                    / np.min(np.abs(localmean[ind_remove_pad]))
+                    < 1e-3
+                ):
                     stop = True
                     break
 
@@ -330,13 +413,23 @@ class TVF_EMD(object):
                 # until the LHF component is narrow band
                 temp_residual = y - localmean
                 temp_residual = temp_residual[ind_remove_pad]
-                temp_residual = temp_residual[np.round(len(temp_residual) * 0.1).astype(int) - 1:
-                                              -np.round(len(temp_residual) * 0.1).astype(int)]
+                temp_residual = temp_residual[
+                    np.round(len(temp_residual) * 0.1).astype(int)
+                    - 1 : -np.round(len(temp_residual) * 0.1).astype(int)
+                ]
                 localmean2 = localmean[ind_remove_pad]
-                localmean2 = localmean2[np.round(len(localmean2) * 0.1).astype(int) - 1:
-                                        -np.round(len(localmean2) * 0.1).astype(int)]
-                if (np.abs(np.max(localmean2)) / np.abs(np.max(inst_amp_0[ind_remove_pad])) < 3.5e-2 or
-                        np.abs(np.max(temp_residual)) / np.abs(np.max(inst_amp_0[ind_remove_pad])) < 1e-2):
+                localmean2 = localmean2[
+                    np.round(len(localmean2) * 0.1).astype(int)
+                    - 1 : -np.round(len(localmean2) * 0.1).astype(int)
+                ]
+                if (
+                    np.abs(np.max(localmean2))
+                    / np.abs(np.max(inst_amp_0[ind_remove_pad]))
+                    < 3.5e-2
+                    or np.abs(np.max(temp_residual))
+                    / np.abs(np.max(inst_amp_0[ind_remove_pad]))
+                    < 1e-2
+                ):
                     stop = True
                     break
 
@@ -367,8 +460,9 @@ def fit_spline(x: np.ndarray, y: np.ndarray, breaks: np.ndarray, n: int) -> np.n
     ii = np.cumsum(ii, axis=0)
     jj = np.tile(np.arange(0, mx).astype(int), (n, 1))
     ii = np.mod(ii, pieces)
-    a_sp = csr_matrix((a_sp.flatten(), (ii.flatten(), jj.flatten())),
-                      shape=(pieces, mx), dtype=float)
+    a_sp = csr_matrix(
+        (a_sp.flatten(), (ii.flatten(), jj.flatten())), shape=(pieces, mx), dtype=float
+    )
     a_sp.eliminate_zeros()
 
     if pieces < 20 * n / np.log(1.7 * n):
@@ -380,11 +474,16 @@ def fit_spline(x: np.ndarray, y: np.ndarray, breaks: np.ndarray, n: int) -> np.n
     jj = np.mod(np.arange(0, pieces + n - 1, dtype=int), pieces)
     u = u[jj]
 
-    ii = np.vstack((np.tile(np.arange(0, pieces, dtype=int), n), np.ones((n - 1, n * pieces))))
+    ii = np.vstack(
+        (np.tile(np.arange(0, pieces, dtype=int), n), np.ones((n - 1, n * pieces)))
+    )
     ii = np.cumsum(ii, axis=0)
     jj = np.tile(np.arange(0, n * pieces, dtype=int), (n, 1))
-    c_mtx = csr_matrix((pp_dict["coefs"].flatten("F"), (ii.flatten("F"), jj.flatten("F"))),
-                       shape=(pieces + n - 1, n * pieces), dtype=float)
+    c_mtx = csr_matrix(
+        (pp_dict["coefs"].flatten("F"), (ii.flatten("F"), jj.flatten("F"))),
+        shape=(pieces + n - 1, n * pieces),
+        dtype=float,
+    )
     coefs = u * c_mtx
     coefs = np.reshape(coefs, (int(len(coefs) / n), n), order="F")
 
@@ -394,7 +493,9 @@ def fit_spline(x: np.ndarray, y: np.ndarray, breaks: np.ndarray, n: int) -> np.n
     return sp_fit[0]
 
 
-def check_knots(x: np.ndarray, y: np.ndarray, knots: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def check_knots(
+    x: np.ndarray, y: np.ndarray, knots: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Check if x points are outside knots range
     This function comes from https://github.com/stfbnc/pytvfemd/tree/master
@@ -431,11 +532,11 @@ def spline_base(breaks: np.ndarray, n: int) -> Dict[str, int | Any | Any]:
             hcopy = h.copy()
         else:
             hcopy = np.tile(h, (int(np.ceil(deg / pieces)),))
-        hl = hcopy[-1:-deg - 1:-1]
+        hl = hcopy[-1 : -deg - 1 : -1]
         bl = breaks[0] - np.cumsum(hl)
         hr = hcopy[:deg]
         br = breaks[-1] + np.cumsum(hr)
-        breaks = np.concatenate([bl[deg - 1::-1], breaks, br])
+        breaks = np.concatenate([bl[deg - 1 :: -1], breaks, br])
         h = np.diff(breaks)
         pieces = len(h)
 
@@ -460,7 +561,7 @@ def spline_base(breaks: np.ndarray, n: int) -> Dict[str, int | Any | Any]:
         fmax = fmax.flatten("F")
         for j in range(k + 1):
             coefs[:, j] = coefs[:, j] / fmax
-        coefs[0:-deg, 0:k + 1] = coefs[0:-deg, 0:k + 1] - coefs[n - 1:, 0:k + 1]
+        coefs[0:-deg, 0 : k + 1] = coefs[0:-deg, 0 : k + 1] - coefs[n - 1 :, 0 : k + 1]
         coefs[::n, k] = 0
 
     scale = np.ones(hh.shape)
@@ -488,11 +589,13 @@ def pp_struct(br: np.ndarray, cf: np.ndarray, d: int) -> Dict:
     dl = d * l
     k = np.fix(dlk / dl + 100 * np.spacing(1)).astype(int)
 
-    pp = {"breaks": br.reshape((1, l + 1))[0],
-          "coefs": cf.reshape((dl, k)),
-          "pieces": l,
-          "order": k,
-          "dim": d}
+    pp = {
+        "breaks": br.reshape((1, l + 1))[0],
+        "coefs": cf.reshape((dl, k)),
+        "pieces": l,
+        "order": k,
+        "dim": d,
+    }
 
     return pp
 
@@ -534,7 +637,9 @@ def spline_eval(pp: Dict, xx: np.ndarray) -> np.ndarray:
         xs = np.tile(xs, (d, 1)).transpose((1, 0)).reshape((d * lx,))
         index = d * (index + 1) - 1
         temp = np.arange(-d, 0).astype(int)
-        arr = np.tile(temp[np.newaxis].transpose(), (1, lx)) + np.tile(index, (d, 1)) + 1
+        arr = (
+            np.tile(temp[np.newaxis].transpose(), (1, lx)) + np.tile(index, (d, 1)) + 1
+        )
         index = arr.transpose((1, 0)).reshape((d * lx,))
     else:
         if len(sizexx) > 1:

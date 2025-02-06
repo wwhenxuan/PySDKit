@@ -20,9 +20,17 @@ class VNCMD(Base):
     IEEE Transactions on Signal Processing, 2017, 65(22): 6024-6037.
     """
 
-    def __init__(self, eIF: Optional[np.ndarray] = None, fs: Optional[float] = None,
-                 alpha: float = 3e-4, beta: float = 1e-9, var: float = 1.0, max_iter: int = 300,
-                 tol: float = 1e-5, dtype: np.dtype = np.float64):
+    def __init__(
+        self,
+        eIF: Optional[np.ndarray] = None,
+        fs: Optional[float] = None,
+        alpha: float = 3e-4,
+        beta: float = 1e-9,
+        var: float = 1.0,
+        max_iter: int = 300,
+        tol: float = 1e-5,
+        dtype: np.dtype = np.float64,
+    ):
         """
         :param eIF: initial instantaneous frequency (IF) time series for all the signal modes; each row of eIF corresponds to the IF of each mode
         :param fs: sampling frequency
@@ -118,8 +126,13 @@ class VNCMD(Base):
             ybar[i - 1] = (y[i + 1] - y[i - 1]) / (2 * delta)
 
         # Prepend and append the boundary differences
-        ybar = np.concatenate((np.array([(y[1] - y[0]) / delta], dtype=self.DTYPE),
-                               ybar, np.array([(y[-1] - y[-2]) / delta], dtype=self.DTYPE)))
+        ybar = np.concatenate(
+            (
+                np.array([(y[1] - y[0]) / delta], dtype=self.DTYPE),
+                ybar,
+                np.array([(y[-1] - y[-2]) / delta], dtype=self.DTYPE),
+            )
+        )
 
         return ybar
 
@@ -152,7 +165,9 @@ class VNCMD(Base):
         opedoub = np.dot(oper.T, oper)
 
         # Used to store the demodulated orthogonal signal components
-        sinm, cosm = np.zeros((K, N), dtype=self.DTYPE), np.zeros((K, N), dtype=self.DTYPE)
+        sinm, cosm = np.zeros((K, N), dtype=self.DTYPE), np.zeros(
+            (K, N), dtype=self.DTYPE
+        )
 
         # Used to store the demodulated orthogonal signal components
         xm, ym = np.zeros((K, N), dtype=self.DTYPE), np.zeros((K, N), dtype=self.DTYPE)
@@ -170,14 +185,26 @@ class VNCMD(Base):
 
         # Initialize the variables defined above through loops
         for i in range(K):
-            sinm[i, :] = np.sin(2 * np.pi * cumtrapz(eIF[i, :], t, initial=0), dtype=self.DTYPE)
-            cosm[i, :] = np.cos(2 * np.pi * cumtrapz(eIF[i, :], t, initial=0), dtype=self.DTYPE)
+            sinm[i, :] = np.sin(
+                2 * np.pi * cumtrapz(eIF[i, :], t, initial=0), dtype=self.DTYPE
+            )
+            cosm[i, :] = np.cos(
+                2 * np.pi * cumtrapz(eIF[i, :], t, initial=0), dtype=self.DTYPE
+            )
 
-            Bm = diags(sinm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE).toarray()
-            Bdoubm = diags((sinm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE).toarray()
+            Bm = diags(
+                sinm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE
+            ).toarray()
+            Bdoubm = diags(
+                (sinm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE
+            ).toarray()
 
-            Am = diags(cosm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE).toarray()
-            Adoubm = diags((cosm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE).toarray()
+            Am = diags(
+                cosm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE
+            ).toarray()
+            Adoubm = diags(
+                (cosm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE
+            ).toarray()
 
             xm[i, :] = solve(2 / self.alpha * opedoub + Adoubm, np.dot(Am.T, signal))
             ym[i, :] = solve(2 / self.alpha * opedoub + Bdoubm, np.dot(Bm.T, signal))
@@ -201,7 +228,9 @@ class VNCMD(Base):
             if betathr > self.beta:
                 betathr = self.beta
 
-            u = self.projec(vec=signal - sum_x - sum_y - lamuda / self.alpha, var=self.var)
+            u = self.projec(
+                vec=signal - sum_x - sum_y - lamuda / self.alpha, var=self.var
+            )
 
             for i in range(K):
                 Bm = diags(sinm[i, :].T, offsets=0, shape=(N, N)).toarray()
@@ -213,14 +242,18 @@ class VNCMD(Base):
                 # remove the relevant component from the sum
                 sum_x = sum_x - xm[i, :] * cosm[i, :]
 
-                xm[i, :] = np.linalg.solve(2 / self.alpha * opedoub + Adoubm,
-                                           np.dot(Am.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T))
+                xm[i, :] = np.linalg.solve(
+                    2 / self.alpha * opedoub + Adoubm,
+                    np.dot(Am.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T),
+                )
                 interx = xm[i, :] * cosm[i, :]
                 sum_x = sum_x + interx
 
                 sum_y = sum_y - ym[i, :] * sinm[i, :]
-                ym[i, :] = np.linalg.solve(2 / self.alpha * opedoub + Bdoubm,
-                                           np.dot(Bm.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T))
+                ym[i, :] = np.linalg.solve(
+                    2 / self.alpha * opedoub + Bdoubm,
+                    np.dot(Bm.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T),
+                )
                 sum_y = sum_y + ym[i, :] * sinm[i, :]
 
                 # compute the derivative of the functions
@@ -228,7 +261,12 @@ class VNCMD(Base):
                 ybar = self.differ(ym[i, :], self.fs)
 
                 # obtain the frequency increment by arctangent demodulation
-                deltaIF = (xm[i, :] * ybar - ym[i, :] * xbar) / (xm[i, :] ** 2 + ym[i, :] ** 2) / 2 / np.pi
+                deltaIF = (
+                    (xm[i, :] * ybar - ym[i, :] * xbar)
+                    / (xm[i, :] ** 2 + ym[i, :] ** 2)
+                    / 2
+                    / np.pi
+                )
                 # smooth the frequency increment by low pass filtering
                 deltaIF = solve(2 / betathr * opedoub + eye(N), deltaIF.T)
                 # update the IF
@@ -253,32 +291,44 @@ class VNCMD(Base):
                 lamuda = np.zeros(shape=(1, len(t)))
                 for i in range(K):
                     Bm = diags(sinm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                    Bdoubm = diags((sinm[i, :] ** 2).T, offsets=0, shape=(N, N)).toarray()
+                    Bdoubm = diags(
+                        (sinm[i, :] ** 2).T, offsets=0, shape=(N, N)
+                    ).toarray()
 
                     Am = diags(cosm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                    Adoubm = diags((cosm[i, :] ** 2).T, offsets=0, shape=(N, N)).toarray()
+                    Adoubm = diags(
+                        (cosm[i, :] ** 2).T, offsets=0, shape=(N, N)
+                    ).toarray()
 
-                    xm[i, :] = solve(2 / self.alpha * opedoub + Adoubm, np.dot(Am.T, signal))
-                    ym[i, :] = solve(2 / self.alpha * opedoub + Bdoubm, np.dot(Bm.T, signal))
+                    xm[i, :] = solve(
+                        2 / self.alpha * opedoub + Adoubm, np.dot(Am.T, signal)
+                    )
+                    ym[i, :] = solve(
+                        2 / self.alpha * opedoub + Bdoubm, np.dot(Bm.T, signal)
+                    )
 
-                    ssetiter[i, :, iter + 1] = xm[i, :] * cosm[i, :] + ym[i, :] * sinm[i, :]
+                    ssetiter[i, :, iter + 1] = (
+                        xm[i, :] * cosm[i, :] + ym[i, :] * sinm[i, :]
+                    )
 
                 sum_x, sum_y = np.sum(xm * cosm, axis=1), np.sum(ym * sinm, axis=1)
 
             # compute the convergence index
             sDif = 0
             for i in range(K):
-                sDif += (norm(ssetiter[i, :, iter + 1] - ssetiter[i, :, iter]) / norm(
-                    ssetiter[i, :, iter])) ** 2
+                sDif += (
+                    norm(ssetiter[i, :, iter + 1] - ssetiter[i, :, iter])
+                    / norm(ssetiter[i, :, iter])
+                ) ** 2
 
             # Increase the number of push iterations
             iter += 1
 
             print(sDif)
 
-        self.IFmset = IFsetiter[:, :, 0: iter]
-        self.smset = ssetiter[:, :, 0: iter]
-        self.IA = np.sqrt(xm ** 2 + ym ** 2)
+        self.IFmset = IFsetiter[:, :, 0:iter]
+        self.smset = ssetiter[:, :, 0:iter]
+        self.IA = np.sqrt(xm**2 + ym**2)
 
         # print(self.IFmset.shape, self.smset.shape)
         return self.IFmset[:, :, -1], self.smset[:, :, -1], self.IA

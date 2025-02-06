@@ -15,17 +15,19 @@ from ._functions import set_themes
 # set_themes(choice="plot_imfs")
 
 
-def plot_IMFs(signal: np.ndarray,
-              IMFs: np.ndarray,
-              max_imfs: int = -1,
-              colors: Optional[List] = None,
-              save_figure: bool = False,
-              return_figure: bool = False,
-              dpi: int = 128,
-              fontsize: float = 14,
-              spine_width: float = 2,
-              labelpad: float = 10,
-              save_name: Optional[str] = None) -> Optional[plt.figure]:
+def plot_IMFs(
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: int = -1,
+    colors: Optional[List] = None,
+    save_figure: bool = False,
+    return_figure: bool = False,
+    dpi: int = 128,
+    fontsize: float = 14,
+    spine_width: float = 2,
+    labelpad: float = 10,
+    save_name: Optional[str] = None,
+) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
@@ -62,14 +64,24 @@ def plot_IMFs(signal: np.ndarray,
 
     # Set the colors for plotting
     if colors is None:
-        colors = ['#000000', '#228B22', '#FF8C00', '#BA55D3', '#4169E1', '#FF6347', '#20B2AA']
+        colors = [
+            "#000000",
+            "#228B22",
+            "#FF8C00",
+            "#BA55D3",
+            "#4169E1",
+            "#FF6347",
+            "#20B2AA",
+        ]
     # Add random colors if there are not enough colors in the list
     while len(colors) <= nrows:
         colors.append(generate_random_hex_color())
 
     for i in range(0, nrows):
         # Plot a horizontal gray line as the x-axis
-        ax[i].axhline(y=0, color='gray', linestyle='-', alpha=0.6, linewidth=spine_width)
+        ax[i].axhline(
+            y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width
+        )
 
         if i == 0:
             # Plot the original signal in black
@@ -84,7 +96,7 @@ def plot_IMFs(signal: np.ndarray,
 
         # Keep only the left spine visible
         for spine_name, spine in ax[i].spines.items():
-            if spine_name != 'left':
+            if spine_name != "left":
                 # Only keep the left spine visible
                 spine.set_visible(False)
             else:
@@ -97,25 +109,24 @@ def plot_IMFs(signal: np.ndarray,
             ax[i].set_xticks([])
 
     # Open the bottom spine of the last axes and set its position
-    ax[-1].spines['bottom'].set_position(('axes', -0.2))
-    ax[-1].spines['bottom'].set_visible(True)
-    ax[-1].spines['bottom'].set_linewidth(spine_width)
+    ax[-1].spines["bottom"].set_position(("axes", -0.2))
+    ax[-1].spines["bottom"].set_visible(True)
+    ax[-1].spines["bottom"].set_linewidth(spine_width)
 
     # Save the figure if requested
     saved = False
     if save_figure is True:
         if save_name is not None:
-            for formate in ['.jpg', '.pdf', '.png', '.bmp']:
+            for formate in [".jpg", ".pdf", ".png", ".bmp"]:
                 if formate in save_name:
-                    fig.savefig(save_name, dpi=dpi, bbox_inches='tight')
+                    fig.savefig(save_name, dpi=dpi, bbox_inches="tight")
                     saved = True
                     break
             if saved is False:
-                fig.savefig(save_name + '.jpg', dpi=dpi, bbox_inches='tight')
+                fig.savefig(save_name + ".jpg", dpi=dpi, bbox_inches="tight")
         else:
-            fig.savefig("plot_imfs.jpg", dpi=dpi, bbox_inches='tight')
+            fig.savefig("plot_imfs.jpg", dpi=dpi, bbox_inches="tight")
 
     # Return the figure if requested
     if return_figure is True:
         return fig
-

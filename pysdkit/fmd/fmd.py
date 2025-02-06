@@ -42,7 +42,7 @@ def Correlated_Kurtosis(x: np.ndarray, T: int, M: int = 2) -> float:
     for m in range(1, M + 1):
         x_shift[m, T:] = x_shift[m - 1, :-T]
     # 计算自相关峭度
-    ck = np.sum(np.prod(x_shift, axis=0) ** 2) / np.sum(x ** 2) ** (M + 1)
+    ck = np.sum(np.prod(x_shift, axis=0) ** 2) / np.sum(x**2) ** (M + 1)
     return ck
 
 
@@ -59,11 +59,11 @@ def xcorr(x: np.ndarray, lags: int) -> np.ndarray:
         x = x_pad
 
     # Compute the autocorrelation
-    auto_corr = correlate(x, x, mode='full')
+    auto_corr = correlate(x, x, mode="full")
 
     # Sample the autocorrelation if the lag is less than the signal length
     if lags < N:
-        auto_corr = auto_corr[N - lags - 1: N + lags]
+        auto_corr = auto_corr[N - lags - 1 : N + lags]
     auto_corr = auto_corr / np.max(auto_corr)
     return auto_corr
 
@@ -81,7 +81,7 @@ def TT(y: np.ndarray, fs: int):
     M = fs
 
     NA = xcorr(y, lags=M)
-    NA = NA[math.ceil(len(NA) / 2) - 1:]
+    NA = NA[math.ceil(len(NA) / 2) - 1 :]
 
     # Find the first zero-crossing
     sample1 = NA[0]
@@ -123,7 +123,7 @@ def xxc_mckd(fs, x, f_init, termIter, T, M, plotMode):
         M = 3
 
     if T.size == 0:
-        hil =  np.abs(hilbert(x))
+        hil = np.abs(hilbert(x))
         xxenvelope = hil - np.mean(hil)
         T = TT(xxenvelope, fs)
 
@@ -138,39 +138,11 @@ def xxc_mckd(fs, x, f_init, termIter, T, M, plotMode):
     for m in range(0, M + 1):
         for l in range(0, L):
             if l == 0:
-                XmT[l, (m * T):, m] = x[:N - m * T]
+                XmT[l, (m * T) :, m] = x[: N - m * T]
             else:
                 XmT[l, 1:, m] = XmT[l - 1, :-1, m]
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     print(TT(a, fs=13))
-
-
-
-
-
-

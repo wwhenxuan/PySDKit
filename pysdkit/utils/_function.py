@@ -55,4 +55,3 @@ def decimal_scaling_normalization(x: np.ndarray) -> np.ndarray:
     max_abs_value = np.max(np.abs(x))
     scaling_factor = 10 ** np.ceil(np.log10(max_abs_value + 1))
     return x / scaling_factor
-

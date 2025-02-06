@@ -9,8 +9,16 @@ from typing import Tuple
 from pysdkit.utils import fft, ifft, fftshift, ifftshift, fmirror
 
 
-def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform', DC: bool = False,
-        max_iter: int = 500, tol: float = 1e-6) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def vmd(
+    signal: np.array,
+    alpha: int,
+    K: int,
+    tau: float,
+    init: str = "uniform",
+    DC: bool = False,
+    max_iter: int = 500,
+    tol: float = 1e-6,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Variational mode decomposition, object-oriented interface.
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
@@ -34,7 +42,7 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
         signal = signal[:-1]
 
     # Period and sampling frequency of input signal
-    fs = 1. / len(signal)
+    fs = 1.0 / len(signal)
 
     # Mirror expansion of signals
     sym = len(signal) // 2
@@ -61,13 +69,15 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
     u_hat_plus = np.zeros([max_iter, len(freqs), K], dtype=complex)
     # Initialization of omega_k
     omega_plus = np.zeros([max_iter, K])
-    if init.lower() == 'uniform':
+    if init.lower() == "uniform":
         for i in range(K):
             omega_plus[0, i] = (0.5 / K) * i
-    elif init.lower() == 'random':
-        omega_plus[0, :] = np.sort(np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * np.random.rand(1, K)))
-    elif init.lower() == 'zero':
-        omega_plus[0, :] = 0.
+    elif init.lower() == "random":
+        omega_plus[0, :] = np.sort(
+            np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * np.random.rand(1, K))
+        )
+    elif init.lower() == "zero":
+        omega_plus[0, :] = 0.0
     else:
         raise ValueError
     if DC:
@@ -83,30 +93,38 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
         # update spectrum of first mode through Wiener filter of residuals
         sum_uk = u_hat_plus[n, :, K - 1] + sum_uk - u_hat_plus[n, :, 0]
         u_hat_plus[n + 1, :, 0] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
-                1. + alpha[0] * (freqs - omega_plus[n, 0]) ** 2)
+            1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
+        )
 
         # update first omega if not held at 0
         if not DC:
-            omega_plus[n + 1, 0] = np.dot(freqs[T // 2:T], (abs(u_hat_plus[n + 1, T // 2:T, 0]) ** 2)) / np.sum(
-                abs(u_hat_plus[n + 1, T // 2:T, 0]) ** 2)
+            omega_plus[n + 1, 0] = np.dot(
+                freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
+            ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
 
         # update of any other mode
         for k in range(1, K):
             # mode spectrum
             sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
             u_hat_plus[n + 1, :, k] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
-                    1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2)
+                1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2
+            )
             # center frequencies
-            omega_plus[n + 1, k] = np.dot(freqs[T // 2:T], (abs(u_hat_plus[n + 1, T // 2:T, k]) ** 2)) / np.sum(
-                abs(u_hat_plus[n + 1, T // 2:T, k]) ** 2)
+            omega_plus[n + 1, k] = np.dot(
+                freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
+            ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
 
         # Update Lagrange multipliers
-        lambda_hat[n + 1, :] = lambda_hat[n, :] + tau * (np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus)
+        lambda_hat[n + 1, :] = lambda_hat[n, :] + tau * (
+            np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus
+        )
 
         # Determine whether the algorithm has converged
         for i in range(K):
-            convergence = convergence + (1 / T) * np.dot((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
-                                                         np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])))
+            convergence = convergence + (1 / T) * np.dot(
+                (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
+                np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])),
+            )
         convergence = np.abs(convergence)
         if convergence <= tol:
             break
@@ -118,8 +136,8 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
 
     # signal reconstruction
     u_hat = np.zeros([T, K], dtype=complex)
-    u_hat[T // 2:T, :] = u_hat_plus[niter - 1, T // 2:T, :]
-    u_hat[idxs, :] = np.conj(u_hat_plus[niter - 1, T // 2:T, :])
+    u_hat[T // 2 : T, :] = u_hat_plus[niter - 1, T // 2 : T, :]
+    u_hat[idxs, :] = np.conj(u_hat_plus[niter - 1, T // 2 : T, :])
     u_hat[0, :] = np.conj(u_hat[-1, :])
 
     u = np.zeros([K, len(t)])
@@ -127,7 +145,7 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
         u[k, :] = np.real(ifft(ts=ifftshift(ts=u_hat[:, k])))
 
     # remove mirror part
-    u = u[:, T // 4:3 * T // 4]
+    u = u[:, T // 4 : 3 * T // 4]
 
     # recompute spectrum
     u_hat = np.zeros([u.shape[1], K], dtype=complex)
@@ -135,4 +153,3 @@ def vmd(signal: np.array, alpha: int, K: int, tau: float, init: str = 'uniform',
         u_hat[:, k] = fftshift(ts=fft(ts=u[k, :]))
 
     return u, u_hat, omega
-

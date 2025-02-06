@@ -16,7 +16,7 @@ def simple_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndarra
     :param window_size: Window size for averaging (default is 2)
     :return: Smoothed signal (numpy array)
     """
-    return np.convolve(signal, np.ones(window_size) / window_size, mode='same')
+    return np.convolve(signal, np.ones(window_size) / window_size, mode="same")
 
 
 def weighted_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndarray:
@@ -27,7 +27,7 @@ def weighted_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndar
     :return: Smoothed signal (numpy array)
     """
     weights = np.arange(1, window_size + 1)
-    return np.convolve(signal, weights / weights.sum(), mode='same')
+    return np.convolve(signal, weights / weights.sum(), mode="same")
 
 
 def gaussian_smoothing(signal: np.ndarray, sigma: int = 2) -> np.ndarray:
@@ -40,7 +40,9 @@ def gaussian_smoothing(signal: np.ndarray, sigma: int = 2) -> np.ndarray:
     return gaussian_filter1d(signal, sigma=sigma)
 
 
-def savgol_smoothing(signal: np.ndarray, window_length: int = 11, polyorder: int = 2) -> np.ndarray:
+def savgol_smoothing(
+    signal: np.ndarray, window_length: int = 11, polyorder: int = 2
+) -> np.ndarray:
     """
     Savitzky-Golay Filtering Smoothing
     :param signal: Input signal (numpy array)
@@ -71,6 +73,7 @@ def smooth_show_info():
     Visualize different signal smoothing methods on a test signal
     """
     import matplotlib.pyplot as plt
+
     # Generate test signal
     np.random.seed(0)
     x = np.linspace(0, 2 * np.pi, 100)
@@ -80,12 +83,34 @@ def smooth_show_info():
     fig, ax = plt.subplots(figsize=(12, 5))
 
     # Apply signal smoothing algorithms and visualize
-    ax.plot(x, signal, label='Original Signal', alpha=0.8)
-    ax.plot(x, simple_moving_average(signal=signal, window_size=5), label='Simple Moving Average', alpha=0.7)
-    ax.plot(x, weighted_moving_average(signal=signal, window_size=5), label='Weighted Moving Average', alpha=0.7)
-    ax.plot(x, gaussian_smoothing(signal=signal, sigma=3), label='Gaussian Filtering', alpha=0.7)
-    ax.plot(x, savgol_smoothing(signal=signal), label='Savitzky-Golay Filtering', alpha=0.7)
-    ax.plot(x, exponential_smoothing(signal=signal, alpha=0.4), label='Exponential Smoothing', alpha=0.7)
+    ax.plot(x, signal, label="Original Signal", alpha=0.8)
+    ax.plot(
+        x,
+        simple_moving_average(signal=signal, window_size=5),
+        label="Simple Moving Average",
+        alpha=0.7,
+    )
+    ax.plot(
+        x,
+        weighted_moving_average(signal=signal, window_size=5),
+        label="Weighted Moving Average",
+        alpha=0.7,
+    )
+    ax.plot(
+        x,
+        gaussian_smoothing(signal=signal, sigma=3),
+        label="Gaussian Filtering",
+        alpha=0.7,
+    )
+    ax.plot(
+        x, savgol_smoothing(signal=signal), label="Savitzky-Golay Filtering", alpha=0.7
+    )
+    ax.plot(
+        x,
+        exponential_smoothing(signal=signal, alpha=0.4),
+        label="Exponential Smoothing",
+        alpha=0.7,
+    )
 
     # Add legend
     ax.legend(loc="best", fontsize=11)

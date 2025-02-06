@@ -3,6 +3,7 @@
 Created on 2025/02/02 00:13:28
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+这部分代码等待进行优化
 """
 import numpy as np
 from scipy.interpolate import pchip_interpolate
@@ -32,7 +33,7 @@ def find_extrema(signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         imax, imin = np.array([], dtype=int), np.array([], dtype=int)
 
         # 标记diff中差分为0的位置
-        bad = (diff == 0.0)
+        bad = diff == 0.0
 
         # 对数组进行两端拓展使其能够处理开始和结束
         c_bad = np.concatenate([[0], bad, [0]])
@@ -64,10 +65,14 @@ def find_extrema(signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
             for k in range(len(debs)):
                 if diff[debs[k] - 1] > 0:
                     if diff[fins[k]] < 0:
-                        imax = np.concatenate([imax, [np.round((fins[k] + debs[k]) / 2)]])
+                        imax = np.concatenate(
+                            [imax, [np.round((fins[k] + debs[k]) / 2)]]
+                        )
                 else:
                     if diff[fins[k]] > 0:
-                        imin = np.concatenate([imin, [np.round((fins[k] + debs[k]) / 2)]])
+                        imin = np.concatenate(
+                            [imin, [np.round((fins[k] + debs[k]) / 2)]]
+                        )
 
         # 对最终的索引进行合并
         if len(imax) > 0:
@@ -100,7 +105,9 @@ def inst_freq_local(data: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 
         phi = np.unwrap(np.angle(h))
         inst_freq_temp = (phi[2:] - phi[:-2]) / 2
-        inst_freq_temp = np.concatenate([[inst_freq_temp[0]], inst_freq_temp, [inst_freq_temp[-1]]])
+        inst_freq_temp = np.concatenate(
+            [[inst_freq_temp[0]], inst_freq_temp, [inst_freq_temp[-1]]]
+        )
         inst_freq[k, :] = inst_freq_temp.flatten() / (2 * np.pi)
 
     # 进一步处理两个端点
@@ -164,16 +171,26 @@ def divide2exp(y, inst_amp_0, inst_freq_0):
     indmin_a2, indmax_a2 = find_extrema(a2)
 
     inst_amp_inst_amp_2 = inst_freq_0 * np.power(inst_amp_0, 2.0)
-    inst_amp_tmax = pchip_interpolate(indmax_amp_0, inst_amp_inst_amp_2[indmax_amp_0],
-                                      np.arange(0, len(inst_amp_inst_amp_2), dtype=int))
-    inst_amp_tmin = pchip_interpolate(indmin_amp_0, inst_amp_inst_amp_2[indmin_amp_0],
-                                      np.arange(0, len(inst_amp_inst_amp_2), dtype=int))
+    inst_amp_tmax = pchip_interpolate(
+        indmax_amp_0,
+        inst_amp_inst_amp_2[indmax_amp_0],
+        np.arange(0, len(inst_amp_inst_amp_2), dtype=int),
+    )
+    inst_amp_tmin = pchip_interpolate(
+        indmin_amp_0,
+        inst_amp_inst_amp_2[indmin_amp_0],
+        np.arange(0, len(inst_amp_inst_amp_2), dtype=int),
+    )
     f1 = np.zeros((len(inst_freq_0),), dtype=float)
     f2 = np.zeros((len(inst_freq_0),), dtype=float)
     for i in range(len(inst_freq_0)):
         a_mtx = np.empty((2, 2), dtype=float)
-        a_mtx[0, :] = np.array([np.power(a1[i], 2.0) + a1[i] * a2[i], np.power(a2[i], 2.0) + a1[i] * a2[i]])
-        a_mtx[1, :] = np.array([np.power(a1[i], 2.0) - a1[i] * a2[i], np.power(a2[i], 2.0) - a1[i] * a2[i]])
+        a_mtx[0, :] = np.array(
+            [np.power(a1[i], 2.0) + a1[i] * a2[i], np.power(a2[i], 2.0) + a1[i] * a2[i]]
+        )
+        a_mtx[1, :] = np.array(
+            [np.power(a1[i], 2.0) - a1[i] * a2[i], np.power(a2[i], 2.0) - a1[i] * a2[i]]
+        )
         b_mtx = np.array([inst_amp_tmax[i], inst_amp_tmin[i]])
         c_mtx = np.linalg.solve(a_mtx, b_mtx)
         f1[i] = c_mtx[0]
@@ -183,8 +200,12 @@ def divide2exp(y, inst_amp_0, inst_freq_0):
     if len(indmax_a2) > 3:
         bis_freq = pchip_interpolate(indmax_a2, bis_freq[indmax_a2], tt)
 
-    avg_freq = (inst_amp_tmax + inst_amp_tmin) / (2 * (np.power(a1, 2.0) + np.power(a2, 2.0)))
-    cos_diffphi = (np.power(inst_amp_0, 2.0) - np.power(a1, 2.0) - np.power(a2, 2.0)) / (2 * a1 * a2)
+    avg_freq = (inst_amp_tmax + inst_amp_tmin) / (
+        2 * (np.power(a1, 2.0) + np.power(a2, 2.0))
+    )
+    cos_diffphi = (
+        np.power(inst_amp_0, 2.0) - np.power(a1, 2.0) - np.power(a2, 2.0)
+    ) / (2 * a1 * a2)
     cos_diffphi[cos_diffphi > 1.2] = 1
     cos_diffphi[cos_diffphi < -1.2] = -1
     inst_amp1, inst_freq_diff_phi = inst_freq_local(cos_diffphi)
@@ -195,10 +216,14 @@ def divide2exp(y, inst_amp_0, inst_freq_0):
     diff_a2 = np.concatenate([[diff_a2[0]], diff_a2, [diff_a2[-1]]])
 
     inst_bw = np.power(
-        (np.power(diff_a1, 2.0) + np.power(diff_a2, 2.0)) / (np.power(a1, 2.0) + np.power(a2, 2.0)) + np.power(a1,
-                                                                                                               2.0) *
-        np.power(a2, 2.0) * np.power(inst_freq_diff_phi, 2.0) / np.power(np.power(a1, 2.0) + np.power(a2, 2.0), 2.0),
-        0.5)
+        (np.power(diff_a1, 2.0) + np.power(diff_a2, 2.0))
+        / (np.power(a1, 2.0) + np.power(a2, 2.0))
+        + np.power(a1, 2.0)
+        * np.power(a2, 2.0)
+        * np.power(inst_freq_diff_phi, 2.0)
+        / np.power(np.power(a1, 2.0) + np.power(a2, 2.0), 2.0),
+        0.5,
+    )
     ratio_bw = np.abs(inst_bw / avg_freq)
     ratio_bw[(a2 / a1) < 5e-3] = 0
     ratio_bw[avg_freq < 1e-7] = 0
@@ -221,4 +246,3 @@ def divide2exp(y, inst_amp_0, inst_freq_0):
     bis_freq[bis_freq < 0] = 0
 
     return a1, f1, a2, f2, bis_freq, ratio_bw, avg_freq
-
