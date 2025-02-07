@@ -375,6 +375,13 @@ class EMD(object):
         time: Optional[np.ndarray] = None,
         max_imfs: Optional[int] = None,
     ) -> np.ndarray:
+        """
+        Signal decomposition using EMD algorithm
+        :param signal: the time domain signal (1D numpy array) to be decomposed
+        :param time: the time array of the input signal
+        :param max_imfs: the maximum number of IMFs to extract
+        :return: the decomposed results of IMFs
+        """
 
         # Define the length of signal
         N = len(signal)

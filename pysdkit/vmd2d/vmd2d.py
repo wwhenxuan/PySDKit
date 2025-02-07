@@ -77,7 +77,14 @@ class VMD2D(object):
         K: Optional[int] = None,
         return_all: Optional[bool] = False,
     ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """开始执行算法"""
+        """
+        Image decomposition using VMD algorithm
+        :param img: the input image of 2D ndarray in numpy
+        :param K: the maximum number of modes to be decomposed
+        :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes,
+                           True plus the spectra of the modes and the estimated mode center-frequencies
+        :return: The extracted modes from the signals / images
+        """
         K = K if K is not None else self.K
 
         # Resolution of image

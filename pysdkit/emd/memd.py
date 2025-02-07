@@ -4,15 +4,15 @@ Created on 2025/02/04 13:10:33
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 We refactored from https://github.com/mariogrune/MEMD-Python-
-
-待修改
 """
 import numpy as np
 import warnings
 
 from sys import exit
-from scipy.interpolate import interp1d, CubicSpline
-from typing import Optional, Tuple
+
+from numpy import ndarray, dtype
+from scipy.interpolate import CubicSpline
+from typing import Optional, Tuple, Any
 
 
 class MEMD(object):
@@ -42,17 +42,18 @@ class MEMD(object):
         stop_cnt: Optional[int] = 2,
     ) -> None:
         """
-        初始化MEMD算法
-        注意该算法要求输入
-        :param stop_crit: 算法停止迭代的准则，可以选择['stop', 'fix_h']
-        :param max_iter: 最大迭代次数
-        :param n_dir: 方向向量的投影个数，一般来说该参数无需指定，
-                      在输入信号后该参数将设定为输入信号通道数目的两倍
-        :param stop_vec: 当`stop_crit`为'stop'时使用的停止参数设置
-        :param stop_cnt: 当`stop_crit`为'fix_h'时使用的停驶参数设置
+        Initialize the Multivariate Empirical Mode Decomposition algorithm
+        Note that this algorithm requires the dimension of the input signal to be greater than or equal to 3
+
+        :param stop_crit: The criterion for stopping the algorithm iteration, you can choose ['stop', 'fix_h']
+        :param max_iter: The maximum number of iterations
+        :param n_dir: The number of projections of the direction vector, generally this parameter does not need to be specified,
+                      After the input signal, this parameter will be set to twice the number of input signal channels
+        :param stop_vec: The stop parameter setting used when `stop_crit` is 'stop'
+        :param stop_cnt: The stop parameter setting used when `stop_crit` is 'fix_h'
         """
 
-        # 设置算法的停止迭代准则
+        # Set the algorithm's stopping criterion
         if not isinstance(stop_crit, str) or (
             stop_crit != "stop" and stop_crit != "fix_h"
         ):
@@ -60,14 +61,14 @@ class MEMD(object):
         self.stop_crit = stop_crit
         self.max_iter = max_iter
 
-        # 设置方向投影向量
+        # Set the direction projection vector
         if not isinstance(n_dir, int) or n_dir < 6:
             exit(
                 "invalid num_dir. num_dir should be an integer greater than or equal to 6."
             )
         self.n_dir = n_dir
 
-        # 使用'stop'作为停止准则
+        # Use 'stop' as stopping criterion
         if not isinstance(stop_vec, (list, tuple, np.ndarray)) or any(
             x for x in stop_vec if not isinstance(x, (int, float, complex))
         ):
@@ -77,13 +78,14 @@ class MEMD(object):
         self.stop_vec = stop_vec
         self.sd, self.sd2, self.tol = stop_vec[0], stop_vec[1], stop_vec[2]
 
-        # 使用'fix_h'作为停止准则
+        # Use 'fix_h' as stopping criterion
         if not isinstance(stop_cnt, int) or stop_cnt < 0:
             exit("invalid stop_count. stop_count should be a non-negative integer.")
         self.stop_cnt = stop_cnt
 
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(self, signal: np.ndarray) -> np.ndarray:
+        """allow instances to be called like functions"""
+        return self.fit_transform(signal=signal)
 
     def init_hammersley(self, N_dim: int) -> np.ndarray:
         """Initializations for Hammersley function"""
@@ -107,7 +109,7 @@ class MEMD(object):
         return seq
 
     def stop_emd(self, signal: np.ndarray, seq: np.ndarray, N_dim: int) -> bool:
-        """控制是否停止EMD算法的迭代"""
+        """Controls whether to stop the iteration of the EMD algorithm"""
         ner = np.zeros(shape=(self.n_dir, 1))
         dir_vec = np.zeros(shape=(N_dim, 1))
 
@@ -164,7 +166,6 @@ class MEMD(object):
         seq_len: int,
         N_dim: int,
     ) -> Tuple[bool, np.ndarray]:
-        """"""
         try:
             env_mean, nem, nzm, amp = envelope_mean(
                 signal, time, seq, self.n_dir, seq_len, N_dim
@@ -196,7 +197,6 @@ class MEMD(object):
         N_dim: int,
         counter: int,
     ) -> Tuple[bool, np.ndarray, int]:
-        """"""
         try:
             env_mean, nem, nzm, amp = envelope_mean(
                 signal, time, seq, self.n_dir, seq_len, N_dim
@@ -218,36 +218,38 @@ class MEMD(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Preform the Multivariate Empirical Mode Decomposition method.
-        请注意该方法仅适用于输入维数大于等于3的信号（遵循最原始的MEMD的MATLAB代码）
-        :param signal:
-        :return:
+        Please note that this method only works for signals with input dimension greater than or equal to 3
+        (following the original MEMD MATLAB code)
+        :param signal: the multivariate signal of numpy ndarray
+        :return: the decomposed signal results
         """
-        # 获取输入信号的维度和长度
+
+        # Get the dimension and length of the input signal
         N_dim, seq_len = signal.shape
 
         if N_dim < 3:
             raise ValueError(
-                "MEMD仅能处理输入三元及以上的信号，如果待处理的信号不满足要求可以尝试使用MVMD算法。"
+                "MEMD can only process signals with three or more input elements. If the signal to be processed does not meet the requirements, you can try using the MVMD algorithm."
             )
 
         # Initializations for Hammersley function
         seq = self.init_hammersley(N_dim)
 
-        # 通过输入信号的维数初始化投影维数
+        # Initialize the projection dimension by the dimension of the input signal
         self.n_dir = N_dim * 2
 
-        # 生成时间戳序列数组
+        # Generate a timestamp sequence array
         time = np.arange(1, seq_len + 1)
 
-        # 对输入信号进行通道变换以进行分解
+        # Channelize the input signal to decompose it
         signal = signal.transpose((1, 0))
 
         print(signal.shape)
 
-        # 用于存放分解结果的列表
+        # List used to store decomposition results
         imfs = []
 
-        # 记录已分解IMFs的数目
+        # Record the number of decomposed IMFs
         n_imfs = 1
 
         # Counter
@@ -275,7 +277,7 @@ class MEMD(object):
                 )
             else:
                 raise ValueError(
-                    "参数`stop_crit`设置错误!请从'stop'或'fix_h'中进行选择。"
+                    "Parameter `stop_crit` is set incorrectly! Please choose from 'stop' or 'fix_h'."
                 )
 
             print(stop_flag)
@@ -318,7 +320,7 @@ class MEMD(object):
                         "emd:warning, forced stop of sifting : too many iterations"
                     )
 
-            # 记录本次分解的结果
+            # Record the results of this decomposition
             imfs.append(m)
 
             n_imfs += 1
@@ -332,102 +334,215 @@ class MEMD(object):
         return imfs
 
 
-def local_peaks(x):
+def local_peaks(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Detect local maxima and minima in the input signal.
+
+    :param x: 1D ndarray,
+        The input signal.
+    :return indmin: 1D ndarray,
+        Indices of the detected local minima.
+    :return indmax: 1D ndarray,
+        Indices of the detected local maxima.
+
+    Notes
+    * This function detects local extrema by identifying points where the signal changes direction.
+    * It handles zero values and repeated values to ensure accurate detection of extrema.
+    """
+    # Check if all values in the signal are close to zero
     if all(x < 1e-5):
         x = np.zeros((1, len(x)))
 
+    # Calculate the length of the signal minus one
     m = len(x) - 1
 
-    # Calculates the extrema of the projected signal
-    # Difference between subsequent elements:
+    # Calculate the first-order difference of the signal
     dy = np.diff(x.transpose()).transpose()
+
+    # Find indices where the difference is non-zero
     a = np.where(dy != 0)[0]
+
+    # Identify points where the indices are not consecutive
     lm = np.where(np.diff(a) != 1)[0] + 1
+
+    # Calculate the difference between non-consecutive indices
     d = a[lm] - a[lm - 1]
+
+    # Adjust the indices to the middle of the non-consecutive points
     a[lm] = a[lm] - np.floor(d / 2)
+
+    # Append the last index of the signal
     a = np.insert(a, len(a), m)
+
+    # Extract the values at the adjusted indices
     ya = x[a]
 
+    # Check if there are more than one extrema
     if len(ya) > 1:
-        # Maxima
+        # Detect maxima
         pks_max, loc_max = peaks(ya)
-        # Minima
+        # Detect minima by inverting the signal
         pks_min, loc_min = peaks(-ya)
 
+        # Extract the indices of the minima
         if len(pks_min) > 0:
             indmin = a[loc_min]
         else:
             indmin = np.asarray([])
 
+        # Extract the indices of the maxima
         if len(pks_max) > 0:
             indmax = a[loc_max]
         else:
             indmax = np.asarray([])
     else:
+        # If there are no extrema, return empty arrays
         indmin = np.array([])
         indmax = np.array([])
 
     return indmin, indmax
 
 
-def peaks(X):
-    dX = np.sign(np.diff(X.transpose())).transpose()
+def peaks(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Detect local maxima in the input signal
+
+    :param x: 1D ndarray,
+        The input signal.
+    :return pks_max: 1D ndarray,
+        Values of the detected local maxima.
+    :return locs_max: 1D ndarray,
+        Indices of the detected local maxima.
+
+    Notes
+    * This function detects local maxima by identifying points where the signal changes from increasing to decreasing.
+    """
+    # Compute the first-order difference of the signal
+    dX = np.sign(np.diff(x.transpose())).transpose()
+
+    # Identify points where the signal changes from increasing to decreasing
     locs_max = np.where(np.logical_and(dX[:-1] > 0, dX[1:] < 0))[0] + 1
-    pks_max = X[locs_max]
+
+    # Extract the values of the local maxima
+    pks_max = x[locs_max]
 
     return pks_max, locs_max
 
 
-def hamm(n, base):
+def hamm(n: int, base: int) -> np.ndarray:
+    """
+    Generate a Hammersley sequence.
+
+    :param n: int,
+        The length of the sequence to generate.
+    :param base: int,
+        The base of the Hammersley sequence.
+
+    :return seq: 1D ndarray,
+        The generated Hammersley sequence.
+
+    Notes
+    * The Hammersley sequence is a low-discrepancy sequence used in quasi-Monte Carlo methods.
+    * This function generates the sequence using a base-dependent algorithm.
+    """
+    # Initialize the sequence with zeros
     seq = np.zeros((1, n))
 
+    # Check if the base is greater than 1
     if 1 < base:
+        # Initialize the seed array
         seed = np.arange(1, n + 1)
         base_inv = 1 / base
+
+        # Generate the sequence using a base-dependent algorithm
         while any(x != 0 for x in seed):
             digit = np.remainder(seed[0:n], base)
             seq = seq + digit * base_inv
             base_inv = base_inv / base
             seed = np.floor(seed / base)
     else:
+        # Generate the sequence using a base-independent algorithm
         temp = np.arange(1, n + 1)
         seq = (np.remainder(temp, (-base + 1)) + 0.5) / (-base)
 
     return seq
 
 
-def nth_prime(n):
+def nth_prime(n: int) -> list:
+    """
+    Generate a list of the first n prime numbers.
+
+    :param n: int,
+        The number of prime numbers to generate.
+    :return lst: list,
+        A list containing the first n prime numbers.
+    ------------
+    * This function uses a helper function `is_prime` to check if a number is prime.
+    * It iterates through natural numbers and appends primes to the list until the list length reaches n.
+    """
+
+    # Initialize the list with the first prime number
     lst = [2]
-    for i in range(3, 104745):
+
+    # Iterate through natural numbers starting from 3
+    for i in range(3, 104745):  # 104745 is an arbitrary upper limit for demonstration
+
+        # Check if the current number is prime
         if is_prime(i):
+            # Append the prime number to the list
             lst.append(i)
+
+            # Check if the list length has reached the desired number of primes
             if len(lst) == n:
+                # Return the list of primes
                 return lst
 
 
-def is_prime(x):
+def is_prime(x: int) -> bool:
+    """
+    Check if a number is prime.
+
+    :param x: int,
+        The number to check for primality.
+
+    :return: bool,
+        True if the number is prime, False otherwise.
+
+    Notes
+    * A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+    * This function checks divisibility by all numbers up to the given number.
+    """
+
+    # Handle the special case for 2, the only even prime number
     if x == 2:
         return True
+
     else:
+        # Check divisibility by 2 and all odd numbers up to x-1
+
         for number in range(3, x):
+            # If x is divisible by any number, it is not prime
             if x % number == 0 or x % 2 == 0:
                 return False
 
+        # If no divisors were found, x is prime
         return True
 
 
-def envelope_mean(m, t, seq, ndir, N, N_dim):  # new
-
+def envelope_mean(
+    m: np.ndarray, t: np.ndarray, seq: np.ndarray, n_dir: int, seq_len: int, N_dim: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Get the envelope spectrum and upper and lower means of the input sequence"""
     NBSYM = 2
     count = 0
 
     env_mean = np.zeros((len(t), N_dim))
     amp = np.zeros((len(t)))
-    nem = np.zeros((ndir))
-    nzm = np.zeros((ndir))
+    nem = np.zeros(n_dir)
+    nzm = np.zeros(n_dir)
 
     dir_vec = np.zeros((N_dim, 1))
-    for it in range(0, ndir):
+    for it in range(0, n_dir):
         if N_dim != 3:  # Multivariate signal (for N_dim ~=3) with hammersley sequence
             # Linear normalisation of hammersley sequence in the range of -1.00 - 1.00
             b = 2 * seq[it, :] - 1
@@ -483,68 +598,147 @@ def envelope_mean(m, t, seq, ndir, N, N_dim):  # new
         else:  # if the projected signal has inadequate extrema
             count = count + 1
 
-    if ndir > count:
-        env_mean = env_mean / (ndir - count)
-        amp = amp / (ndir - count)
+    if n_dir > count:
+        env_mean = env_mean / (n_dir - count)
+        amp = amp / (n_dir - count)
     else:
-        env_mean = np.zeros((N, N_dim))
-        amp = np.zeros((N))
-        nem = np.zeros((ndir))
+        env_mean = np.zeros((seq_len, N_dim))
+        amp = np.zeros((seq_len))
+        nem = np.zeros((n_dir))
 
-    return (env_mean, nem, nzm, amp)
+    return env_mean, nem, nzm, amp
 
 
-def zero_crossings(x):
+def zero_crossings(x: np.ndarray) -> np.ndarray:
+    """
+    Detect zero-crossings in the input signal.
+    :param x: 1D ndarray, The input signal.
+    :return indzer: 1D ndarray, Indices of the zero-crossings in the input signal.
+
+    Notes
+    * Zero-crossings are detected by identifying sign changes between consecutive samples.
+    * If the signal contains zero values, these are also considered as zero-crossings.
+    """
+    # Detect zero-crossings by identifying sign changes between consecutive samples
     indzer = np.where(x[0:-1] * x[1:] < 0)[0]
 
+    # Check if the signal contains zero values
     if any(x == 0):
+        # Find indices where the signal is zero
         iz = np.where(x == 0)[0]
+
+        # Check if there are consecutive zero values
         if any(np.diff(iz) == 1):
+            # Create a boolean array indicating where the signal is zero
             zer = x == 0
+
+            # Compute the difference to find the start and end of zero sequences
             dz = np.diff([0, zer, 0])
+
+            # Find the start indices of zero sequences
             debz = np.where(dz == 1)[0]
+
+            # Find the end indices of zero sequences
             finz = np.where(dz == -1)[0] - 1
+
+            # Compute the midpoint indices of zero sequences
             indz = np.round((debz + finz) / 2)
         else:
+            # If there are no consecutive zero values, use the zero indices directly
             indz = iz
+
+        # Combine the detected zero-crossings and zero indices
         indzer = np.sort(np.concatenate((indzer, indz)))
 
+    # Return the sorted indices of zero-crossings
     return indzer
 
 
-def boundary_conditions(indmin, indmax, t, x, z, nbsym):
+def boundary_conditions(
+    indmin: np.ndarray,
+    indmax: np.ndarray,
+    t: np.ndarray,
+    x: np.ndarray,
+    z: np.ndarray,
+    nbsym: int,
+) -> (
+    Tuple[None, None, None, None, int]
+    | Tuple[
+        ndarray[Any, dtype[Any]],
+        ndarray[Any, dtype[Any]],
+        ndarray[Any, dtype[Any]],
+        ndarray[Any, dtype[Any]],
+        int,
+    ]
+):
+    """
+    Handle boundary conditions for signal processing by extending the signal symmetrically.
+
+    :param indmin: 1D ndarray,
+        Indices of the signal's minima.
+    :param indmax: 1D ndarray,
+        Indices of the signal's maxima.
+    :param t: 1D ndarray,
+        Time stamps of the signal.
+    :param x: 1D ndarray,
+        Values of the signal.
+    :param z: 2D ndarray,
+        Values of the signal (possibly multi-channel).
+    :param nbsym: int,
+        Number of symmetric points to extend.
+
+    :return tmin: 1D ndarray,
+        Time stamps of the processed minima.
+    :return tmax: 1D ndarray,
+        Time stamps of the processed maxima.
+    :return zmin: 2D ndarray,
+        Values of the processed minima.
+    :return zmax: 2D ndarray,
+        Values of the processed maxima.
+    :return mode: int,
+        Processing mode (0 if the signal has inadequate extrema, 1 otherwise).
+
+    Notes
+    * The function ensures the signal's continuity at the boundaries by symmetrically extending the signal.
+    * If the signal has inadequate extrema, the function returns mode 0.
+    """
+
+    # Calculate the length of the signal
     lx = len(x) - 1
+
+    # Calculate the length of the maxima and minima arrays
     end_max = len(indmax) - 1
     end_min = len(indmin) - 1
+
+    # Convert indices to integers
     indmin = indmin.astype(int)
     indmax = indmax.astype(int)
 
+    # Check if the signal has inadequate extrema
     if len(indmin) + len(indmax) < 3:
-        mode = 0
-        tmin = tmax = zmin = zmax = None
-        return (tmin, tmax, zmin, zmax, mode)
+        mode = 0  # Inadequate extrema
+        tmin = tmax = zmin = zmax = None  # No processed values
+        return tmin, tmax, zmin, zmax, mode
     else:
-        mode = 1  # the projected signal has inadequate extrema
-    # boundary conditions for interpolations :
+        mode = 1  # The projected signal has adequate extrema
+
+    # Boundary conditions for interpolations
     if indmax[0] < indmin[0]:
         if x[0] > x[indmin[0]]:
             lmax = np.flipud(indmax[1 : min(end_max + 1, nbsym + 1)])
             lmin = np.flipud(indmin[: min(end_min + 1, nbsym)])
             lsym = indmax[0]
-
         else:
             lmax = np.flipud(indmax[: min(end_max + 1, nbsym)])
             lmin = np.concatenate(
                 (np.flipud(indmin[: min(end_min + 1, nbsym - 1)]), ([0]))
             )
             lsym = 0
-
     else:
         if x[0] < x[indmax[0]]:
             lmax = np.flipud(indmax[: min(end_max + 1, nbsym)])
             lmin = np.flipud(indmin[1 : min(end_min + 1, nbsym + 1)])
             lsym = indmin[0]
-
         else:
             lmax = np.concatenate(
                 (np.flipud(indmax[: min(end_max + 1, nbsym - 1)]), ([0]))
@@ -557,33 +751,31 @@ def boundary_conditions(indmin, indmax, t, x, z, nbsym):
             rmax = np.flipud(indmax[max(end_max - nbsym + 1, 0) :])
             rmin = np.flipud(indmin[max(end_min - nbsym, 0) : -1])
             rsym = indmin[-1]
-
         else:
             rmax = np.concatenate(
-                (np.array([lx]), np.flipud(indmax[max(end_max - nbsym + 2, 0) :]))
+                (np.array([lx]), np.flipud(indmax[max(end_max - nbsym + 2, 0) :])),
             )
             rmin = np.flipud(indmin[max(end_min - nbsym + 1, 0) :])
             rsym = lx
-
     else:
         if x[-1] > x[indmin[-1]]:
             rmax = np.flipud(indmax[max(end_max - nbsym, 0) : -1])
             rmin = np.flipud(indmin[max(end_min - nbsym + 1, 0) :])
             rsym = indmax[-1]
-
         else:
             rmax = np.flipud(indmax[max(end_max - nbsym + 1, 0) :])
             rmin = np.concatenate(
-                (np.array([lx]), np.flipud(indmin[max(end_min - nbsym + 2, 0) :]))
+                (np.array([lx]), np.flipud(indmin[max(end_min - nbsym + 2, 0) :])),
             )
             rsym = lx
 
+    # Calculate the time stamps for the symmetric extensions
     tlmin = 2 * t[lsym] - t[lmin]
     tlmax = 2 * t[lsym] - t[lmax]
     trmin = 2 * t[rsym] - t[rmin]
     trmax = 2 * t[rsym] - t[rmax]
 
-    # in case symmetrized parts do not extend enough
+    # Ensure the symmetric parts extend enough
     if tlmin[0] > t[0] or tlmax[0] > t[0]:
         if lsym == indmax[0]:
             lmax = np.flipud(indmax[: min(end_max + 1, nbsym)])
@@ -606,17 +798,19 @@ def boundary_conditions(indmin, indmax, t, x, z, nbsym):
         trmin = 2 * t[rsym] - t[rmin]
         trmax = 2 * t[rsym] - t[rmax]
 
+    # Extract the values for the symmetric extensions
     zlmax = z[lmax, :]
     zlmin = z[lmin, :]
     zrmax = z[rmax, :]
     zrmin = z[rmin, :]
 
+    # Combine the symmetric extensions with the original extrema
     tmin = np.hstack((tlmin, t[indmin], trmin))
     tmax = np.hstack((tlmax, t[indmax], trmax))
     zmin = np.vstack((zlmin, z[indmin, :], zrmin))
     zmax = np.vstack((zlmax, z[indmax, :], zrmax))
 
-    return (tmin, tmax, zmin, zmax, mode)
+    return tmin, tmax, zmin, zmax, mode
 
 
 if __name__ == "__main__":

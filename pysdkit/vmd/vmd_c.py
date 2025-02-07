@@ -145,7 +145,7 @@ class VMD(Base):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using VMD algorithm
-        :param signal: the time domain signal (1D numpy array)  to be decomposed
+        :param signal: the time domain signal (1D numpy array) to be decomposed
         :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes,
                            True plus the spectra of the modes and the estimated mode center-frequencies
         :return:  u       - the collection of decomposed modes,

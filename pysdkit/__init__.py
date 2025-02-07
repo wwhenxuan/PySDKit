@@ -16,6 +16,18 @@ from .tvf_emd import TVF_EMD
 # 希尔伯特震动分解
 from .hvd import HVD
 
+# 本征时间尺度分解
+from .itd import ITD
+
+# 局部均值分解
+from .lmd import LMD
+
+# 稳健局部均值分解
+from .lmd import RLMD
+
+# 奇异谱分析
+from .ssa import SSA
+
 # 变分模态分解算法
 from .vmd import vmd, VMD
 
@@ -33,12 +45,3 @@ from .vncmd import VNCMD
 
 # 经验小波变换
 from .ewt import ewt, EWT
-
-# 本征时间尺度分解
-from .itd import ITD
-
-# 局部均值分解
-from .lmd import LMD
-
-# 稳健局部均值分解
-from .lmd import RLMD

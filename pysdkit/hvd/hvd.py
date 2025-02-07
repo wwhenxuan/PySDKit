@@ -38,7 +38,7 @@ class HVD(object):
     """
 
     def __init__(
-            self, K: int = 3, fpar: Optional[int] = 20, mirror: Optional[bool] = True
+        self, K: int = 3, fpar: Optional[int] = 20, mirror: Optional[bool] = True
     ) -> None:
         """
         Create the Hilbert Vibration Decomposition instance
@@ -53,16 +53,16 @@ class HVD(object):
         self.mirror = mirror
 
     def __call__(
-            self, signal: np.ndarray, return_all: Optional[bool] = False
+        self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Tuple[np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal, return_all)
 
     def square_window(
-            self,
-            seq_len: int,
-            w_filt: Tuple[int, int] = None,
-            real_valued_filter: bool = True,
+        self,
+        seq_len: int,
+        w_filt: Tuple[int, int] = None,
+        real_valued_filter: bool = True,
     ) -> np.ndarray:
         """
         Square window in range 0:fs//2.
@@ -104,7 +104,7 @@ class HVD(object):
         return Hp
 
     def fit_transform(
-            self, signal: np.ndarray, return_all: Optional[bool] = False
+        self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Tuple[np.ndarray, np.ndarray] | np.ndarray:
         """Start executing the Hilbert Vibration Decomposition algorithm."""
 
@@ -139,7 +139,7 @@ class HVD(object):
             intfreqf = filter_by_window(intfreq, hp)
 
             # To avoid transition zone
-            f[i] = np.abs(np.mean(intfreqf[seq_len // 50: -seq_len // 50]))
+            f[i] = np.abs(np.mean(intfreqf[seq_len // 50 : -seq_len // 50]))
 
             signal_ref = np.exp(-2j * np.pi * f[i] * time)
 
@@ -157,7 +157,7 @@ class HVD(object):
 
         if self.mirror is True:
             # Remove the mirrored part after decomposition
-            imfs = imfs[:, sym: -sym]
+            imfs = imfs[:, sym:-sym]
 
         if return_all:
             # Return both the decomposed intrinsic mode functions and frequency information
@@ -175,7 +175,7 @@ def make_window_real_valued(H, N):
     :return: spectrum window (in frequency domain) with two parts in the range 0:fs//2 and fs//2:fs
              (mirrored and shifted by 1 point to fs//2)
     """
-    H[N // 2 + 1: N] = H[1: N // 2][::-1]
+    H[N // 2 + 1 : N] = H[1 : N // 2][::-1]
     return H
 
 
