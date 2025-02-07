@@ -35,7 +35,9 @@ setuptools.setup(
     install_requires=[
         "numpy>=1.24.3,<=1.26.4",
         "scipy>=1.11.1,<=1.13.1",
-        "matplotlib>=3.7.2,<=3.8.4" "tqdm>=4.66.5",
+        "matplotlib>=3.7.2,<=3.8.4",
+        "tqdm>=4.66.5",
+        "requests>=2.32.3"
     ],  # 手动指定依赖的Python以及最低的版本
     package_data={"": ["*.txt"]},  # 连同数据一起打包
     include_package_data=True,
