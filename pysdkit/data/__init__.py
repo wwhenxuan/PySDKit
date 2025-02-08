@@ -18,16 +18,16 @@ from ._generator import generate_am_signal, generate_exponential_signal
 from ._generator import test_emd
 
 # Generator for 1D univariate
-from ._generator import test_uni_1D
+from ._generator import test_uni_signal
 
 # Generator for 1D multivariate
-from ._generator import test_multi_1D
+from ._generator import test_multi_signal
 
 # Functions that generate signal visualizations
-from ._generator import plot_signal1D
+from ._generator import plot_signal
 
 # add Gaussian noise
 from ._add_noise import add_noise
 
-# 加载二维灰度图像的测试案例
+# Test case for loading a 2D grayscale image
 from ._image import test_grayscale

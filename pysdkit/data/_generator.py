@@ -198,7 +198,7 @@ def generate_exponential_signal(
     return t, noisy_exp_signal
 
 
-def test_uni_1D(
+def test_uni_signal(
     case: int = 1,
     duration: float = 1.0,
     sampling_rate: int = 1000,
@@ -302,7 +302,7 @@ def test_emd(
     return t, noise_signal
 
 
-def test_multi_1D(
+def test_multi_signal(
     case: int = 1,
     duration: float = 1.0,
     sampling_rate: int = 1000,
@@ -445,7 +445,7 @@ def test_multi_1D_3(
     return t, f
 
 
-def plot_signal1D(
+def plot_signal(
     t: np.array,
     signal: np.array,
     color: str = "royalblue",
@@ -516,15 +516,15 @@ def plot_signal1D(
 
 
 if __name__ == "__main__":
-    from pysdkit.data import test_emd, plot_signal1D, test_multi_1D
+    from pysdkit.data import test_emd, plot_signal, test_multi_signal
 
-    t, signal = test_uni_1D(case=1)
+    t, signal = test_uni_signal(case=1)
     print(signal.shape)
 
-    fig = plot_signal1D(t, signal)
+    fig = plot_signal(t, signal)
 
-    t, signal = test_multi_1D(case=2)
+    t, signal = test_multi_signal(case=2)
     print(signal.shape)
 
-    fig = plot_signal1D(t, signal, save=False)
+    fig = plot_signal(t, signal, save=False)
     plt.show()
