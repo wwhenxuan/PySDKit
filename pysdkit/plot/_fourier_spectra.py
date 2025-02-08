@@ -10,8 +10,8 @@ from matplotlib import pyplot as plt
 from typing import Optional, List, Tuple
 from ._functions import set_themes
 from ._functions import generate_random_hex_color
-from ..utils import simple_moving_average, weighted_moving_average
-from ..utils import gaussian_smoothing, savgol_smoothing, exponential_smoothing
+from pysdkit.utils import simple_moving_average, weighted_moving_average
+from pysdkit.utils import gaussian_smoothing, savgol_smoothing, exponential_smoothing
 
 # set_themes(choice='classic')
 

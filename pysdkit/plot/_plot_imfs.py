@@ -55,13 +55,13 @@ def plot_IMFs(
     :param save_name: The name of the saved image file
     :return: The figure object for the plot
     """
-    # 获取选择的可视化方式
+    # Get the selected visualization
     view = view.lower()
 
-    # 这里要判断函数输入的维数然后选择使用的函数
+    # Here you need to determine the dimension of the function input and then select the function to use
 
     if view == "2d":
-        # 在二维平面上绘制一元信号分解的结果
+        # Plot the results of the decomposition of a univariate signal on a 2D plane
         return plot_1D_IMFs(
             signal=signal,
             IMFs=IMFs,
@@ -76,7 +76,7 @@ def plot_IMFs(
             save_name=save_name,
         )
     elif view == "3d":
-        # 在三维空间中绘制一元信号分解的结果
+        # Plot the results of the decomposition of a univariate signal in 3D space
         return plot_3D_IMFs(
             signal=signal,
             IMFs=IMFs,
@@ -142,6 +142,7 @@ def plot_1D_IMFs(
     # Set the colors for plotting
     if colors is None:
         colors = COLORS
+
     # Add random colors if there are not enough colors in the list
     while len(colors) <= n_rows:
         colors.append(generate_random_hex_color())
@@ -238,6 +239,7 @@ def plot_3D_IMFs(
     # Set the colors for plotting
     if colors is None:
         colors = COLORS
+
     # Add random colors if there are not enough colors in the list
     while len(colors) <= n_rows:
         colors.append(generate_random_hex_color())
@@ -301,7 +303,7 @@ def plot_multi_IMFs(
         save_name: Optional[str] = None,
 ):
     """
-    绘制多元信号及其分解后的本征模态函数
+    Plotting a multivariate signal and its decomposed intrinsic mode functions
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted
@@ -318,7 +320,7 @@ def plot_multi_IMFs(
     # Set the matplotlib configs
     set_themes(choice="plot_imfs")
 
-    # 获取多元信号的元数和信号长度
+    # Get the number of elements and signal length of a multi-element signal
     n_vars, seq_len = signal.shape
 
     # Edge padding
@@ -348,22 +350,22 @@ def plot_multi_IMFs(
     )
     fig.tight_layout()
 
-    # 开始绘制信号
+    # Start drawing the signal
     for row in range(n_rows):
-        # 遍历每行绘制原始信号和本征模态函数
+        # Iterate over each row and plot the original signal and the intrinsic mode function
         for col in range(n_vars):
-            # 遍历每列绘制每一元信号及其分解的结果
+            # Traverse each column to draw each element signal and its decomposition result
             ax[row, col].axhline(
                 y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width
             )
 
-            # 绘制信号
+            # Plotting the signal
             ax[row, col].plot(signals[row, :, col], color=colors[row])
 
-            # 设置信号的范围
+            # Set the range of the signal
             ax[row, col].set_xlim(-padding, seq_len + padding)
 
-            # 调整坐标轴刻度的大小
+            # Adjust the size of the axis scale
             ax[row, col].tick_params(axis='both', which='major', labelsize=8)
 
             # Keep only the left spine visible
@@ -426,7 +428,18 @@ def plot_multi_3D_IMFs(
         dpi: Optional[int] = 128,
         save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
-    """以3D的视角绘制多元信号分解后的结果"""
+    """
+    Plot the results of multivariate signal decomposition in 3D
+    :param signal: The input original signal
+    :param IMFs: The intrinsic mode functions obtained after signal decomposition
+    :param max_imfs: The number of decomposition modes to be plotted
+    :param colors: List of color strings for plotting
+    :param save_figure: Whether to save the figure as an image
+    :param return_figure: Whether to return the figure object
+    :param dpi: The resolution of the saved image
+    :param save_name: The name of the saved image file
+    :return: The figure object for the plot
+    """
 
     # Determine the number of rows
     if max_imfs == -1:
@@ -434,7 +447,7 @@ def plot_multi_3D_IMFs(
     else:
         n_rows = min(IMFs.shape[0], max_imfs) + 1
 
-    # 获取多元信号的元数和信号长度
+    # Get the number of elements and signal length of a multi-element signal
     n_vars, seq_len = signal.shape
 
     # Reconstruct the input signal
@@ -452,7 +465,7 @@ def plot_multi_3D_IMFs(
     # Create the figure and axes
     fig = plt.figure(figsize=(5 * n_vars, 6), dpi=200)
 
-    # 通过一个列表的方式来调整ax对象
+    # Adjust the ax object by using a list
     axes = [fig.add_subplot(100 + n_vars * 10 + i, projection="3d") for i in range(1, n_vars + 1)]
 
     # Create the x and y axes for 3D plotting
@@ -471,7 +484,7 @@ def plot_multi_3D_IMFs(
             axes[col].plot(np.ones(seq_len) * x[row], y, signals[row, :, col], color=colors[row],
                            lw=0.75)
 
-        # 调整坐标轴刻度的大小
+        # Adjust the size of the axis scale
         axes[col].tick_params(axis='both', which='major', labelsize=9)
 
         # Set the x axes ticks and labels
@@ -518,14 +531,3 @@ if __name__ == "__main__":
 
     plot_multi_3D_IMFs(signal=signal, IMFs=IMFs)
     plt.show()
-
-    # time, signal = test_emd()
-    # ewt = EWT(K=3)
-    #
-    # IMFs = ewt(signal)
-    #
-    # plot_IMFs(signal, IMFs, view='2d')
-    # plt.show()
-    #
-    # plot_IMFs(signal, IMFs, view='3d')
-    # plt.show()

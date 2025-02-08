@@ -204,7 +204,7 @@ def test_uni_1D(
         sampling_rate: int = 1000,
 ) -> Tuple[np.array, np.array]:
     """
-    根据输入`case`选择一维一元信号的测试实例
+    Select a test case for a one-dimensional univariate signal based on the input `case`
     :param case: the test number in [1, 2, 3]
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
@@ -299,16 +299,81 @@ def test_multi_1D(
         case: int = 1,
         duration: float = 1.0,
         sampling_rate: int = 1000,
-        noise_level: float = 0.0,
-        random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
-    pass
+    """
+    Select a test case for a 1D multivariate signal based on the input `case`
+    :param case: the test number in [1, 2, 3]
+    :param duration: Length of the signal in seconds.
+    :param sampling_rate: Number of samples per second.
+    :return: Tuple containing time array and the generated signal.
+    :return: the generated signal for multivariate 1D.
+    """
+    if case == 1:
+        return test_multi_1D_1(duration=duration, sampling_rate=sampling_rate)
+    elif case == 2:
+        return test_multi_1D_2(duration=duration, sampling_rate=sampling_rate)
+    elif case == 3:
+        return test_multi_1D_3(duration=duration, sampling_rate=sampling_rate)
+    else:
+        # When there is no such test instance, the function returns `case==1`
+        print(f"There is no case {case}, so it will return case==1!")
+        return test_multi_1D_1(duration=duration, sampling_rate=sampling_rate)
 
 
 def test_multi_1D_1(
+        duration: float = 1.0, sampling_rate: int = 1000
+) -> Tuple[np.array, np.array]:
+    """
+    Generate some simple cosine and sine function for multivariate signal decomposition test
+    :param duration: Length of the signal in seconds.
+    :param sampling_rate: Number of samples per second.
+    :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len].
+    """
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+
+    # Generate the multi-channels signals
+    signal_1 = np.cos(2 * np.pi * 5 * t + np.pi / 3) + 2.5 * np.cos(2 * np.pi * 36 * t + np.pi / 2)
+    signal_2 = 3 * np.cos(2 * np.pi * 24 * t) + 2 * np.cos(2 * np.pi * 36 * t)
+
+    # concat all channels
+    signal = np.vstack([signal_1, signal_2])
+
+    return t, signal
+
+
+def test_multi_1D_2(duration: float = 1.0, sampling_rate: int = 1000) -> Tuple[np.array, np.array]:
+    """
+    Generate four channels simple cosine and sine function for multivariate signal decomposition
+    :param duration: Length of the signal in seconds.
+    :param sampling_rate: Number of samples per second.
+    :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len].
+    """
+    np.random.seed(seed=42)
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
+
+    # Generate the multi-channels signals
+    signal_1 = 2 * np.cos(2 * np.pi * 3 * t ** 2) + 1.7 * np.cos(2 * np.pi * 20 * t) + np.cos(
+        2 * np.pi * 40 * t) + np.random.uniform(0, 0.2, t.shape)
+
+    signal_2 = 1.5 * np.cos(2 * np.pi * 3 * t ** 2) + np.random.uniform(0, 0.2, t.shape)
+
+    signal_3 = 2 * np.cos(2 * np.pi * 20 * t + np.pi / 3) + 1.8 * np.cos(2 * np.pi * 40 * t) + np.random.uniform(0, 0.2,
+                                                                                                                 t.shape)
+
+    signal_4 = 1.8 * np.cos(2 * np.pi * 3 * t ** 2) + 2 * np.cos(2 * np.pi * 40 * t) + np.random.uniform(0, 0.2,
+                                                                                                         t.shape)
+
+    # Concat all the input channels
+    signal = np.vstack([signal_1, signal_2, signal_3, signal_4])
+
+    return t, signal
+
+
+def test_multi_1D_3(
         duration: float = 1.0,
         sampling_rate: int = 1000,
-        noise_level: float = 0.0,
+        noise_level: float = 0.1,
         random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -357,21 +422,6 @@ def test_multi_1D_1(
     f = np.vstack([f_channel1, f_channel2, f_channel3, f_channel4, f_channel5])
 
     return t, f
-
-
-pass
-
-
-def test_multi_1D_2(
-        duration: float = 1.0, sampling_rate: int = 1000
-) -> Tuple[np.array, np.array]:
-    pass
-
-
-def test_multi_1D_3(
-        duration: float = 1.0, sampling_rate: int = 1000
-) -> Tuple[np.array, np.array]:
-    pass
 
 
 def plot_signal1D(

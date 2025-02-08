@@ -14,10 +14,14 @@ from ._generator import (
 )
 from ._generator import generate_am_signal, generate_exponential_signal
 
-# The simple base example for two IMFs decomp
-
 # Generates the main test sample signal
 from ._generator import test_emd
+
+# Generator for 1D univariate
+from ._generator import test_uni_1D
+
+# Generator for 1D multivariate
+from ._generator import test_multi_1D
 
 # Functions that generate signal visualizations
 from ._generator import plot_signal1D
