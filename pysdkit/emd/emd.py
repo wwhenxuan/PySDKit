@@ -86,7 +86,9 @@ class EMD(object):
 
         self.max_imfs = max_imfs
 
-    def __call__(self, signal, time: Optional[np.ndarray] = None, max_imfs=-1):
+    def __call__(
+        self, signal, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None
+    ) -> np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, time=time, max_imfs=max_imfs)
 
@@ -373,7 +375,7 @@ class EMD(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = None,
+        max_imfs: Optional[int] = 4,
     ) -> np.ndarray:
         """
         Signal decomposition using EMD algorithm
@@ -422,6 +424,7 @@ class EMD(object):
         while not finished:
             residue[:] = signal - np.sum(IMF[:imfNo], axis=0)
             imf = residue.copy()
+
             mean = np.zeros(N, dtype=self.DTYPE)
 
             # Counters
@@ -431,6 +434,7 @@ class EMD(object):
 
             for n in range(1, self.MAX_ITERATION + 1):
                 ext_res = self.find_extrema(time, imf)
+
                 max_pos, min_pos, indzer = ext_res[0], ext_res[2], ext_res[4]
 
                 # Record the number of extreme points and the number of zero crossing points separately

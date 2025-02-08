@@ -14,14 +14,16 @@ from ._generator import (
 )
 from ._generator import generate_am_signal, generate_exponential_signal
 
+# The simple base example for two IMFs decomp
+
 # Generates the main test sample signal
 from ._generator import test_emd
 
 # Functions that generate signal visualizations
-from ._generator import plot_generate_signal
+from ._generator import plot_signal1D
 
 # add Gaussian noise
 from ._add_noise import add_noise
 
 # 加载二维灰度图像的测试案例
-from .image import test_grayscale
+from ._image import test_grayscale

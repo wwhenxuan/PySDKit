@@ -9,24 +9,101 @@ import matplotlib.pyplot as plt
 
 from typing import Optional, List
 
-from ._functions import generate_random_hex_color
-from ._functions import set_themes
+from pysdkit.plot._functions import generate_random_hex_color
+from pysdkit.plot._functions import set_themes
 
 # set_themes(choice="plot_imfs")
+COLORS = [
+    "#000000",
+    "#228B22",
+    "#FF8C00",
+    "#BA55D3",
+    "#4169E1",
+    "#FF6347",
+    "#20B2AA",
+]
 
 
 def plot_IMFs(
-    signal: np.ndarray,
-    IMFs: np.ndarray,
-    max_imfs: int = -1,
-    colors: Optional[List] = None,
-    save_figure: bool = False,
-    return_figure: bool = False,
-    dpi: int = 128,
-    fontsize: float = 14,
-    spine_width: float = 2,
-    labelpad: float = 10,
-    save_name: Optional[str] = None,
+        signal: np.ndarray,
+        IMFs: np.ndarray,
+        max_imfs: Optional[int] = -1,
+        view: Optional[str] = "2d",
+        colors: Optional[List] = None,
+        save_figure: Optional[bool] = False,
+        return_figure: Optional[bool] = False,
+        dpi: Optional[int] = 64,
+        fontsize: float = 14,
+        spine_width: float = 2,
+        labelpad: float = 10,
+        save_name: Optional[str] = None,
+) -> Optional[plt.figure]:
+    """
+    Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
+    Can be used as a generic interface for plotting.
+    :param signal: The input original signal
+    :param IMFs: The intrinsic mode functions obtained after signal decomposition
+    :param max_imfs: The number of decomposition modes to be plotted
+    :param view: The view of the figure, choice ["2d", "3d"]
+    :param colors: List of color strings for plotting
+    :param save_figure: Whether to save the figure as an image
+    :param return_figure: Whether to return the figure object
+    :param dpi: The resolution of the saved image
+    :param fontsize: The font size of the axis labels
+    :param spine_width: The width of the visible axes spines
+    :param labelpad: Controls the filling distance of the y-axis coordinate
+    :param save_name: The name of the saved image file
+    :return: The figure object for the plot
+    """
+    # 获取选择的可视化方式
+    view = view.lower()
+
+    # 这里要判断函数输入的维数然后选择使用的函数
+
+    if view == "2d":
+        # 在二维平面上绘制一元信号分解的结果
+        return plot_1D_IMFs(
+            signal=signal,
+            IMFs=IMFs,
+            max_imfs=max_imfs,
+            colors=colors,
+            save_figure=save_figure,
+            return_figure=return_figure,
+            dpi=dpi,
+            fontsize=fontsize,
+            spine_width=spine_width,
+            labelpad=labelpad,
+            save_name=save_name,
+        )
+    elif view == "3d":
+        # 在三维空间中绘制一元信号分解的结果
+        return plot_3D_IMFs(
+            signal=signal,
+            IMFs=IMFs,
+            max_imfs=max_imfs,
+            colors=colors,
+            save_figure=save_figure,
+            return_figure=return_figure,
+            dpi=dpi,
+            fontsize=fontsize,
+            save_name=save_name,
+        )
+    else:
+        raise ValueError("View must be either `2d` or `3d`")
+
+
+def plot_1D_IMFs(
+        signal: np.ndarray,
+        IMFs: np.ndarray,
+        max_imfs: Optional[int] = -1,
+        colors: Optional[List] = None,
+        save_figure: Optional[bool] = False,
+        return_figure: Optional[bool] = False,
+        dpi: Optional[int] = 64,
+        fontsize: float = 14,
+        spine_width: float = 2,
+        labelpad: float = 10,
+        save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -49,9 +126,9 @@ def plot_IMFs(
 
     # Determine the number of rows
     if max_imfs == -1:
-        nrows = IMFs.shape[0] + 1
+        n_rows = IMFs.shape[0] + 1
     else:
-        nrows = min(max_imfs, IMFs.shape[0]) + 1
+        n_rows = min(max_imfs, IMFs.shape[0]) + 1
 
     # The length of the signal
     length = IMFs.shape[1]
@@ -59,25 +136,17 @@ def plot_IMFs(
     padding = int(length / 50)
 
     # Create the figure and axes
-    fig, ax = plt.subplots(nrows=nrows, ncols=1, figsize=(10, 2 * nrows - 1), dpi=400)
+    fig, ax = plt.subplots(nrows=n_rows, ncols=1, figsize=(10, 2 * n_rows - 1), dpi=256)
     fig.tight_layout()
 
     # Set the colors for plotting
     if colors is None:
-        colors = [
-            "#000000",
-            "#228B22",
-            "#FF8C00",
-            "#BA55D3",
-            "#4169E1",
-            "#FF6347",
-            "#20B2AA",
-        ]
+        colors = COLORS
     # Add random colors if there are not enough colors in the list
-    while len(colors) <= nrows:
+    while len(colors) <= n_rows:
         colors.append(generate_random_hex_color())
 
-    for i in range(0, nrows):
+    for i in range(0, n_rows):
         # Plot a horizontal gray line as the x-axis
         ax[i].axhline(
             y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width
@@ -105,7 +174,7 @@ def plot_IMFs(
                 spine.set_linewidth(spine_width)
 
         # Hide x-axis tick labels for all but the last plot
-        if i != nrows - 1:
+        if i != n_rows - 1:
             ax[i].set_xticks([])
 
     # Open the bottom spine of the last axes and set its position
@@ -130,3 +199,333 @@ def plot_IMFs(
     # Return the figure if requested
     if return_figure is True:
         return fig
+
+
+def plot_3D_IMFs(
+        signal: np.ndarray,
+        IMFs: np.ndarray,
+        max_imfs: Optional[int] = -1,
+        colors: Optional[List] = None,
+        save_figure: Optional[bool] = False,
+        return_figure: Optional[bool] = False,
+        dpi: Optional[int] = 64,
+        fontsize: float = 8,
+        save_name: Optional[str] = None,
+) -> Optional[plt.figure]:
+    """
+    Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
+    Can be used as a generic interface for plotting.
+    :param signal: The input original signal
+    :param IMFs: The intrinsic mode functions obtained after signal decomposition
+    :param max_imfs: The number of decomposition modes to be plotted
+    :param colors: List of color strings for plotting
+    :param save_figure: Whether to save the figure as an image
+    :param return_figure: Whether to return the figure object
+    :param dpi: The resolution of the saved image
+    :param fontsize: The font size of the axis labels
+    :param save_name: The name of the saved image file
+    :return: The figure object for the plot
+    """
+    # Determine the number of rows
+    if max_imfs == -1:
+        n_rows = IMFs.shape[0] + 1
+    else:
+        n_rows = min(IMFs.shape[0], max_imfs) + 1
+
+    # The length of the signal
+    length = IMFs.shape[1]
+
+    # Set the colors for plotting
+    if colors is None:
+        colors = COLORS
+    # Add random colors if there are not enough colors in the list
+    while len(colors) <= n_rows:
+        colors.append(generate_random_hex_color())
+
+    # Create the figure and axes
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection="3d")
+
+    # Stacking all the signal including input and IMFs
+    signals = np.vstack([signal, IMFs])
+
+    # Create the x and y axes for 3D plotting
+    x = np.flip(np.arange(n_rows))
+    y = np.arange(length)
+
+    # Set the x string label
+    x_label = ["Signal"]
+    for num in range(n_rows - 1):
+        x_label.append(f"IMF-{num + 1}")
+
+    # Traverse each signal segment to draw an image
+    for i in range(0, n_rows):
+        ax.plot(np.ones(length) * x[i], y, signals[i, :], color=colors[i])
+
+    # Set the x axes ticks and labels
+    ax.set_xticks(x)
+    ax.set_xticklabels(x_label)
+
+    # Set the tick params including fontsize and colors
+    ax.tick_params(axis="both", which="major", labelsize=fontsize, colors="black")
+
+    # Save the figure if requested
+    saved = False
+    if save_figure is True:
+        if save_name is not None:
+            for formate in [".jpg", ".pdf", ".png", ".bmp"]:
+                if formate in save_name:
+                    fig.savefig(save_name, dpi=dpi, bbox_inches="tight")
+                    saved = True
+                    break
+            if saved is False:
+                fig.savefig(save_name + ".jpg", dpi=dpi, bbox_inches="tight")
+        else:
+            fig.savefig("plot_IMFs_3D.jpg", dpi=dpi, bbox_inches="tight")
+
+    # Return the figure if requested
+    if return_figure is True:
+        return fig
+
+
+def plot_multi_IMFs(
+        signal: np.ndarray,
+        IMFs: np.ndarray,
+        max_imfs: Optional[int] = -1,
+        colors: Optional[List] = None,
+        save_figure: Optional[bool] = False,
+        return_figure: Optional[bool] = False,
+        dpi: Optional[int] = 64,
+        fontsize: float = 10,
+        spine_width: float = 2,
+        save_name: Optional[str] = None,
+):
+    """
+    绘制多元信号及其分解后的本征模态函数
+    :param signal: The input original signal
+    :param IMFs: The intrinsic mode functions obtained after signal decomposition
+    :param max_imfs: The number of decomposition modes to be plotted
+    :param colors: List of color strings for plotting
+    :param save_figure: Whether to save the figure as an image
+    :param return_figure: Whether to return the figure object
+    :param dpi: The resolution of the saved image
+    :param fontsize: The font size of the axis labels
+    :param save_name: The name of the saved image file
+    :param spine_width: The width of the visible axes spines
+    :return: The figure object for the plot
+    """
+
+    # Set the matplotlib configs
+    set_themes(choice="plot_imfs")
+
+    # 获取多元信号的元数和信号长度
+    n_vars, seq_len = signal.shape
+
+    # Edge padding
+    padding = int(seq_len / 50)
+
+    # Determine the number of rows
+    if max_imfs == -1:
+        n_rows = IMFs.shape[0] + 1
+    else:
+        n_rows = min(max_imfs, IMFs.shape[0]) + 1
+
+    # Reconstruct the input signal
+    signals = np.zeros(shape=(n_rows, seq_len, n_vars))
+    signals[0, :, :] = signal.transpose(1, 0)
+    signals[1:, :, :] = IMFs
+
+    # Set the colors for plotting
+    if colors is None:
+        colors = COLORS
+    # Add random colors if there are not enough colors in the list
+    while len(colors) <= n_rows:
+        colors.append(generate_random_hex_color())
+
+    # Create the figure and axes for multi-plotting
+    fig, ax = plt.subplots(
+        nrows=n_rows, ncols=n_vars, figsize=(3 * n_vars, 1.5 * n_rows - 1), dpi=256
+    )
+    fig.tight_layout()
+
+    # 开始绘制信号
+    for row in range(n_rows):
+        # 遍历每行绘制原始信号和本征模态函数
+        for col in range(n_vars):
+            # 遍历每列绘制每一元信号及其分解的结果
+            ax[row, col].axhline(
+                y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width
+            )
+
+            # 绘制信号
+            ax[row, col].plot(signals[row, :, col], color=colors[row])
+
+            # 设置信号的范围
+            ax[row, col].set_xlim(-padding, seq_len + padding)
+
+            # 调整坐标轴刻度的大小
+            ax[row, col].tick_params(axis='both', which='major', labelsize=8)
+
+            # Keep only the left spine visible
+            for spine_name, spine in ax[row, col].spines.items():
+                if spine_name != "left":
+                    # Only keep the left spine visible
+                    spine.set_visible(False)
+                else:
+                    # Set the width of the left spine
+                    spine.set_visible(True)
+                    spine.set_linewidth(spine_width)
+
+            # Hide x-axis tick labels for all but the last plot
+            if row != n_rows - 1:
+                ax[row, col].set_xticks([])
+
+    for col in range(n_vars):
+        # Open the bottom spine of the last axes and set its position
+        ax[-1, col].spines["bottom"].set_position(("axes", -0.1))
+        ax[-1, col].spines["bottom"].set_visible(True)
+        ax[-1, col].spines["bottom"].set_linewidth(spine_width)
+
+    # Setting the y label
+    for row in range(n_rows):
+        if row == 0:
+            ax[row, 0].set_ylabel("Signal", fontsize=fontsize)
+        else:
+            ax[row, 0].set_ylabel(f"IMF-{row - 1}", fontsize=fontsize)
+
+    # Setting the number of variations
+    for col in range(n_vars):
+        ax[0, col].set_title(f"Var-{col}", fontsize=fontsize)
+
+    # Save the figure if requested
+    saved = False
+    if save_figure is True:
+        if save_name is not None:
+            for formate in [".jpg", ".pdf", ".png", ".bmp"]:
+                if formate in save_name:
+                    fig.savefig(save_name, dpi=dpi, bbox_inches="tight")
+                    saved = True
+                    break
+            if saved is False:
+                fig.savefig(save_name + ".jpg", dpi=dpi, bbox_inches="tight")
+        else:
+            fig.savefig("plot_imfs.jpg", dpi=dpi, bbox_inches="tight")
+
+    # Return the figure if requested
+    if return_figure is True:
+        return fig
+
+
+def plot_multi_3D_IMFs(
+        signal,
+        IMFs,
+        max_imfs: Optional[int] = -1,
+        colors: Optional[List] = None,
+        save_figure: Optional[bool] = False,
+        return_figure: Optional[bool] = False,
+        dpi: Optional[int] = 128,
+        save_name: Optional[str] = None,
+) -> Optional[plt.figure]:
+    """以3D的视角绘制多元信号分解后的结果"""
+
+    # Determine the number of rows
+    if max_imfs == -1:
+        n_rows = IMFs.shape[0] + 1
+    else:
+        n_rows = min(IMFs.shape[0], max_imfs) + 1
+
+    # 获取多元信号的元数和信号长度
+    n_vars, seq_len = signal.shape
+
+    # Reconstruct the input signal
+    signals = np.zeros(shape=(n_rows, seq_len, n_vars))
+    signals[0, :, :] = signal.transpose(1, 0)
+    signals[1:, :, :] = IMFs
+
+    # Set the colors for plotting
+    if colors is None:
+        colors = COLORS
+    # Add random colors if there are not enough colors in the list
+    while len(colors) <= n_rows:
+        colors.append(generate_random_hex_color())
+
+    # Create the figure and axes
+    fig = plt.figure(figsize=(5 * n_vars, 6), dpi=200)
+
+    # 通过一个列表的方式来调整ax对象
+    axes = [fig.add_subplot(100 + n_vars * 10 + i, projection="3d") for i in range(1, n_vars + 1)]
+
+    # Create the x and y axes for 3D plotting
+    x = np.flip(np.arange(n_rows))
+    y = np.arange(seq_len)
+
+    # Set the x string label
+    x_label = ["Signal"]
+    for num in range(n_rows - 1):
+        x_label.append(f"IMF-{num + 1}")
+
+    # 遍历每一个维度绘制信号
+    for col in range(n_vars):
+        # 遍历原始信号和分解的本征模态函数
+        for row in range(n_rows):
+            axes[col].plot(np.ones(seq_len) * x[row], y, signals[row, :, col], color=colors[row],
+                           lw=0.75)
+
+        # 调整坐标轴刻度的大小
+        axes[col].tick_params(axis='both', which='major', labelsize=9)
+
+        # Set the x axes ticks and labels
+        axes[col].set_xticks(x)
+        axes[col].set_xticklabels(x_label)
+
+    # Setting the number of variations
+    for col in range(n_vars):
+        axes[col].set_title(f"Var-{col}", fontsize=15)
+
+    # Save the figure if requested
+    saved = False
+    if save_figure is True:
+        if save_name is not None:
+            for formate in [".jpg", ".pdf", ".png", ".bmp"]:
+                if formate in save_name:
+                    fig.savefig(save_name, dpi=dpi, bbox_inches="tight")
+                    saved = True
+                    break
+            if saved is False:
+                fig.savefig(save_name + ".jpg", dpi=dpi, bbox_inches="tight")
+        else:
+            fig.savefig("plot_imfs.jpg", dpi=dpi, bbox_inches="tight")
+
+    # Return the figure if requested
+    if return_figure is True:
+        return fig
+
+
+if __name__ == "__main__":
+    from pysdkit.data import test_emd
+    from pysdkit.data._generator import test_multi_1D_1
+    from pysdkit import EWT, MVMD
+    from matplotlib import pyplot as plt
+
+    time, signal = test_multi_1D_1()
+
+    print(signal.shape)
+
+    mvmd = MVMD(alpha=100, K=2, tau=0.0)
+    IMFs = mvmd(signal=signal)
+
+    print(IMFs.shape)
+
+    plot_multi_3D_IMFs(signal=signal, IMFs=IMFs)
+    plt.show()
+
+    # time, signal = test_emd()
+    # ewt = EWT(K=3)
+    #
+    # IMFs = ewt(signal)
+    #
+    # plot_IMFs(signal, IMFs, view='2d')
+    # plt.show()
+    #
+    # plot_IMFs(signal, IMFs, view='3d')
+    # plt.show()

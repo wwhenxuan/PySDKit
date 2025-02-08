@@ -172,7 +172,6 @@ class MVMD(Base):
             for k in range(2, self.K + 1):
 
                 # update mode accumulator
-                print(n)
                 sum_uk = (
                     u_hat_plus[n, :, k - 2, :] + sum_uk - u_hat_plus[n - 1, :, k - 1, :]
                 )

@@ -25,11 +25,3 @@ def add_noise(N: int, Mean: float, STD: float) -> np.ndarray:
     y = Mean + STD * y
 
     return y
-
-
-if __name__ == "__main__":
-    N = 1000
-    Mean = 0
-    STD = 1
-    noise = add_noise(N, Mean, STD)
-    print(noise)
