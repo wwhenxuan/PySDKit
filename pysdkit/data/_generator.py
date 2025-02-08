@@ -12,11 +12,11 @@ from typing import Tuple
 
 
 def generate_sin_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
@@ -36,11 +36,11 @@ def generate_sin_signal(
 
 
 def generate_cos_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
@@ -60,11 +60,11 @@ def generate_cos_signal(
 
 
 def generate_square_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a square wave signal with Gaussian noise.
@@ -86,11 +86,11 @@ def generate_square_wave(
 
 
 def generate_triangle_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a triangular wave signal with Gaussian noise.
@@ -113,11 +113,11 @@ def generate_triangle_wave(
 
 
 def generate_sawtooth_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a sawtooth wave signal with Gaussian noise.
@@ -137,13 +137,13 @@ def generate_sawtooth_wave(
 
 
 def generate_am_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        carrier_freq: float = 100.0,
-        modulating_freq: float = 5.0,
-        mod_index: float = 1.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    carrier_freq: float = 100.0,
+    modulating_freq: float = 5.0,
+    mod_index: float = 1.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate an Amplitude Modulated (AM) signal with Gaussian noise.
@@ -171,12 +171,12 @@ def generate_am_signal(
 
 
 def generate_exponential_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        decay_rate: float = 1.0,
-        initial_amplitude: float = 1.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    decay_rate: float = 1.0,
+    initial_amplitude: float = 1.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate an exponentially decaying signal with Gaussian noise.
@@ -199,9 +199,9 @@ def generate_exponential_signal(
 
 
 def test_uni_1D(
-        case: int = 1,
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
+    case: int = 1,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a one-dimensional univariate signal based on the input `case`
@@ -224,7 +224,7 @@ def test_uni_1D(
 
 
 def test_1D_1(
-        duration: float = 1.0, sampling_rate: int = 1000
+    duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
     :param duration: Length of the signal in seconds.
@@ -232,13 +232,20 @@ def test_1D_1(
     :return: Tuple containing time array and the generated signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = 4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(
-        2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
+    signal = (
+        4
+        / np.pi
+        * (
+            np.sin(2 * np.pi * 10 * t)
+            + np.sin(2 * np.pi * 30 * t) / 3
+            + np.sin(2 * np.pi * (50 * t + 20 * t**2)) / 2
+        )
+    )
     return t, signal
 
 
 def test_1D_2(
-        duration: float = 10.0, sampling_rate: int = 128
+    duration: float = 10.0, sampling_rate: int = 128
 ) -> Tuple[np.array, np.array]:
     """
     Generate 3 * 2 ^ (-t) * sin(sin(2 * pi * t))
@@ -252,10 +259,10 @@ def test_1D_2(
 
 
 def test_1D_3(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t)
@@ -274,10 +281,10 @@ def test_1D_3(
 
 
 def test_emd(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        random_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for emd test.
@@ -289,16 +296,16 @@ def test_emd(
     """
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = np.cos(22 * np.pi * t ** 2) + 2 * t ** 2
+    signal = np.cos(22 * np.pi * t**2) + 2 * t**2
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
     return t, noise_signal
 
 
 def test_multi_1D(
-        case: int = 1,
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
+    case: int = 1,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a 1D multivariate signal based on the input `case`
@@ -321,7 +328,7 @@ def test_multi_1D(
 
 
 def test_multi_1D_1(
-        duration: float = 1.0, sampling_rate: int = 1000
+    duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
     Generate some simple cosine and sine function for multivariate signal decomposition test
@@ -332,7 +339,9 @@ def test_multi_1D_1(
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
     # Generate the multi-channels signals
-    signal_1 = np.cos(2 * np.pi * 5 * t + np.pi / 3) + 2.5 * np.cos(2 * np.pi * 36 * t + np.pi / 2)
+    signal_1 = np.cos(2 * np.pi * 5 * t + np.pi / 3) + 2.5 * np.cos(
+        2 * np.pi * 36 * t + np.pi / 2
+    )
     signal_2 = 3 * np.cos(2 * np.pi * 24 * t) + 2 * np.cos(2 * np.pi * 36 * t)
 
     # concat all channels
@@ -341,7 +350,9 @@ def test_multi_1D_1(
     return t, signal
 
 
-def test_multi_1D_2(duration: float = 1.0, sampling_rate: int = 1000) -> Tuple[np.array, np.array]:
+def test_multi_1D_2(
+    duration: float = 1.0, sampling_rate: int = 1000
+) -> Tuple[np.array, np.array]:
     """
     Generate four channels simple cosine and sine function for multivariate signal decomposition
     :param duration: Length of the signal in seconds.
@@ -353,16 +364,26 @@ def test_multi_1D_2(duration: float = 1.0, sampling_rate: int = 1000) -> Tuple[n
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
     # Generate the multi-channels signals
-    signal_1 = 2 * np.cos(2 * np.pi * 3 * t ** 2) + 1.7 * np.cos(2 * np.pi * 20 * t) + np.cos(
-        2 * np.pi * 40 * t) + np.random.uniform(0, 0.2, t.shape)
+    signal_1 = (
+        2 * np.cos(2 * np.pi * 3 * t**2)
+        + 1.7 * np.cos(2 * np.pi * 20 * t)
+        + np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
+    )
 
-    signal_2 = 1.5 * np.cos(2 * np.pi * 3 * t ** 2) + np.random.uniform(0, 0.2, t.shape)
+    signal_2 = 1.5 * np.cos(2 * np.pi * 3 * t**2) + np.random.uniform(0, 0.2, t.shape)
 
-    signal_3 = 2 * np.cos(2 * np.pi * 20 * t + np.pi / 3) + 1.8 * np.cos(2 * np.pi * 40 * t) + np.random.uniform(0, 0.2,
-                                                                                                                 t.shape)
+    signal_3 = (
+        2 * np.cos(2 * np.pi * 20 * t + np.pi / 3)
+        + 1.8 * np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
+    )
 
-    signal_4 = 1.8 * np.cos(2 * np.pi * 3 * t ** 2) + 2 * np.cos(2 * np.pi * 40 * t) + np.random.uniform(0, 0.2,
-                                                                                                         t.shape)
+    signal_4 = (
+        1.8 * np.cos(2 * np.pi * 3 * t**2)
+        + 2 * np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
+    )
 
     # Concat all the input channels
     signal = np.vstack([signal_1, signal_2, signal_3, signal_4])
@@ -371,10 +392,10 @@ def test_multi_1D_2(duration: float = 1.0, sampling_rate: int = 1000) -> Tuple[n
 
 
 def test_multi_1D_3(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        random_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate some simple cosine function for multivariate signal decomposition test
@@ -389,33 +410,33 @@ def test_multi_1D_3(
 
     # Generate the multi-channels signals
     f_channel1 = (
-            (10 * np.cos(2 * np.pi * 2 * t))
-            + (9 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (10 * np.cos(2 * np.pi * 2 * t))
+        + (9 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel2 = (
-            (9 * (np.cos(2 * np.pi * 24 * t)))
-            + (8 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (9 * (np.cos(2 * np.pi * 24 * t)))
+        + (8 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel3 = (
-            (8 * (np.cos(2 * np.pi * 28 * t)))
-            + (7 * (np.cos(2 * np.pi * 48 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (8 * (np.cos(2 * np.pi * 28 * t)))
+        + (7 * (np.cos(2 * np.pi * 48 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel4 = (
-            (7 * (np.cos(2 * np.pi * 32 * t)))
-            + (6 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (7 * (np.cos(2 * np.pi * 32 * t)))
+        + (6 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel5 = (
-            (6 * (np.cos(2 * np.pi * 19 * t)))
-            + (5 * (np.cos(2 * np.pi * 64 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (6 * (np.cos(2 * np.pi * 19 * t)))
+        + (5 * (np.cos(2 * np.pi * 64 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     # concat all channels
@@ -425,13 +446,12 @@ def test_multi_1D_3(
 
 
 def plot_signal1D(
-        t: np.array,
-        signal: np.array,
-        color: str = "royalblue",
-        save: bool = False,
-        figsize: Tuple = (12, 4),
-        dpi: int = 128,
-        fontsize: int = 16,
+    t: np.array,
+    signal: np.array,
+    color: str = "royalblue",
+    save: bool = False,
+    dpi: int = 128,
+    fontsize: int = 12,
 ) -> plt.figure:
     """
     Plot and optionally save an amplitude modulated (AM) signal with time on the x-axis and amplitude on the y-axis.
@@ -439,26 +459,72 @@ def plot_signal1D(
     :param signal: Array containing the signal data to be plotted.
     :param color: Color of the plot line.
     :param save: Boolean flag to indicate whether the plot should be saved to a file.
-    :param figsize: Tuple representing the width and height of the figure in inches.
     :param dpi: Dots per inch (resolution) of the figure, if saved.
     :param fontsize: Font size of the axis labels.
     :return: The figure object containing the plot.
     """
-    # Create a figure and a single subplot
-    fig, ax = plt.subplots(figsize=figsize)
-    # Plot the signal against time with specified line color
-    ax.plot(t, signal, color=color)
-    # Set the x-axis label with specified font size
-    ax.set_xlabel("Time (seconds)", fontsize=fontsize)
-    # Set the y-axis label with default font size
-    ax.set_ylabel("Amplitude", fontsize=fontsize)
-    # Enable grid for better readability
-    ax.grid(True)
-    # Display the plot
-    plt.show()
+
+    # Determine the number of input signals
+    n_dim = len(signal.shape)
+
+    if n_dim == 1:
+        # Create a figure and a single subplot
+        fig, ax = plt.subplots(figsize=(8, 3))
+
+        # Plot the signal against time with specified line color
+        ax.plot(t, signal, color=color)
+
+        # Set the x-axis label with specified font size
+        ax.set_xlabel("Time (seconds)", fontsize=fontsize)
+
+        # Set the y-axis label with default font size
+        ax.set_ylabel("Amplitude", fontsize=fontsize)
+
+        # Enable grid for better readability
+        ax.grid(True)
+
+    elif n_dim == 2:
+        # Determining the number of multivariate signals
+        n_vars = signal.shape[0]
+
+        # Create a figure and a single subplot
+        fig, ax = plt.subplots(nrows=n_vars, figsize=(10, 1 + 2 * n_vars), sharex=True)
+
+        for i in range(n_vars):
+            # Plot the signal against time with specified line color
+            ax[i].plot(t, signal[i, :], color=color)
+
+            # Set the y-axis label with default font size
+            ax[i].set_ylabel("Amplitude", fontsize=fontsize)
+
+            # Enable grid for better readability
+            ax[i].grid(True)
+
+        # Set the x-axis label with specified font size
+        ax[-1].set_xlabel("Time (seconds)", fontsize=fontsize)
+
+    else:
+        raise ValueError("Wrong input signal, please input the 1D signal.")
+
     # Check if the figure needs to be saved
     if save:
         # Save the figure with the specified dpi and bounding box tightly around the figure
         fig.savefig("generate_signal.jpg", dpi=dpi, bbox_inches="tight")
+
     # Return the figure object
     return fig
+
+
+if __name__ == "__main__":
+    from pysdkit.data import test_emd, plot_signal1D, test_multi_1D
+
+    t, signal = test_uni_1D(case=1)
+    print(signal.shape)
+
+    fig = plot_signal1D(t, signal)
+
+    t, signal = test_multi_1D(case=2)
+    print(signal.shape)
+
+    fig = plot_signal1D(t, signal, save=False)
+    plt.show()

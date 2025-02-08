@@ -25,18 +25,18 @@ COLORS = [
 
 
 def plot_IMFs(
-        signal: np.ndarray,
-        IMFs: np.ndarray,
-        max_imfs: Optional[int] = -1,
-        view: Optional[str] = "2d",
-        colors: Optional[List] = None,
-        save_figure: Optional[bool] = False,
-        return_figure: Optional[bool] = False,
-        dpi: Optional[int] = 64,
-        fontsize: float = 14,
-        spine_width: float = 2,
-        labelpad: float = 10,
-        save_name: Optional[str] = None,
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: Optional[int] = -1,
+    view: Optional[str] = "2d",
+    colors: Optional[List] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 64,
+    fontsize: float = 14,
+    spine_width: float = 2,
+    labelpad: float = 10,
+    save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -93,17 +93,17 @@ def plot_IMFs(
 
 
 def plot_1D_IMFs(
-        signal: np.ndarray,
-        IMFs: np.ndarray,
-        max_imfs: Optional[int] = -1,
-        colors: Optional[List] = None,
-        save_figure: Optional[bool] = False,
-        return_figure: Optional[bool] = False,
-        dpi: Optional[int] = 64,
-        fontsize: float = 14,
-        spine_width: float = 2,
-        labelpad: float = 10,
-        save_name: Optional[str] = None,
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: Optional[int] = -1,
+    colors: Optional[List] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 64,
+    fontsize: float = 14,
+    spine_width: float = 2,
+    labelpad: float = 10,
+    save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -203,15 +203,15 @@ def plot_1D_IMFs(
 
 
 def plot_3D_IMFs(
-        signal: np.ndarray,
-        IMFs: np.ndarray,
-        max_imfs: Optional[int] = -1,
-        colors: Optional[List] = None,
-        save_figure: Optional[bool] = False,
-        return_figure: Optional[bool] = False,
-        dpi: Optional[int] = 64,
-        fontsize: float = 8,
-        save_name: Optional[str] = None,
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: Optional[int] = -1,
+    colors: Optional[List] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 64,
+    fontsize: float = 8,
+    save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -291,16 +291,16 @@ def plot_3D_IMFs(
 
 
 def plot_multi_IMFs(
-        signal: np.ndarray,
-        IMFs: np.ndarray,
-        max_imfs: Optional[int] = -1,
-        colors: Optional[List] = None,
-        save_figure: Optional[bool] = False,
-        return_figure: Optional[bool] = False,
-        dpi: Optional[int] = 64,
-        fontsize: float = 10,
-        spine_width: float = 2,
-        save_name: Optional[str] = None,
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: Optional[int] = -1,
+    colors: Optional[List] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 64,
+    fontsize: float = 10,
+    spine_width: float = 2,
+    save_name: Optional[str] = None,
 ):
     """
     Plotting a multivariate signal and its decomposed intrinsic mode functions
@@ -366,7 +366,7 @@ def plot_multi_IMFs(
             ax[row, col].set_xlim(-padding, seq_len + padding)
 
             # Adjust the size of the axis scale
-            ax[row, col].tick_params(axis='both', which='major', labelsize=8)
+            ax[row, col].tick_params(axis="both", which="major", labelsize=8)
 
             # Keep only the left spine visible
             for spine_name, spine in ax[row, col].spines.items():
@@ -419,14 +419,14 @@ def plot_multi_IMFs(
 
 
 def plot_multi_3D_IMFs(
-        signal,
-        IMFs,
-        max_imfs: Optional[int] = -1,
-        colors: Optional[List] = None,
-        save_figure: Optional[bool] = False,
-        return_figure: Optional[bool] = False,
-        dpi: Optional[int] = 128,
-        save_name: Optional[str] = None,
+    signal,
+    IMFs,
+    max_imfs: Optional[int] = -1,
+    colors: Optional[List] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 128,
+    save_name: Optional[str] = None,
 ) -> Optional[plt.figure]:
     """
     Plot the results of multivariate signal decomposition in 3D
@@ -466,7 +466,10 @@ def plot_multi_3D_IMFs(
     fig = plt.figure(figsize=(5 * n_vars, 6), dpi=200)
 
     # Adjust the ax object by using a list
-    axes = [fig.add_subplot(100 + n_vars * 10 + i, projection="3d") for i in range(1, n_vars + 1)]
+    axes = [
+        fig.add_subplot(100 + n_vars * 10 + i, projection="3d")
+        for i in range(1, n_vars + 1)
+    ]
 
     # Create the x and y axes for 3D plotting
     x = np.flip(np.arange(n_rows))
@@ -481,11 +484,16 @@ def plot_multi_3D_IMFs(
     for col in range(n_vars):
         # 遍历原始信号和分解的本征模态函数
         for row in range(n_rows):
-            axes[col].plot(np.ones(seq_len) * x[row], y, signals[row, :, col], color=colors[row],
-                           lw=0.75)
+            axes[col].plot(
+                np.ones(seq_len) * x[row],
+                y,
+                signals[row, :, col],
+                color=colors[row],
+                lw=0.75,
+            )
 
         # Adjust the size of the axis scale
-        axes[col].tick_params(axis='both', which='major', labelsize=9)
+        axes[col].tick_params(axis="both", which="major", labelsize=9)
 
         # Set the x axes ticks and labels
         axes[col].set_xticks(x)
