@@ -46,25 +46,319 @@ def test_grayscale() -> np.ndarray | None:
     return None
 
 
-def get_meshgrid(low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256) -> Tuple[np.ndarray, np.ndarray]:
+def get_meshgrid(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    给定输入输出范围来生成网格矩阵
-    :param low: 网格矩阵的最小值
-    :param high: 网格矩阵的最大值
-    :param sampling_rate: 网格矩阵的采样率，即为矩阵中的点数
-    :return: 以元组的形式范围生成的网格矩阵
+    Generate a grid matrix given an input and output range
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: A grid matrix generated from a range in the form of a tuple
     """
-    # 首先生成一维数组
+    # First generate a one-dimensional array
     X = np.linspace(low, high, sampling_rate)
     Y = np.linspace(low, high, sampling_rate)
 
-    # 随后构建网格矩阵
+    # Then construct the grid matrix
     x, y = np.meshgrid(X, Y)
 
     return x, y
 
 
-def test_uni_image():
-    pass
+def test_uni_image(
+    case: int = 1, low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image for 2D decomposition
+    please input the case from 1 to 7
+    :param case: case number in 1~7
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: the generated image for 2D decomposition
+    """
+    if case == 1:
+        return test_image_1(low, high, sampling_rate)
+    elif case == 2:
+        return test_image_2(low, high, sampling_rate)
+    elif case == 3:
+        return test_image_3(low, high, sampling_rate)
+    elif case == 4:
+        return test_image_4(low, high, sampling_rate)
+    elif case == 5:
+        return test_image_5(low, high, sampling_rate)
+    elif case == 6:
+        return test_image_6(low, high, sampling_rate)
+    elif case == 7:
+        return test_uni_image_7(low, high, sampling_rate)
+    else:
+        print(
+            f"There is no case {case}, so it will return the generated function `test_grayscale`."
+        )
+        return test_grayscale()
 
 
+def test_multi_image(
+    case: Tuple = (1, 2, 3),
+    low: int = 0,
+    high: int = 10,
+    sampling_rate: Optional[int] = 256,
+) -> np.ndarray:
+    """
+    Generate multivariate image for 2D decomposition, the number of image is `len(case)`
+    please input the case from 1 to 7
+    :param case: case number in 1~7
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: the generated image for 2D decomposition
+    """
+    # The number of generated images
+    number = len(case)
+
+    # Preventing too many samples from being generated
+    assert number < 8, "the number of cases should be less than 8, better for 3"
+
+    # Make the input legal
+    c_list = []
+    for c in case:
+        if c in list(range(1, 8)):
+            c_list.append(c)
+
+    # Illegal Image Substitute
+    sub = number - len(c_list)
+    if sub > 0:
+        c = 1
+        while sub == 0:
+            if c not in c_list:
+                c_list.append(c)
+                sub -= 1
+            else:
+                c += 1
+
+    # Get multivariate image by sampling univariate function
+    images = [
+        test_uni_image(case=c, low=low, high=high, sampling_rate=sampling_rate)[
+            np.newaxis, :, :
+        ]
+        for c in c_list
+    ]
+
+    # Merging data types
+    images = np.vstack(images)
+
+    return images
+
+
+def test_image_1(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 1
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a 2D image using sin(4x), sin(x) and cos(x/24)
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.sin(4 * x) + np.sin(4 * y)
+    uc2 = np.sin(x) + np.sin(y)
+    ru = np.cos(x / 24) + np.cos(y / 24)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_image_2(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 2
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.sin(x) + np.sin(y)
+    uc2 = np.sin(3.5 * x) + np.sin(3.5 * y)
+    ru = np.cos(x / 16) + np.cos(y / 16)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_image_3(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 3
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.sin(x / 24) + np.sin(y / 24)
+    uc2 = np.sin(x / 5) + np.sin(y / 5)
+    ru = np.sin(x) + np.sin(y)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_image_4(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 4
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.sin(x / 60) + np.sin(y / 60)
+    uc2 = np.sin(x / 16) + np.sin(y / 16)
+    ru = np.sin(x / 32) + np.sin(y / 32)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_image_5(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 5
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.sin(x * 8) + np.sin(y * 8)
+    uc2 = np.sin(x * 16) + np.sin(y * 16)
+    ru = np.sin(x / 32) + np.sin(y / 32)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_image_6(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 6
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.cos(x**1.2 * 8) + np.sin(y**1.2 * 8)
+    uc2 = np.sin(x**1.3 * 4) + np.cos(y**1.3 * 4)
+    ru = np.sin(x / 12) + np.sin(y / 12)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+def test_uni_image_7(
+    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+) -> np.ndarray:
+    """
+    Generate a single image test sample 7
+    the symbol function comes from:
+    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :param low: Minimum value of grid matrix
+    :param high: Maximum value of grid matrix
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    :return: Generate a mixed image using two-dimensional sine and cosine functions
+    """
+    # Construct the two dim grid matrix
+    x, y = get_meshgrid(low, high, sampling_rate)
+
+    # Generate a function according to the specified method
+    uc1 = np.cos(x**1.2 * 8) + np.sin(y**1.2 * 8)
+    uc2 = np.sin(x**1.3 * 4) + np.cos(y**1.3 * 4)
+    ru = np.sin(x**3) + np.sin(y**3)
+
+    # add it together
+    image = uc1 + uc2 + ru
+
+    # normalize
+    image = (image - image.mean()) / image.std()
+
+    return image
+
+
+if __name__ == "__main__":
+    from pysdkit.plot import plot_grayscale_image
+    from matplotlib import pyplot as plt
+
+    plot_grayscale_image(test_uni_image_7())
+    plt.show()
+
+    print(test_multi_image().shape)

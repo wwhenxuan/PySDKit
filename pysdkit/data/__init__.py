@@ -31,3 +31,9 @@ from ._add_noise import add_noise
 
 # Test case for loading a 2D grayscale image
 from ._image import test_grayscale
+
+# Test case for univariate image
+from ._image import test_uni_image
+
+# Test case for multivariate image
+from ._image import test_multi_image

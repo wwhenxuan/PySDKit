@@ -7,14 +7,16 @@ Created on 2025/01/31 21:35:18
 import numpy as np
 from scipy.signal import argrelextrema
 
-from typing import Optional, Tuple
+from typing import Optional
 
 
 class LMD(object):
     """
     Local Mean Decomposition
+
     Jia, Linshan, et al. “The Empirical Optimal Envelope and Its Application to Local Mean Decomposition.”
     Digital Signal Processing, vol. 87, Elsevier BV, Apr. 2019, pp. 166–77, doi:10.1016/j.dsp.2019.01.024.
+
     Python code: https://github.com/shownlin/PyLMD
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/107829-local-mean-decomposition?s_tid=srchtitle
     """
@@ -128,7 +130,9 @@ class LMD(object):
 
         # Initialize the parameters of the sliding average decomposition
         weight = np.array(list(range(1, half + 2)) + list(range(half, 0, -1)))
-        assert len(weight) == window  # Make sure the parameter length is the size of the window
+        assert (
+            len(weight) == window
+        )  # Make sure the parameter length is the size of the window
 
         smoothed = signal
 

@@ -37,7 +37,7 @@ def plot_IMFs(
     spine_width: float = 2,
     labelpad: float = 10,
     save_name: Optional[str] = None,
-) -> Optional[plt.figure]:
+) -> Optional[plt.Figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
@@ -104,7 +104,7 @@ def plot_1D_IMFs(
     spine_width: float = 2,
     labelpad: float = 10,
     save_name: Optional[str] = None,
-) -> Optional[plt.figure]:
+) -> Optional[plt.Figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
@@ -212,7 +212,7 @@ def plot_3D_IMFs(
     dpi: Optional[int] = 64,
     fontsize: float = 8,
     save_name: Optional[str] = None,
-) -> Optional[plt.figure]:
+) -> Optional[plt.Figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
@@ -301,7 +301,7 @@ def plot_multi_IMFs(
     fontsize: float = 10,
     spine_width: float = 2,
     save_name: Optional[str] = None,
-):
+) -> Optional[plt.Figure]:
     """
     Plotting a multivariate signal and its decomposed intrinsic mode functions
     :param signal: The input original signal
@@ -427,7 +427,7 @@ def plot_multi_3D_IMFs(
     return_figure: Optional[bool] = False,
     dpi: Optional[int] = 128,
     save_name: Optional[str] = None,
-) -> Optional[plt.figure]:
+) -> Optional[plt.Figure]:
     """
     Plot the results of multivariate signal decomposition in 3D
     :param signal: The input original signal
