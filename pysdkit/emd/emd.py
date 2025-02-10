@@ -20,6 +20,7 @@ from pysdkit.utils import get_timeline, normalize_signal, common_dtype
 class EMD(object):
     """
     Empirical Mode Decomposition
+
     Huang, Norden E., et al.
     "The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis."
     Proceedings of the Royal Society of London.

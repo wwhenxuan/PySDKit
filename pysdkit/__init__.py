@@ -14,7 +14,7 @@ from .emd import REMD
 from .emd import MEMD
 
 # 基于时变滤波器的经验模态分解
-from .tvf_emd import TVF_EMD
+from .emd import TVF_EMD
 
 # 希尔伯特震动分解
 from .hvd import HVD
@@ -48,3 +48,6 @@ from .vncmd import VNCMD
 
 # 经验小波变换
 from .ewt import ewt, EWT
+
+# 滑动平均分解
+from .tsa import Moving_Decomp
