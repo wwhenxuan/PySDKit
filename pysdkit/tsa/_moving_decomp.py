@@ -20,9 +20,9 @@ from typing import Optional, Tuple, List
 
 class Moving_Decomp(object):
     """
-    通过滑动平均的方式进行一维信号的分解，将其分解为趋势和周期两部分内容。
-    该方法十分简单，非常适合用于处理非平稳的时间序列数据。
-    在
+    Moving Average decomposition.
+    The 1D signal is decomposed into two parts, trend and cycle, by sliding average.
+    This method is very simple and very suitable for processing non-stationary time series data.
     """
 
     def __init__(
@@ -34,97 +34,122 @@ class Moving_Decomp(object):
         alpha: float = 0.4,
     ) -> None:
         """
-        通过滑动平均的方式对输入的信号进行分解，得到趋势和周期两部分内容
-        :param window_size:
-        :param method:
-        :param sigma:
-        :param poly_order:
-        :param alpha:
+        The input signal is decomposed by sliding average to obtain the trend and cycle parts.
+        :param window_size: The window size of the sliding average decomposition is preferably an odd number
+        :param method: Sliding decomposition method, optional ["simple", "weighted", "gaussian", "savgol", "exponential"]
+        :param sigma: Standard deviation for Gaussian kernel (default is 2)
+        :param poly_order: Order of the polynomial used to fit the samples (default is 2)
+        :param alpha: Smoothing factor, range from 0 to 1 (default is 0.4)
         """
         self.window_size = window_size
         self.method = method
 
+        # Specific parameter settings for various methods
         self.sigma = sigma
         self.poly_order = poly_order
         self.alpha = alpha
 
-        # 存放所有方法的列表
-        self.method_list = ["simple", "weighted", "gaussian", "savgol", "exponential"]
-        if self.method not in self.method_list:
-            # 使用的平滑方法错误
-            raise ValueError("method must be one of {}".format(self.method_list))
+        # A list of all methods of moving average decomposition
+        self.methods_list = ["simple", "weighted", "gaussian", "savgol", "exponential"]
+        if self.method not in self.methods_list:
+            # Wrong smoothing method used
+            raise ValueError("method must be one of {}".format(self.methods_list))
 
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """allow instances to be called like functions"""
+        return self.fit_transform(signal=signal)
 
-    def __str__(self):
-        pass
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Moving Average decomposition (Moving_Decomp)"
 
-    def _decomposition(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def _decomposition(self, signal: np.ndarray, method: str) -> Tuple[np.ndarray, np.ndarray]:
         """
-        执行一次滑动平均分解算法
-        要求输入的信号必须是一元信号
+        Execute a sliding average decomposition algorithm.
+        The input signal must be a univariate signal.
+        For multivariate signals, multiple calls are required to decompose
 
         :param signal: the input univariate signal of 1D numpy ndarray
         :return: the trend and seasonality of the input signal
         """
-        # 使用具体的滑动平均分解方法
-        if self.method == "simple":
+        # Use a specific moving average decomposition method
+        if method == "simple":
             trend = simple_moving_average(signal=signal, window_size=self.window_size)
-        elif self.method == "weighted":
+        elif method == "weighted":
             trend = weighted_moving_average(signal=signal, window_size=self.window_size)
-        elif self.method == "gaussian":
+        elif method == "gaussian":
             trend = gaussian_smoothing(signal=signal, sigma=self.sigma)
-        elif self.method == "savgol":
+        elif method == "savgol":
             trend = savgol_smoothing(
                 signal=signal,
                 window_length=self.window_size,
                 poly_order=self.poly_order,
             )
-        elif self.method == "exponential":
+        elif method == "exponential":
             trend = exponential_smoothing(signal=signal, alpha=self.alpha)
         else:
             raise ValueError(
                 "method must be 'simple' or 'weighted' or 'gaussian' or 'savgol' or 'exponential'"
             )
 
-        # 从原始的输入信号中减去趋势部分
+        # Subtract the trend component from the original input signal
         seasonality = signal - trend
 
-        # 同时返回趋势和季节性分量
+        # Returns both trend and seasonal components
         return trend, seasonality
 
-    def fit_transform(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """"""
-        # TODO: 可以指定传入一个列表表示对于每一个通道的时间序列到底采用哪种分解方法
-        # 检验输入信号的维度
+    def fit_transform(self, signal: np.ndarray, methods_list: List[str] = None) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Execute the moving average decomposition algorithm
+        :param signal: the input univariate or multivariate signal of 1D numpy ndarray
+        :param methods_list: If it is a multivariate signal or a multivariate time series,
+                             a different sliding average method needs to be used for the signal of each channel.
+                             This can be done by passing a string that matches the number of input signal channels to the variable.
+        :return: The trend and seasonality of the input signal.
+        """
+        # Verify the dimensionality of the input signal
         shape = signal.shape
 
         if len(shape) == 1:
-            # 输入为一维的一元信号
-            trend, seasonality = self._decomposition(signal=signal)
+            # The input is a one-dimensional univariate signal
+            # Choose a specific decomposition method
+            method = methods_list[0] if methods_list is not None else self.method
+            trend, seasonality = self._decomposition(signal=signal, method=method)
 
         elif len(shape) == 2:
-            # 输入为一维的多元信号
-            # 获取输入信号的数目
+            # The input is a one-dimensional multivariate signal
+            # Get the number of input signals
             n_vars, seq_len = shape
 
-            # 初始化分解的数组
+            # Initialize the decomposed array
             trend, seasonality = np.zeros(shape=(n_vars, seq_len)), np.zeros(
                 shape=(n_vars, seq_len)
             )
 
-            for n in range(n_vars):
-                # 遍历每一个信号进行滑动平均分解
-                trend[n, :], seasonality[n, :] = self._decomposition(
-                    signal=signal[n, :]
-                )
+            # The submitted decomposition list must be greater than or equal to the number of channels of the input signal
+            if methods_list is not None:
+                if len(methods_list) < n_vars:
+                    methods_list = methods_list + ([None] * (n_vars - len(methods_list)))
+
+                for n, method in enumerate(methods_list, 0):
+                    # Traverse each signal and perform sliding average decomposition
+                    # Further determine the specific method to be used
+                    if method is None or method not in self.methods_list:
+                        method = self.method
+
+                    trend[n, :], seasonality[n, :] = self._decomposition(
+                        signal=signal[n, :], method=method
+                    )
+            else:
+                for n in range(n_vars):
+                    # Traverse each signal and perform sliding average decomposition
+                    trend[n, :], seasonality[n, :] = self._decomposition(signal=signal[n, :], method=self.method)
         else:
             raise ValueError(
                 "The input must be 1D univariate or multivariate signal with shape [seq_len] or [n_vars, seq_len]"
             )
 
-        # 返回分解后的结果
+        # Return the decomposed result
         return trend, seasonality
 
     @staticmethod
@@ -135,23 +160,23 @@ class Moving_Decomp(object):
         colors: List[str] = None,
     ) -> Optional[plt.Figure]:
         """
-        对输入信号分解后的结果进行可视化
-        :param signal:
-        :param trend:
-        :param seasonality:
-        :param colors:
-        :return:
+        Visualize the decomposition results of the input signal
+        :param signal: The input 1D signal of numpy ndarray
+        :param trend: The trend of the input 1D signal decomposed by `Moving_Decomp`
+        :param seasonality: The seasonality of the input 1D signal decomposed by `Moving_Decomp`
+        :param colors: The colors for plotting signal, trend and seasonality
+        :return: the figure of matplotlib for plotting
         """
-        # 通过输入数据的形状判断其维数
+        # Determine the dimensionality of the input data by its shape
         if colors is None:
             colors = ["royalblue", "royalblue", "royalblue"]
         shape = signal.shape
 
         # If the inputs is univariate signal
         if len(shape) == 1:
-            # 创建绘图对象
+            # Creating a drawing object
             fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(10, 5), sharex=True)
-            # 开始绘制图像
+            # Start drawing the image
             ax[0].plot(signal, color=colors[0])
             ax[1].plot(trend, color=colors[1])
             ax[2].plot(seasonality, color=colors[2])
@@ -161,13 +186,13 @@ class Moving_Decomp(object):
             ax[2].set_ylabel("seasonality")
 
         elif len(shape) == 2:
-            # 获取输入信号的数目
+            # Get the number of input signals
             n_vars, seq_len = shape
-            # 创建绘图对象
+            # Creating a drawing object
             fig, ax = plt.subplots(
                 nrows=3, ncols=n_vars, figsize=(4 * n_vars, 5), sharex=True
             )
-            # 遍历所有维度的变量绘制图像
+            # Iterate over all dimensions of variables and draw images
             for n in range(n_vars):
                 ax[0, n].plot(signal[n, :], color=colors[n])
                 ax[1, n].plot(trend[n, :], color=colors[n])
