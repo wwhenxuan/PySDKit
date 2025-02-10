@@ -10,10 +10,10 @@ from typing import Optional, Union
 
 
 def simulate_seasonal_term(
-        periodicity: Union[float, np.ndarray],
-        total_cycles: Union[float, np.ndarray],
-        noise_std: Union[float, np.ndarray] = 1.0,
-        harmonics=None,
+    periodicity: Union[float, np.ndarray],
+    total_cycles: Union[float, np.ndarray],
+    noise_std: Union[float, np.ndarray] = 1.0,
+    harmonics=None,
 ) -> np.ndarray:
     """
     This function is adapted from the famous statistical analysis library in Python, statsmodels.
@@ -64,14 +64,14 @@ def simulate_seasonal_term(
 
             # Update the gamma values for the next time step using a recursive process.
             gamma_jtp1[j - 1] = (
-                    gamma_jt[j - 1] * cos_j
-                    + gamma_star_jt[j - 1] * sin_j
-                    + noise_std * np.random.randn()
+                gamma_jt[j - 1] * cos_j
+                + gamma_star_jt[j - 1] * sin_j
+                + noise_std * np.random.randn()
             )
             gamma_star_jtp1[j - 1] = (
-                    -gamma_jt[j - 1] * sin_j
-                    + gamma_star_jt[j - 1] * cos_j
-                    + noise_std * np.random.randn()
+                -gamma_jt[j - 1] * sin_j
+                + gamma_star_jt[j - 1] * cos_j
+                + noise_std * np.random.randn()
             )
 
         # Assign the new gamma values to the time series for the current time step.
@@ -88,11 +88,11 @@ def simulate_seasonal_term(
 
 
 def generate_time_series(
-        duration: int = 300,
-        periodicities: np.ndarray = np.array([10, 30, 50]),
-        num_harmonics: np.ndarray = np.array([3, 2, 2]),
-        std: np.ndarray = np.array([2, 3, 5]),
-        seed: Optional[int] = 42,
+    duration: int = 300,
+    periodicities: np.ndarray = np.array([10, 30, 50]),
+    num_harmonics: np.ndarray = np.array([3, 2, 2]),
+    std: np.ndarray = np.array([2, 3, 5]),
+    seed: Optional[int] = 42,
 ) -> np.ndarray:
     """
     Generates a time series data by combining multiple seasonal components with different periodicities,
@@ -117,8 +117,13 @@ def generate_time_series(
     for ix, _ in enumerate(periodicities):
         # For each periodicity, generate a seasonal time series using the simulate_seasonal_term function.
         s = simulate_seasonal_term(
-            periodicity=periodicities[ix],  # The length of the cycle for this component.
-            total_cycles=duration / periodicities[ix],  # Number of cycles to generate based on the total duration.
+            periodicity=periodicities[
+                ix
+            ],  # The length of the cycle for this component.
+            total_cycles=duration
+            / periodicities[
+                ix
+            ],  # Number of cycles to generate based on the total duration.
             harmonics=num_harmonics[ix],  # Number of harmonics for this component.
             noise_std=std[ix],  # Standard deviation of noise for this component.
         )

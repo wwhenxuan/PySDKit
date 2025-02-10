@@ -164,7 +164,9 @@ class Moving_Decomp(object):
             # 获取输入信号的数目
             n_vars, seq_len = shape
             # 创建绘图对象
-            fig, ax = plt.subplots(nrows=3, ncols=n_vars, figsize=(4 * n_vars, 5), sharex=True)
+            fig, ax = plt.subplots(
+                nrows=3, ncols=n_vars, figsize=(4 * n_vars, 5), sharex=True
+            )
             # 遍历所有维度的变量绘制图像
             for n in range(n_vars):
                 ax[0, n].plot(signal[n, :], color=colors[n])
@@ -195,7 +197,9 @@ if __name__ == "__main__":
 
     trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
-    moving_decomp.plot_decomposition(signal=time_series, trend=trends, seasonality=seasonalities)
+    moving_decomp.plot_decomposition(
+        signal=time_series, trend=trends, seasonality=seasonalities
+    )
     plt.show()
 
     # multivariate time series
@@ -203,5 +207,7 @@ if __name__ == "__main__":
 
     trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
-    moving_decomp.plot_decomposition(signal=time_series, trend=trends, seasonality=seasonalities)
+    moving_decomp.plot_decomposition(
+        signal=time_series, trend=trends, seasonality=seasonalities
+    )
     plt.show()
