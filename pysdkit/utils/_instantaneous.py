@@ -36,7 +36,7 @@ def find_extrema(signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         bad = diff == 0.0
 
         # 对数组进行两端拓展使其能够处理开始和结束
-        c_bad = np.concatenate([[0], bad, [0]])
+        c_bad = np.concatenate([np.array([0]), bad, np.array([0])])
 
         # 用于找到平稳区间的起始点和结束点
         dd = np.diff(c_bad)
@@ -106,7 +106,11 @@ def inst_freq_local(data: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         phi = np.unwrap(np.angle(h))
         inst_freq_temp = (phi[2:] - phi[:-2]) / 2
         inst_freq_temp = np.concatenate(
-            [[inst_freq_temp[0]], inst_freq_temp, [inst_freq_temp[-1]]]
+            [
+                np.array([inst_freq_temp[0]]),
+                inst_freq_temp,
+                np.array([inst_freq_temp[-1]]),
+            ]
         )
         inst_freq[k, :] = inst_freq_temp.flatten() / (2 * np.pi)
 
@@ -246,3 +250,13 @@ def divide2exp(y, inst_amp_0, inst_freq_0):
     bis_freq[bis_freq < 0] = 0
 
     return a1, f1, a2, f2, bis_freq, ratio_bw, avg_freq
+
+
+if __name__ == "__main__":
+    x = np.array([1, 2, 3, 4, 0, 1, -1, -2, 1, 3])
+    from matplotlib import pyplot as plt
+
+    plt.plot(x)
+    plt.show()
+
+    print(find_extrema(x))

@@ -7,6 +7,9 @@ from .emd import EEMD
 # 具有自适应噪声的完全集合经验模态分解
 from .emd import CEEMDAN
 
+# 稳健经验模态分解
+from .emd import REMD
+
 # 多元变分模态分解算法
 from .emd import MEMD
 

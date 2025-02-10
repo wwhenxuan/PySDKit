@@ -10,28 +10,28 @@ from ._fft import (
 from ._fft import fft2d, ifft2d
 
 # Signal mirroring extension
-from .mirror import fmirror
+from ._mirror import fmirror
 
 # Various functions for Hilbert Transform
-from .hilbert import (
+from ._hilbert import (
     hilbert_transform,
     hilbert_real,
     hilbert_imaginary,
 )
-from .hilbert import (
+from ._hilbert import (
     plot_hilbert,
     plot_hilbert_complex_plane,
 )
 
-from .process import normalize_signal
-from .process import common_dtype
-from .process import not_duplicate
+from ._process import normalize_signal
+from ._process import common_dtype
+from ._process import not_duplicate
 
 # Find the zero crossing points of the signal
-from .process import find_zero_crossings
+from ._process import find_zero_crossings
 
 # Get the time axis of the signal and generate a timestamp array
-from .process import get_timeline
+from ._process import get_timeline
 
 # Algorithm for discrete signal differencing
 from ._differ import differ
@@ -64,11 +64,14 @@ from ._function import log_transformation
 # Decimal scaling normalization
 from ._function import decimal_scaling_normalization
 
+# 寻找一维信号的极值点
+from ._instantaneous import find_extrema
+
 # Find the instantaneous amplitude and instantaneous frequency of a one-bit input signal
-from .instantaneous import inst_freq_local
+from ._instantaneous import inst_freq_local
 
 # Decompose the input one-dimensional signal into two eigenmode functions
-from .instantaneous import divide2exp
+from ._instantaneous import divide2exp
 
 # Any pair of IMFs is locally orthogonal
 from ._Index_of_Orthogonality import index_of_orthogonality

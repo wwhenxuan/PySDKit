@@ -8,11 +8,11 @@ Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 import numpy as np
 from numpy import ndarray
 from scipy.interpolate import interp1d
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 
-from ._splines import akima, cubic, pchip, cubic_hermite, cubic_spline_3pts
-from ._find_extrema import find_extrema_parabol, find_extrema_simple
-from ._prepare_points import prepare_points_parabol, prepare_points_simple
+from pysdkit.emd import akima, cubic, pchip, cubic_hermite, cubic_spline_3pts
+from pysdkit.emd import find_extrema_parabol, find_extrema_simple
+from pysdkit.emd import prepare_points_parabol, prepare_points_simple
 
 from pysdkit.utils import get_timeline, normalize_signal, common_dtype
 
@@ -140,7 +140,7 @@ class EMD(object):
         max_val: np.ndarray,
         min_pos: np.ndarray,
         min_val: np.ndarray,
-    ):
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Further processing of the maximum and minimum points of the input signal makes the upper and lower envelope spectra smoother.
         :param time: position or time array of numpy
