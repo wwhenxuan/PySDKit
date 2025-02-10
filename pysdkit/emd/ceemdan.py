@@ -125,6 +125,10 @@ class CEEMDAN(object):
             signal=signal, time=time, max_imfs=max_imfs, progress=progress
         )
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Complete Ensemble Empirical Mode Decomposition with Adaptive Noise (CEEMDAN)"
+
     def generate_noise(
         self, scale: float, size: Union[int, Sequence[int]]
     ) -> np.ndarray:

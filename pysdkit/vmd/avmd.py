@@ -20,5 +20,8 @@ class AVMD(Base):
         super().__init__()
         pass
 
+    def __call__(self, *args, **kwargs):
+        pass
+
     def fit_transform(self):
         pass

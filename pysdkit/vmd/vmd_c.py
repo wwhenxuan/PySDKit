@@ -80,6 +80,10 @@ class VMD(Base):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Variational mode decomposition (VMD)"
+
     def __init_omega(self, fs: float) -> np.ndarray:
         """Initialization of omega_k"""
         omega_plus = np.zeros([self.max_iter, self.K])

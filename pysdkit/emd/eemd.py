@@ -101,6 +101,10 @@ class EEMD(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal, time, max_imfs, progress)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Ensemble Empirical Mode Decomposition (EEMD)"
+
     def generate_noise(
         self, scale: float, size: Union[int, Sequence[int]]
     ) -> np.ndarray:

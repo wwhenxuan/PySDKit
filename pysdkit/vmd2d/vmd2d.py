@@ -13,6 +13,7 @@ from typing import Optional, Tuple
 class VMD2D(object):
     """
     Variational Mode Decomposition for 2D Image
+
     Konstantin, Dragomiretskiy, and Dominique Zosso. "Two-dimensional variational mode decomposition."
     Energy Minimization Methods in Computer Vision and Pattern Recognition. Vol. 8932. 2015.
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/45918-two-dimensional-variational-mode-decomposition?s_tid=srchtitle
@@ -44,6 +45,19 @@ class VMD2D(object):
         self.max_iter, self.tol = max_iter, tol
         # 创建一个随机数生成器用于初始化
         self.rng = np.random.RandomState(random_seed)
+
+    def __call__(
+            self,
+            img: np.ndarray,
+            K: Optional[int] = None,
+            return_all: Optional[bool] = False,
+    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """allow instances to be called like functions"""
+        return self.fit_transform(img=img, K=K, return_all=return_all)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Variational mode decomposition for 2D Images (VMD2D)"
 
     def init_omega(self, K: int) -> np.ndarray:
         """Initialization of omega_k"""

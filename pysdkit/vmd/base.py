@@ -5,6 +5,10 @@ from numpy import fft as f
 class Base(object):
     """Base class for signal decomposition algorithms of VMD family"""
 
+    def __str__(self) -> str:
+        """Return string representation of class"""
+        return "The base class of VMD family"
+
     @staticmethod
     def fft(ts: np.ndarray) -> np.ndarray:
         """Fast Fourier Transform"""

@@ -18,9 +18,11 @@ from typing import Optional, Tuple
 class EWT(object):
     """
     Empirical Wavelet Transform with Class Interface.
+
     Gilles, J., 2013. Empirical Wavelet Transform.
     IEEE Transactions on Signal Processing, 61(16), pp.3999–4010.
-    Paper link: http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=6522142.
+
+    Paper link: https://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=6522142.
     Python code: https://github.com/vrcarva/ewtpy
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/42141-empirical-wavelet-transforms
     """
@@ -60,6 +62,10 @@ class EWT(object):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, N=N, return_all=return_all)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Empirical Wavelet Transform (EWT)"
 
     def fit_transform(
         self,

@@ -25,3 +25,10 @@ class MJMD(object):
 
     def __init__(self):
         pass
+
+    def __call__(self, *args, **kwargs):
+        pass
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Multivariate Jump Plus AM-FM Mode Decomposition (MJMD)"

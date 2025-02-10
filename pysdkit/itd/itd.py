@@ -14,6 +14,7 @@ from scipy.interpolate import interp1d
 class ITD(object):
     """
     ITD: Intrinsic Time-Scale Decomposition
+
     H=itd(x); returns the returns proper rotation components(PRC) and residual signal corresponding to the ITD of X
     Frei, M. G., & Osorio, I. (2007, February).
     Intrinsic time-scale decomposition: time-frequency-energy analysis and real-time filtering of non-stationary signals.
@@ -24,6 +25,14 @@ class ITD(object):
 
     def __init__(self, N_max: int = 10):
         self.N_max = N_max
+
+    def __call__(self, signal: np.ndarray) -> np.ndarray:
+        """allow instances to be called like functions"""
+        return self.fit_transform(signal=signal)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Intrinsic Time-Scale Decomposition (ITD)"
 
     def stop_iter(self, x, counter, E_x):
         """Stop the main iteration loop"""
@@ -45,7 +54,8 @@ class ITD(object):
         # EOF
         return False
 
-    def itd_baseline_extract(self, x):
+    @staticmethod
+    def itd_baseline_extract(x):
         """This function is to calculate the baseline L of the signal x."""
         length = len(x)
         t = np.arange(0, length)
@@ -119,21 +129,21 @@ class ITD(object):
         print(H)
         return L, H
 
-    def fit_transform(self, x: np.ndarray) -> np.ndarray:
+    def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """Input x is a 1D numpy signal and return the decomposition results."""
         H = []
-        E_x = np.sum(x**2)
+        E_x = np.sum(signal ** 2)
         counter = 0
 
         while True:
             counter = counter + 1
-            L1, H1 = self.itd_baseline_extract(x)
+            L1, H1 = self.itd_baseline_extract(signal)
             H.append(H1)
-            STOP = self.stop_iter(x, counter, E_x)
+            STOP = self.stop_iter(signal, counter, E_x)
             if STOP is True:
                 H.append(L1)
                 break
-            x = L1
+            signal = L1
 
         H = np.vstack(H)
 

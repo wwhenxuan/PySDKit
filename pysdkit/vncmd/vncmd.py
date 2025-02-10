@@ -15,7 +15,8 @@ from pysdkit.vmd.base import Base
 
 class VNCMD(Base):
     """
-    Variational nonlinear chirp mode decomposition.
+    Variational Nonlinear Chirp Mode Decomposition
+
     Chen S, Dong X, Peng Z, et al. Nonlinear chirp mode decomposition: A variational method[J].
     IEEE Transactions on Signal Processing, 2017, 65(22): 6024-6037.
     """
@@ -67,6 +68,10 @@ class VNCMD(Base):
     def __call__(self, signal: np.ndarray, eIF: Optional[np.ndarray] = None):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, eIF=eIF)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Variational Nonlinear Chirp Mode Decomposition (VNCMD)"
 
     @staticmethod
     def projec(vec: np.ndarray, var: float) -> np.ndarray:

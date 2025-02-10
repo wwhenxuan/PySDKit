@@ -21,5 +21,12 @@ class RLMD(object):
     ):
         pass
 
+    def __call__(self, *args, **kwargs):
+        pass
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Robust Local Mean Decomposition (RLMD)"
+
     def fit_transform(self, signal: np.ndarray):
         pass

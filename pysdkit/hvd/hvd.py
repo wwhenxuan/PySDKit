@@ -58,6 +58,10 @@ class HVD(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal, return_all)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Hilbert Vibration Decomposition (HVD)"
+
     def square_window(
         self,
         seq_len: int,

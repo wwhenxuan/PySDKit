@@ -92,6 +92,10 @@ class EMD(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, time=time, max_imfs=max_imfs)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Empirical Mode Decomposition (EMD)"
+
     @staticmethod
     def _check_length(signal: np.ndarray, time: Optional[np.ndarray] = None):
         """Check input timing and signal length are equal"""

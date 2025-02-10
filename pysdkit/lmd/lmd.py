@@ -52,6 +52,10 @@ class LMD(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, K=K)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Local Mean Decomposition (LMD)"
+
     def is_monotonous(self, signal: np.ndarray) -> bool:
         """Determine whether the signal is a (non-strict) monotone sequence"""
         # This method is used to determine the termination condition of the iterative loop

@@ -60,6 +60,10 @@ class SSA(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Singular Spectral Analysis (SSA)"
+
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Execute the Singular Spectral Analysis (SSA) algorithm to perform signal decomposition

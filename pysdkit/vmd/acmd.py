@@ -17,19 +17,22 @@ from typing import Optional, Tuple, Union
 
 class ACMD(Base):
     """
+    Adaptive Chirp Mode Decomposition
+
     Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method Based on Adaptive Chirp Mode Decomposition,
     Chen S, Yang Y, Peng Z, et al, Journal of Sound and Vibration, 2018.
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/69128-adaptive-chirp-mode-decomposition
     """
 
     def __init__(
-        self,
-        K: int,
-        fs: Optional[int] = None,
-        alpha0: float = 1e-3,
-        beta: float = 1e-4,
-        tol: float = 1e-8,
-        max_iter: int = 300,
+            self,
+            K: int,
+            fs: Optional[int] = None,
+            alpha0: float = 1e-3,
+            beta: float = 1e-4,
+            tol: float = 1e-8,
+            max_iter: int = 300,
     ) -> None:
         """
         :param K: the number of intrinsic mode functions obtained by decomposing the signal is also the number of decomposition rounds
@@ -47,6 +50,16 @@ class ACMD(Base):
         self.beta = beta
         self.tol = tol
         self.max_iter = max_iter
+
+    def __call__(
+            self, signal: np.ndarray, return_all: Optional[bool] = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """allow instances to be called like functions"""
+        return self.fit_transform(signal, return_all)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Adaptive Chirp Mode Decomposition (ACMD)"
 
     @staticmethod
     def init_IF1(signal: np.ndarray, SampFreq: int, N: int):
@@ -88,7 +101,7 @@ class ACMD(Base):
         return ybar
 
     def iter(
-        self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: int
+            self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: int
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Perform an algorithm decomposition"""
         # Initialize
@@ -164,7 +177,7 @@ class ACMD(Base):
             # Compute the derivatives of the functions
             ycmbar, ysmbar = self.differ(ycm, 1 / fs), self.differ(ysm, 1 / fs)
             # Obtain the frequency increment by arctangent demodulation
-            deltaIF = (ycm * ysmbar - ysm * ycmbar) / (ycm**2 + ysm**2) / (2 * pi)
+            deltaIF = (ycm * ysmbar - ysm * ycmbar) / (ycm ** 2 + ysm ** 2) / (2 * pi)
             # Smooth the frequency increment by low-pass filtering
             deltaIF = spsolve(
                 (1 / self.beta * opedoub + eye(N, format="csr")), deltaIF.T
@@ -175,8 +188,8 @@ class ACMD(Base):
             # Compute the convergence index
             if n > 0:
                 sDif = (
-                    norm(ssetiter[n, :] - ssetiter[n - 1]) / norm(ssetiter[n - 1, :])
-                ) ** 2
+                               norm(ssetiter[n, :] - ssetiter[n - 1]) / norm(ssetiter[n - 1, :])
+                       ) ** 2
 
             n = n + 1
 
@@ -189,12 +202,12 @@ class ACMD(Base):
         ycm = ysetiter[n, :N]
         ysm = ysetiter[n, N:]
         # Estimated IA
-        IAest = np.sqrt(ycm**2 + ysm**2)
+        IAest = np.sqrt(ycm ** 2 + ysm ** 2)
 
         return sest, IFest, IAest
 
     def fit_transform(
-        self, signal: np.ndarray, return_all: Optional[bool] = False
+            self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """Start the ACMD algorithm"""
         # Initialize
@@ -224,7 +237,7 @@ class ACMD(Base):
             IAests[ii, :] = IAest
             # Use the residual from this decomposition as the input for the next iteration
             signal = (
-                signal - sest
+                    signal - sest
             )  # obtain the residual signal by extracting the component from the raw signal
 
         if return_all is True:

@@ -87,6 +87,10 @@ class MEMD(object):
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal)
 
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Multivariate Empirical Mode Decomposition (MEMD)"
+
     def init_hammersley(self, N_dim: int) -> np.ndarray:
         """Initializations for Hammersley function"""
         base = [-self.n_dir]
