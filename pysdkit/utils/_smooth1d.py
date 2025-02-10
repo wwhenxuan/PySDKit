@@ -41,16 +41,17 @@ def gaussian_smoothing(signal: np.ndarray, sigma: int = 2) -> np.ndarray:
 
 
 def savgol_smoothing(
-    signal: np.ndarray, window_length: int = 11, polyorder: int = 2
+    signal: np.ndarray, window_length: int = 11, poly_order: int = 2
 ) -> np.ndarray:
     """
     Savitzky-Golay Filtering Smoothing
     :param signal: Input signal (numpy array)
     :param window_length: Length of the filter window (default is 11, must be odd)
-    :param polyorder: Order of the polynomial used to fit the samples (default is 2)
+    :param poly_order: Order of the polynomial used to fit the samples (default is 2)
     :return: Smoothed signal (numpy array)
     """
-    return savgol_filter(signal, window_length=window_length, polyorder=polyorder)
+    assert window_length % 2 == 1, "the window length must be odd!"
+    return savgol_filter(signal, window_length=window_length, polyorder=poly_order)
 
 
 def exponential_smoothing(signal: np.ndarray, alpha: float = 0.4) -> np.ndarray:

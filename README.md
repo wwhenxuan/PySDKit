@@ -6,7 +6,6 @@
 ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit)
 [![Python](https://img.shields.io/badge/python-3.8+-blue?logo=python)](https://www.python.org/)
 [![Downloads](https://pepy.tech/badge/pysdkit)](https://pepy.tech/project/pysdkit)
-![Visits Badge](https://badges.pufler.dev/visits/ForestsKing/D3R)
 [![codestyle](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A Python library for signal decomposition algorithms 🥳
