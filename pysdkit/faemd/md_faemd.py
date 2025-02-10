@@ -27,7 +27,9 @@ class MD_FAEMD(object):
 
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
-        return "Multidimensional Fast and Adaptive Empirical Mode Decomposition (MD_FAEMD)"
+        return (
+            "Multidimensional Fast and Adaptive Empirical Mode Decomposition (MD_FAEMD)"
+        )
 
     def fit_transform(self):
         pass

@@ -132,7 +132,7 @@ class ITD(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """Input x is a 1D numpy signal and return the decomposition results."""
         H = []
-        E_x = np.sum(signal ** 2)
+        E_x = np.sum(signal**2)
         counter = 0
 
         while True:

@@ -47,10 +47,10 @@ class VMD2D(object):
         self.rng = np.random.RandomState(random_seed)
 
     def __call__(
-            self,
-            img: np.ndarray,
-            K: Optional[int] = None,
-            return_all: Optional[bool] = False,
+        self,
+        img: np.ndarray,
+        K: Optional[int] = None,
+        return_all: Optional[bool] = False,
     ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(img=img, K=K, return_all=return_all)

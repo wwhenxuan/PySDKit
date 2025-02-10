@@ -4,14 +4,16 @@ Created on 2025/02/10 13:14:41
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
-import torch
-from torch import Tensor
-from torch import nn
-
 import numpy as np
 from matplotlib import pyplot as plt
 
-from pysdkit.utils import simple_moving_average, weighted_moving_average, gaussian_smoothing, savgol_smoothing, exponential_smoothing
+from pysdkit.utils import (
+    simple_moving_average,
+    weighted_moving_average,
+    gaussian_smoothing,
+    savgol_smoothing,
+    exponential_smoothing,
+)
 
 from typing import Optional, Tuple, List
 
@@ -23,7 +25,14 @@ class Moving_Decomp(object):
     在
     """
 
-    def __init__(self, window_size: int = 25, method: str = "simple", sigma: int = 2, poly_order: int = 2, alpha: float = 0.4) -> None:
+    def __init__(
+        self,
+        window_size: int = 5,
+        method: str = "simple",
+        sigma: int = 2,
+        poly_order: int = 2,
+        alpha: float = 0.4,
+    ) -> None:
         """
         通过滑动平均的方式对输入的信号进行分解，得到趋势和周期两部分内容
         :param window_size:
@@ -45,6 +54,12 @@ class Moving_Decomp(object):
             # 使用的平滑方法错误
             raise ValueError("method must be one of {}".format(self.method_list))
 
+    def __call__(self, *args, **kwargs):
+        pass
+
+    def __str__(self):
+        pass
+
     def _decomposition(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         执行一次滑动平均分解算法
@@ -59,13 +74,19 @@ class Moving_Decomp(object):
         elif self.method == "weighted":
             trend = weighted_moving_average(signal=signal, window_size=self.window_size)
         elif self.method == "gaussian":
-            trend = gaussian_smoothing(signal=signal,  sigma=self.sigma)
+            trend = gaussian_smoothing(signal=signal, sigma=self.sigma)
         elif self.method == "savgol":
-            trend = savgol_smoothing(signal=signal, window_length=self.window_size, poly_order=self.poly_order)
+            trend = savgol_smoothing(
+                signal=signal,
+                window_length=self.window_size,
+                poly_order=self.poly_order,
+            )
         elif self.method == "exponential":
             trend = exponential_smoothing(signal=signal, alpha=self.alpha)
         else:
-            raise ValueError("method must be 'simple' or 'weighted' or 'gaussian' or 'savgol' or 'exponential'")
+            raise ValueError(
+                "method must be 'simple' or 'weighted' or 'gaussian' or 'savgol' or 'exponential'"
+            )
 
         # 从原始的输入信号中减去趋势部分
         seasonality = signal - trend
@@ -75,6 +96,7 @@ class Moving_Decomp(object):
 
     def fit_transform(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """"""
+        # TODO: 可以指定传入一个列表表示对于每一个通道的时间序列到底采用哪种分解方法
         # 检验输入信号的维度
         shape = signal.shape
 
@@ -85,22 +107,33 @@ class Moving_Decomp(object):
         elif len(shape) == 2:
             # 输入为一维的多元信号
             # 获取输入信号的数目
-            n_vars, seq_len = shape[0]
+            n_vars, seq_len = shape
 
             # 初始化分解的数组
-            trend, seasonality = np.zeros(shape=(n_vars, seq_len)), np.zeros(shape=(n_vars, seq_len))
+            trend, seasonality = np.zeros(shape=(n_vars, seq_len)), np.zeros(
+                shape=(n_vars, seq_len)
+            )
 
             for n in range(n_vars):
                 # 遍历每一个信号进行滑动平均分解
-                trend[n, :], seasonality[n, :] = self._decomposition(signal=signal[n, :])
+                trend[n, :], seasonality[n, :] = self._decomposition(
+                    signal=signal[n, :]
+                )
         else:
-            raise ValueError("The input must be 1D univariate or multivariate signal with shape [seq_len] or [n_vars, seq_len]")
+            raise ValueError(
+                "The input must be 1D univariate or multivariate signal with shape [seq_len] or [n_vars, seq_len]"
+            )
 
         # 返回分解后的结果
         return trend, seasonality
 
-    def plot_decomposition(self, signal: np.ndarray, trend: np.ndarray, seasonality: np.ndarray,
-                           colors: List[str]=None) -> Optional[plt.Figure]:
+    @staticmethod
+    def plot_decomposition(
+        signal: np.ndarray,
+        trend: np.ndarray,
+        seasonality: np.ndarray,
+        colors: List[str] = None,
+    ) -> Optional[plt.Figure]:
         """
         对输入信号分解后的结果进行可视化
         :param signal:
@@ -117,44 +150,58 @@ class Moving_Decomp(object):
         # If the inputs is univariate signal
         if len(shape) == 1:
             # 创建绘图对象
-            fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(10, 5))
+            fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(10, 5), sharex=True)
+            # 开始绘制图像
             ax[0].plot(signal, color=colors[0])
             ax[1].plot(trend, color=colors[1])
             ax[2].plot(seasonality, color=colors[2])
 
+            ax[0].set_ylabel("input signal")
+            ax[1].set_ylabel("trend")
+            ax[2].set_ylabel("seasonality")
+
         elif len(shape) == 2:
             # 获取输入信号的数目
-            n_vars, seq_len = shape[0]
+            n_vars, seq_len = shape
             # 创建绘图对象
-            fig, ax = plt.subplots(nrows=3, ncols=n_vars, figsize=(10, 5))
+            fig, ax = plt.subplots(nrows=3, ncols=n_vars, figsize=(4 * n_vars, 5), sharex=True)
+            # 遍历所有维度的变量绘制图像
+            for n in range(n_vars):
+                ax[0, n].plot(signal[n, :], color=colors[n])
+                ax[1, n].plot(trend[n, :], color=colors[n])
+                ax[2, n].plot(seasonality[n, :], color=colors[n])
+
+                ax[0, n].set_title(f"Input channels {n}")
+
+            ax[0, 0].set_ylabel("input signal")
+            ax[1, 0].set_ylabel("trend")
+            ax[2, 0].set_ylabel("seasonality")
+
+        else:
+            raise ValueError(
+                "The input must be 1D univariate or multivariate signal with shape [seq_len] or [n_vars, seq_len]"
+            )
+
+        return fig
 
 
-class moving_avg(nn.Module):
-    """Moving average block to highlight the trend of time series"""
+if __name__ == "__main__":
+    from pysdkit.data import generate_time_series
 
-    def __init__(self, kernel_size: int = 25, stride: int = 1) -> None:
-        super(moving_avg, self).__init__()
-        self.kernel_size = kernel_size
-        self.avg = nn.AvgPool1d(kernel_size=kernel_size, stride=stride, padding=0)
+    # univariate time series
+    time_series = generate_time_series()
 
-    def forward(self, x: Tensor) -> Tensor:
-        # padding on the both ends of time series
-        front = x[:, 0:1, :].repeat(1, (self.kernel_size - 1) // 2, 1)
-        end = x[:, -1:, :].repeat(1, (self.kernel_size - 1) // 2, 1)
-        x = torch.cat([front, x, end], dim=1)
-        x = self.avg(x.permute(0, 2, 1))
-        x = x.permute(0, 2, 1)
-        return x
+    moving_decomp = Moving_Decomp(window_size=5)
 
+    trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
-class series_decomp(nn.Module):
-    """Series decomposition instance block"""
+    moving_decomp.plot_decomposition(signal=time_series, trend=trends, seasonality=seasonalities)
+    plt.show()
 
-    def __init__(self, kernel_size: int) -> None:
-        super(series_decomp, self).__init__()
-        self.moving_avg = moving_avg(kernel_size, stride=1)
+    # multivariate time series
+    time_series = np.vstack([time_series] * 3)
 
-    def forward(self, x: Tensor) -> Tuple[Tensor, Tensor]:
-        moving_mean = self.moving_avg(x)
-        res = x - moving_mean
-        return res, moving_mean
+    trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
+
+    moving_decomp.plot_decomposition(signal=time_series, trend=trends, seasonality=seasonalities)
+    plt.show()

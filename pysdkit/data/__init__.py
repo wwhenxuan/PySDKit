@@ -37,3 +37,6 @@ from ._image import test_uni_image
 
 # Test case for multivariate image
 from ._image import test_multi_image
+
+# Generator for 1D univariate time series data
+from ._time_series import generate_time_series
