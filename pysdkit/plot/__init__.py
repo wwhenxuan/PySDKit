@@ -17,3 +17,6 @@ from ._plot_images import plot_grayscale_image, plot_grayscale_spectrum
 # 通用的图像可视化函数
 # 可以选择是否绘制频域图谱以及是否添加颜色条
 from ._plot_images import plot_images
+
+# Functions that generate signal visualizations
+from ._plot_signal import plot_signal

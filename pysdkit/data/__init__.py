@@ -26,9 +26,6 @@ from ._generator import test_univariate_signal
 # Generator for 1D multivariate
 from ._generator import test_multivariate_signal
 
-# Functions that generate signal visualizations
-from ._generator import plot_signal
-
 # add Gaussian noise
 from ._add_noise import add_noise
 

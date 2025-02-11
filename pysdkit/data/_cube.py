@@ -58,7 +58,7 @@ def get_meshgrid_3D(
 
 def test_univariate_cube(
     case: int = 1,
-    low: Union[int, np.ndarray] = 10,
+    low: Union[int, np.ndarray] = 0,
     high: Union[int, np.ndarray] = 10,
     sampling_rate: int = 30,
 ) -> np.ndarray:
@@ -92,7 +92,7 @@ def test_univariate_cube(
 
 def test_multivariate_cube(
     case: Union[List[int], Tuple[int], np.ndarray] = None,
-    low: Union[int, np.ndarray] = 10,
+    low: Union[int, np.ndarray] = 0,
     high: Union[int, np.ndarray] = 10,
     sampling_rate: int = 30,
 ) -> np.ndarray:
@@ -152,7 +152,7 @@ def test_cube_1(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.01)
     return u
 
 
@@ -175,7 +175,7 @@ def test_cube_2(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.001)
     return u
 
 
@@ -198,7 +198,7 @@ def test_cube_3(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.001)
     return u
 
 
@@ -221,7 +221,7 @@ def test_cube_4(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.001)
     return u
 
 
@@ -244,7 +244,7 @@ def test_cube_5(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.001)
     return u
 
 
@@ -267,5 +267,10 @@ def test_cube_6(
     # Fusion of different modalities
     u = uc1 + uc2 + ru
     # Standardize the results of the integration
-    u = (u - np.mean(u)) / np.std(u)
+    u = (u - np.mean(u)) / np.std(u + 0.001)
     return u
+
+
+if __name__ == "__main__":
+    print(test_univariate_cube().shape)
+    print(test_univariate_cube())

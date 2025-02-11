@@ -8,7 +8,7 @@ import numpy as np
 from scipy.signal import sawtooth
 from matplotlib import pyplot as plt
 
-from typing import Tuple
+from typing import Tuple, Optional
 
 
 def generate_sin_signal(
@@ -254,7 +254,12 @@ def test_1D_2(
     :return: Tuple containing time array and the 3 * 2 ^ (-t) * sin(sin(2 * pi * t)) signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = 3 * 2 ^ (-t) * np.sin(np.sin(2 * np.pi * t))
+    signal = (
+        3 * 2 ** (-t) * np.sin(np.sin(2 * np.pi * t))
+        + np.cos(2 * np.pi * t * 5)
+        + np.sin(2 * np.pi * (t + 2 * t**2))
+        + np.sin(2 * np.pi * t * 30)
+    )
     return t, signal
 
 
@@ -274,7 +279,13 @@ def test_1D_3(
     """
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = 5 * np.sin(2 * np.pi * t) + 3 * np.sin(2 * np.pi * t)
+    signal = (
+        5 * np.sin(2 * np.pi * t)
+        + 3 * np.cos(2 * np.pi * t)
+        + 2 * np.cos(2 * np.pi * t**2)
+        + np.sin(2 * np.pi * t**3)
+        + np.sin(2 * np.pi * (t * 30 + t**2 * 2))
+    )
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
     return t, noise_signal
@@ -361,7 +372,6 @@ def test_multivariate_1D_2(
     """
     np.random.seed(seed=42)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
     # Generate the multi-channels signals
     signal_1 = (
@@ -445,78 +455,9 @@ def test_multivariate_1D_3(
     return t, f
 
 
-def plot_signal(
-    t: np.array,
-    signal: np.array,
-    color: str = "royalblue",
-    save: bool = False,
-    dpi: int = 128,
-    fontsize: int = 12,
-) -> plt.figure:
-    """
-    Plot and optionally save an amplitude modulated (AM) signal with time on the x-axis and amplitude on the y-axis.
-    :param t: Array of time points corresponding to the signal.
-    :param signal: Array containing the signal data to be plotted.
-    :param color: Color of the plot line.
-    :param save: Boolean flag to indicate whether the plot should be saved to a file.
-    :param dpi: Dots per inch (resolution) of the figure, if saved.
-    :param fontsize: Font size of the axis labels.
-    :return: The figure object containing the plot.
-    """
-
-    # Determine the number of input signals
-    n_dim = len(signal.shape)
-
-    if n_dim == 1:
-        # Create a figure and a single subplot
-        fig, ax = plt.subplots(figsize=(8, 3))
-
-        # Plot the signal against time with specified line color
-        ax.plot(t, signal, color=color)
-
-        # Set the x-axis label with specified font size
-        ax.set_xlabel("Time (seconds)", fontsize=fontsize)
-
-        # Set the y-axis label with default font size
-        ax.set_ylabel("Amplitude", fontsize=fontsize)
-
-        # Enable grid for better readability
-        ax.grid(True)
-
-    elif n_dim == 2:
-        # Determining the number of multivariate signals
-        n_vars = signal.shape[0]
-
-        # Create a figure and a single subplot
-        fig, ax = plt.subplots(nrows=n_vars, figsize=(10, 1 + 2 * n_vars), sharex=True)
-
-        for i in range(n_vars):
-            # Plot the signal against time with specified line color
-            ax[i].plot(t, signal[i, :], color=color)
-
-            # Set the y-axis label with default font size
-            ax[i].set_ylabel("Amplitude", fontsize=fontsize)
-
-            # Enable grid for better readability
-            ax[i].grid(True)
-
-        # Set the x-axis label with specified font size
-        ax[-1].set_xlabel("Time (seconds)", fontsize=fontsize)
-
-    else:
-        raise ValueError("Wrong input signal, please input the 1D signal.")
-
-    # Check if the figure needs to be saved
-    if save:
-        # Save the figure with the specified dpi and bounding box tightly around the figure
-        fig.savefig("generate_signal.jpg", dpi=dpi, bbox_inches="tight")
-
-    # Return the figure object
-    return fig
-
-
 if __name__ == "__main__":
-    from pysdkit.data import test_emd, plot_signal, test_multivariate_signal
+    from pysdkit.data import test_emd, test_multivariate_signal
+    from pysdkit.plot import plot_signal
 
     t, signal = test_univariate_signal(case=1)
     print(signal.shape)

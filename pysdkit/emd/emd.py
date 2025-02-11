@@ -380,7 +380,7 @@ class EMD(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = 4,
+        max_imfs: Optional[int] = None,
     ) -> np.ndarray:
         """
         Signal decomposition using EMD algorithm

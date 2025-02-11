@@ -109,7 +109,6 @@ class VMD(Base):
         save_figure: bool = False,
         return_figure: bool = False,
         dpi: int = 500,
-        fontsize: float = 14,
         spine_width: float = 2,
         labelpad: float = 10,
         save_name: Optional[str] = None,
@@ -121,7 +120,6 @@ class VMD(Base):
         :param save_figure: Whether to save the figure as an image
         :param return_figure: Whether to return the figure object
         :param dpi: The resolution of the saved image
-        :param fontsize: The font size of the axis labels
         :param spine_width: The width of the visible axes spines
         :param labelpad: Controls the filling distance of the y-axis coordinate
         :param save_name: The name of the saved image file
@@ -136,7 +134,6 @@ class VMD(Base):
                 save_figure=save_figure,
                 return_figure=return_figure,
                 dpi=dpi,
-                fontsize=fontsize,
                 spine_width=spine_width,
                 labelpad=labelpad,
                 save_name=save_name,

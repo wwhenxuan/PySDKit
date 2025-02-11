@@ -3,6 +3,11 @@
 Created on Sat Mar 4 11:59:21 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
+可视化图像的函数需要再专门去写几个
+就不同可视化信号的放在一起了
+
+对分解后的频谱进行可视化
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,7 +17,6 @@ from typing import Optional, List
 from pysdkit.plot._functions import generate_random_hex_color
 from pysdkit.plot._functions import set_themes
 
-# set_themes(choice="plot_imfs")
 COLORS = [
     "#000000",
     "#228B22",
@@ -33,7 +37,6 @@ def plot_IMFs(
     save_figure: Optional[bool] = False,
     return_figure: Optional[bool] = False,
     dpi: Optional[int] = 64,
-    fontsize: float = 14,
     spine_width: float = 2,
     labelpad: float = 10,
     save_name: Optional[str] = None,
@@ -41,6 +44,10 @@ def plot_IMFs(
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
+    You can choose to visualize on a 2D plane or in 3D space.
+    The 2D plane visualization is more intuitive,
+    while the 3D visualization can better reflect the size relationship between the decomposed modes.
+
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted
@@ -49,7 +56,6 @@ def plot_IMFs(
     :param save_figure: Whether to save the figure as an image
     :param return_figure: Whether to return the figure object
     :param dpi: The resolution of the saved image
-    :param fontsize: The font size of the axis labels
     :param spine_width: The width of the visible axes spines
     :param labelpad: Controls the filling distance of the y-axis coordinate
     :param save_name: The name of the saved image file
@@ -59,40 +65,75 @@ def plot_IMFs(
     view = view.lower()
 
     # Here you need to determine the dimension of the function input and then select the function to use
+    # Judging whether the input signal is multivariate by its dimension
+    shape = signal.shape
 
     if view == "2d":
-        # Plot the results of the decomposition of a univariate signal on a 2D plane
-        return plot_1D_IMFs(
-            signal=signal,
-            IMFs=IMFs,
-            max_imfs=max_imfs,
-            colors=colors,
-            save_figure=save_figure,
-            return_figure=return_figure,
-            dpi=dpi,
-            fontsize=fontsize,
-            spine_width=spine_width,
-            labelpad=labelpad,
-            save_name=save_name,
-        )
+        # 在2D平面上进行可视化
+        if len(shape) == 1:
+            # Plotting the results of the decomposition of a univariate signal on a 2D plane
+            return plot_2D_IMFs(
+                signal=signal,
+                IMFs=IMFs,
+                max_imfs=max_imfs,
+                colors=colors,
+                save_figure=save_figure,
+                return_figure=return_figure,
+                dpi=dpi,
+                spine_width=spine_width,
+                labelpad=labelpad,
+                save_name=save_name,
+            )
+        elif len(shape) == 2:
+            # Plotting the results of the decomposition of a multivariate signal on a 2D plane
+            return plot_multi_IMFs(
+                signal=signal,
+                IMFs=IMFs,
+                max_imfs=max_imfs,
+                colors=colors,
+                save_figure=save_figure,
+                return_figure=return_figure,
+                dpi=dpi,
+                spine_width=spine_width,
+                save_name=save_name,
+            )
+        else:
+            # The output data is in the wrong format
+            raise ValueError("The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]")
     elif view == "3d":
-        # Plot the results of the decomposition of a univariate signal in 3D space
-        return plot_3D_IMFs(
-            signal=signal,
-            IMFs=IMFs,
-            max_imfs=max_imfs,
-            colors=colors,
-            save_figure=save_figure,
-            return_figure=return_figure,
-            dpi=dpi,
-            fontsize=fontsize,
-            save_name=save_name,
-        )
+        # Visualization in 3D space
+        if len(shape) == 1:
+            # Plot the results of the decomposition of a univariate signal in 3D space
+            return plot_3D_IMFs(
+                signal=signal,
+                IMFs=IMFs,
+                max_imfs=max_imfs,
+                colors=colors,
+                save_figure=save_figure,
+                return_figure=return_figure,
+                dpi=dpi,
+                save_name=save_name,
+            )
+        elif len(shape) == 2:
+            # Plotting the results of the decomposition of the multivariate signal in 3D space
+            return plot_multi_3D_IMFs(
+                signal=signal,
+                IMFs=IMFs,
+                max_imfs=max_imfs,
+                colors=colors,
+                save_figure=save_figure,
+                return_figure=return_figure,
+                dpi=dpi,
+                save_name=save_name,
+            )
+        else:
+            # The output data is in the wrong format
+            raise ValueError("The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]")
     else:
         raise ValueError("View must be either `2d` or `3d`")
 
 
-def plot_1D_IMFs(
+def plot_2D_IMFs(
     signal: np.ndarray,
     IMFs: np.ndarray,
     max_imfs: Optional[int] = -1,
@@ -210,7 +251,7 @@ def plot_3D_IMFs(
     save_figure: Optional[bool] = False,
     return_figure: Optional[bool] = False,
     dpi: Optional[int] = 64,
-    fontsize: float = 8,
+    fontsize: float = 5,
     save_name: Optional[str] = None,
 ) -> Optional[plt.Figure]:
     """
@@ -262,14 +303,14 @@ def plot_3D_IMFs(
 
     # Traverse each signal segment to draw an image
     for i in range(0, n_rows):
-        ax.plot(np.ones(length) * x[i], y, signals[i, :], color=colors[i])
+        ax.plot(np.ones(length) * x[i], y, signals[i, :], color=colors[i], lw=0.75)
 
     # Set the x axes ticks and labels
     ax.set_xticks(x)
     ax.set_xticklabels(x_label)
 
     # Set the tick params including fontsize and colors
-    ax.tick_params(axis="both", which="major", labelsize=fontsize, colors="black")
+    ax.tick_params(axis="both", which="major", labelsize=8, colors="black")
 
     # Save the figure if requested
     saved = False
@@ -298,7 +339,7 @@ def plot_multi_IMFs(
     save_figure: Optional[bool] = False,
     return_figure: Optional[bool] = False,
     dpi: Optional[int] = 64,
-    fontsize: float = 10,
+    fontsize: float = 8,
     spine_width: float = 2,
     save_name: Optional[str] = None,
 ) -> Optional[plt.Figure]:
@@ -360,7 +401,7 @@ def plot_multi_IMFs(
             )
 
             # Plotting the signal
-            ax[row, col].plot(signals[row, :, col], color=colors[row])
+            ax[row, col].plot(signals[row, :, col], color=colors[row], lw=0.75)
 
             # Set the range of the signal
             ax[row, col].set_xlim(-padding, seq_len + padding)
@@ -397,7 +438,7 @@ def plot_multi_IMFs(
 
     # Setting the number of variations
     for col in range(n_vars):
-        ax[0, col].set_title(f"Var-{col}", fontsize=fontsize)
+        ax[0, col].set_title(f"Var-{col}", fontsize=fontsize + 1)
 
     # Save the figure if requested
     saved = False
@@ -419,8 +460,8 @@ def plot_multi_IMFs(
 
 
 def plot_multi_3D_IMFs(
-    signal,
-    IMFs,
+    signal: np.ndarray,
+    IMFs: np.ndarray,
     max_imfs: Optional[int] = -1,
     colors: Optional[List] = None,
     save_figure: Optional[bool] = False,
@@ -493,7 +534,7 @@ def plot_multi_3D_IMFs(
             )
 
         # Adjust the size of the axis scale
-        axes[col].tick_params(axis="both", which="major", labelsize=9)
+        axes[col].tick_params(axis="both", which="major", labelsize=8)
 
         # Set the x axes ticks and labels
         axes[col].set_xticks(x)
@@ -523,12 +564,11 @@ def plot_multi_3D_IMFs(
 
 
 if __name__ == "__main__":
-    from pysdkit.data import test_emd
-    from pysdkit.data._generator import test_multi_1D_1
+    from pysdkit.data._generator import test_multivariate_1D_1
     from pysdkit import EWT, MVMD
     from matplotlib import pyplot as plt
 
-    time, signal = test_multi_1D_1()
+    time, signal = test_multivariate_1D_1()
 
     print(signal.shape)
 
