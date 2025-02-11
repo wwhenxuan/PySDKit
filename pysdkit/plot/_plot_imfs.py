@@ -99,7 +99,9 @@ def plot_IMFs(
             )
         else:
             # The output data is in the wrong format
-            raise ValueError("The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]")
+            raise ValueError(
+                "The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]"
+            )
     elif view == "3d":
         # Visualization in 3D space
         if len(shape) == 1:
@@ -128,7 +130,9 @@ def plot_IMFs(
             )
         else:
             # The output data is in the wrong format
-            raise ValueError("The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]")
+            raise ValueError(
+                "The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]"
+            )
     else:
         raise ValueError("View must be either `2d` or `3d`")
 
