@@ -14,14 +14,17 @@ from ._generator import (
 )
 from ._generator import generate_am_signal, generate_exponential_signal
 
+# Generator for 1D univariate time series data
+from ._time_series import generate_time_series
+
 # Generates the main test sample signal
 from ._generator import test_emd
 
 # Generator for 1D univariate
-from ._generator import test_uni_signal
+from ._generator import test_univariate_signal
 
 # Generator for 1D multivariate
-from ._generator import test_multi_signal
+from ._generator import test_multivariate_signal
 
 # Functions that generate signal visualizations
 from ._generator import plot_signal
@@ -32,11 +35,14 @@ from ._add_noise import add_noise
 # Test case for loading a 2D grayscale image
 from ._image import test_grayscale
 
-# Test case for univariate image
-from ._image import test_uni_image
+# Test case for univariate 2D image
+from ._image import test_univariate_image
 
-# Test case for multivariate image
-from ._image import test_multi_image
+# Test case for multivariate 2D image
+from ._image import test_multivariate_image
 
-# Generator for 1D univariate time series data
-from ._time_series import generate_time_series
+# Test case for univariate 3D cube
+from ._cube import test_univariate_cube
+
+# Test case for multivariate 3D cube
+from ._cube import test_multivariate_cube

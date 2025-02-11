@@ -206,17 +206,17 @@ def plot_grayscale_spectrum(
 
 
 if __name__ == "__main__":
-    from pysdkit.data import test_uni_image, test_multi_image
+    from pysdkit.data import test_univariate_image, test_multivariate_image
     from matplotlib import pyplot as plt
 
-    plot_images(test_uni_image(), spectrum=True, colorbar=True)
+    plot_images(test_univariate_image(), spectrum=True, colorbar=True)
     plt.show()
 
-    plot_images(test_uni_image(), spectrum=False, colorbar=True)
+    plot_images(test_univariate_image(), spectrum=False, colorbar=True)
     plt.show()
 
-    plot_images(test_multi_image(case=(5, 6, 7)), spectrum=True, colorbar=True)
+    plot_images(test_multivariate_image(case=(5, 6, 7)), spectrum=True, colorbar=True)
     plt.show()
 
-    plot_images(test_multi_image(case=(5, 6, 7)), spectrum=False, colorbar=True)
+    plot_images(test_multivariate_image(case=(5, 6, 7)), spectrum=False, colorbar=True)
     plt.show()

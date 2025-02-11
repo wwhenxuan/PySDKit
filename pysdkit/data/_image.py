@@ -46,7 +46,7 @@ def test_grayscale() -> np.ndarray | None:
     return None
 
 
-def get_meshgrid(
+def get_meshgrid_2D(
     low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -66,7 +66,7 @@ def get_meshgrid(
     return x, y
 
 
-def test_uni_image(
+def test_univariate_image(
     case: int = 1, low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
 ) -> np.ndarray:
     """
@@ -99,7 +99,7 @@ def test_uni_image(
         return test_grayscale()
 
 
-def test_multi_image(
+def test_multivariate_image(
     case: Tuple = (1, 2, 3),
     low: int = 0,
     high: int = 10,
@@ -139,7 +139,7 @@ def test_multi_image(
 
     # Get multivariate image by sampling univariate function
     images = [
-        test_uni_image(case=c, low=low, high=high, sampling_rate=sampling_rate)[
+        test_univariate_image(case=c, low=low, high=high, sampling_rate=sampling_rate)[
             np.newaxis, :, :
         ]
         for c in c_list
@@ -164,7 +164,7 @@ def test_image_1(
     :return: Generate a 2D image using sin(4x), sin(x) and cos(x/24)
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.sin(4 * x) + np.sin(4 * y)
@@ -193,7 +193,7 @@ def test_image_2(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.sin(x) + np.sin(y)
@@ -222,7 +222,7 @@ def test_image_3(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.sin(x / 24) + np.sin(y / 24)
@@ -251,7 +251,7 @@ def test_image_4(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.sin(x / 60) + np.sin(y / 60)
@@ -280,7 +280,7 @@ def test_image_5(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.sin(x * 8) + np.sin(y * 8)
@@ -309,7 +309,7 @@ def test_image_6(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.cos(x**1.2 * 8) + np.sin(y**1.2 * 8)
@@ -338,7 +338,7 @@ def test_uni_image_7(
     :return: Generate a mixed image using two-dimensional sine and cosine functions
     """
     # Construct the two dim grid matrix
-    x, y = get_meshgrid(low, high, sampling_rate)
+    x, y = get_meshgrid_2D(low, high, sampling_rate)
 
     # Generate a function according to the specified method
     uc1 = np.cos(x**1.2 * 8) + np.sin(y**1.2 * 8)
@@ -361,4 +361,4 @@ if __name__ == "__main__":
     plot_grayscale_image(test_uni_image_7())
     plt.show()
 
-    print(test_multi_image().shape)
+    print(test_multivariate_image().shape)

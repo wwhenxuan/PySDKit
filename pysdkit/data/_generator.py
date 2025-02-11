@@ -198,7 +198,7 @@ def generate_exponential_signal(
     return t, noisy_exp_signal
 
 
-def test_uni_signal(
+def test_univariate_signal(
     case: int = 1,
     duration: float = 1.0,
     sampling_rate: int = 1000,
@@ -302,7 +302,7 @@ def test_emd(
     return t, noise_signal
 
 
-def test_multi_signal(
+def test_multivariate_signal(
     case: int = 1,
     duration: float = 1.0,
     sampling_rate: int = 1000,
@@ -316,18 +316,18 @@ def test_multi_signal(
     :return: the generated signal for multivariate 1D.
     """
     if case == 1:
-        return test_multi_1D_1(duration=duration, sampling_rate=sampling_rate)
+        return test_multivariate_1D_1(duration=duration, sampling_rate=sampling_rate)
     elif case == 2:
-        return test_multi_1D_2(duration=duration, sampling_rate=sampling_rate)
+        return test_multivariate_1D_2(duration=duration, sampling_rate=sampling_rate)
     elif case == 3:
-        return test_multi_1D_3(duration=duration, sampling_rate=sampling_rate)
+        return test_multivariate_1D_3(duration=duration, sampling_rate=sampling_rate)
     else:
         # When there is no such test instance, the function returns `case==1`
         print(f"There is no case {case}, so it will return case==1!")
-        return test_multi_1D_1(duration=duration, sampling_rate=sampling_rate)
+        return test_multivariate_1D_1(duration=duration, sampling_rate=sampling_rate)
 
 
-def test_multi_1D_1(
+def test_multivariate_1D_1(
     duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
@@ -350,7 +350,7 @@ def test_multi_1D_1(
     return t, signal
 
 
-def test_multi_1D_2(
+def test_multivariate_1D_2(
     duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
@@ -391,7 +391,7 @@ def test_multi_1D_2(
     return t, signal
 
 
-def test_multi_1D_3(
+def test_multivariate_1D_3(
     duration: float = 1.0,
     sampling_rate: int = 1000,
     noise_level: float = 0.1,
@@ -516,14 +516,14 @@ def plot_signal(
 
 
 if __name__ == "__main__":
-    from pysdkit.data import test_emd, plot_signal, test_multi_signal
+    from pysdkit.data import test_emd, plot_signal, test_multivariate_signal
 
-    t, signal = test_uni_signal(case=1)
+    t, signal = test_univariate_signal(case=1)
     print(signal.shape)
 
     fig = plot_signal(t, signal)
 
-    t, signal = test_multi_signal(case=2)
+    t, signal = test_multivariate_signal(case=2)
     print(signal.shape)
 
     fig = plot_signal(t, signal, save=False)

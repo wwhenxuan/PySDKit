@@ -63,7 +63,9 @@ class Moving_Decomp(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Moving Average decomposition (Moving_Decomp)"
 
-    def _decomposition(self, signal: np.ndarray, method: str) -> Tuple[np.ndarray, np.ndarray]:
+    def _decomposition(
+        self, signal: np.ndarray, method: str
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Execute a sliding average decomposition algorithm.
         The input signal must be a univariate signal.
@@ -98,7 +100,9 @@ class Moving_Decomp(object):
         # Returns both trend and seasonal components
         return trend, seasonality
 
-    def fit_transform(self, signal: np.ndarray, methods_list: List[str] = None) -> Tuple[np.ndarray, np.ndarray]:
+    def fit_transform(
+        self, signal: np.ndarray, methods_list: List[str] = None
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Execute the moving average decomposition algorithm
         :param signal: the input univariate or multivariate signal of 1D numpy ndarray
@@ -129,7 +133,9 @@ class Moving_Decomp(object):
             # The submitted decomposition list must be greater than or equal to the number of channels of the input signal
             if methods_list is not None:
                 if len(methods_list) < n_vars:
-                    methods_list = methods_list + ([None] * (n_vars - len(methods_list)))
+                    methods_list = methods_list + (
+                        [None] * (n_vars - len(methods_list))
+                    )
 
                 for n, method in enumerate(methods_list, 0):
                     # Traverse each signal and perform sliding average decomposition
@@ -143,7 +149,9 @@ class Moving_Decomp(object):
             else:
                 for n in range(n_vars):
                     # Traverse each signal and perform sliding average decomposition
-                    trend[n, :], seasonality[n, :] = self._decomposition(signal=signal[n, :], method=self.method)
+                    trend[n, :], seasonality[n, :] = self._decomposition(
+                        signal=signal[n, :], method=self.method
+                    )
         else:
             raise ValueError(
                 "The input must be 1D univariate or multivariate signal with shape [seq_len] or [n_vars, seq_len]"

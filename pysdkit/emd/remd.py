@@ -525,10 +525,10 @@ class REMD(object):
 
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
-    from pysdkit.data import test_emd, test_uni_signal
+    from pysdkit.data import test_emd, test_univariate_signal
     from pysdkit.plot import plot_IMFs
 
-    time, signal = test_uni_signal()
+    time, signal = test_univariate_signal()
 
     remd = REMD(max_imfs=4, ext_ratio=0.0)
 
