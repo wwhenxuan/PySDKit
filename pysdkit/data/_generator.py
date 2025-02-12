@@ -298,7 +298,7 @@ def test_emd(
     random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
-    Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for emd test.
+    Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for _emd test.
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
