@@ -62,11 +62,11 @@ class INCMD(object):
         self.tol = tol
 
     def __call__(
-            self,
-            signal: np.ndarray,
-            time: Optional[np.ndarray] = None,
-            K: Optional[int] = None,
-            return_all: Optional[bool] = False,
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        K: Optional[int] = None,
+        return_all: Optional[bool] = False,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, time=time, K=K, return_all=return_all)
@@ -93,7 +93,11 @@ class INCMD(object):
         return D
 
     def _NCMD(
-        self, signal: np.ndarray, time: np.ndarray, g_factor: np.ndarray, f_filter: np.ndarray
+        self,
+        signal: np.ndarray,
+        time: np.ndarray,
+        g_factor: np.ndarray,
+        f_filter: np.ndarray,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Execute a nonlinear frequency modulation mode decomposition algorithm"""
 
