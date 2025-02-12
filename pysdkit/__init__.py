@@ -46,6 +46,9 @@ from ._vmd2d import VMD2D
 # 非线性啁啾模式分解
 from ._vncmd import VNCMD
 
+# 迭代非线性线性调频模式分解
+from ._vncmd import INCMD
+
 # 经验小波变换
 from ._ewt import ewt, EWT
 
