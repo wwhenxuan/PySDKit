@@ -12,7 +12,7 @@ from typing import Optional, Tuple, Any
 
 
 def sample_entropy(
-        y: np.ndarray, m: Optional[int], r: Optional[float], dist_type="chebychev"
+    y: np.ndarray, m: Optional[int], r: Optional[float], dist_type="chebychev"
 ) -> np.ndarray | float:
     """
     Computing the Sample Entropy of a given signal or time series of 1D numpy ndarray.
@@ -96,16 +96,16 @@ def buffer(x: np.ndarray, tau: int) -> np.ndarray:
     # Calculate the length that needs to be added so that it can divide tau
     pad_length = (tau - len(x) % tau) % tau
     # Fill with 0 or NaN (depending on the requirement)
-    x_padded = np.pad(x, (0, pad_length), mode='constant', constant_values=0)
+    x_padded = np.pad(x, (0, pad_length), mode="constant", constant_values=0)
     # Split x into (n, tau) shapes
     return x_padded.reshape(-1, tau)
 
 
 def multiscale_sample_entropy(
-        x: np.ndarray,
-        m: Optional[int] = 2,
-        r: Optional[float] = 0.15,
-        tau: Optional[int] = 1,
+    x: np.ndarray,
+    m: Optional[int] = 2,
+    r: Optional[float] = 0.15,
+    tau: Optional[int] = 1,
 ) -> Tuple[float | Any, bool_, bool_]:
     """
     Multiscale Sample Entropy (MSE) computation.
@@ -131,7 +131,7 @@ def multiscale_sample_entropy(
     y = np.nanmean(buffered_x, axis=1)
 
     # Create (m+1)-element sequences
-    X = np.array([y[i: i + m + 1] for i in range(len(y) - m)])
+    X = np.array([y[i : i + m + 1] for i in range(len(y) - m)])
 
     # Calculate A: Number of matching (m+1)-element sequences
     A = np.sum(pdist(X, metric="chebychev") < r * np.nanstd(x, ddof=1))
