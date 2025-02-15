@@ -88,7 +88,9 @@ class EMDTest(unittest.TestCase):
 
         # 判断余弦与趋势分量输入
         IMFs = emd.fit_transform(signal=trend.copy() + cosine.copy(), time=time)
-        self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting two IMF of cosine and trend!")
+        self.assertEqual(
+            first=IMFs.shape[0], second=2, msg="Expecting two IMF of cosine and trend!"
+        )
 
         # 进一步判断两个模态输出的数值差异
         diff_cosine = np.allclose(IMFs[0], cosine, atol=0.2)
@@ -104,7 +106,15 @@ class EMDTest(unittest.TestCase):
         trend = 3 * (time - 0.1)
         signal = cosine.copy() + trend.copy()
 
-        for spline_kind in ["akima", "cubic", "pchip", "cubic_hermite", "slinear", "quadratic", "linear"]:
+        for spline_kind in [
+            "akima",
+            "cubic",
+            "pchip",
+            "cubic_hermite",
+            "slinear",
+            "quadratic",
+            "linear",
+        ]:
             # 遍历所有的插值算法并创建实例
             emd = EMD(spline_kind=spline_kind)
 
@@ -112,14 +122,23 @@ class EMDTest(unittest.TestCase):
             IMFs = emd.fit_transform(signal=signal, time=time)
 
             # 判断IMF的数目是否符合要求
-            self.assertEqual(first=IMFs.shape[0], second=2,
-                             msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {spline_kind}")
+            self.assertEqual(
+                first=IMFs.shape[0],
+                second=2,
+                msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {spline_kind}",
+            )
 
             # 进一步判断两个模态输出的数值差异
             diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
-            self.assertTrue(diff_cosine, msg=f"Expecting 1st IMF to be cosine when the `spline_kind` is {spline_kind}")
+            self.assertTrue(
+                diff_cosine,
+                msg=f"Expecting 1st IMF to be cosine when the `spline_kind` is {spline_kind}",
+            )
             diff_trend = np.allclose(IMFs[1], trend, atol=0.3)
-            self.assertTrue(diff_trend, msg=f"Expecting 2nd IMF to be trend when the `spline_kind` is {spline_kind}")
+            self.assertTrue(
+                diff_trend,
+                msg=f"Expecting 2nd IMF to be trend when the `spline_kind` is {spline_kind}",
+            )
 
     def test_wrong_spline_kind(self) -> None:
         """验证错误的插值类型输入是否会引发异常"""
@@ -150,16 +169,23 @@ class EMDTest(unittest.TestCase):
             IMFs = emd.fit_transform(signal=signal, time=time)
 
             # 判断IMF的数目是否符合要求
-            self.assertEqual(first=IMFs.shape[0], second=2,
-                             msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {extrema_detection}")
+            self.assertEqual(
+                first=IMFs.shape[0],
+                second=2,
+                msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {extrema_detection}",
+            )
 
             # 进一步判断两个模态输出的数值差异
             diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
-            self.assertTrue(diff_cosine,
-                            msg=f"Expecting 1st IMF to be cosine when the `extrema_detection` is {extrema_detection}")
+            self.assertTrue(
+                diff_cosine,
+                msg=f"Expecting 1st IMF to be cosine when the `extrema_detection` is {extrema_detection}",
+            )
             diff_trend = np.allclose(IMFs[1], trend, atol=0.3)
-            self.assertTrue(diff_trend,
-                            msg=f"Expecting 2nd IMF to be trend when the `extrema_detection` is {extrema_detection}")
+            self.assertTrue(
+                diff_trend,
+                msg=f"Expecting 2nd IMF to be trend when the `extrema_detection` is {extrema_detection}",
+            )
 
     def test_wrong_extrema_detection(self) -> None:
         """验证错误的极值点探测类型输入是否会引发异常"""
@@ -195,9 +221,17 @@ class EMDTest(unittest.TestCase):
         all_imfs = emd(signal, max_imfs=3)
 
         imfs, residue = emd.get_imfs_and_residue()
-        self.assertEqual(all_imfs.shape[0], imfs.shape[0] + 1, msg="Compare number of components")
-        self.assertTrue(np.array_equal(all_imfs[:-1], imfs), msg="Shouldn't matter where imfs are from")
-        self.assertTrue(np.array_equal(all_imfs[-1], residue), msg="Residue, if any, is the last row")
+        self.assertEqual(
+            all_imfs.shape[0], imfs.shape[0] + 1, msg="Compare number of components"
+        )
+        self.assertTrue(
+            np.array_equal(all_imfs[:-1], imfs),
+            msg="Shouldn't matter where imfs are from",
+        )
+        self.assertTrue(
+            np.array_equal(all_imfs[-1], residue),
+            msg="Residue, if any, is the last row",
+        )
 
     def test_get_imfs_and_residue_without_running(self) -> None:
         """验证当不执行算法时能不能获得输出的结果"""
@@ -212,7 +246,11 @@ class EMDTest(unittest.TestCase):
         emd = EMD()
         time = np.linspace(0, 2 * np.pi, 100)
         expected_trend = 5 * time
-        signal = 2 * np.sin(4.1 * 6.28 * time) + 1.2 * np.cos(7.4 * 6.28 * time) + expected_trend
+        signal = (
+            2 * np.sin(4.1 * 6.28 * time)
+            + 1.2 * np.cos(7.4 * 6.28 * time)
+            + expected_trend
+        )
 
         # 执行信号分解算法
         IMFs = emd(signal)
@@ -222,13 +260,17 @@ class EMDTest(unittest.TestCase):
         # 对趋势分量进行进一步的数值验证
         onset_trend = trend - trend.mean()
         onset_expected_trend = expected_trend - expected_trend.mean()
-        self.assertEqual(IMFs.shape[0], imfs.shape[0] + 1, "Compare number of components")
-        self.assertTrue(np.array_equal(IMFs[:-1], imfs), "Shouldn't matter where imfs are from")
+        self.assertEqual(
+            IMFs.shape[0], imfs.shape[0] + 1, "Compare number of components"
+        )
+        self.assertTrue(
+            np.array_equal(IMFs[:-1], imfs), "Shouldn't matter where imfs are from"
+        )
         self.assertTrue(
             np.allclose(onset_trend, onset_expected_trend, rtol=0.1, atol=0.5),
             "Extracted trend should be close to the actual trend",
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

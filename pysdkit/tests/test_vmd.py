@@ -77,7 +77,9 @@ class Test(unittest.TestCase):
 
         # 判断余弦与趋势分量输入
         IMFs = vmd.fit_transform(signal=trend.copy() + cosine.copy())
-        self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting two IMF of cosine and trend!")
+        self.assertEqual(
+            first=IMFs.shape[0], second=2, msg="Expecting two IMF of cosine and trend!"
+        )
 
         # 进一步判断两个模态输出的数值差异
         diff_cosine = np.allclose(IMFs[0], trend, atol=0.2)
@@ -86,5 +88,5 @@ class Test(unittest.TestCase):
         self.assertTrue(diff_trend, "Expecting 2nd IMF to be cosine")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
