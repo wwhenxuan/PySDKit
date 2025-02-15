@@ -12,7 +12,7 @@ from pysdkit import vmd as vmd_f
 from pysdkit.data import test_emd
 
 
-class Test(unittest.TestCase):
+class VMDTest(unittest.TestCase):
     """对变分模态分解(VMD)算法进行自动化测试"""
 
     def test_fit_transform(self) -> None:
@@ -138,7 +138,9 @@ class Test(unittest.TestCase):
             vmd = VMD(K=2, alpha=1000, tau=0.0, init=init)
             # 执行信号分解算法
             IMFs = vmd.fit_transform(signal=signal)
-            self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting IMF number is Two")
+            self.assertEqual(
+                first=IMFs.shape[0], second=2, msg="Expecting IMF number is Two"
+            )
 
     def test_wrong_init_omega(self) -> None:
         """验证错误的omega_k初始化方法"""
@@ -164,8 +166,12 @@ class Test(unittest.TestCase):
         u, u_hat, omega = outputs
 
         # 判断频率分量信息
-        self.assertEqual(first=len(u_hat.shape), second=2, msg="Expecting two dimensions of u_hat")
-        self.assertEqual(first=len(omega.shape), second=2, msg="Expecting two dimensions of omega")
+        self.assertEqual(
+            first=len(u_hat.shape), second=2, msg="Expecting two dimensions of u_hat"
+        )
+        self.assertEqual(
+            first=len(omega.shape), second=2, msg="Expecting two dimensions of omega"
+        )
 
     def test_fmirror(self) -> None:
         """验证镜像拓展函数`fmirror`"""
@@ -176,8 +182,11 @@ class Test(unittest.TestCase):
         # 遍历部分长度来验证函数的输出
         for i in range(1, len(array)):
             fMirr = vmd.fmirror(ts=array, sym=i)
-            self.assertEqual(len(fMirr), len(array) + i * 2,
-                             msg=f"Something went wrong on the fMirr with length {len(fMirr)} and {len(array)}")
+            self.assertEqual(
+                len(fMirr),
+                len(array) + i * 2,
+                msg=f"Something went wrong on the fMirr with length {len(fMirr)} and {len(array)}",
+            )
 
 
 if __name__ == "__main__":
