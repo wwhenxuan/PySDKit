@@ -128,6 +128,58 @@ class Test(unittest.TestCase):
         diff_cosine = np.allclose(IMFs[1], cosine, atol=0.2)
         self.assertTrue(diff_cosine, "Expecting 2nd IMF to be cosine")
 
+    def test_init_omega(self) -> None:
+        """验证VMD算法对omega_k的三种初始化方式"""
+        time, signal = test_emd()
+
+        # 遍历三种不同的初始化方法
+        for init in ["uniform", "random", "zero"]:
+            # 根据输入的参数创建算法实例
+            vmd = VMD(K=2, alpha=1000, tau=0.0, init=init)
+            # 执行信号分解算法
+            IMFs = vmd.fit_transform(signal=signal)
+            self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting IMF number is Two")
+
+    def test_wrong_init_omega(self) -> None:
+        """验证错误的omega_k初始化方法"""
+        time, signal = test_emd()
+        init = "wrong"
+        # 使用错误的参数创建算法实例
+        with self.assertRaises(ValueError):
+            vmd = VMD(K=2, alpha=1000, tau=0.0, init=init)
+            vmd.fit_transform(signal=signal)
+
+    def test_return_all(self) -> None:
+        """判断VMD算法返回的所有信息"""
+        time, signal = test_emd()
+
+        # 创建VMD算法并获得全部的输出
+        vmd = VMD(K=2, alpha=1000, tau=0.0)
+        outputs = vmd.fit_transform(signal=signal, return_all=True)
+
+        # 判断模型返回变量的数目
+        self.assertEqual(first=len(outputs), second=3, msg="Expecting three outputs")
+
+        # 解耦全部的变量
+        u, u_hat, omega = outputs
+
+        # 判断频率分量信息
+        self.assertEqual(first=len(u_hat.shape), second=2, msg="Expecting two dimensions of u_hat")
+        self.assertEqual(first=len(omega.shape), second=2, msg="Expecting two dimensions of omega")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
