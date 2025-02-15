@@ -18,7 +18,7 @@ def vmd(
     DC: bool = False,
     max_iter: int = 500,
     tol: float = 1e-6,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Variational mode decomposition, object-oriented interface.
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,

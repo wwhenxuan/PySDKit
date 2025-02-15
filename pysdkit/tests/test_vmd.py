@@ -8,6 +8,7 @@ import unittest
 import numpy as np
 
 from pysdkit import VMD
+from pysdkit import vmd as VMD_f
 from pysdkit.data import test_emd
 
 
@@ -34,6 +35,19 @@ class Test(unittest.TestCase):
         # 创建算法实例对象
         vmd = VMD(K=3, alpha=1000, tau=0.0)
         IMFs = vmd(signal)
+
+        # 判断输出的维数
+        dim = len(IMFs.shape)
+        self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
+        # 判断输出信号的长度
+        _, length = IMFs.shape
+        self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+
+    def test_vmd_function(self) -> None:
+        """判断VMD函数接口能否正常运行"""
+        time, signal = test_emd()
+        # 创建算法实例对象
+        IMFs, _, _ = VMD_f(signal, alpha=1000, K=3, tau=0.0)
 
         # 判断输出的维数
         dim = len(IMFs.shape)
@@ -84,8 +98,34 @@ class Test(unittest.TestCase):
         # 进一步判断两个模态输出的数值差异
         diff_cosine = np.allclose(IMFs[0], trend, atol=0.2)
         self.assertTrue(diff_cosine, "Expecting 1st IMF to be trend")
+
         diff_trend = np.allclose(IMFs[1], cosine, atol=0.2)
         self.assertTrue(diff_trend, "Expecting 2nd IMF to be cosine")
+
+    def test_vmd_DC(self) -> None:
+        """判断VMD能否分离出主流信号分量"""
+        # 创建VMD算法实例
+        vmd = VMD(K=2, alpha=1000, tau=0.0, DC=True)
+
+        # 创建带有直流分量的信号
+        time = np.arange(0, 1, 0.001)
+        DC = 2
+        cosine = np.cos(2 * np.pi * 4 * time)
+        signal = DC + cosine.copy()
+
+        # 开始执行信号分解算法
+        IMFs = vmd.fit_transform(signal=signal)
+
+        # 首先判断信号的数目
+        self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting the number of IMFs is Two")
+
+        # 进一步判断两个模态输出的数值差异
+        diff_DC = np.allclose(IMFs[0], np.ones_like(time) * DC, atol=0.1)
+        self.assertTrue(diff_DC, "Expecting 1st IMF to be DC")
+
+        diff_cosine = np.allclose(IMFs[1], cosine, atol=0.2)
+        self.assertTrue(diff_cosine, "Expecting 2nd IMF to be cosine")
+
 
 
 if __name__ == "__main__":
