@@ -167,18 +167,17 @@ class Test(unittest.TestCase):
         self.assertEqual(first=len(u_hat.shape), second=2, msg="Expecting two dimensions of u_hat")
         self.assertEqual(first=len(omega.shape), second=2, msg="Expecting two dimensions of omega")
 
+    def test_fmirror(self) -> None:
+        """验证镜像拓展函数`fmirror`"""
+        # 创建输入信号
+        array = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+        vmd = VMD(K=2, alpha=1000, tau=0.0)
 
-
-
-
-
-
-
-
-
-
-
-
+        # 遍历部分长度来验证函数的输出
+        for i in range(1, len(array)):
+            fMirr = vmd.fmirror(ts=array, sym=i)
+            self.assertEqual(len(fMirr), len(array) + i * 2,
+                             msg=f"Something went wrong on the fMirr with length {len(fMirr)} and {len(array)}")
 
 
 if __name__ == "__main__":
