@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 
 from pysdkit import VMD
-from pysdkit import vmd as VMD_f
+from pysdkit import vmd as vmd_f
 from pysdkit.data import test_emd
 
 
@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
         """判断VMD函数接口能否正常运行"""
         time, signal = test_emd()
         # 创建算法实例对象
-        IMFs, _, _ = VMD_f(signal, alpha=1000, K=3, tau=0.0)
+        IMFs, _, _ = vmd_f(signal, alpha=1000, K=3, tau=0.0)
 
         # 判断输出的维数
         dim = len(IMFs.shape)
@@ -117,7 +117,9 @@ class Test(unittest.TestCase):
         IMFs = vmd.fit_transform(signal=signal)
 
         # 首先判断信号的数目
-        self.assertEqual(first=IMFs.shape[0], second=2, msg="Expecting the number of IMFs is Two")
+        self.assertEqual(
+            first=IMFs.shape[0], second=2, msg="Expecting the number of IMFs is Two"
+        )
 
         # 进一步判断两个模态输出的数值差异
         diff_DC = np.allclose(IMFs[0], np.ones_like(time) * DC, atol=0.1)
@@ -125,7 +127,6 @@ class Test(unittest.TestCase):
 
         diff_cosine = np.allclose(IMFs[1], cosine, atol=0.2)
         self.assertTrue(diff_cosine, "Expecting 2nd IMF to be cosine")
-
 
 
 if __name__ == "__main__":
