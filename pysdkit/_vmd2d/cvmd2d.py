@@ -25,6 +25,8 @@ class CVMD2D(object):
 
     [3] K. Dragomiretskiy, D. Zosso, Two-Dimensional Variational Mode Decomposition,
     EMMCVPR 2015, Hong Kong, LNCS 8932:197-208, 2015. DOI:10.1007/978-3-319-14612-6_15.
+
+    MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/67285-two-dimensional-compact-variational-mode-decomposition-2d-tv-vmd?s_tid=FX_rc2_behav
     """
 
     def __init__(self):
