@@ -7,6 +7,10 @@ Created on 2025/02/15 16:18:33
 import sys
 import unittest
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 if __name__ == "__main__":
     # 创建测试用例加载器
     test_suite = unittest.defaultTestLoader.discover(".", "*test_*.py")
