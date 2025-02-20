@@ -171,8 +171,9 @@ class MDTest(unittest.TestCase):
         # multivariate time series
         time_series = np.vstack([time_series] * 3)
 
-        trends, seasonalities = moving_decomp.fit_transform(signal=time_series,
-                                                            methods_list=["simple", "weighted", "gaussian"])
+        trends, seasonalities = moving_decomp.fit_transform(
+            signal=time_series, methods_list=["simple", "weighted", "gaussian"]
+        )
 
         # 验证输入输出的形状是否匹配
         self.assertEqual(
@@ -202,7 +203,9 @@ class MDTest(unittest.TestCase):
         trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
         # 绘制图像
-        fig = moving_decomp.plot_decomposition(signal=time_series, trend=trends, seasonality=seasonalities)
+        fig = moving_decomp.plot_decomposition(
+            signal=time_series, trend=trends, seasonality=seasonalities
+        )
         self.assertTrue(expr=isinstance(fig, plt.Figure))
 
     def test_multivariate_plotting(self) -> None:
@@ -214,7 +217,9 @@ class MDTest(unittest.TestCase):
         moving_decomp = Moving_Decomp()
 
         # 绘制图像
-        fig = moving_decomp.plot_decomposition(signal=time_series, trend=time_series, seasonality=time_series)
+        fig = moving_decomp.plot_decomposition(
+            signal=time_series, trend=time_series, seasonality=time_series
+        )
         self.assertTrue(expr=isinstance(fig, plt.Figure))
 
     def test_wrong_plotting(self) -> None:
@@ -226,7 +231,9 @@ class MDTest(unittest.TestCase):
 
         # 绘制图像
         with self.assertRaises(ValueError):
-            moving_decomp.plot_decomposition(signal=wrong_inputs, trend=wrong_inputs, seasonality=wrong_inputs)
+            moving_decomp.plot_decomposition(
+                signal=wrong_inputs, trend=wrong_inputs, seasonality=wrong_inputs
+            )
 
 
 if __name__ == "__main__":
