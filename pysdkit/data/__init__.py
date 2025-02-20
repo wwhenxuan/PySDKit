@@ -29,6 +29,9 @@ from ._generator import test_multivariate_signal
 # add Gaussian noise
 from ._add_noise import add_noise
 
+# Generate a grid matrix given an input and output range
+from ._image import get_meshgrid_2D
+
 # Test case for loading a 2D grayscale image
 from ._image import test_grayscale
 

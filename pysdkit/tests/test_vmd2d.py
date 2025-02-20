@@ -33,3 +33,22 @@ class VMD2DTest(unittest.TestCase):
         self.assertEqual(first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误")
         self.assertEqual(first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误")
         self.assertEqual(first=C, second=K, msg="算法分解的模态数目错误")
+
+    def test_default_call(self) -> None:
+        """验证call方法嫩否正常运行"""
+        # 分解模态的数目
+        K = 5
+
+        # 创建二维信号分解的测试实例
+        vmd2d = VMD2D(K=K, alpha=5000, tau=0.25, DC=True, init="random", tol=1e-6, max_iter=64)
+
+        # 执行信号分解算法
+        IMFs = vmd2d(self.grayscale)
+
+        # 判断生成图像的长宽是否与输入图像相匹配
+        H, W, C = IMFs.shape
+        self.assertEqual(first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误")
+        self.assertEqual(first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误")
+        self.assertEqual(first=C, second=K, msg="算法分解的模态数目错误")
+
+
