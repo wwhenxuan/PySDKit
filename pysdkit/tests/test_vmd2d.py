@@ -75,3 +75,7 @@ class VMD2DTest(unittest.TestCase):
 
     def test_return_all(self) -> None:
         """判断VMD2D算法是否能通过参数控制返回所有的信息"""
+
+
+if __name__ == '__main__':
+    unittest.main()
