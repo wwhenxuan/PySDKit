@@ -125,20 +125,20 @@ class EWT(object):
         mfb = EWT_Meyer_FilterBank(boundaries, ffMirr.size)
 
         # Filter the signal to extract each subband
-        ewt = np.zeros(mfb.shape)
+        imfs = np.zeros(mfb.shape)
         for k in range(mfb.shape[1]):
-            ewt[:, k] = np.real(np.fft.ifft(np.conjugate(mfb[:, k]) * ffMirr))
-        ewt = ewt[ltemp - 1 : -ltemp, :].T
+            imfs[:, k] = np.real(np.fft.ifft(np.conjugate(mfb[:, k]) * ffMirr))
+        imfs = imfs[ltemp - 1: -ltemp, :].T
 
         # Return the requested data
         if return_all is True:
-            return ewt, mfb, boundaries
+            return imfs, mfb, boundaries
         else:
-            return ewt
+            return imfs
 
 
 def ewt(
-    signal,
+    signal: np.ndarray,
     K: Optional[int] = 5,
     log: Optional[float] = 0,
     detect: Optional[str] = "locmax",

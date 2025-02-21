@@ -7,7 +7,7 @@ Created on 2025/02/21 23:40:33
 import unittest
 import numpy as np
 
-from pysdkit import EWT
+from pysdkit import ewt, EWT
 from pysdkit.data import test_emd
 
 
@@ -19,7 +19,7 @@ class EWTTest(unittest.TestCase):
         # 生成测试函数样例
         time, signal = test_emd()
         # 遍历不同的分解模态数目
-        for K in range(1, 4):
+        for K in range(1, 5):
             # 创建信号分解实例对象
             ewt = EWT(K=K)
             # 执行信号分解算法
