@@ -51,6 +51,7 @@ class EWTTest(unittest.TestCase):
             self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
             # 判断分解模态的数目
             self.assertEqual(first=number, second=K)
+
     def test_ewt_function(self) -> None:
         """测试经验小波变换的函数"""
 
