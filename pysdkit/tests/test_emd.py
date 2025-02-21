@@ -56,7 +56,7 @@ class EMDTest(unittest.TestCase):
         """判断对于单一的趋势信号输入"""
         emd = EMD()
 
-        # 创建仅有趋势分类的时间戳和信号
+        # 创建仅有趋势分量的时间戳和信号
         time = np.arange(0, 1, 0.01)
         signal = 2 * time
 
