@@ -91,13 +91,43 @@ class VMD2DTest(unittest.TestCase):
 
     def test_init_omega(self) -> None:
         """验证VMD2D算法对omega_k的多种初始化方式"""
+        # 遍历几种不同的初始化方式
+        for init in ["random", "zero"]:
+            # 根据输入的参数创建算法实例
+            vmd2d = VMD2D(K=5, alpha=5000, tau=0.25, init=init, tol=1e-6, max_iter=64)
+            # 执行信号分解算法
+            IMFs = vmd2d.fit_transform(self.grayscale)
+            self.assertEqual(first=IMFs.shape[-1], second=5, msg="VMD2D算法输出错误")
+
 
     def test_wrong_init_omega(self) -> None:
         """验证错误的omega_k初始化方式"""
+        init = "uniform"
+        # 使用错误的参数创建算法实例
+        with self.assertRaises(ValueError):
+            vmd2d = VMD2D(K=5, alpha=5000, tau=0.25, init=init, tol=1e-6, max_iter=64)
+            vmd2d.fit_transform(self.grayscale)
 
     def test_return_all(self) -> None:
         """判断VMD2D算法是否能通过参数控制返回所有的信息"""
 
+        # 创建VMD算法并获得全部的输出
+        vmd = VMD2D(K=5, alpha=5000, tau=0.25, DC=False, init="random", tol=1e-6, max_iter=64)
+        outputs = vmd.fit_transform(self.grayscale, return_all=True)
+
+        # 判断模型返回变量的数目
+        self.assertEqual(first=len(outputs), second=3, msg="Expecting three outputs")
+
+        # 解耦全部的变量
+        u, u_hat, omega = outputs
+
+        # 判断频率分量信息
+        self.assertEqual(
+            first=len(u_hat.shape), second=3, msg="Expecting three dimensions of u_hat"
+        )
+        self.assertEqual(
+            first=len(omega.shape), second=3, msg="Expecting three dimensions of omega"
+        )
 
 if __name__ == '__main__':
     unittest.main()
