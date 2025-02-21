@@ -438,7 +438,7 @@ def EWT_Boundaries_Completion(boundaries: np.ndarray, NT: int) -> np.ndarray:
     return boundaries
 
 
-def EWT_Meyer_FilterBank(boundaries: int, Nsig: int) -> np.ndarray:
+def EWT_Meyer_FilterBank(boundaries: np.ndarray, Nsig: int) -> np.ndarray:
     """
     Generates the filter bank (scaling function + wavelets) corresponding to the
     provided set of frequency segments.
