@@ -30,7 +30,7 @@ class EMDTest(unittest.TestCase):
             self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
 
     def test_default_call(self) -> None:
-        """验证call方法嫩否正常运行"""
+        """验证call方法能否正常运行"""
         time, signal = test_emd()
         # 创建算法实例对象
         emd = EMD()
