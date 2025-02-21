@@ -19,11 +19,11 @@ class EWTTest(unittest.TestCase):
         # 生成测试函数样例
         time, signal = test_emd()
         # 遍历不同的分解模态数目
-        for K in range(1, 5):
+        for K in range(2, 6):
             # 创建信号分解实例对象
-            ewt = EWT(K=K)
+            ewt_c = EWT(K=K)
             # 执行信号分解算法
-            IMFs = ewt.fit_transform(signal)
+            IMFs = ewt_c.fit_transform(signal)
             # 判断输出的维数
             dim = len(IMFs.shape)
             self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
@@ -38,11 +38,11 @@ class EWTTest(unittest.TestCase):
         # 生成测试函数样例
         time, signal = test_emd()
         # 遍历不同的分解模态数目
-        for K in range(1, 4):
+        for K in range(2, 6):
             # 创建信号分解实例对象
-            ewt = EWT(K=K)
+            ewt_c = EWT(K=K)
             # 执行信号分解算法
-            IMFs = ewt(signal)
+            IMFs = ewt_c(signal)
             # 判断输出的维数
             dim = len(IMFs.shape)
             self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
@@ -54,9 +54,25 @@ class EWTTest(unittest.TestCase):
 
     def test_ewt_function(self) -> None:
         """测试经验小波变换的函数"""
+        # 生成测试函数样例
+        time, signal = test_emd()
+        # 遍历不同的分解模态数目
+        for K in range(2, 6):
+            # 执行信号分解算法
+            IMFs = ewt(signal, K=K)
+            # 判断输出的维数
+            dim = len(IMFs.shape)
+            self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
+            # 判断输出信号的长度
+            number, length = IMFs.shape
+            self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+            # 判断分解模态的数目
+            self.assertEqual(first=number, second=K)
 
     def test_trend(self) -> None:
         """验证算法能否分解出趋势信息"""
+
+        # 创建仅有趋势分量的时间戳和信号
 
     def test_signal_imf(self) -> None:
         """验证单一本征模态函数的输入"""
