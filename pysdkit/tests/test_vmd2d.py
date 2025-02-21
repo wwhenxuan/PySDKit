@@ -66,15 +66,28 @@ class VMD2DTest(unittest.TestCase):
     def test_VMD2D_DC(self) -> None:
         """判断VMD2D能否分离出直流信号分量"""
 
-
+        # 创建信号分解算法
+        vmd2d = VMD2D(K=2, alpha=5000, tau=0.0, DC=True, init="random", tol=1e-6, max_iter=5000)
 
         for size in [16, 32, 64]:
             # 生成简单的直流分量
-            DC = np.ones(shape=(size, size)) * 2
+            DC = np.ones(shape=(size, size)) * 100
 
             # 生成网格矩阵
-            x, y = get_meshgrid_2D(low=0, high=2 * np.pi)
+            x, y = get_meshgrid_2D(low=0, high=2 * np.pi, sampling_rate=size)
 
+            # 生成一个模态的函数
+            mode = np.sin(2 * np.pi * x) + np.cos(2 * np.pi * y)
+
+            # 合成2D信号
+            image = DC + mode
+
+            # 执行信号分解算法
+            IMFs = vmd2d.fit_transform(image)
+
+            # 判断能否提取出直流分量
+            diff_DC = np.allclose(IMFs[:, :, 0], DC, atol=1)
+            self.assertTrue(expr=diff_DC, msg="VMD2D未能成功提取直流分量")
 
     def test_init_omega(self) -> None:
         """验证VMD2D算法对omega_k的多种初始化方式"""
