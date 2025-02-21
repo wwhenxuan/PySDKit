@@ -67,7 +67,9 @@ class VMD2DTest(unittest.TestCase):
         """判断VMD2D能否分离出直流信号分量"""
 
         # 创建信号分解算法
-        vmd2d = VMD2D(K=2, alpha=5000, tau=0.0, DC=True, init="random", tol=1e-6, max_iter=5000)
+        vmd2d = VMD2D(
+            K=2, alpha=5000, tau=0.0, DC=True, init="random", tol=1e-6, max_iter=5000
+        )
 
         for size in [16, 32, 64]:
             # 生成简单的直流分量
@@ -99,7 +101,6 @@ class VMD2DTest(unittest.TestCase):
             IMFs = vmd2d.fit_transform(self.grayscale)
             self.assertEqual(first=IMFs.shape[-1], second=5, msg="VMD2D算法输出错误")
 
-
     def test_wrong_init_omega(self) -> None:
         """验证错误的omega_k初始化方式"""
         init = "uniform"
@@ -112,7 +113,9 @@ class VMD2DTest(unittest.TestCase):
         """判断VMD2D算法是否能通过参数控制返回所有的信息"""
 
         # 创建VMD算法并获得全部的输出
-        vmd = VMD2D(K=5, alpha=5000, tau=0.25, DC=False, init="random", tol=1e-6, max_iter=64)
+        vmd = VMD2D(
+            K=5, alpha=5000, tau=0.25, DC=False, init="random", tol=1e-6, max_iter=64
+        )
         outputs = vmd.fit_transform(self.grayscale, return_all=True)
 
         # 判断模型返回变量的数目
@@ -129,5 +132,6 @@ class VMD2DTest(unittest.TestCase):
             first=len(omega.shape), second=3, msg="Expecting three dimensions of omega"
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

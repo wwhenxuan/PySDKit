@@ -67,6 +67,13 @@ class EWT(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Empirical Wavelet Transform (EWT)"
 
+    @staticmethod
+    def fmirror(ts: np.ndarray, sym: int, end: int) -> np.ndarray:
+        """Implements a signal mirroring expansion function."""
+        fMirr = np.append(np.flip(ts[0 : sym - end], axis=0), ts)
+        fMirr = np.append(fMirr, np.flip(ts[-sym - end : -end], axis=0))
+        return fMirr
+
     def fit_transform(
         self,
         signal: np.ndarray,
@@ -111,7 +118,7 @@ class EWT(object):
 
         # Extend the signal by mirroring to avoid boundary effects during filtering
         ltemp = int(np.ceil(signal.size / 2))
-        fMirr = fmirror(ts=signal, sym=ltemp, end=1)
+        fMirr = self.fmirror(ts=signal, sym=ltemp, end=1)
         ffMirr = np.fft.fft(fMirr)
 
         # Build the filter bank based on the detected boundaries
@@ -194,13 +201,6 @@ def ewt(
         return ewt
 
 
-def fmirror(ts: np.ndarray, sym: int, end: int) -> np.ndarray:
-    """Implements a signal mirroring expansion function."""
-    fMirr = np.append(np.flip(ts[0 : sym - end], axis=0), ts)
-    fMirr = np.append(fMirr, np.flip(ts[-sym - end : -end], axis=0))
-    return fMirr
-
-
 def EWT_Boundaries_Detect(
     ff: np.ndarray,
     log: Optional[int],
@@ -278,6 +278,13 @@ def EWT_Boundaries_Detect(
         raise ValueError("Invalid detection method provided.")
 
     return boundaries + 1  # Increment indices by 1 to account for zero-based indexing
+
+
+def fmirror(ts: np.ndarray, sym: int, end: int) -> np.ndarray:
+    """Implements a signal mirroring expansion function."""
+    fMirr = np.append(np.flip(ts[0 : sym - end], axis=0), ts)
+    fMirr = np.append(fMirr, np.flip(ts[-sym - end : -end], axis=0))
+    return fMirr
 
 
 def LocalMax(ff: np.ndarray, N: int) -> np.ndarray:
