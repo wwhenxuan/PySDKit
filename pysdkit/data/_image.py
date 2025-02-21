@@ -47,7 +47,7 @@ def test_grayscale() -> np.ndarray | None:
 
 
 def get_meshgrid_2D(
-    low: int = 0, high: int = 10, sampling_rate: Optional[int] = 256
+    low: float = 0, high: float = 10, sampling_rate: Optional[int] = 256
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a grid matrix given an input and output range
