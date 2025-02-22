@@ -85,7 +85,7 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 
 ## Target 🎯 <a id="Target"></a>
 
-`PySDKit` is still under development. We are currently working on reproducing the signal decomposition algorithms in the table below, including not only common decomposition algorithms for `univariate signals` such as EMD and VMD, but also decomposition algorithms for `multivariate signals` such as MEMD and MVMD. We will also further reproduce the decomposition algorithms for `two-dimensional images` to make PySDKit not only suitable for signal processing, but also for image analysis and understanding.
+`PySDKit` is still under development. We are currently working on reproducing the signal decomposition algorithms in the table below, including not only common decomposition algorithms for `univariate signals` such as EMD and VMD, but also decomposition algorithms for `multivariate signals` such as MEMD and MVMD. We will also further reproduce the decomposition algorithms for `two-dimensional images` to make PySDKit not only suitable for signal processing, but also for image analysis and understanding. See [`Mission`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/README.md) for the reasons why we developed PySDKit.
 
 |                          Algorithm                           |                            Paper                             |                             Code                             | State |
 | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :---: |
