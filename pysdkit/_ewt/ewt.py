@@ -128,7 +128,7 @@ class EWT(object):
         imfs = np.zeros(mfb.shape)
         for k in range(mfb.shape[1]):
             imfs[:, k] = np.real(np.fft.ifft(np.conjugate(mfb[:, k]) * ffMirr))
-        imfs = imfs[ltemp - 1: -ltemp, :].T
+        imfs = imfs[ltemp - 1 : -ltemp, :].T
 
         # Return the requested data
         if return_all is True:
