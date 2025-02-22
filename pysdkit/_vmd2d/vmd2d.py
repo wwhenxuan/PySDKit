@@ -37,6 +37,8 @@ class VMD2D(object):
         :param DC: true, if the first mode is put and kept at DC (0-freq)
         :param init: zero means all omegas start at 0 and random means all omegas start initialized randomly
         :param max_iter: the maximum number of iterations
+        :param tol: the tolerance parameter for data fidelity constraint
+        :param random_seed: random seed for randomly initialization
         """
         self.K = K  # 分解子信号的数目
         # 调控分解效果的参数
