@@ -43,7 +43,7 @@ from ._vmd import MVMD
 # 适用于二维图像的变分模态分解算法
 from ._vmd2d import VMD2D
 
-# 2D Compact Variational Mode Decomposition
+# 2D 紧凑变分模态分解
 from ._vmd2d import CVMD2D
 
 # 非线性啁啾模式分解
