@@ -50,6 +50,10 @@ class FAEMD(object):
         if self.window_type not in [0, 1, 2, 3, 4, 5, 6]:
             raise ValueError("`window_type` must be 0, 1, 2, 3, 4, 5, 6")
 
+        # Saving imfs and residue for external references
+        self.imfs = None
+        self.residue = None
+
     def __call__(
         self,
         signal: np.ndarray,
@@ -82,7 +86,7 @@ class FAEMD(object):
         The determination of the window size is based on the work of Bhuiyan et al
         """
 
-        # 通过差分计算极值点之间的举例
+        # Example of calculating the difference between extreme points
         edge_len_max = np.diff(np.sort(imax))
         edge_len_min = np.diff(np.sort(imin))
 
@@ -296,10 +300,47 @@ class FAEMD(object):
         # Adjust the channel order of the output
         imfs = check_outputs(imfs=imfs, inputs_shape=inputs_shape)
 
+        # Saving the results
+        self.imfs = imfs[:-1, :, :]
+        self.residue = Residue
+
         # Organising results
         if return_all is True:
             return imfs, Residue, windows, sift_count
         return imfs
+
+    def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Provides access to separated imfs and residue from recently analysed signal
+        :return: obtained IMFs and residue through EMD
+        """
+        if self.imfs is None or self.residue is None:
+            # If the algorithm has not been executed yet, there is no result for this decomposition.
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
+        return self.imfs, self.residue
+
+    def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Provides access to separated imfs and trend from recently analysed signal.
+        Note that this may differ from the `get_imfs_and_residue` as the trend isn't
+        necessarily the residue. Residue is a point-wise difference between input signal
+        and all obtained components, whereas trend is the slowest component (can be zero).
+        :return: obtained IMFs and main trend through EMD
+        """
+        if self.imfs is None or self.residue is None:
+            # There is no decomposition result for this storage yet
+            raise ValueError(
+                "No IMF found. Please, run `fit_transform` method or its variant first."
+            )
+
+        # Get the intrinsic mode function and residual respectively
+        imfs, residue = self.get_imfs_and_residue()
+        if np.allclose(residue, 0):
+            return imfs[:-1].copy(), imfs[-1].copy()
+        else:
+            return imfs, residue
 
 
 def immse(a: np.ndarray, b: np.ndarray) -> floating[Any]:
