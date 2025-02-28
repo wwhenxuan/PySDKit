@@ -5,7 +5,10 @@ Created on 2025/02/01 22:30:40
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
+from numpy import floating
 from scipy.stats import mode
+
+from typing import Any, Optional, Tuple, Union
 
 from pysdkit._faemd.extrema import extrema
 from pysdkit.utils import simple_moving_average
@@ -21,14 +24,22 @@ class FAEMD(object):
     Oct. 2018, pp. 1550–54, doi:10.1109/lsp.2018.2867335.
 
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
+    also see: `EMD`, `EEMD`, `REMD` and `CEEMDAN`.
     """
 
-    def __init__(self, max_imfs: int, tol: float = None, window_type: int = 1, ):  # window_type参数暂时待定
-
+    def __init__(self, max_imfs: Optional[int], tol: Optional[float] = None, window_type: Optional[int] = 0) -> None:
+        """
+        相比于EMD算法
+        :param max_imfs:The number of IMFs to be extracted
+        :param tol:
+        :param window_type:
+        """
         self.max_imfs = max_imfs
         if max_imfs < 1:
             raise ValueError("`max_imfs` must be a positive integer")
         self.tol = tol
+        #
         self.window_type = window_type
         # 这里需要对这个参数进行进一步的检验
 
@@ -45,7 +56,7 @@ class FAEMD(object):
         """Get the tolerance parameter for FAEMD"""
         # 当`tol`变量默认为None时
         if self.tol is None:
-            tol = np.min(np.sqrt(np.mean(signal ** 2)), np.array([1])) * 0.001
+            tol = min(np.sqrt(np.mean(signal ** 2)), 1) * 0.001
             return tol
         # 返回用户指定的参数
         return self.tol
@@ -62,10 +73,10 @@ class FAEMD(object):
         edge_len_min = np.diff(np.sort(imin))
 
         # Window size calculations
-        d1 = np.min(np.min(edge_len_max), np.min(edge_len_min))
-        d2 = np.max(np.min(edge_len_max), np.min(edge_len_min))
-        d3 = np.min(np.max(edge_len_max), np.max(edge_len_min))
-        d4 = np.max(np.max(edge_len_max), np.max(edge_len_min))
+        d1 = np.min([np.min(edge_len_max), np.min(edge_len_min)])
+        d2 = np.max([np.min(edge_len_max), np.min(edge_len_min)])
+        d3 = np.min([np.max(edge_len_max), np.max(edge_len_min)])
+        d4 = np.max([np.max(edge_len_max), np.max(edge_len_min)])
         d5 = (d1 + d2 + d3 + d4) / 4
         concat = np.concatenate((edge_len_min, edge_len_max))
         d6 = np.median(concat)
@@ -91,7 +102,7 @@ class FAEMD(object):
         Env_max, Env_min = self.OSF(H=H, w_sz=w_sz)
 
         # padding
-        Env_med = self.pad_smooth(env_max=Env_max, env_min=Env_min, w_sz=w_sz)
+        Env_med = env_smoothing(env_max=Env_max, env_min=Env_min, w_sz=w_sz)
 
         # Subtracting from residue
         H1 = H - Env_med
@@ -110,28 +121,11 @@ class FAEMD(object):
 
 
     @staticmethod
-    def pad_smooth(env_max, env_min, w_sz):
-        """padding"""
-        # h = np.floor(w_sz / )
-        #
-        # # Padding
-        # env_maxp = np.pad(Env_max, pad_width=(h, h), mode='reflect')  # TODO: 这里记得对函数的形状进行检查
-        # env_minp = np.pad(Env_min, pad_width=(h, h), mode='reflect')
-
-        # Smoothing
-        env_maxs = simple_moving_average(signal=env_max, window_size=w_sz)
-        env_mins = simple_moving_average(signal=env_min, window_size=w_sz)
-
-        # Calculating mean envelope
-        return (env_maxs + env_mins) / 2
-
-
-    @staticmethod
     def ord_filt1(signal, order, window_size) -> np.ndarray:
         """1-D Rank order filter function"""
         # Pre-processing
         # Original signal size
-        a, b, c = signal.shape
+        shape = signal.shape
 
         # Removing the singleton dimensions
         signal = np.squeeze(signal)
@@ -142,7 +136,7 @@ class FAEMD(object):
         # Ensure that the processed signal is always a column vector
         signal = np.reshape(signal, newshape=[L, 1])
 
-        r = (window_size - 1) / 2
+        r = int((window_size - 1) / 2)
 
         # Padding boundaries
         x = np.concatenate([np.flip(signal[:r]), signal, np.flip(signal[-r:])])
@@ -153,7 +147,7 @@ class FAEMD(object):
 
         # Switch the order
         if order == "max":
-            for m in range(r, M - r + 1):  # TODO: 注意这个地方的索引是否正确
+            for m in range(r, M - r + 1):
                 # Extract a window of size (2r+1) around (m)
                 temp = x[(m - r): (m + r)]
                 w = np.sort(temp)
@@ -172,12 +166,12 @@ class FAEMD(object):
         f_signal = y[r: -r]
 
         # Restoring Signal size
-        f_signal = np.reshape(f_signal, newshape=[a, b, c])
+        f_signal = np.reshape(f_signal, newshape=shape)
 
         return f_signal
 
 
-    def fit_transform(self, signal: np.ndarray):
+    def fit_transform(self, signal: np.ndarray, return_all: bool = False):
 
         # 获取信号的变量数目和长度
         signal = signal.T
@@ -190,7 +184,7 @@ class FAEMD(object):
 
         windows = np.zeros(shape=(7, self.max_imfs))
 
-        sift_count = np.zeros(shape=(1, self.max_imfs))
+        sift_count = np.zeros(shape=self.max_imfs)
 
         imf = 0
 
@@ -199,55 +193,145 @@ class FAEMD(object):
 
         # 获取算法停止的容忍度参数
         tol = self._get_tol(signal)
-    #
-    #     # 开始进行信号的迭代分解
-    #     while imf <= self.max_imfs:
-    #         # Initialising intermediary IMFs
-    #         H = Residue.copy()
-    #
-    #         # flag to control sifting loop
-    #         sift_stop = 0
-    #
-    #         # Combining two signals with equal weights
-    #         Combined = np.sum(H / np.sqrt(num_vars), axis=1)
-    #
-    #         # Obtaining extrema of combined signal
-    #         Maxima, MaxPos, Minima, MinPos = extrema(Combined)
-    #
-    #         # Checking whether there are too few extrema in the IMF
-    #         if np.count_nonzero(Maxima) < 3 or np.count_nonzero(Minima) < 3:
-    #             # Fewer than three extrema found in extrema map. Stopping now...
-    #             break
-    #
-    #         # Window size determination by delaunay triangulation
-    #         windows[:, imf] = self.filter_size1D(imax=MaxPos, imin=MinPos)
-    #
-    #         # extracting window size chosen by input parameter
-    #         w_sz = windows[self.window_type, imf]
-    #
-    #         # Begin sifting iteration
-    #         while not sift_stop:
-    #             # Incrementing sift counter
-    #             sift_count[imf] = sift_count[imf] + 1
-    #
-    #             # Entering parallel sift calculations
-    #             for i in range(num_vars):
-    #                 H1[:, i] = self.sift(H[:, i], w_sz=w_sz)
-    #
-    #                 mse[i] = immse()
+
+        # 开始进行信号的迭代分解
+        while imf < self.max_imfs - 1:
+
+            # Initialising intermediary IMFs
+            H = Residue.copy()
+
+            # flag to control sifting loop
+            sift_stop = 0
+
+            # Combining two signals with equal weights
+            Combined = np.sum(H / np.sqrt(num_vars), axis=1)
+
+            # Obtaining extrema of combined signal
+            Maxima, MaxPos, Minima, MinPos = extrema(Combined)
+
+            # Checking whether there are too few extrema in the IMF
+            if np.count_nonzero(Maxima) < 3 or np.count_nonzero(Minima) < 3:
+                # Fewer than three extrema found in extrema map. Stopping now...
+                break
+
+            # Window size determination by delaunay triangulation
+            windows[:, imf] = self.filter_size1D(imax=MaxPos, imin=MinPos)
+
+            # extracting window size chosen by input parameter
+            w_sz = windows[self.window_type, imf]
+
+            # Begin sifting iteration
+            while not sift_stop:
+                # Incrementing sift counter
+                sift_count[imf] = sift_count[imf] + 1
+
+                # Entering parallel sift calculations
+                for i in range(num_vars):
+                    H1[:, i] = self.sift(H[:, i], w_sz=w_sz)
+
+                    # 计算均方误差
+                    mse[i] = immse(a=H1[:, i], b=H[:, i])
+
+                # Stop condition checks
+                if (mse < tol).all() and sift_count[imf] != 1:
+                    sift_stop = True
+
+                H = H1
+
+            # Storing IMFs
+            imfs[:, :, imf] = H
+
+            # Subtracting from Residual Signals
+            Residue = Residue - imfs[:, :, imf]
+
+            # Incrementing IMF counter
+            imf = imf + 1
+
+        # Checking for oversifting
+        if np.any(sift_count >= 5 * np.ones(shape=self.max_imfs)):
+            print("Decomposition may be oversifted. Checking if window size increases monotonically...")
+
+            if np.any(np.diff(windows[self.window_type, :]) <= np.zeros(shape=self.max_imfs - 1)):
+                print("Filter window size does not increase monotonically")
+
+        # 记录残差分量
+        imfs[:, :, -1] = Residue
+
+        # 调整输出的通道顺序
+        imfs = np.transpose(imfs, axes=[2, 0, 1])
+
+        # Organising results
+        if return_all is True:
+            return imfs, Residue, windows, sift_count
+
+        else:
+            return imfs
+
+
+def immse(a: np.ndarray, b: np.ndarray) -> floating[Any]:
+    """
+    复现Matlab中的immse函数
+    该函数用于计算两个数组的均方误差
+    :param a: 输入的数组a
+    :param b: 输入的数组b
+    :return: 计算得到的均方误差值
+    """
+    assert a.shape == b.shape, "the shape of `a` and `b` must be same"
+    return np.mean((a - b) ** 2)
+
+
+def env_smoothing(env_max: np.ndarray, env_min: np.ndarray, w_sz: Union[int, float]) -> np.ndarray:
+    """
+    平滑上下包络谱信号
+    :param env_max: 上包络谱信号
+    :param env_min: 下包络谱信号
+    :param w_sz: 滑动平均的窗口大小
+    :return: 平滑后且上下包络谱的均值
+    """
+    # Make sure the window_size is an integer
+    w_sz = int(w_sz)
+
+    # Smoothing
+    env_maxs = simple_moving_average(signal=env_max, window_size=w_sz)
+    env_mins = simple_moving_average(signal=env_min, window_size=w_sz)
+
+    # Calculating mean envelope
+    return (env_maxs + env_mins) / 2
 
 
 if __name__ == '__main__':
     import numpy as np
+    from matplotlib import pyplot as plt
+    from pysdkit.data import test_emd
 
-    # 假设Env_max和Env_min是输入数组
-    Env_max = np.array([[1], [2], [3], [4]])  # 示例数组
-    Env_min = np.array([5, 6, 7, 8])  # 示例数组
-    h = 2  # 填充量
+    faemd = FAEMD(max_imfs=2, window_type=0)
 
-    # 使用numpy.pad进行镜像填充
-    Env_maxp = np.pad(Env_max, pad_width=(h, h), mode='reflect')
-    Env_minp = np.pad(Env_min, pad_width=(h, h), mode='reflect')
+    time = np.linspace(0, 6 * np.pi, 100)
+    u = 2.5 * np.cos(time)
+    v = 2.5 * np.sin(5 * time)
+    w = u + v
+    w = w[np.newaxis, :]
+    w = np.concatenate([w, w], axis=0)
 
-    print("Env_maxp:", Env_maxp)
-    print("Env_minp:", Env_minp)
+    imfs = faemd.fit_transform(signal=w, return_all=False)
+
+    fig, ax = plt.subplots(4, 2)
+    for i in range(2):
+        ax[0, i].plot(w[i, :])
+        for j in range(2):
+            ax[j + 1, i].plot(imfs[j, :, i])
+
+    plt.show()
+
+    time, signal = test_emd()
+    signal = signal[np.newaxis, :]
+    signal = np.concatenate([signal, signal], axis=0)
+    imfs = faemd.fit_transform(signal=signal, return_all=False)
+
+    fig, ax = plt.subplots(4, 2)
+    for i in range(2):
+        ax[0, i].plot(signal[i, :])
+        for j in range(2):
+            ax[j + 1, i].plot(imfs[j, :, i])
+
+    plt.show()
