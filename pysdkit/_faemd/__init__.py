@@ -7,6 +7,6 @@ Created on 2025/02/01 22:30:27
 
 from .faemd import FAEMD
 
-from .md_faemd import MD_FAEMD
+from .faemd2d import FAEMD2D
 
-from .mv_faemd import MV_FAEMD
+from .faemd3d import FAEMD3D
