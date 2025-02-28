@@ -28,44 +28,58 @@ class FAEMD(object):
     also see: `EMD`, `EEMD`, `REMD` and `CEEMDAN`.
     """
 
-    def __init__(self, max_imfs: Optional[int], tol: Optional[float] = None, window_type: Optional[int] = 0) -> None:
+    def __init__(
+        self,
+        max_imfs: Optional[int],
+        tol: Optional[float] = None,
+        window_type: Optional[int] = 0,
+    ) -> None:
         """
-        相比于EMD算法
+        Compared to the `EMD` algorithm, `FAEMD3D` requires simpler parameters to be specified and is faster
         :param max_imfs:The number of IMFs to be extracted
-        :param tol:
-        :param window_type:
+        :param tol: The threshold for loop stopping in an iterative decomposition
+        :param window_type: Sliding window type using smoothing algorithm
         """
         self.max_imfs = max_imfs
         if max_imfs < 1:
             raise ValueError("`max_imfs` must be a positive integer")
         self.tol = tol
-        #
+
+        # This parameter needs to be further tested.
         self.window_type = window_type
-        # 这里需要对这个参数进行进一步的检验
+        if self.window_type not in [0, 1, 2, 3, 4, 5, 6]:
+            raise ValueError("`window_type` must be 0, 1, 2, 3, 4, 5, 6")
 
-        pass
-
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(
+        self,
+        signal: np.ndarray,
+        return_all: bool = False,
+        max_imfs: Optional[int] = None,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+        """allow instances to be called like functions"""
+        return self.fit_transform(
+            signal=signal, return_all=return_all, max_imfs=max_imfs
+        )
 
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
-        return "Fast and Adaptive Empirical Mode Decomposition (FAEMD)"
+        return "Fast and Adaptive Empirical Mode Decomposition (FAEMD3D)"
 
     def _get_tol(self, signal: np.ndarray) -> float:
-        """Get the tolerance parameter for FAEMD"""
-        # 当`tol`变量默认为None时
+        """Get the tolerance parameter for FAEMD3D"""
+
+        # When the `tol` variable defaults to None
         if self.tol is None:
-            tol = min(np.sqrt(np.mean(signal ** 2)), 1) * 0.001
+            tol = min(np.sqrt(np.mean(signal**2)), 1) * 0.001
             return tol
-        # 返回用户指定的参数
+
+        # Returns the user-specified parameter
         return self.tol
 
     def filter_size1D(self, imax: np.ndarray, imin: np.ndarray):
         """
         To determine the window size for order statistics filtering of a signal.
         The determination of the window size is based on the work of Bhuiyan et al
-        :return:
         """
 
         # 通过差分计算极值点之间的举例
@@ -87,16 +101,15 @@ class FAEMD(object):
         # making sure w_size is an odd integer
         windows = 2 * np.floor(windows / 2) + 1
 
-        # 遍历窗口数组规整其最小值
+        # Traverse the window array to normalize its minimum value
         for t in range(7):
             if windows[self.window_type] < 3:
                 windows[self.window_type] = 3
 
         return windows
 
-
-    def sift(self, H, w_sz):
-        """"""
+    def sift(self, H: np.ndarray, w_sz: Union[float, np.ndarray]) -> np.ndarray:
+        """Perform an iteration of the EMD algorithm"""
 
         # Envelope Generation
         Env_max, Env_min = self.OSF(H=H, w_sz=w_sz)
@@ -109,9 +122,11 @@ class FAEMD(object):
 
         return H1
 
+    def OSF(
+        self, H: np.ndarray, w_sz: Union[float, np.ndarray]
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Used to generate upper and lower envelope spectra of a signal"""
 
-    def OSF(self, H, w_sz):
-        """用于生成信号的上下包络谱"""
         # Max envelope
         Max = self.ord_filt1(H, order="max", window_size=w_sz)
         # Min envelope
@@ -119,10 +134,10 @@ class FAEMD(object):
 
         return Max, Min
 
-
     @staticmethod
     def ord_filt1(signal, order, window_size) -> np.ndarray:
         """1-D Rank order filter function"""
+
         # Pre-processing
         # Original signal size
         shape = signal.shape
@@ -149,53 +164,70 @@ class FAEMD(object):
         if order == "max":
             for m in range(r, M - r + 1):
                 # Extract a window of size (2r+1) around (m)
-                temp = x[(m - r): (m + r)]
+                temp = x[(m - r) : (m + r)]
                 w = np.sort(temp)
                 # Select the greatest element
                 y[m] = w[-1]
         elif order == "min":
             for m in range(r, M - r + 1):
                 # Extract a window of size (2r+1) around (m)
-                temp = x[(m - r): (m + r)]
+                temp = x[(m - r) : (m + r)]
                 w = np.sort(temp)
                 # Select the smallest element
                 y[m] = w[-1]
         else:
             raise ValueError("No such filering operation defined")
 
-        f_signal = y[r: -r]
+        f_signal = y[r:-r]
 
         # Restoring Signal size
         f_signal = np.reshape(f_signal, newshape=shape)
 
         return f_signal
 
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        return_all: bool = False,
+        max_imfs: Optional[int] = None,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+        """
+        Execute the signal decomposition algorithm
+        :param signal: The input 1D NumPy signal
+        :param return_all: whether to return all results or just the IMFs
+        :param max_imfs: The number of IMFs to be extracted
+        :return: The IMFs of input signal
+        """
+        # Get the variable number and length of a signal
+        signal, inputs_shape = check_inputs(signal=signal)
 
-    def fit_transform(self, signal: np.ndarray, return_all: bool = False):
-
-        # 获取信号的变量数目和长度
-        signal = signal.T
         seq_len, num_vars = signal.shape
 
+        # Adjust the maximum number of modes in the decomposition
+        max_imfs = self.max_imfs if max_imfs is None else max_imfs
+
         # Initialisations
-        imfs = np.zeros(shape=(seq_len, num_vars, self.max_imfs))
+        imfs = np.zeros(shape=(seq_len, num_vars, max_imfs))
         H1 = np.zeros(shape=(seq_len, num_vars))
         mse = np.zeros(num_vars)
 
-        windows = np.zeros(shape=(7, self.max_imfs))
+        # Array storing sliding average window
+        windows = np.zeros(shape=(7, max_imfs))
 
-        sift_count = np.zeros(shape=self.max_imfs)
+        # The number of sliding averages
+        sift_count = np.zeros(shape=max_imfs)
 
+        # Intrinsic mode function pointer
         imf = 0
 
-        # 分解的剩余分量初始化
+        # Initialization of residual components of decomposition
         Residue = signal.copy()
 
-        # 获取算法停止的容忍度参数
+        # Get the tolerance parameter for algorithm stopping
         tol = self._get_tol(signal)
 
         # 开始进行信号的迭代分解
-        while imf < self.max_imfs - 1:
+        while imf < max_imfs - 1:
 
             # Initialising intermediary IMFs
             H = Residue.copy()
@@ -229,7 +261,7 @@ class FAEMD(object):
                 for i in range(num_vars):
                     H1[:, i] = self.sift(H[:, i], w_sz=w_sz)
 
-                    # 计算均方误差
+                    # Calculate mean square error
                     mse[i] = immse(a=H1[:, i], b=H[:, i])
 
                 # Stop condition checks
@@ -248,90 +280,136 @@ class FAEMD(object):
             imf = imf + 1
 
         # Checking for oversifting
-        if np.any(sift_count >= 5 * np.ones(shape=self.max_imfs)):
-            print("Decomposition may be oversifted. Checking if window size increases monotonically...")
+        if np.any(sift_count >= 5 * np.ones(shape=max_imfs)):
+            print(
+                "Decomposition may be oversifted. Checking if window size increases monotonically..."
+            )
 
-            if np.any(np.diff(windows[self.window_type, :]) <= np.zeros(shape=self.max_imfs - 1)):
+            if np.any(
+                np.diff(windows[self.window_type, :]) <= np.zeros(shape=max_imfs - 1)
+            ):
                 print("Filter window size does not increase monotonically")
 
-        # 记录残差分量
+        # Record residual components
         imfs[:, :, -1] = Residue
 
-        # 调整输出的通道顺序
-        imfs = np.transpose(imfs, axes=[2, 0, 1])
+        # Adjust the channel order of the output
+        imfs = check_outputs(imfs=imfs, inputs_shape=inputs_shape)
 
         # Organising results
         if return_all is True:
             return imfs, Residue, windows, sift_count
-
-        else:
-            return imfs
+        return imfs
 
 
 def immse(a: np.ndarray, b: np.ndarray) -> floating[Any]:
     """
-    复现Matlab中的immse函数
-    该函数用于计算两个数组的均方误差
-    :param a: 输入的数组a
-    :param b: 输入的数组b
-    :return: 计算得到的均方误差值
+    Reimplementation of MATLAB's immse function.
+    Calculates the Mean Squared Error (MSE) between two arrays.
+
+    :param a: Input array a
+    :param b: Input array b
+    :return: Computed Mean Squared Error value
     """
-    assert a.shape == b.shape, "the shape of `a` and `b` must be same"
+    assert a.shape == b.shape, "The shape of `a` and `b` must be identical"
     return np.mean((a - b) ** 2)
 
 
-def env_smoothing(env_max: np.ndarray, env_min: np.ndarray, w_sz: Union[int, float]) -> np.ndarray:
+def env_smoothing(
+    env_max: np.ndarray, env_min: np.ndarray, w_sz: Union[int, float]
+) -> np.ndarray:
     """
-    平滑上下包络谱信号
-    :param env_max: 上包络谱信号
-    :param env_min: 下包络谱信号
-    :param w_sz: 滑动平均的窗口大小
-    :return: 平滑后且上下包络谱的均值
+    Smooth upper and lower envelope signals using moving average.
+
+    :param env_max: Upper envelope signal
+    :param env_min: Lower envelope signal
+    :param w_sz: Window size for moving average (will be converted to integer)
+    :return: Smoothed mean of upper and lower envelopes
     """
-    # Make sure the window_size is an integer
+    # Ensure window size is integer
     w_sz = int(w_sz)
 
-    # Smoothing
+    # Apply smoothing
     env_maxs = simple_moving_average(signal=env_max, window_size=w_sz)
     env_mins = simple_moving_average(signal=env_min, window_size=w_sz)
 
-    # Calculating mean envelope
+    # Calculate mean envelope
     return (env_maxs + env_mins) / 2
 
 
-if __name__ == '__main__':
-    import numpy as np
+def check_inputs(signal: np.ndarray) -> Tuple[np.ndarray, Tuple]:
+    """
+    Check the specific shape of the input signal.
+
+    Args:
+        signal (np.ndarray): Input signal to be checked.
+
+    Returns:
+        tuple: Transposed signal and original input shape.
+    """
+    # Get the shape of the input signal
+    inputs_shape = signal.shape
+    len_shape = len(inputs_shape)
+
+    if len_shape == 1:
+        # If the input is a 1D signal, add an additional channel
+        signal = signal[np.newaxis, :]
+    elif len_shape == 2:
+        # Input is a multivariate signal
+        pass
+    else:
+        # Input signal is in an incorrect format
+        raise ValueError(
+            "The input signal must be a NumPy ndarray univariate or multivariate signal with shape [seq_len, ] or [num_vars, seq_len]"
+        )
+
+    return signal.T, inputs_shape
+
+
+def check_outputs(imfs: np.ndarray, inputs_shape: Tuple) -> np.ndarray:
+    """
+    Check and standardize the shape and channel order of the output intrinsic mode functions (IMFs).
+
+    Args:
+        imfs (np.ndarray): Extracted IMFs to be checked.
+        inputs_shape: Original shape of the input signal.
+
+    Returns:
+        np.ndarray: Reshaped and reordered IMFs.
+    """
+    len_shape = len(inputs_shape)
+
+    if len_shape == 1:
+        # Original input was a univariate signal
+        imfs = imfs[:, 0, :]
+        imfs = np.transpose(imfs, axes=[1, 0])
+    else:
+        # Original input was a multivariate signal
+        imfs = np.transpose(imfs, axes=[2, 0, 1])
+    return imfs
+
+
+if __name__ == "__main__":
     from matplotlib import pyplot as plt
-    from pysdkit.data import test_emd
+    from pysdkit.data import test_emd, test_multivariate_signal
+    from pysdkit.plot import plot_IMFs
 
-    faemd = FAEMD(max_imfs=2, window_type=0)
-
-    time = np.linspace(0, 6 * np.pi, 100)
-    u = 2.5 * np.cos(time)
-    v = 2.5 * np.sin(5 * time)
-    w = u + v
-    w = w[np.newaxis, :]
-    w = np.concatenate([w, w], axis=0)
-
-    imfs = faemd.fit_transform(signal=w, return_all=False)
-
-    fig, ax = plt.subplots(4, 2)
-    for i in range(2):
-        ax[0, i].plot(w[i, :])
-        for j in range(2):
-            ax[j + 1, i].plot(imfs[j, :, i])
-
-    plt.show()
+    faemd = FAEMD(max_imfs=3)
 
     time, signal = test_emd()
-    signal = signal[np.newaxis, :]
-    signal = np.concatenate([signal, signal], axis=0)
-    imfs = faemd.fit_transform(signal=signal, return_all=False)
 
-    fig, ax = plt.subplots(4, 2)
+    IMFs = faemd.fit_transform(signal)
+
+    plot_IMFs(signal, IMFs)
+    plt.show()
+
+    time, signal = test_multivariate_signal()
+    IMFs = faemd.fit_transform(signal)
+
+    plot_IMFs(signal, IMFs)
+
+    sum_IMFs = np.sum(IMFs, axis=0).T
+    print(sum_IMFs.shape)
     for i in range(2):
-        ax[0, i].plot(signal[i, :])
-        for j in range(2):
-            ax[j + 1, i].plot(imfs[j, :, i])
-
+        print(np.allclose(sum_IMFs[i], signal[i]))
     plt.show()

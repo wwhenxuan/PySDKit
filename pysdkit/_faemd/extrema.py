@@ -10,7 +10,12 @@ import numpy as np
 from typing import Tuple
 
 
-def extrema(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | Tuple[None, None, None, None]:
+def extrema(
+    x: np.ndarray,
+) -> (
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
+    | Tuple[None, None, None, None]
+):
     """
     Gets the global extrema points from a time series
 
