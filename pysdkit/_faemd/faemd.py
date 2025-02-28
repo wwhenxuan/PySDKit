@@ -177,28 +177,28 @@ class FAEMD(object):
         return f_signal
 
 
-    # def fit_transform(self, signal: np.ndarray):
-    #
-    #     # 获取信号的变量数目和长度
-    #     signal = signal.T
-    #     seq_len, num_vars = signal.shape
-    #
-    #     # Initialisations
-    #     imfs = np.zeros(shape=(seq_len, num_vars, self.max_imfs))
-    #     H1 = np.zeros(shape=(seq_len, num_vars))
-    #     mse = np.zeros(num_vars)
-    #
-    #     windows = np.zeros(shape=(7, self.max_imfs))
-    #
-    #     sift_count = np.zeros(shape=(1, self.max_imfs))
-    #
-    #     imf = 0
-    #
-    #     # 分解的剩余分量初始化
-    #     Residue = signal.copy()
-    #
-    #     # 获取算法停止的容忍度参数
-    #     tol = self._get_tol(signal)
+    def fit_transform(self, signal: np.ndarray):
+
+        # 获取信号的变量数目和长度
+        signal = signal.T
+        seq_len, num_vars = signal.shape
+
+        # Initialisations
+        imfs = np.zeros(shape=(seq_len, num_vars, self.max_imfs))
+        H1 = np.zeros(shape=(seq_len, num_vars))
+        mse = np.zeros(num_vars)
+
+        windows = np.zeros(shape=(7, self.max_imfs))
+
+        sift_count = np.zeros(shape=(1, self.max_imfs))
+
+        imf = 0
+
+        # 分解的剩余分量初始化
+        Residue = signal.copy()
+
+        # 获取算法停止的容忍度参数
+        tol = self._get_tol(signal)
     #
     #     # 开始进行信号的迭代分解
     #     while imf <= self.max_imfs:
