@@ -301,7 +301,7 @@ class FAEMD(object):
         imfs = check_outputs(imfs=imfs, inputs_shape=inputs_shape)
 
         # Saving the results
-        self.imfs = imfs[:-1, :, :]
+        self.imfs = imfs[:-1, :, :] if len(imfs.shape) == 3 else imfs[:-1, :]
         self.residue = Residue
 
         # Organising results

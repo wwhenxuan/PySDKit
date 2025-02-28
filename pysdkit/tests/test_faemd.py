@@ -22,6 +22,20 @@ class FAEMDTest(unittest.TestCase):
             IMFs = faemd.fit_transform(signal, max_imfs=num_imfs)
             # 获取分解得到的本征模态函数
             num_vars, seq_len = IMFs.shape
+            # 检查信号的分解模态数目
+            self.assertEqual(first=num_vars, second=num_imfs, msg=f"分解模态的数目错误")
+            # 检查信号的长度
+            self.assertEqual(first=seq_len, second=len(signal), msg="分解信号的长度错误")
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
