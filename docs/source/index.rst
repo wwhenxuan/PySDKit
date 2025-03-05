@@ -15,14 +15,14 @@ Quick links
     :gutter: 3
 
     .. grid-item-card:: :octicon:`rocket` Get started
-        :link: user_guide/install
+        :link: 
         :link-type: any
 
         New to pysdkit? Start with our installation guide and pysdkit's key
         concepts.
 
     .. grid-item-card:: :octicon:`image` Examples
-        :link: examples/index
+        :link: 
         :link-type: any
 
         ......
@@ -33,19 +33,19 @@ Quick links
         .......
 
     .. grid-item-card:: :octicon:`repo` API reference
-        :link: api/api
+        :link: 
         :link-type: any
 
         ......
 
     .. grid-item-card:: :octicon:`tools` Contribute
-        :link: development/contribute
+        :link: 
         :link-type: any
 
         ......
 
     .. grid-item-card:: :octicon:`history` Release notes
-        :link: release_notes/index
+        :link: 
         :link-type: any
 
         ......

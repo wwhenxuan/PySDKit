@@ -64,7 +64,7 @@ html_theme_options = {
         "text": "pysdkit",
         "link": "",
     },
-    "header_links_before_dropdown":4 ,
+    "header_links_before_dropdown":6 ,
     "icon_links": [
         {
             "name": "GitHub",
@@ -86,7 +86,7 @@ html_theme_options = {
     #"navbar_persistent": ["search-button"],
     #______________________________________________________________________________________
     "switcher": {
-        "json_url": ("https://github.com/changewam/PySDKit/blob/main/docs/source/_static/version_switcher.json"),#the persistent location of the JSON file
+        "json_url": ("https://raw.githubusercontent.com/changewam/PySDKit/refs/heads/main/docs/source/_static/version_switcher.json"),#the persistent location of the JSON file
         "version_match": "dev" if "dev" in version else version,
     },
     "show_version_warning_banner": True,
