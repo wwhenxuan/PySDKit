@@ -7,6 +7,7 @@ version: 2
 # Set the OS, Python version and other tools you might need
 build:
   tools:
+    os : "Windows"
     python: "3.10"
     # You can also specify other tool versions:
     # nodejs: "20"
