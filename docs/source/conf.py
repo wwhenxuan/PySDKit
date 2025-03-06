@@ -62,7 +62,7 @@ html_theme_options = {
     #_____________________________________________________________
     "logo": {
         "text": "pysdkit",
-        "link": "",
+        "link": "https://pysdkit.org/",
     },
     "header_links_before_dropdown":6 ,
     "icon_links": [

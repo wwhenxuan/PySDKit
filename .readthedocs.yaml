@@ -6,8 +6,8 @@ version: 2
 
 # Set the OS, Python version and other tools you might need
 build:
+  os: "ubuntu-24.04"
   tools:
-    os: "ubuntu-24.04"
     python: "3.10"
     # You can also specify other tool versions:
     # nodejs: "20"
