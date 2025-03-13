@@ -42,8 +42,9 @@ extensions = [
 ]
 
 apidoc_modules = [
-    {'path': '../../pysdkit', 'destination': 'source/API'},
     {
+        'path': '../../pysdkit',
+        'destination': 'source/API',
         'exclude_patterns': ['**/test*'],
         'max_depth': 4,
         'follow_links': False,
@@ -63,7 +64,7 @@ source_suffix = {".rst": "restructuredtext"}
 #__________________________________________________________________________
 html_logo = "_static/logo.png"
 
-language = "zh_CN"
+language = "en"
 
 show_warning_types = True
 suppress_warnings = []
