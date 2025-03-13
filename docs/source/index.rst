@@ -7,59 +7,16 @@ PYSDKIT's documentation
 ===================================
 
 **Version**: |version|,**Date**: 
-.. gitstamp:: 
 
 Quick links
 -----------
-.. grid:: 2
-    :gutter: 3
-
-    .. grid-item-card:: :octicon:`rocket` Get started
-        :link: 
-        :link-type: any
-
-        New to pysdkit? Start with our installation guide and pysdkit's key
-        concepts.
-
-    .. grid-item-card:: :octicon:`image` Examples
-        :link: 
-        :link-type: any
-
-        ......
-
-    .. grid-item-card:: :octicon:`comment-discussion` Get help :octicon:`link-external`
-        :link: https://forum.image.sc/tag/scikit-image
-
-        .......
-
-    .. grid-item-card:: :octicon:`repo` API reference
-        :link: 
-        :link-type: any
-
-        ......
-
-    .. grid-item-card:: :octicon:`tools` Contribute
-        :link: 
-        :link-type: any
-
-        ......
-
-    .. grid-item-card:: :octicon:`history` Release notes
-        :link: 
-        :link-type: any
-
-        ......
-
-
-
-
 
 .. toctree::
    :hidden:
 
    user_guide/index
    examples/index
-   API reference/index
+   API/modules
    release_notes/index
    development/index
    about/index

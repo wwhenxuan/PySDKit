@@ -71,11 +71,13 @@ def test_univariate_image(
 ) -> np.ndarray:
     """
     Generate a single image for 2D decomposition
+
     please input the case from 1 to 7
     :param case: case number in 1~7
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+
     :return: the generated image for 2D decomposition
     """
     if case == 1:
@@ -107,11 +109,13 @@ def test_multivariate_image(
 ) -> np.ndarray:
     """
     Generate multivariate image for 2D decomposition, the number of image is `len(case)`
+
     please input the case from 1 to 7
     :param case: case number in 1~7
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
+    
     :return: the generated image for 2D decomposition
     """
     # The number of generated images

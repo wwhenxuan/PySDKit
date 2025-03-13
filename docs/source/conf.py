@@ -8,6 +8,8 @@ import os
 import sys
 from pathlib import Path
 
+import pysdkit
+
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -23,6 +25,7 @@ version = "0.4.15"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 #sys.path.append(str(Path('exts').resolve()))
+sys.path.insert(0, str(Path('..', 'pysdkit').resolve()))
 
 extensions = [
     "sphinx_copybutton",
@@ -33,12 +36,29 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_design",
+    'sphinx.ext.napoleon',
 
-    "sphinx_gitstamp"
+    "sphinx_gitstamp",
 ]
 
+apidoc_modules = [
+    {'path': '../../pysdkit', 'destination': 'source/API'},
+    {
+        'exclude_patterns': ['**/test*'],
+        'max_depth': 4,
+        'follow_links': False,
+        'separate_modules': False,
+        'include_private': True,
+        'no_headings': False,
+        'module_first': False,
+        'implicit_namespaces': True,
+        'automodule_options': {
+            'members', 'show-inheritance', 'undoc-members'
+        },
+    },
+]
 templates_path = ["_templates"]
-exclude_patterns = []
+
 source_suffix = {".rst": "restructuredtext"}
 #__________________________________________________________________________
 html_logo = "_static/logo.png"
@@ -59,10 +79,9 @@ html_css_files = ["theme_overrides.css","custom.css"]
 html_theme_options = {
     "announcement": "",#You can specify an arbitrary URL that will be used as the HTML source for your announcement. 
     # Navigation bar
-    #_____________________________________________________________
     "logo": {
         "text": "pysdkit",
-        "link": "https://pysdkit.org/",
+        "link": "https://pysdkit.readthedocs.io/",
     },
     "header_links_before_dropdown":6 ,
     "icon_links": [
@@ -75,7 +94,7 @@ html_theme_options = {
         {
             "name": "PyPI",
             "url": "https://pypi.org/project/PySDKit/",
-            "icon": "_static/logo-pypi.svg",
+            "icon": "https://raw.githubusercontent.com/changewam/PySDKit/refs/heads/main/docs/source/_static/logo-pypi.svg",
             "type": "url",
         },
     ],
