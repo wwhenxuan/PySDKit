@@ -30,4 +30,4 @@ from pysdkit import (
     Moving_Decomp,
 )
 
-DICT = {}
+DICT = {"EMD": ""}
