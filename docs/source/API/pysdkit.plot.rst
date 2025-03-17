@@ -1,10 +1,6 @@
-pysdkit.plot package
-====================
-
-Module contents
----------------
+﻿pysdkit.plot
+============
 
 .. automodule:: pysdkit.plot
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   

@@ -9,7 +9,6 @@ import numpy as np
 
 from typing import Optional, Union, Tuple, List
 
-
 def get_meshgrid_3D(
     low: Union[int, np.ndarray], high: Union[int, np.ndarray], sampling_rate: int = 30
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -69,7 +68,7 @@ def test_univariate_cube(
 
     :param case: Test case, range in [1, 2, 3, 4, 5, 6]
     :param low: Minimum value of grid matrix,
-         If it is a ndarray array, its length must be 3 to indicate the range of three dimensions.
+        If it is a ndarray array, its length must be 3 to indicate the range of three dimensions.
     :param high: Maximum value of grid matrix,
         If it is a ndarray array, its length must be 3 to indicate the range of three dimensions.
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -100,15 +99,14 @@ def test_multivariate_cube(
 ) -> np.ndarray:
     """
     Generate 3D cubes data for testing 3D multivariate signal decomposition algorithms
-    
+
     :param case: The test cases to use are specified by inputting a list or tuple or ndarray in the range [1, 2, 3, 4, 5, 6],
-        The default parameter settings are [1, 2, 3].
+            The default parameter settings are [1, 2, 3].
     :param low: Minimum value of grid matrix,
         If it is a ndarray array, its length must be 3 to indicate the range of three dimensions.
     :param high: Maximum value of grid matrix,
         If it is a ndarray array, its length must be 3 to indicate the range of three dimensions.
-    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix\
-    
+    :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
     :return: Get 3D cube data of multiple different channels
     """
     # Default Parameters

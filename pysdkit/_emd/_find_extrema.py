@@ -4,6 +4,7 @@ Created on Sat Mar 5 21:38:26 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 The following code is mainly used to find extreme points in the EMD algorithm
+
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 import numpy as np
@@ -75,6 +76,7 @@ def find_extrema_simple(time: np.ndarray, signal: np.ndarray) -> FindExtremaOutp
     This method identifies local maxima and minima by analyzing the first differences of the signal.
     The approach is straightforward and computationally efficient, making it suitable for signal processing applications
     where quick identification of critical turning points in the signal is required.
+    
     :param time: Array representing the time or sequence indices.
     :param signal: One-dimensional array representing the signal values.
     :return: Positions and corresponding values of local maxima and minima, and the positions of zero crossings.

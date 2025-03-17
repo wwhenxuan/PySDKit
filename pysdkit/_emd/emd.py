@@ -25,14 +25,15 @@ class EMD(object):
     "The empirical mode decomposition and the Hilbert spectrum for nonlinear and non-stationary time series analysis."
     Proceedings of the Royal Society of London.
     Series A: mathematical, physical and engineering sciences 454.1971 (1998): 903-995.
-
     The algorithm first interpolates the signal extreme values and averages the upper and lower envelopes to obtain the local mean of the signal,
     which can be regarded as an estimate of the low-frequency components in the signal;
     then, the low-frequency components are iteratively separated from the input signal to obtain the high-frequency (fast oscillation) components.
     This completes a screening. Repeat the screening process until all the main oscillation modes in the input signal are extracted.
 
     Python code: https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
+
     MATLAB code: https://www.mathworks.com/help/signal/ref/emd.html
+
     R code: https://rdrr.io/github/PierreMasselot/Library--emdr/f/README.md
     """
 
@@ -52,6 +53,7 @@ class EMD(object):
     ) -> None:
         """
         Configuration, such as threshold values, can be passed as kwargs (keyword arguments).
+
         :param spline_kind: The specific interpolation algorithm used to construct the upper and lower envelope spectra, optional:
                             [akima, cubic, pchip, cubic_hermite, slinear, quadratic, linear]
         :param extrema_detection: method used to finding extrema, choices: ['parabol', 'simple']
@@ -118,14 +120,17 @@ class EMD(object):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Returns extrema (minima and maxima) for given signal S.
+
         Detection and definition of the extrema depends on
         ``extrema_detection`` variable, set on initiation of EMD.
+
         :param time: position or time array of numpy
         :param signal: input signal of numpy ndarray
-        :return: local_max_pos : numpy array, Position of local maxima
-                 local_max_val : numpy array, Values of local maxima
-                 local_min_pos : numpy array, Position of local minima
-                 local_min_val : numpy array, Values of local minima
+
+        :return: - local_max_pos - numpy array, Position of local maxima
+                 - local_max_val - numpy array, Values of local maxima
+                 - local_min_pos - numpy array, Position of local minima
+                 - local_min_val - numpy array, Values of local minima
         """
         if self.extrema_detection == "parabol":
             return find_extrema_parabol(time=time, signal=signal)
@@ -148,6 +153,7 @@ class EMD(object):
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Further processing of the maximum and minimum points of the input signal makes the upper and lower envelope spectra smoother.
+        
         :param time: position or time array of numpy
         :param signal: input signal of numpy ndarray
         :param max_pos: numpy array, Position of local maxima.
@@ -227,7 +233,6 @@ class EMD(object):
         """
         Extracts top and bottom envelopes based on the signal,
         which are constructed based on maxima and minima, respectively.
-
         Based on the local maximum and minimum values of the signal,
         the upper envelope and the lower envelope are constructed.
         This method is one of the key steps in constructing IMF,
@@ -235,10 +240,11 @@ class EMD(object):
 
         :param time: position or time array of numpy
         :param signal: input signal of numpy ndarray
-        :return: local_max_pos : numpy array, Position of local maxima
-                 local_max_val : numpy array, Values of local maxima
-                 local_min_pos : numpy array, Position of local minima
-                 local_min_val : numpy array, Values of local minima
+
+        :return: - local_max_pos - numpy array, Position of local maxima
+                 - local_max_val - numpy array, Values of local maxima
+                 - local_min_pos - numpy array, Position of local minima
+                 - local_min_val - numpy array, Values of local minima
         """
 
         # Get indexes and values of extrema
@@ -274,7 +280,7 @@ class EMD(object):
         """
         Evaluate if the current IMF (Intrinsic Mode Function) satisfies the end condition
         based on Huang's criteria, similar to the Cauchy convergence test.
-
+        
         This function ensures that consecutive siftings of the signal have minimal impact,
         indicating that the IMF component has been properly extracted. The criteria include
         checking if all local maxima are positive, all local minima are negative, and various
@@ -284,7 +290,8 @@ class EMD(object):
         :param imf_old: np.ndarray - the previously extracted IMF from the last iteration.
         :param eMax: np.ndarray - array of values at local maxima points, used for validation.
         :param eMin: np.ndarray - array of values at local minima points, used for validation.
-        :return: bool - True if the current IMF meets the stopping criteria, False otherwise.
+        :return: True if the current IMF meets the stopping criteria, False otherwise.
+        :rtype: bool
         """
 
         # Check that all local maxima are positive and all local minima are negative
@@ -321,14 +328,14 @@ class EMD(object):
         Evaluate whether the Empirical Mode Decomposition (EMD) process should terminate.
         The process stops when either the absolute amplitude of the residue is below a
         threshold or the mean absolute difference of the residue is below another threshold.
-
         This function ensures that the decomposition stops when further significant
         intrinsic mode functions (IMFs) cannot be extracted reliably due to the minimal
         variation in the remaining signal.
 
         :param signal: np.ndarray - The original signal on which EMD was performed.
         :param IMF: np.ndarray - A 2D array containing all extracted IMFs, where each row represents an IMF.
-        :return: bool - True if the EMD process should terminate, False otherwise.
+        :return: True if the EMD process should terminate, False otherwise.
+        :rtype: bool
         """
         # Calculate the residue from the original signal minus all extracted IMFs
         tmp = signal - np.sum(IMF, axis=0)
@@ -346,6 +353,7 @@ class EMD(object):
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and residue from recently analysed signal
+
         :return: obtained IMFs and residue through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -361,6 +369,7 @@ class EMD(object):
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).
+
         :return: obtained IMFs and main trend through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -384,6 +393,7 @@ class EMD(object):
     ) -> np.ndarray:
         """
         Signal decomposition using EMD algorithm
+
         :param signal: the time domain signal (1D numpy array) to be decomposed
         :param time: the time array of the input signal
         :param max_imfs: the maximum number of IMFs to extract

@@ -4,8 +4,9 @@ Created on 2024/7/12 13:41
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 Empirical Wavelet Transform for 1D signals
+
 Original paper:
-Gilles, J., 2013. Empirical Wavelet Transform. IEEE Transactions on Signal Processing, 61(16), pp.3999–4010.
+Gilles, J., 2013. Empirical Wavelet Transform. IEEE Transactions on Signal Processing, 61(16), pp.3999-4010.
 Available at: https://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=6522142.
 Original Matlab toolbox: https://www.mathworks.com/matlabcentral/fileexchange/42141-empirical-wavelet-transforms
 Original Code from: https://github.com/vrcarva/ewtpy
@@ -150,6 +151,7 @@ def ewt(
 ):
     """
     Empirical Wavelet Transform with Function Interface.
+
     :param signal: The input signal to be decomposed.
     :param K: Maximum number of modes (signal components) to detect and extract.
     :param log: Set to 0 or 1 to indicate whether to work with the logarithmic spectrum.
@@ -161,10 +163,9 @@ def ewt(
     :param return_all: If True, return the EWT decomposition, the filter bank, and the boundaries.
                        If False, return only the EWT decomposition.
 
-    :returns:
-        - _ewt: The extracted modes from the signal.
-        - mfb: The filter bank in the Fourier domain (only if return_all is True).
-        - boundaries: Boundaries detected in the Fourier spectrum (only if return_all is True).
+    :returns: - _ewt - The extracted modes from the signal.
+              - mfb: The filter bank in the Fourier domain (only if return_all is True).
+              - boundaries: Boundaries detected in the Fourier spectrum (only if return_all is True).
     """
     # Compute the one-sided magnitude of the signal's Fourier transform
     ff = np.fft.fft(signal)
@@ -228,8 +229,7 @@ def EWT_Boundaries_Detect(
     :param lengthFilter: The width of the Gaussian or average filter for regularization.
     :param sigmaFilter: The standard deviation of the Gaussian filter for regularization.
 
-    :returns:
-        - boundaries: A list of detected boundaries (in terms of indices).
+    :returns boundaries: A list of detected boundaries (in terms of indices).
 
     This function detects boundaries in the frequency domain based on different detection
     methods. The spectrum can be regularized using Gaussian or average filters, which smooths

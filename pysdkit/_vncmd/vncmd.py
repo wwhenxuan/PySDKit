@@ -3,6 +3,7 @@
 Created on Sat Mar 18 12:11:34 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
 MATLAB code source https://www.mathworks.com/matlabcentral/fileexchange/64292-variational-nonlinear-chirp-mode-decomposition
 """
 import numpy as np
@@ -77,6 +78,7 @@ class VNCMD(Base):
     def projec(vec: np.ndarray, var: float) -> np.ndarray:
         """
         Projection operation.
+
         :param vec: The vector for projection.
         :param var: The variance of the noise.
         :return: numpy.ndarray: The projected vector.
@@ -93,6 +95,7 @@ class VNCMD(Base):
     def difference_matrix(self, N: int) -> np.ndarray:
         """
         Constructs an NxN second-order difference matrix.
+
         :param N: The size of the matrix.
         :return: The second-order difference matrix.
         """
@@ -120,6 +123,7 @@ class VNCMD(Base):
     def differ(self, y: np.ndarray, delta: float) -> np.ndarray:
         """
         Compute the derivative of a discrete time series y.
+
         :param y: The input time series.
         :param delta: The sampling time interval of y.
         :return: numpy.ndarray: The derivative of the time series.
@@ -155,11 +159,12 @@ class VNCMD(Base):
     def fit_transform(self, signal: np.ndarray, eIF: Optional[np.ndarray] = None):
         """
         Execute VNCMD algorithm for signal decomposition
+
         :param signal: the time domain signal (1D numpy array)  to be decomposed
         :param eIF: initial instantaneous frequency (IF) time series for all the signal modes; each row of eIF corresponds to the IF of each mode
-        :return: IFmset: the collection of the obtained IF time series of all the signal modes at each iteration
-                 smset: the collection of the obtained signal modes at each iteration
-                 IA: the finally estimated instantaneous amplitudes of the obtained signal modes
+        :return: - IFmset: the collection of the obtained IF time series of all the signal modes at each iteration
+                 - smset: the collection of the obtained signal modes at each iteration
+                 - IA: the finally estimated instantaneous amplitudes of the obtained signal modes
         """
         signal = signal.astype(self.DTYPE)
         K, N, eIF = self.init_K_N(eIF=eIF)

@@ -1,9 +1,6 @@
-pysdkit.utils package
-=====================
-
-
+﻿pysdkit.utils
+=============
 
 .. automodule:: pysdkit.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   

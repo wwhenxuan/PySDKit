@@ -1,6 +1,6 @@
 html[data-theme=light] {
-  --pst-color-primary: #0a7d91;
-  --pst-color-primary-bg: #d0ecf1;
+  --pst-color-primary: #91a9f6;
+  --pst-color-primary-bg: #f9f9f9;
   --pst-color-secondary: #8045e5;
   --pst-color-secondary-bg: #e0c7ff;
   --pst-color-accent: #c132af;
@@ -27,8 +27,8 @@ html[data-theme=light] {
   --pst-color-table: #14181e;
   --pst-color-table-row-hover-bg: #d5b4fd;
   --pst-color-table-inner-border: #e5e7ea;
-  --pst-color-background: #aedef7;
-  --pst-color-on-background: #9cbef8;
+  --pst-color-background: #fefefe;
+  --pst-color-on-background: #9cccf8;
   --pst-color-surface: #d8e8f8;
   --pst-color-on-surface: #222832;
   color-scheme: light;

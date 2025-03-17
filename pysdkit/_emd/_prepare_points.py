@@ -4,6 +4,7 @@ Created on Sat Mar 8 22:53:11 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 The following code is mainly used to Performs extrapolation on edges by adding extra extrema in the EMD algorithm
+
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 import numpy as np
@@ -22,11 +23,16 @@ def prepare_points_parabol(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Performs mirroring on signal which extrema do not necessarily
+
     belong on the position array.
+
     max_pos, max_val: the position and corresponding value of the local maximum.
     min_pos, min_val: the position and corresponding value of the local minimum.
+
     Used to perform a mirror operation at the extreme points of the signal so that smoother and more complete boundaries can be obtained when constructing the upper and lower envelopes of the signal.
+
     This processing is especially important at the beginning and end edges of the signal, because these areas may lack enough data points to accurately estimate the extreme values.
+    
     The mirror operation helps provide enough data points to make interpolation (such as spline interpolation) more accurate and natural.
     """
 

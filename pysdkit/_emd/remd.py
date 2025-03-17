@@ -59,6 +59,7 @@ class REMD(object):
         """
         Initialize REMD parameters.
         A useful adaptive signal processing tool for multi-component signal separation, non-stationary signal processing.
+        
         :param max_imfs: max number of imf to be decomposed
         :param max_iter: max iteration number in a IMF sifting process
         :param nbsym:

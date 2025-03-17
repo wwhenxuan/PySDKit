@@ -1,9 +1,6 @@
-pysdkit.tsa package
-===================
-
-
+﻿pysdkit.tsa
+===========
 
 .. automodule:: pysdkit.tsa
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   

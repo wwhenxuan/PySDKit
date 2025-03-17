@@ -21,7 +21,7 @@ class FAEMD(object):
     Thirumalaisamy, Mruthun R., and Phillip J. Ansell.
     “Fast and Adaptive Empirical Mode Decomposition for Multidimensional, Multivariate Signals.”
     IEEE Signal Processing Letters, vol. 25, no. 10, Institute of Electrical and Electronics Engineers (IEEE),
-    Oct. 2018, pp. 1550–54, doi:10.1109/lsp.2018.2867335.
+    Oct. 2018, pp. 1550-54, doi:10.1109/lsp.2018.2867335.
 
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
 
@@ -36,6 +36,7 @@ class FAEMD(object):
     ) -> None:
         """
         Compared to the `EMD` algorithm, `FAEMD3D` requires simpler parameters to be specified and is faster
+
         :param max_imfs:The number of IMFs to be extracted
         :param tol: The threshold for loop stopping in an iterative decomposition
         :param window_type: Sliding window type using smoothing algorithm
@@ -197,6 +198,7 @@ class FAEMD(object):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Execute the signal decomposition algorithm
+
         :param signal: The input 1D NumPy signal
         :param return_all: whether to return all results or just the IMFs
         :param max_imfs: The number of IMFs to be extracted
@@ -312,6 +314,7 @@ class FAEMD(object):
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and residue from recently analysed signal
+
         :return: obtained IMFs and residue through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -324,9 +327,11 @@ class FAEMD(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
+        
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).
+
         :return: obtained IMFs and main trend through EMD
         """
         if self.imfs is None or self.residue is None:

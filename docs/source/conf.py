@@ -8,8 +8,6 @@ import os
 import sys
 from pathlib import Path
 
-import pysdkit
-
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
@@ -25,7 +23,9 @@ version = "0.4.15"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 #sys.path.append(str(Path('exts').resolve()))
-sys.path.insert(0, str(Path('..', 'pysdkit').resolve()))
+sys.path.insert(0, str(Path('..', '..').resolve()))
+
+import pysdkit
 
 extensions = [
     "sphinx_copybutton",
@@ -135,7 +135,8 @@ remove_from_toctrees = []
 
 # Custom sidebar templates, maps document names to template names.
 html_sidebars = {
-    "index": []  # Hide sidebar in home page
+    "index": [] , # Hide sidebar in home page
+    "API/pysdkit.*": []
 }
 html_show_sourcelink = False
 

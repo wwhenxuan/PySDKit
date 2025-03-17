@@ -29,6 +29,7 @@ class HVD(object):
     2014 IEEE PES Transmission & Distribution Conference and Exposition-Latin America (PES T&D-LA). IEEE, 2014.
 
     Python code: https://github.com/MVRonkin/dsatools/blob/master/dsatools/_base/_imf_decomposition/_hvd.py#L6
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/178804-hilbert-vibration-decomposition?s_tid=FX_rc1_behav
 
     The original code has a serious endpoint problem.
@@ -42,8 +43,10 @@ class HVD(object):
     ) -> None:
         """
         Create the Hilbert Vibration Decomposition instance
+
         Decomposition results are very depends on the `fpar` value
         We have improved the original code by mirroring the input signal to alleviate this problem.
+        
         :param K: the number of intrinsic mode functions to be decomposed
         :param fpar: filter parameter, equal to point of cut frequency for low-pass filter (have to be regulized for optimal decomposition).
         :param mirror: whether to mirror the original input signal
