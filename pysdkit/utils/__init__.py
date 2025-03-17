@@ -74,25 +74,25 @@ from ._instantaneous import inst_freq_local
 from ._instantaneous import divide2exp
 
 # Any pair of IMFs is locally orthogonal
-from ._Index_of_Orthogonality import index_of_orthogonality
+from ._function import index_of_orthogonality
 
 # Determine whether an array is one-dimensional
-from ._types import is_1d
+from ._function import is_1d
 
 # Determine whether an array is a complex array
-from ._types import is_complex
+from ._function import is_complex
 
 # Convert all input data into one-dimensional form
-from ._types import to_1d
+from ._function import to_1d
 
 # Add a new axis to the 1D ndarray
-from ._types import to_2d
+from ._function import to_2d
 
 # This function generates the lag matrix of a signal, also known as the data matrix or correlation matrix
-from ._lags import lags_matrix
+from ._function import lags_matrix
 
 # This function calculates the covariance matrix of the input signal's lag matrix
-from ._lags import covariance_matrix
+from ._function import covariance_matrix
 
 # This function is used to generate the kernel matrix of the input signal
 from ._kernel_matrix import kernel_matrix
