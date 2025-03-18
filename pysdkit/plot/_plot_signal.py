@@ -23,6 +23,7 @@ def plot_signal(
 ) -> plt.figure:
     """
     Plot and optionally save an amplitude modulated (AM) signal with time on the x-axis and amplitude on the y-axis.
+    
     :param time: Array of time points corresponding to the signal.
     :param signal: Array containing the signal data to be plotted.
     :param spectrum: bool, Whether to draw the spectrum signal of fast Fourier transform at the same time

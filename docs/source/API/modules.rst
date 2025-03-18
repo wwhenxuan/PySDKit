@@ -17,7 +17,6 @@ API reference
    pysdkit._vncmd
    pysdkit.data
    pysdkit.entropy
-   pysdkit.hht
    pysdkit.plot
    pysdkit.tsa
    pysdkit.utils

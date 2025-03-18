@@ -24,6 +24,7 @@ emd.\_splines
    :private-members:
    :special-members: 
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.\_find_extrema
 -----------------------------
@@ -34,6 +35,7 @@ emd.\_find_extrema
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.\_prepare_points
 -----------------------------
@@ -55,6 +57,7 @@ emd.emd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.eemd
 -----------------------------
@@ -66,6 +69,7 @@ emd.eemd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.ceemdan
 -----------------------------
@@ -77,6 +81,7 @@ emd.ceemdan
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.remd
 -----------------------------
@@ -88,6 +93,7 @@ emd.remd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.memed
 -----------------------------
@@ -98,6 +104,7 @@ emd.memed
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 emd.tvf_emd
 -----------------------------
@@ -109,6 +116,6 @@ emd.tvf_emd
    :private-members:
    :special-members:
    :show-inheritance:
-
+   :exclude-members: __dict__
 
 

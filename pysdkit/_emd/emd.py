@@ -3,6 +3,7 @@
 Created on Sat Mar 4 21:58:54 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 import numpy as np
@@ -28,6 +29,7 @@ class EMD(object):
     The algorithm first interpolates the signal extreme values and averages the upper and lower envelopes to obtain the local mean of the signal,
     which can be regarded as an estimate of the low-frequency components in the signal;
     then, the low-frequency components are iteratively separated from the input signal to obtain the high-frequency (fast oscillation) components.
+
     This completes a screening. Repeat the screening process until all the main oscillation modes in the input signal are extracted.
 
     Python code: https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
@@ -235,6 +237,7 @@ class EMD(object):
         which are constructed based on maxima and minima, respectively.
         Based on the local maximum and minimum values of the signal,
         the upper envelope and the lower envelope are constructed.
+
         This method is one of the key steps in constructing IMF,
         because IMF is obtained by the difference between the original signal and its mean.
 
@@ -326,8 +329,10 @@ class EMD(object):
     def end_condition(self, signal: np.ndarray, IMF: np.ndarray) -> bool:
         """
         Evaluate whether the Empirical Mode Decomposition (EMD) process should terminate.
+
         The process stops when either the absolute amplitude of the residue is below a
         threshold or the mean absolute difference of the residue is below another threshold.
+
         This function ensures that the decomposition stops when further significant
         intrinsic mode functions (IMFs) cannot be extracted reliably due to the minimal
         variation in the remaining signal.
@@ -366,6 +371,7 @@ class EMD(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
+        
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).

@@ -15,7 +15,9 @@ from typing import Optional, Tuple
 def test_grayscale() -> np.ndarray | None:
     """
     Load a sample 2D grayscale image for testing, the size is [256, 256]
+
     We download the data from https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/pysdkit/data/texture.txt
+    
     This data comes from https://www.mathworks.com/matlabcentral/fileexchange/45918-two-dimensional-variational-mode-decomposition
     Konstantin, Dragomiretskiy, and Dominique Zosso. "Two-dimensional variational mode decomposition."
     Energy Minimization Methods in Computer Vision and Pattern Recognition. Vol. 8932. 2015.
@@ -51,6 +53,7 @@ def get_meshgrid_2D(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a grid matrix given an input and output range
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -73,6 +76,7 @@ def test_univariate_image(
     Generate a single image for 2D decomposition
 
     please input the case from 1 to 7
+
     :param case: case number in 1~7
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
@@ -111,6 +115,7 @@ def test_multivariate_image(
     Generate multivariate image for 2D decomposition, the number of image is `len(case)`
 
     please input the case from 1 to 7
+
     :param case: case number in 1~7
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
@@ -190,7 +195,8 @@ def test_image_2(
     """
     Generate a single image test sample 2
     the symbol function comes from:
-    https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+    :ref: https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -220,6 +226,7 @@ def test_image_3(
     Generate a single image test sample 3
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix

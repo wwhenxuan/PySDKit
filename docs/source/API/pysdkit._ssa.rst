@@ -1,5 +1,5 @@
 ﻿pysdkit.ssa
-=============
+===========
 
 .. automodule:: pysdkit._ssa
 
@@ -16,5 +16,6 @@ ssa.ssa
     :members:
     :undoc-members:
     :private-members:
-    :special-members: 
- 
+    :special-members:    
+    :show-inheritance:
+    :exclude-members: __dict__

@@ -18,6 +18,8 @@ ewt.ewt
    :undoc-members:
    :private-members:
    :special-members:
+   :show-inheritance:
+   :exclude-members: __dict__
 
 
    

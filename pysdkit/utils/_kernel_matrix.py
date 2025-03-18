@@ -28,29 +28,47 @@ def kernel_matrix(
 
     :param x: 1D numpy ndarray signal
     :param mode: Specifies the type of lag matrix to be generated. The supported modes include:
-           > mode = 'full': lags_matrix is the full Toeplitz convolutional matrix with dimensions [lags+N-1,lags],
+
+           - mode = 'full': 
+                    lags_matrix is the full Toeplitz convolutional matrix with dimensions [lags+N-1,lags],
+
                     math:: out = [ [x,0..0]^T,[0,x,0..0]^T,...,[0,..0,x]^T ], where: N is the size of x.
-           > mode =  'prew': lags_matrix is the prewindowed matrix with the first N columns of the full matrix, and dimension = [N,lags];
-           > mode = 'postw': lags_matrix is the postwindowed matrix with the last N columns of the full matrix, and dimension = [N,lags];
-           > mode = 'covar' or 'valid': lags_matrix is the trimmed full matrix with the first and last m columns cut off
+           - mode =  'prew': 
+                    lags_matrix is the prewindowed matrix with the first N columns of the full matrix, and dimension = [N,lags];
+           - mode = 'postw': 
+                    lags_matrix is the postwindowed matrix with the last N columns of the full matrix, and dimension = [N,lags];
+           - mode = 'covar' or 'valid': 
+                    lags_matrix is the trimmed full matrix with the first and last m columns cut off
+
                     (out = full[lags:N-lags,:]), with dimension = [N-lags+1,lags];
-           > mode = 'same': conv_matrix is the trimmed full matrix with the first and last m columns cut off
+           - mode = 'same': 
+                    conv_matrix is the trimmed full matrix with the first and last m columns cut off
+
                     (out = full[(lags-1)//2:N+(lags-1)//2,:]), with dimension = [N,lags];
-           > mode = 'traj': lags_matrix is the trajectory or so-called caterpillar matrix with dimension = [N,lags];
-           > mode = 'hanekl': lags_matrix is the Hankel matrix with dimension = [N,N];
-           > mode = 'toeplitz': lags_matrix is the symmetric Toeplitz matrix, with dimension = [N,N].
+           - mode = 'traj': 
+                    lags_matrix is the trajectory or so-called caterpillar matrix with dimension = [N,lags];
+           - mode = 'hanekl': 
+                    lags_matrix is the Hankel matrix with dimension = [N,N];
+           - mode = 'toeplitz': 
+                    lags_matrix is the symmetric Toeplitz matrix, with dimension = [N,N].
+
     :param kernel: kernel = {exp, rbf, polynomial, sigmoid, linear, euclid, minkowsky, thin_plate, bump, polymorph}
     :param kpar: kernel parameter, depends on the kernel type
     :param lags: number of lags (N//2 dy default of `None`)
     :param return_base: if true, than lags matrix will be also returned
     :param normalization: if True, than matrix mean will be substructed
-    :return: > ret_base is False: * kernel matrix: 2d ndarray.
-             > ret_base is True:  * matrix: 2d ndarray, kernel matrix.
-                                  * lags_matrix: lags matrix.
-    **Note** Selection of kernel function: Different kernel functions are suitable for different application scenarios.
-             For example, the RBF kernel is suitable for processing Gaussian distributed data, while the polynomial kernel is suitable for data with polynomial relationships.
-             Normalization: Normalization can reduce the scale difference of the kernel matrix, making it more suitable for subsequent analysis.
-             Adjustment of the number of lags: If the input signal is short, you may need to adjust the value of lags to avoid generating an overly large lag matrix.
+    :return: 
+        - ret_base is False: 
+            * kernel matrix: 2d ndarray.
+        -  ret_base is True:  
+            * matrix: 2d ndarray, kernel matrix.
+            * lags_matrix: lags matrix.
+
+    :Note:
+        Selection of kernel function: Different kernel functions are suitable for different application scenarios.
+        For example, the RBF kernel is suitable for processing Gaussian distributed data, while the polynomial kernel is suitable for data with polynomial relationships.
+        Normalization: Normalization can reduce the scale difference of the kernel matrix, making it more suitable for subsequent analysis.
+        Adjustment of the number of lags: If the input signal is short, you may need to adjust the value of lags to avoid generating an overly large lag matrix.
     """
     # Adjust the input data format to prevent errors
     x = np.asarray(x)

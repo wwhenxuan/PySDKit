@@ -19,6 +19,7 @@ lmd.lmd
    :private-members:
    :special-members:
    :show-inheritance: 
+   :exclude-members: __dict__
 
 lmd.rlmd
 -----------------------------
@@ -30,3 +31,4 @@ lmd.rlmd
    :private-members:
    :special-members:
    :show-inheritance: 
+   :exclude-members: __dict__

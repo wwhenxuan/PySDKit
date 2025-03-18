@@ -110,11 +110,13 @@ html_theme_options = {
         "version_match": "dev" if "dev" in version else version,
     },
     "show_version_warning_banner": True,
-    # Secondary_sidebar_items
+    # Secondary_sidebar
     "secondary_sidebar_items": {
     "**": ["page-toc", "sourcelink"],
     "index": [],
     },
+    "show_toc_level": 4,
+    "collapse_navigation": True,
     # Footer
     "footer_start": ["copyright"],
     "footer_end": ["sphinx-version", "theme-version"],

@@ -1,52 +1,46 @@
 pysdkit.data
 ====================
 
+.. automodule:: pysdkit.data
+
 .. autosummary::
    :nosignatures:
 
+   pysdkit.data._time_series
    pysdkit.data._add_noise
    pysdkit.data._cube
    pysdkit.data._generator
    pysdkit.data._image
-   pysdkit.data._time_series
 
-data.add\_noise module
+data.\_time\_series
+-----------------------
+
+.. automodule:: pysdkit.data._time_series
+   :members: generate_time_series
+
+data.add\_noise
 -----------------------
 
 .. automodule:: pysdkit.data._add_noise
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :members: add_noise
 
-data.cube module
+data.cube
 -----------------
 
 .. automodule:: pysdkit.data._cube
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :members: test_univariate_cube , test_multivariate_cube
 
-data.generator module
+data.generator
 ----------------------
 
 .. automodule:: pysdkit.data._generator
    :members:
    :undoc-members:
-   :show-inheritance:
+   :exclude-members: test_1D_1 , test_1D_2 , test_1D_3 , test_multivariate_1D_1 , test_multivariate_1D_2 , test_multivariate_1D_3
 
-data.image module
+data.image
 ------------------
 
 .. automodule:: pysdkit.data._image
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-data.time\_series module
--------------------------
-
-.. automodule:: pysdkit.data._time_series
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   :members: test_grayscale , test_univariate_image , test_multivariate_image
 

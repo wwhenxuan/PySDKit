@@ -26,6 +26,8 @@ vmd.vmd_c
    :undoc-members:
    :private-members:
    :special-members:
+   :show-inheritance:
+   :exclude-members: __dict__
 
 vmd.mvmd
 ---------------------------
@@ -36,6 +38,8 @@ vmd.mvmd
    :undoc-members:
    :private-members:
    :special-members:
+   :show-inheritance:
+   :exclude-members: __dict__
 
 vmd.acmd
 ---------------------------
@@ -46,3 +50,5 @@ vmd.acmd
    :undoc-members:
    :private-members:
    :special-members:
+   :show-inheritance:
+   :exclude-members: __dict__

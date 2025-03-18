@@ -17,18 +17,15 @@ def diagonal_average(
     and you can choose whether to calculate the average value of the diagonal elements.
     The function returns a one-dimensional array representing the processed result.
 
-    :param matrix: 2D ndarray,
-        The input matrix to be averaged.
-    :param reverse: bool,
-        If True, diagonals are taken in reverse order (from the bottom-right to the top-left).
-    :param samesize: bool,
-        If True, only diagonals from the main to the leftmost are taken.
-    :param averaging: bool,
-        If True, the mean value of each diagonal is taken; otherwise, the sum is taken.
+    :param 2D_ndarray matrix: The input matrix to be averaged.
+    :param bool reverse: If True, diagonals are taken in reverse order (from the bottom-right to the top-left).
+    :param bool samesize: If True, only diagonals from the main to the leftmost are taken.
+    :param bool averaging: If True, the mean value of each diagonal is taken; otherwise, the sum is taken.
     :return vector: 1D ndarray,
         The resulting vector after diagonal averaging.
 
-    **Note**
+    :Note:
+    
     * If samesize = False:
         - If reverse = False, diagonals from the bottom-left to the top-right are taken.
         - If reverse = True, diagonals from the bottom-right to the top-left are taken.
@@ -95,17 +92,15 @@ def get_diagonal(
     The function also supports reverse extraction of diagonals,
     that is, starting from the lower right corner of the matrix.
 
-    :param matrix: 2D ndarray,
-        The input matrix from which the diagonal is extracted.
-    :param idx: int,
-        The index of the diagonal relative to the main diagonal (zero diagonal).
-        Positive indices are to the right of the main diagonal, and negative indices are to the left.
-    :param reverse: bool,
-        If True, extract the diagonal in reverse order (from the bottom-right to the top-left).
+    :param 2D_ndarray matrix: The input matrix from which the diagonal is extracted.
+    :param int idx: The index of the diagonal relative to the main diagonal (zero diagonal).
+                    Positive indices are to the right of the main diagonal, and negative indices are to the left.
+    :param bool reverse: If True, extract the diagonal in reverse order (from the bottom-right to the top-left).
     :return diag: 1D ndarray,
         The extracted diagonal elements.
 
-    Notes
+    :Notes:
+
     * If reverse = False:
         - idx = 0: main diagonal
         - idx > 0: diagonals to the left of the main diagonal
@@ -115,7 +110,8 @@ def get_diagonal(
         - idx > 0: diagonals to the right of the main backward diagonal
         - idx < 0: diagonals to the left of the main backward diagonal
 
-    Example
+    :Example:
+    
     >>> a = [1, 2, 3, 4, 5]
     >>> b = signals.matrix.toeplitz(a)[:3, :]
     >>> print(b)

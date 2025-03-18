@@ -19,6 +19,7 @@ vmd2d.vmd2d
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 cvmd2d.cvmd2d
 -----------------------------
@@ -30,3 +31,4 @@ cvmd2d.cvmd2d
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__

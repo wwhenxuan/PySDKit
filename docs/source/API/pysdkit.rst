@@ -1,7 +1,7 @@
 pysdkit
 ================
 
-A Python library for signal decomposition algorithms
+**A Python library for signal decomposition algorithms**
 
 
 Subpackages
@@ -21,7 +21,6 @@ Subpackages
    pysdkit._vncmd
    pysdkit.data
    pysdkit.entropy
-   pysdkit.hht
    pysdkit.plot
    pysdkit.tsa
    pysdkit.utils  

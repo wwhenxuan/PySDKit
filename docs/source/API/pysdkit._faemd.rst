@@ -20,6 +20,7 @@ faemd.faemd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 faemd.faemd2d
 -----------------------------
@@ -31,6 +32,7 @@ faemd.faemd2d
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 faemd.faemd3d
 -----------------------------
@@ -42,3 +44,4 @@ faemd.faemd3d
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__

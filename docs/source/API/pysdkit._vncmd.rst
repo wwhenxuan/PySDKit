@@ -19,6 +19,7 @@ vncmd.vncmd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
 
 vncmd.incmd
 -----------------------------
@@ -30,3 +31,4 @@ vncmd.incmd
    :private-members:
    :special-members:
    :show-inheritance:
+   :exclude-members: __dict__
