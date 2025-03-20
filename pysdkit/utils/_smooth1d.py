@@ -12,6 +12,7 @@ from scipy.signal import savgol_filter
 def simple_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndarray:
     """
     Simple Moving Average
+
     :param signal: Input signal (numpy array)
     :param window_size: Window size for averaging (default is 2)
     :return: Smoothed signal (numpy array)
@@ -22,6 +23,7 @@ def simple_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndarra
 def weighted_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndarray:
     """
     Weighted Moving Average
+
     :param signal: Input signal (numpy array)
     :param window_size: Window size for averaging (default is 2)
     :return: Smoothed signal (numpy array)
@@ -33,6 +35,7 @@ def weighted_moving_average(signal: np.ndarray, window_size: int = 2) -> np.ndar
 def gaussian_smoothing(signal: np.ndarray, sigma: int = 2) -> np.ndarray:
     """
     Gaussian Filtering Smoothing
+
     :param signal: Input signal (numpy array)
     :param sigma: Standard deviation for Gaussian kernel (default is 2)
     :return: Smoothed signal (numpy array)
@@ -45,6 +48,7 @@ def savgol_smoothing(
 ) -> np.ndarray:
     """
     Savitzky-Golay Filtering Smoothing
+
     :param signal: Input signal (numpy array)
     :param window_length: Length of the filter window (default is 11, must be odd)
     :param poly_order: Order of the polynomial used to fit the samples (default is 2)
@@ -57,6 +61,7 @@ def savgol_smoothing(
 def exponential_smoothing(signal: np.ndarray, alpha: float = 0.4) -> np.ndarray:
     """
     Exponential Smoothing (Single Exponential Smoothing)
+    
     :param signal: Input signal (numpy array)
     :param alpha: Smoothing factor, range from 0 to 1 (default is 0.4)
     :return: Smoothed signal (numpy array)

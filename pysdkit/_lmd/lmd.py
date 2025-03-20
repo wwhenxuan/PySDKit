@@ -18,6 +18,7 @@ class LMD(object):
     Digital Signal Processing, vol. 87, Elsevier BV, Apr. 2019, pp. 166–77, doi:10.1016/j.dsp.2019.01.024.
 
     Python code: https://github.com/shownlin/PyLMD
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/107829-local-mean-decomposition?s_tid=srchtitle
     """
 
@@ -273,6 +274,7 @@ class LMD(object):
     def fit_transform(self, signal: np.ndarray, K: Optional[int] = None) -> np.ndarray:
         """
         Signal decomposition using Local Mean Decomposition (LMD) algorithm
+        
         :param signal: the time domain signal (1D numpy array)  to be decomposed
         :param K: the maximum number of IFMs to be decomposed
         :return: IMFs

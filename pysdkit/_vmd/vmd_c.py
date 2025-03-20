@@ -14,14 +14,17 @@ from pysdkit.plot import plot_IMFs
 class VMD(Base):
     """
     Variational mode decomposition, object-oriented interface.
+
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
     IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
 
     The goal of VMD is to decompose the input signal into a series of modes with sparse characteristics.
     The sparse characteristics here refer to the fact that all modes are narrowband signals concentrated near their respective center frequencies.
+
     To achieve this goal, VMD constructs a constrained variational optimization problem,
     in which the objective function is to minimize the bandwidth of all modes,
     and the constraint condition is that the decomposed modes can completely reconstruct the input signal.
+
     The construction of the VMD objective function is divided into three steps:
     1) Perform Hilbert transform on each mode to obtain its analytical signal;
     2) Shift the spectrum of the analytical signal to zero intermediate frequency to obtain the baseband signal;
@@ -33,7 +36,9 @@ class VMD(Base):
     VMD abandons the iterative strategy and transforms the decomposition into an optimization problem.
 
     Our code: https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/vmd/vmd_c.py
+
     Python code: https://github.com/vrcarva/vmdpy
+
     MATLAB code: https://www.mathworks.com/help/wavelet/ref/vmd.html
     """
 
@@ -115,6 +120,7 @@ class VMD(Base):
     ) -> None:
         """
         An easy way to visualize signal decomposition results
+
         :param max_imf: The number of decomposition modes to be plotted
         :param colors: List of color strings for plotting
         :param save_figure: Whether to save the figure as an image
@@ -146,12 +152,13 @@ class VMD(Base):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using VMD algorithm
+
         :param signal: the time domain signal (1D numpy array) to be decomposed
         :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes,
                            True plus the spectra of the modes and the estimated mode center-frequencies
-        :return:  u       - the collection of decomposed modes,
-                  u_hat   - spectra of the modes,
-                  omega   - estimated mode center-frequencies
+        :return: - u     - the collection of decomposed modes,
+                 - u_hat - spectra of the modes,
+                 - omega - estimated mode center-frequencies
         """
         if len(signal) % 2 == 1:
             signal = signal[:-1]

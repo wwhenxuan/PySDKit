@@ -14,7 +14,9 @@ class MVMD(Base):
     Multivariate Variational mode decomposition, object-oriented interface.
     ur Rehman, Naveed and Aftab, Hania (2019) 'Multivariate Variational Mode Decomposition',
     IEEE Transactions on Signal Processing, 67(23), pp. 6039–6052.
+
     Python code: https://github.com/yunyueye/MVMD
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/72814-multivariate-variational-mode-decomposition-mvmd
     """
 
@@ -30,6 +32,7 @@ class MVMD(Base):
     ) -> None:
         """
         Multivariate Variational Mode Decomposition (MVMD) algorithm.
+
         :param alpha: float
             The balancing parameter of the data-fidelity constraint, controlling the trade-off
             between the smoothness of the modes and the accuracy of the reconstruction.
@@ -51,6 +54,7 @@ class MVMD(Base):
             across iterations is below this threshold. Typically around 1e-6 to 1e-7. Defaults to 1e-7.
         :param max_iter: int, optional
             Maximum number of iterations if convergence is not reached. Defaults to 100.
+            
         Attributes:
         -----------
         DTYPE : numpy.dtype
@@ -100,11 +104,12 @@ class MVMD(Base):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Multivariate signal decomposition using MVMD algorithm
+
         :param signal: the time domain signal (ndarray) to be decomposed
         :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes
-        :return:  u       - the collection of decomposed modes, shape: [K, length, num_channels]
-                  u_hat   - spectra of the modes,
-                  omega   - estimated mode center-frequencies
+        :return: - u     - the collection of decomposed modes, shape: [K, length, num_channels]
+                 - u_hat - spectra of the modes,
+                 - omega - estimated mode center-frequencies
         """
 
         # Get the number of channels and the length of the input signal

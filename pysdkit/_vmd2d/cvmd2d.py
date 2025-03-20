@@ -20,6 +20,7 @@ class CVMD2D(object):
     Spatially Compact and Spectrally Sparse Image Decomposition and Segmentation.
     Decomposing multidimensional signals, such as images, into spatially compact,
     potentially overlapping modes of essentially wavelike nature makes these components accessible for further downstream analysis.
+    
     This decomposition enables space-frequency analysis, demodulation, estimation of local orientation, edge and corner detection,
     texture analysis, denoising, inpainting, or curvature estimation.
 
@@ -59,8 +60,11 @@ class CVMD2D(object):
     ) -> None:
         """
         Please note that this algorithm is very sensitive to hyperparameters.
+
         When using it, please try multiple configurations based on the input image features.
+
         You can try the VMD2D algorithm instead of the complex hyperparameter configuration of the algorithm.
+
         :param K: the number of modes to be recovered
         :param alpha: narrowbandedness of subsignals coefficient (scalar)
         :param beta: L1 penalty coefficient of spatial mode support (scalar)
@@ -179,6 +183,7 @@ class CVMD2D(object):
 
         Please note that this algorithm is very sensitive to hyperparameters.
         Please try multiple configurations based on the input image features.
+
         You can try the VMD2D algorithm instead of the complex hyperparameter configuration of the algorithm.
         """
 

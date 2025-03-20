@@ -28,7 +28,9 @@ class CEEMDAN(object):
     Prague, Czech Republic, 2011, pp. 4144-4147, doi: 10.1109/ICASSP.2011.5947265.
 
     Python code: https://github.com/mariogrune/MEMD-Python-
+
     MATLAB code: http://www.commsp.ee.ic.ac.uk/~mandic/research/emd.htm
+
     Word "complete" presumably refers to decomposing completely everything, even added perturbation (noise).
     """
 
@@ -239,6 +241,7 @@ class CEEMDAN(object):
     ) -> np.ndarray:
         """
         Vanilla Empirical Mode Decomposition method
+
         Perform the specified EMD algorithm to obtain the corresponding signal decomposition results.
         """
         return self.EMD.fit_transform(signal=signal, time=time, max_imfs=max_imfs)
@@ -246,6 +249,7 @@ class CEEMDAN(object):
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and residue from recently analysed signal
+
         :return: obtained IMFs and residue through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -258,9 +262,11 @@ class CEEMDAN(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
+
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).
+
         :return: obtained IMFs and main trend through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -281,7 +287,9 @@ class CEEMDAN(object):
     ) -> bool:
         """
         Test for end condition for CEEMDAN method.
+
         The algorithm's performance can be enhanced by adjusting the decomposition parameters.
+
         :param signal: the original input signal as a numpy ndarray
         :param cIMFs: the signal decomposition results
         :param max_imf: the maximum number of IMFs obtained
@@ -325,6 +333,7 @@ class CEEMDAN(object):
     ) -> np.ndarray:
         """
         Perform the CEEMDAN method for signal decomposition.
+        
         :param signal: the original signal on which CEEMDAN is to be performed
         :param time: the time array of the original input signal
         :param max_imfs: the maximum number of components to extract

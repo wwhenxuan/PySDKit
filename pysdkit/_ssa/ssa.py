@@ -42,6 +42,7 @@ class SSA(object):
     ) -> None:
         """
         Estimation the signal components based on the Singular Spectral Analysis (SSA) algorithm
+
         :param K: order of the model (number of valuable components, size of signal subspace)
         :param mode: the mode of lags matrix (i.e. trajectory (or caterpillar) matrix or its analouge), mode = {traj, full, covar, toeplitz, hankel}
         :param lags: number of lags in correlation function (x.shape[0]//2 by default)
@@ -67,6 +68,7 @@ class SSA(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Execute the Singular Spectral Analysis (SSA) algorithm to perform signal decomposition
+        
         :param signal: input signal of 1D ndarray
         :return: the decomposed results of IMFs
         """

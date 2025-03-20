@@ -28,6 +28,7 @@ class TVF_EMD(object):
     Signal Processing 138 (2017): 146-158.
 
     Python code: https://github.com/stfbnc/pytvfemd/tree/master
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/63300-time-varying-filter-based-empirical-mode-decomposition-tvf-emd
     """
 
@@ -263,6 +264,7 @@ class TVF_EMD(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Execute the Time Varying Filter based Empirical Mode Decomposition algorithm
+        
         :param signal: 1D numpy ndarray signal to be decomposed
         :return: IMF decomposition [num_imf, seq_len]
         """

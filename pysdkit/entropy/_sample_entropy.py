@@ -29,6 +29,7 @@ def sample_entropy(
     American Journal of Physiology-Heart and Circulatory Physiology, 278(6), H2039-H2049.
 
     MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/69381-sample-entropy?s_tid=FX_rc3_behav
+
     :param y: The input 1D signal or time series with numpy ndarray vector with dims. [1xN]
     :param m: Embedding dimension (m < N) less than the length of the 1D inputs.
     :param r: Tolerance (percentage applied to the SD).
@@ -115,13 +116,14 @@ def multiscale_sample_entropy(
     Published on 18 February 2005 in Phys. Rev. E 71, 021906.
 
     MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/62706-multiscale-sample-entropy
+
     :param x: (array): Input time series (1D array).
     :param m: (int): Embedding dimension (default 2).
     :param r: (float): Tolerance (default 0.15).
     :param tau: (int): Time delay for coarse-graining (default 1).
-    :return: e (float): Multiscale Sample Entropy.
-             A (int): Number of matching (m+1)-element sequences.
-             B (int): Number of matching m-element sequences.
+    :return: - e (float): Multiscale Sample Entropy.
+             - A (int): Number of matching (m+1)-element sequences.
+             - B (int): Number of matching m-element sequences.
     """
     # Coarse-graining of the signal
     # y = np.mean(np.reshape(x, (-1, tau)), axis=1)

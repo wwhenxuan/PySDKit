@@ -23,6 +23,7 @@ def vmd(
     Variational mode decomposition, object-oriented interface.
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
     IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
+
     :param signal: the time domain signal (1D numpy array)  to be decomposed
     :param alpha: the balancing parameter of the data-fidelity constraint
     :param K: the number of modes to be recovered
@@ -33,9 +34,10 @@ def vmd(
     :param DC: true if the first mode is put and kept at DC (0-freq)
     :param max_iter: Maximum number of iterations
     :param tol: tolerance of convergence criterion; typically around 1e-6
-    :return: u - the collection of decomposed modes,
-             u_hat   - spectra of the modes,
-             omega   - estimated mode center-frequencies
+
+    :return: - u - the collection of decomposed modes,
+             - u_hat   - spectra of the modes,
+             - omega   - estimated mode center-frequencies
     """
 
     if len(signal) % 2:

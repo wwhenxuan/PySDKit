@@ -28,7 +28,7 @@ def plot_images(
     The `spectrum` variable controls whether to visualize the time domain
     The `colorbar` variable controls whether to add a color bar
 
-    :param img: The input images，which shape are [height, width]或[n_vars, height, width]
+    :param img: The input images,which shape are [height, width]或[n_vars, height, width]
     :param spectrum: bool, Whether to draw the spectrum image of fast Fourier transform at the same time
     :param dpi: The resolution at which the image is drawn
     :param cmap: The colormap to use, defaults is `colorwarm`

@@ -7,7 +7,7 @@ Created on 2025/02/01 22:33:51
 import numpy
 
 
-class MD_FAEMD(object):
+class FAEMD2D(object):
     """
     Multidimensional Fast and Adaptive Empirical Mode Decomposition
 
@@ -28,7 +28,7 @@ class MD_FAEMD(object):
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
         return (
-            "Multidimensional Fast and Adaptive Empirical Mode Decomposition (MD_FAEMD)"
+            "Multidimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD2D)"
         )
 
     def fit_transform(self):

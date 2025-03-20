@@ -1,3 +1,28 @@
+__all__ = [
+    "EMD",
+    "EEMD",
+    "CEEMDAN",
+    "REMD",
+    "MEMD",
+    "TVF_EMD",
+    "FAEMD",
+    "HVD",
+    "ITD",
+    "LMD",
+    "RLMD",
+    "SSA",
+    "vmd",
+    "VMD",
+    "ACMD",
+    "MVMD",
+    "CVMD2D",
+    "VNCMD",
+    "INCMD",
+    "ewt",
+    "EWT",
+    "Moving_Decomp",
+]
+
 # 经验模态分解算法
 from ._emd import EMD
 
@@ -15,6 +40,9 @@ from ._emd import MEMD
 
 # 基于时变滤波器的经验模态分解
 from ._emd import TVF_EMD
+
+# 快速自适应经验模态分解
+from ._faemd import FAEMD
 
 # 希尔伯特震动分解
 from ._hvd import HVD

@@ -21,6 +21,7 @@ from typing import Optional, Tuple, List
 class Moving_Decomp(object):
     """
     Moving Average decomposition.
+
     The 1D signal is decomposed into two parts, trend and cycle, by sliding average.
     This method is very simple and very suitable for processing non-stationary time series data.
     """
@@ -35,6 +36,7 @@ class Moving_Decomp(object):
     ) -> None:
         """
         The input signal is decomposed by sliding average to obtain the trend and cycle parts.
+
         :param window_size: The window size of the sliding average decomposition is preferably an odd number
         :param method: Sliding decomposition method, optional ["simple", "weighted", "gaussian", "savgol", "exponential"]
         :param sigma: Standard deviation for Gaussian kernel (default is 2)
@@ -69,6 +71,7 @@ class Moving_Decomp(object):
         """
         Execute a sliding average decomposition algorithm.
         The input signal must be a univariate signal.
+
         For multivariate signals, multiple calls are required to decompose
 
         :param signal: the input univariate signal of 1D numpy ndarray
@@ -105,6 +108,7 @@ class Moving_Decomp(object):
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Execute the moving average decomposition algorithm
+
         :param signal: the input univariate or multivariate signal of 1D numpy ndarray
         :param methods_list: If it is a multivariate signal or a multivariate time series,
                              a different sliding average method needs to be used for the signal of each channel.
@@ -169,6 +173,7 @@ class Moving_Decomp(object):
     ) -> Optional[plt.Figure]:
         """
         Visualize the decomposition results of the input signal
+        
         :param signal: The input 1D signal of numpy ndarray
         :param trend: The trend of the input 1D signal decomposed by `Moving_Decomp`
         :param seasonality: The seasonality of the input 1D signal decomposed by `Moving_Decomp`

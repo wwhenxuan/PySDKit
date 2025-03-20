@@ -1,0 +1,92 @@
+html[data-theme=light] {
+  --pst-color-primary: #91a9f6;
+  --pst-color-primary-bg: #f9f9f9;
+  --pst-color-secondary: #8045e5;
+  --pst-color-secondary-bg: #e0c7ff;
+  --pst-color-accent: #c132af;
+  --pst-color-accent-bg: #f8dff5;
+  --pst-color-info: #276be9;
+  --pst-color-info-bg: #dce7fc;
+  --pst-color-warning: #f66a0a;
+  --pst-color-warning-bg: #f8e3d0;
+  --pst-color-success: #00843f;
+  --pst-color-success-bg: #d6ece1;
+  --pst-color-attention: var(--pst-color-warning);
+  --pst-color-attention-bg: var(--pst-color-warning-bg);
+  --pst-color-danger: #d72d47;
+  --pst-color-danger-bg: #f9e1e4;
+  --pst-color-text-base: #222832;
+  --pst-color-text-muted: #48566b;
+  --pst-color-shadow: rgba(0, 0, 0, 0.1);
+  --pst-color-border: #d1d5da;
+  --pst-color-border-muted: rgba(23, 23, 26, 0.2);
+  --pst-color-blockquote-notch: #677384;
+  --pst-color-inline-code: #912583;
+  --pst-color-inline-code-links: #085d6c;
+  --pst-color-target: #f3cf95;
+  --pst-color-table: #14181e;
+  --pst-color-table-row-hover-bg: #d5b4fd;
+  --pst-color-table-inner-border: #e5e7ea;
+  --pst-color-background: #fefefe;
+  --pst-color-on-background: #9cccf8;
+  --pst-color-surface: #d8e8f8;
+  --pst-color-on-surface: #222832;
+  color-scheme: light;
+}
+html[data-theme=light] {
+  --pst-color-heading: var(--pst-color-text-base);
+  --pst-color-link: var(--pst-color-primary);
+  --pst-color-link-hover: var(--pst-color-secondary);
+  --pst-color-table-outer-border: var(--pst-color-surface);
+  --pst-color-table-heading-bg: var(--pst-color-surface);
+  --pst-color-table-row-zebra-high-bg: var(--pst-color-on-background);
+  --pst-color-table-row-zebra-low-bg: var(--pst-color-surface);
+}
+html[data-theme=light] .only-dark,
+html[data-theme=light] .only-dark ~ figcaption {
+  display: none !important;
+}
+
+html[data-theme=dark] {
+  --pst-color-primary: #3fb1c5;
+  --pst-color-primary-bg: #042c33;
+  --pst-color-secondary: #9c5ffd;
+  --pst-color-secondary-bg: #341a61;
+  --pst-color-accent: #e47fd7;
+  --pst-color-accent-bg: #46123f;
+  --pst-color-info: #79a3f2;
+  --pst-color-info-bg: #06245d;
+  --pst-color-warning: #ff9245;
+  --pst-color-warning-bg: #652a02;
+  --pst-color-success: #5fb488;
+  --pst-color-success-bg: #002f17;
+  --pst-color-attention: var(--pst-color-warning);
+  --pst-color-attention-bg: var(--pst-color-warning-bg);
+  --pst-color-danger: #e78894;
+  --pst-color-danger-bg: #4e111b;
+  --pst-color-text-base: #ced6dd;
+  --pst-color-text-muted: #9ca4af;
+  --pst-color-shadow: rgba(0, 0, 0, 0.2);
+  --pst-color-border: #48566b;
+  --pst-color-border-muted: #29313d;
+  --pst-color-blockquote-notch: #9ca4af;
+  --pst-color-inline-code: #f3c7ee;
+  --pst-color-inline-code-links: #3fb1c5;
+  --pst-color-target: #675c04;
+  --pst-color-table: #ffffff;
+  --pst-color-table-row-hover-bg: #4b258f;
+  --pst-color-table-inner-border: #364150;
+  --pst-color-background: #14181e;
+  --pst-color-on-background: #222832;
+  --pst-color-surface: #29313d;
+  --pst-color-on-surface: #f3f4f5;
+  /* Adjust images in dark mode (unless they have class .only-dark or
+   * .dark-light, in which case assume they're already optimized for dark
+   * mode).
+   */
+  /* Give images a light background in dark mode in case they have
+  *  transparency and black text (unless they have class .only-dark or .dark-light, in
+  *  which case assume they're already optimized for dark mode).
+  */
+  color-scheme: dark;
+}

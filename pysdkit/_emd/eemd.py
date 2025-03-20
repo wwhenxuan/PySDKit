@@ -21,12 +21,15 @@ from pysdkit.utils import get_timeline
 class EEMD(object):
     """
     Ensemble Empirical Mode Decomposition
+
     Ensemble empirical mode decomposition (EEMD) [Wu2009] is noise-assisted technique, which is meant to be more robust
     than simple Empirical Mode Decomposition (EMD). The robustness is checked by performing many decompositions on signals slightly
     perturbed from their initial position. In the grand average over all IMF results the noise will cancel each other out and the result is pure decomposition.
     Wu, Zhaohua, and Norden E. Huang. "Ensemble empirical mode decomposition: a noise-assisted data analysis method."
     Advances in adaptive data analysis 1.01 (2009): 1-41.
+
     Python code: https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EEMD.py
+
     MATLAB code: https://www.mathworks.com/help/signal/ref/emd.html
     """
 
@@ -110,8 +113,10 @@ class EEMD(object):
     ) -> np.ndarray:
         """
         Generate noise with specified standard deviation and size.
+
         The choice of noise is in ["normal", "uniform"],
         where normal has a standard deviation equal to scale and uniform has a range of [-scale / 2, scale / 2].
+
         :param scale: The width for the noise distribution.
         :param size: The size of the noise ndarray.
         :return: The generated white noise ndarray.
@@ -129,6 +134,7 @@ class EEMD(object):
     def _update_trial(self, trial) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """
         A single trial evaluation, i.e., EMD(signal + noise).
+
         *Note*: Although the `trial` argument isn't used, it's needed for the (multiprocessing) map method.
         """
         # Generate noise sequence
@@ -150,6 +156,7 @@ class EEMD(object):
     ) -> np.ndarray:
         """
         Vanilla Empirical Mode Decomposition method
+
         Perform the specified EMD algorithm to obtain the corresponding signal decomposition results
         """
         return self.EMD.fit_transform(signal=signal, time=time, max_imfs=max_imfs)
@@ -174,6 +181,7 @@ class EEMD(object):
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and residue from recently analysed signal
+
         :return: obtained IMFs and residue through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -186,9 +194,11 @@ class EEMD(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
+
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).
+
         :return: obtained IMFs and main trend through EMD
         """
         if self.imfs is None or self.residue is None:
@@ -213,11 +223,13 @@ class EEMD(object):
     ) -> np.ndarray:
         """
         Perform Ensemble Empirical Mode Decomposition for the input signal
+
         :param signal: input ndarray signal to be decomposed
         :param time: time array for the signal
         :param max_imfs: The number of imf decomposed
         :param progress: the number of multiple processes
         :return: Set of ensemble IMFs produced from input signal of ndarray
+        
         In general, these do not have to be, and most likely will not be, same as IMFs produced using EMD
         """
         # The length of the input signal

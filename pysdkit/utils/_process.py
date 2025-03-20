@@ -3,7 +3,9 @@
 Created on Sat Mar 5 21:57:53 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
 The following code is mainly used to find extreme points in the EMD algorithm
+
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 import numpy as np
@@ -32,7 +34,8 @@ def smallest_inclusive_dtype(ref_dtype: np.dtype, ref_value) -> np.dtype:
     """
     Determines the smallest numpy dtype that can include a specified reference value,
     maintaining the base type (integer or float) of the reference dtype.
-    ValueError: If the requested range exceeds the maximum limits of available numpy data types.
+
+    :ValueError: If the requested range exceeds the maximum limits of available numpy data types.
 
     :param ref_dtype: The reference dtype, used to select the base type (i.e., int or float) for the returned type.
     :param ref_value: A value which needs to be included in the returned dtype's range.
@@ -67,7 +70,9 @@ def smallest_inclusive_dtype(ref_dtype: np.dtype, ref_value) -> np.dtype:
 def normalize_signal(t: np.ndarray) -> np.ndarray:
     """
     Normalize time array so that it doesn't explode on tiny values.
+
     Returned array starts with 0 and the smallest increase is by 1.
+
     :param t: Input 1D Signal - Numpy Array
     :return: Output 1D Signal after normalize - Numpy Array
     """
@@ -80,6 +85,7 @@ def normalize_signal(t: np.ndarray) -> np.ndarray:
 def common_dtype(x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Casts inputs (x, y) into a common numpy DTYPE.
+
     :param x: Input 1D Signal 1 - Numpy Array
     :param y: Input 1D Signal 2 - Numpy Array
     :return: Output two array with same common dtype - Numpy Array
@@ -97,10 +103,12 @@ def common_dtype(x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 def not_duplicate(ts: np.ndarray) -> np.ndarray:
     """
     Returns indices for not repeating values, where there is no extremum.
+
     This feature is particularly important for extreme value detection and data simplification in signal processing,
     and can help avoid double calculations of consecutive repeated values in extreme value detection and other analyses.
     For example, when determining which points should be used to calculate the envelope in the EMD algorithm,
     continuously repeated data points can be excluded, thereby improving calculation efficiency and accuracy.
+    
     :param ts: Input 1D Signal 1 - Numpy Array
     :return: Index of distinct values in array
     """
