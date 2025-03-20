@@ -104,6 +104,7 @@ class INCMD(object):
 
         # Initial frequency estimate by welch method
         f_0 = self._welch_method_estimate(signal=signal, time=time)
+        f_bar, g = None, None
 
         # Initialize phi matrices
         phi_1 = self._compute_new_phi_1(new_f=f_0, time=time)
@@ -179,13 +180,15 @@ class INCMD(object):
     def _compute_new_g(
         signal: np.ndarray, phi: np.ndarray, g_factor: np.ndarray
     ) -> np.ndarray:
-        # Compute the phi^T phi term (which, for diagonal phi is diag(phi) squared)
+        """Compute the phi^T phi term (which, for diagonal phi is diag(phi) squared)"""
         phi_diagonal = phi.data[0, :]
         phi_square_diag = phi_diagonal * phi_diagonal
+
         # Compute the new mode
         new_G_A = g_factor + diags(phi_square_diag, format="csc")
         new_G_b = phi @ signal
         new_G = spsolve(new_G_A, new_G_b)
+
         # new_G = new_G.flatten() # Commented this out because flatten seemed to densify this sparse matrix (bad for memory)
         return new_G
 
@@ -194,6 +197,7 @@ class INCMD(object):
         phi_1: np.ndarray, g_d1: np.ndarray, phi_2: np.ndarray, g_d2: np.ndarray
     ) -> np.ndarray:
         """Compute and return the estimated signal from mode g_k"""
+
         # mode = np.dot(phi_1, g_d1) + np.dot(phi_2, g_d2)
         # mode = phi_1 @ g_d1 + phi_2 @ g_d2
         mode = phi_1.data[0, :] * g_d1 + phi_2.data[0, :] * g_d2
@@ -209,15 +213,19 @@ class INCMD(object):
     ) -> np.ndarray:
         """Get a new filter based on the input of the original filter"""
         dt = time[1] - time[0]
+
         # Compute gradients
         dg1dt = np.gradient(g1, dt)
         dg2dt = np.gradient(g2, dt)
+
         # Compute frequency step
         delta_f_num = (1 / (2 * np.pi)) * (g2 * dg1dt - g1 * dg2dt)
         delta_f_denom = g1**2 + g2**2
         delta_f = delta_f_num / delta_f_denom
+
         # And compute the frequency step vector
         step = f_filter @ delta_f
+
         # Finally, compute the vector of frequency steps
         new_f = old_f.reshape(-1, 1) + step.reshape(-1, 1)
         new_f = np.asarray(new_f).flatten()
