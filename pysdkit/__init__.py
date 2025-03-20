@@ -1,3 +1,9 @@
+"""
+A Python library for signal decomposition algorithms.
+"""
+
+__version__ = "0.4.15"
+
 __all__ = [
     "EMD",
     "EEMD",
@@ -21,6 +27,13 @@ __all__ = [
     "ewt",
     "EWT",
     "Moving_Decomp",
+    "data",
+    "entropy",
+    "hht",
+    "plot",
+    "tsa",
+    "utils",
+    "__version__",
 ]
 
 # 经验模态分解算法
