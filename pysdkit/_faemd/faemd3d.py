@@ -10,6 +10,7 @@ import numpy
 class FAEMD3D(object):
     """
     Multivariate Fast and Adaptive Empirical Mode Decomposition
+    
     Thirumalaisamy, Mruthun R., and Phillip J. Ansell.
     “Fast and Adaptive Empirical Mode Decomposition for Multidimensional, Multivariate Signals.”
     IEEE Signal Processing Letters, vol. 25, no. 10, Institute of Electrical and Electronics Engineers (IEEE),

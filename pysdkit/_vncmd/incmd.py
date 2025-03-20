@@ -46,8 +46,9 @@ class INCMD(object):
         """
         Initialize the parameters of the Iterative nonlinear chirp mode decomposition algorithm.
 
-        Note: This algorithm is very sensitive to parameters. If you are not satisfied with the decomposition effect,
-        please readjust the parameters `K`, `max_iter`, `mu` and `rho` to initialize the algorithm instance.
+        :Note: This algorithm is very sensitive to parameters. If you are not satisfied with the decomposition effect,
+               please readjust the parameters `K`, `max_iter`, `mu` and `rho` to initialize the algorithm instance.
+
         :param K: The number of intrinsic mode functions obtained by decomposition,
                   that is the number of sub-signals obtained by decomposition.
         :param max_iter: Maximum number of iterations within one mode decomposition
@@ -233,8 +234,9 @@ class INCMD(object):
         """
         Start executing the INCMD algorithm for signal decomposition.
 
-        Note: This algorithm is very sensitive to parameters. If you are not satisfied with the decomposition effect,
-        please readjust the parameters `K`, `max_iter`, `mu` and `rho` to initialize the algorithm instance.
+        :Note: This algorithm is very sensitive to parameters. If you are not satisfied with the decomposition effect,
+               please readjust the parameters `K`, `max_iter`, `mu` and `rho` to initialize the algorithm instance.
+               
         :param signal: The input numpy ndarray 1D univariate signal
         :param time: Timestamp array for the input signal,
                      initialized by the length of the signal if not specified explicitly

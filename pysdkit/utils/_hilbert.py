@@ -14,6 +14,7 @@ from typing import Optional
 def hilbert_transform(signal: np.ndarray) -> np.ndarray:
     """
     Apply the Hilbert transform to a given numpy signal.
+
     :param signal: NumPy array containing the input signal.
     :return: A NumPy array containing the analytical signal obtained from the Hilbert transform.
     """
@@ -38,6 +39,7 @@ def plot_hilbert(
 ) -> Optional[plt.figure]:
     """
     Plot the Hilbert transform of a signal
+
     :param signal: Original NumPy signal.
     :param analytical_signal: A NumPy array containing the analytical signal obtained from the Hilbert transform.
     :param return_figure: Whether to return the figure.
@@ -74,6 +76,7 @@ def plot_hilbert_complex_plane(
 ) -> plt.figure:
     """
     Plot the Hilbert transform of a signal on the complex plane.
+    
     :param analytical_signal: NumPy array containing the analytical signal (Hilbert transform of the original).
     :param return_figure: Whether to return the figure.
     :return: The plot figure or None.

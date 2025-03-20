@@ -1,0 +1,12 @@
+/* Additional styling for the PyData Sphinx theme. */
+
+/* Stack components in footer vertically. */
+.bd-footer .footer-items__end, .bd-footer .footer-items__start {
+  flex-direction: row;
+}
+
+
+
+.bd-page-width {
+  max-width: 88%;  /* default is 88rem */
+}

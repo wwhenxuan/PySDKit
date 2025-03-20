@@ -20,11 +20,13 @@ def generate_sin_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param frequency: Frequency of the sinusoidal component.
     :param rand_state: Random seed for the noise in signal.
+
     :return: Array of the Cosine signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
@@ -44,11 +46,13 @@ def generate_cos_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param frequency: Frequency of the sinusoidal component.
     :param rand_state: Random seed for the noise in signal.
+
     :return: Array of the Cosine signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
@@ -68,11 +72,13 @@ def generate_square_wave(
 ) -> Tuple[np.array, np.array]:
     """
     Generate a square wave signal with Gaussian noise.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param frequency: Frequency of the square wave component.
     :param rand_state: Random seed for the noise in signal.
+
     :return: Tuple containing time array and the square wave signal with noise.
     """
     np.random.seed(rand_state)
@@ -94,11 +100,13 @@ def generate_triangle_wave(
 ) -> Tuple[np.array, np.array]:
     """
     Generate a triangular wave signal with Gaussian noise.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param frequency: Frequency of the triangular wave component.
     :param rand_state: Random seed for the noise in signal.
+
     :return: Tuple containing time array and the triangular wave signal with noise.
     """
     np.random.seed(rand_state)  # Set random seed for reproducibility
@@ -121,11 +129,13 @@ def generate_sawtooth_wave(
 ) -> Tuple[np.array, np.array]:
     """
     Generate a sawtooth wave signal with Gaussian noise.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param frequency: Frequency of the sawtooth wave component.
     :param rand_state: Random seed for the noise in signal.
+
     :return: Tuple containing time array and the sawtooth wave signal with noise.
     """
     np.random.seed(rand_state)  # Set the random seed for reproducibility
@@ -147,6 +157,7 @@ def generate_am_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Generate an Amplitude Modulated (AM) signal with Gaussian noise.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
@@ -154,6 +165,7 @@ def generate_am_signal(
     :param modulating_freq: Frequency of the modulating signal.
     :param mod_index: Modulation index.
     :param rand_state: Random seed for the noise generation.
+
     :return: Tuple containing time array and the AM signal with noise.
     """
     np.random.seed(rand_state)  # Set the random seed for reproducibility
@@ -180,12 +192,14 @@ def generate_exponential_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Generate an exponentially decaying signal with Gaussian noise.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param decay_rate: Exponential decay rate (larger values decay faster).
     :param initial_amplitude: Initial amplitude of the signal.
     :param rand_state: Random seed for the noise generation.
+
     :return: Tuple containing time array and the exponentially decaying signal with noise.
     """
     np.random.seed(rand_state)  # Set the random seed for reproducibility
@@ -205,9 +219,11 @@ def test_univariate_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a one-dimensional univariate signal based on the input `case`
+
     :param case: the test number in [1, 2, 3]
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the generated signal.
     :return: the generated signal for univariate 1D.
     """
@@ -226,9 +242,12 @@ def test_univariate_signal(
 def test_1D_1(
     duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
-    """4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
+    """
+    4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the generated signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
@@ -249,8 +268,10 @@ def test_1D_2(
 ) -> Tuple[np.array, np.array]:
     """
     Generate 3 * 2 ^ (-t) * sin(sin(2 * pi * t))
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the 3 * 2 ^ (-t) * sin(sin(2 * pi * t)) signal.
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
@@ -271,10 +292,12 @@ def test_1D_3(
 ) -> Tuple[np.array, np.array]:
     """
     Generate 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t)
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param random_state: Random seed for the noise generation.
+
     :return: Tuple containing time array and the 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t) signal with noise.
     """
     np.random.seed(seed=random_state)
@@ -299,10 +322,12 @@ def test_emd(
 ) -> Tuple[np.array, np.array]:
     """
     Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for _emd test.
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param random_state: Random seed for the noise generation.
+
     :return: Tuple containing time array and the cos(22 * pi * t ^ 2) + 6 * t ^ 2 signal with noise.
     """
     np.random.seed(seed=random_state)
@@ -320,9 +345,11 @@ def test_multivariate_signal(
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a 1D multivariate signal based on the input `case`
+
     :param case: the test number in [1, 2, 3]
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the generated signal.
     :return: the generated signal for multivariate 1D.
     """
@@ -343,8 +370,10 @@ def test_multivariate_1D_1(
 ) -> Tuple[np.array, np.array]:
     """
     Generate some simple cosine and sine function for multivariate signal decomposition test
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len].
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
@@ -366,8 +395,10 @@ def test_multivariate_1D_2(
 ) -> Tuple[np.array, np.array]:
     """
     Generate four channels simple cosine and sine function for multivariate signal decomposition
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
+
     :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len].
     """
     np.random.seed(seed=42)
@@ -409,10 +440,12 @@ def test_multivariate_1D_3(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate some simple cosine function for multivariate signal decomposition test
+
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param random_state: Random seed for the noise generation.
+    
     :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len] with noise.
     """
     np.random.seed(seed=random_state)

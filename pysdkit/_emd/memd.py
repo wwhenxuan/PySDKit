@@ -23,13 +23,15 @@ class MEMD(object):
     Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences 466.2117 (2010): 1291-1302.
 
     G. Rilling, P. Flandrin and P. Goncalves, "On Empirical Mode Decomposition and its Algorithms", Proc of the IEEE-EURASIP
-     Workshop on Nonlinear Signal and Image Processing, NSIP-03, Grado (I), June 2003
+    Workshop on Nonlinear Signal and Image Processing, NSIP-03, Grado (I), June 2003
 
     N. E. Huang et al., "A confidence limit for the Empirical Mode Decomposition and Hilbert spectral analysis",
-     Proceedings of the Royal Society A, Vol. 459, pp. 2317-2345, 2003
+    Proceedings of the Royal Society A, Vol. 459, pp. 2317-2345, 2003
 
     Python code: https://github.com/mariogrune/MEMD-Python-
+
     MATLAB code: http://www.commsp.ee.ic.ac.uk/~mandic/research/emd.htm
+
     R code: https://rdrr.io/github/PierreMasselot/Library--emdr/man/memd.html
     """
 
@@ -43,6 +45,7 @@ class MEMD(object):
     ) -> None:
         """
         Initialize the Multivariate Empirical Mode Decomposition algorithm
+
         Note that this algorithm requires the dimension of the input signal to be greater than or equal to 3
 
         :param stop_crit: The criterion for stopping the algorithm iteration, you can choose ['stop', 'fix_h']
@@ -222,7 +225,9 @@ class MEMD(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Preform the Multivariate Empirical Mode Decomposition method.
+
         Please note that this method only works for signals with input dimension greater than or equal to 3
+
         (following the original MEMD MATLAB code)
         :param signal: the multivariate signal of numpy ndarray
         :return: the decomposed signal results
@@ -349,9 +354,9 @@ def local_peaks(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     :return indmax: 1D ndarray,
         Indices of the detected local maxima.
 
-    Notes
-    * This function detects local extrema by identifying points where the signal changes direction.
-    * It handles zero values and repeated values to ensure accurate detection of extrema.
+    :Notes:
+    - This function detects local extrema by identifying points where the signal changes direction.
+    - It handles zero values and repeated values to ensure accurate detection of extrema.
     """
     # Check if all values in the signal are close to zero
     if all(x < 1e-5):
@@ -419,7 +424,7 @@ def peaks(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         Indices of the detected local maxima.
 
     Notes
-    * This function detects local maxima by identifying points where the signal changes from increasing to decreasing.
+    - This function detects local maxima by identifying points where the signal changes from increasing to decreasing.
     """
     # Compute the first-order difference of the signal
     dX = np.sign(np.diff(x.transpose())).transpose()
@@ -446,8 +451,8 @@ def hamm(n: int, base: int) -> np.ndarray:
         The generated Hammersley sequence.
 
     Notes
-    * The Hammersley sequence is a low-discrepancy sequence used in quasi-Monte Carlo methods.
-    * This function generates the sequence using a base-dependent algorithm.
+    - The Hammersley sequence is a low-discrepancy sequence used in quasi-Monte Carlo methods.
+    - This function generates the sequence using a base-dependent algorithm.
     """
     # Initialize the sequence with zeros
     seq = np.zeros((1, n))
@@ -513,8 +518,8 @@ def is_prime(x: int) -> bool:
         True if the number is prime, False otherwise.
 
     Notes
-    * A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself.
-    * This function checks divisibility by all numbers up to the given number.
+    - A prime number is a natural number greater than 1 that has no positive divisors other than 1 and itself.
+    - This function checks divisibility by all numbers up to the given number.
     """
 
     # Handle the special case for 2, the only even prime number

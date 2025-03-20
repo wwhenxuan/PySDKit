@@ -13,6 +13,7 @@ class RLMD(object):
     Zhiliang Liu, Yaqiang Jin, Ming J. Zuo, and Zhipeng Feng.
     Time-frequency representation based on robust local mean decomposition for multi-component AM-FM signal analysis.
     Mechanical Systems and Signal Processing. 95: 468-487, 2017.
+    
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/66935-robust-local-mean-decomposition-rlmd
     """
 

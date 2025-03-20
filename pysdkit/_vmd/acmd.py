@@ -78,6 +78,7 @@ class ACMD(Base):
     def differ(y: np.ndarray, delta: float, dtype: np.dtype = np.float64) -> np.ndarray:
         """
         Compute the derivative of a discrete time series y.
+        
         :param y: The input time series.
         :param delta: The sampling time interval of y.
         :param dtype: The data type of numpy array

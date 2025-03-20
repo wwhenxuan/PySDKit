@@ -16,6 +16,7 @@ class VMD2D(object):
 
     Konstantin, Dragomiretskiy, and Dominique Zosso. "Two-dimensional variational mode decomposition."
     Energy Minimization Methods in Computer Vision and Pattern Recognition. Vol. 8932. 2015.
+
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/45918-two-dimensional-variational-mode-decomposition?s_tid=srchtitle
     """
 
@@ -95,6 +96,7 @@ class VMD2D(object):
     ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Image decomposition using VMD algorithm
+        
         :param img: the input image of 2D ndarray in numpy
         :param K: the maximum number of modes to be decomposed
         :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes,

@@ -65,7 +65,9 @@ def cubic_spline_3pts(x, y, T):
 def akima(X, Y, x):
     """
     Akima Interpolation.
+
     This function uses the Akima interpolation method to interpolate values at specified points x.
+
     Akima interpolation is known for its smoothness and is suitable for curves with rapid changes.
 
     :param X: Array-like, the x-coordinates of the data points.
@@ -80,7 +82,9 @@ def akima(X, Y, x):
 def cubic_hermite(X, Y, x):
     """
     Cubic Hermite Spline Interpolation.
+
     This function uses the Cubic Hermite Spline interpolation method to interpolate values at specified points x.
+
     Cubic Hermite Spline interpolation ensures that the first derivatives are continuous.
 
     :param X: Array-like, the x-coordinates of the data points.
@@ -96,12 +100,13 @@ def cubic_hermite(X, Y, x):
 def cubic(X, Y, x):
     """
     Cubic Spline Interpolation.
+
     This function uses the Cubic Spline interpolation method to interpolate values at specified points x.
+
     Cubic Spline interpolation ensures that the second derivatives are continuous, resulting in a smooth curve.
 
     :param X: Array-like, the x-coordinates of the data points.
     :param Y: Array-like, the y-coordinates of the data points.
-    :param x: Array-like, the x-coordinates where interpolation is desired.
     :return: Array-like, the interpolated y-coordinates.
     """
     spl = CubicSpline(X, Y)
@@ -111,7 +116,9 @@ def cubic(X, Y, x):
 def pchip(X, Y, x):
     """
     Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) Interpolation.
+
     This function uses the PCHIP interpolation method to interpolate values at specified points x.
+    
     PCHIP interpolation ensures that the interpolated curve is monotonic in regions where the data is monotonic.
 
     :param X: Array-like, the x-coordinates of the data points.

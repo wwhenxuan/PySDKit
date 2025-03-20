@@ -26,6 +26,7 @@ def permutation_entropy(
     [2] X Li, G Ouyang, D Richards, Predictability analysis of absence seizures with permutation entropy, Epilepsy Research,  Vol. 77pp. 70-74, 2007.
 
     MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/37289-permutation-entropy?s_tid=FX_rc1_behav
+
     :param y: The input 1D time series or signal of numpy ndarray.
     :param m: The order of permutation entropy.
     :param t: The delay time of permutation entropy.
@@ -63,6 +64,7 @@ def permutation_entropy(
 def multi(Data: np.ndarray, S: int) -> np.ndarray:
     """
     Generate a coarse-grained version of the time series.
+
     :param Data: numpy array of time series data.
     :param S: scale factor.
     :return: the coarse-grained time series at scale S
@@ -102,6 +104,7 @@ def multiscale_permutation_entropy(
     [2] X Li, G Ouyang, D Richards, Predictability analysis of absence seizures with permutation entropy, Epilepsy Research,  Vol. 77pp. 70-74, 2007.
 
     MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/37288-multiscale-permutation-entropy-mpe?s_tid=FX_rc2_behav
+    
     :param X: The input 1D time series or signal of numpy ndarray.
     :param m: The order of permutation entropy (pattern length).
     :param t: The delay time of permutation entropy.
