@@ -173,7 +173,7 @@ class Moving_Decomp(object):
     ) -> Optional[plt.Figure]:
         """
         Visualize the decomposition results of the input signal
-        
+
         :param signal: The input 1D signal of numpy ndarray
         :param trend: The trend of the input 1D signal decomposed by `Moving_Decomp`
         :param seasonality: The seasonality of the input 1D signal decomposed by `Moving_Decomp`

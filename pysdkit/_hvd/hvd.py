@@ -46,7 +46,7 @@ class HVD(object):
 
         Decomposition results are very depends on the `fpar` value
         We have improved the original code by mirroring the input signal to alleviate this problem.
-        
+
         :param K: the number of intrinsic mode functions to be decomposed
         :param fpar: filter parameter, equal to point of cut frequency for low-pass filter (have to be regulized for optimal decomposition).
         :param mirror: whether to mirror the original input signal

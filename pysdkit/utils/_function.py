@@ -160,27 +160,27 @@ def lags_matrix(
     :param x: 1D numpy ndarray signal
     :param mode: Specifies the type of lag matrix to be generated. The supported modes include:
 
-            - mode = 'full' : 
+            - mode = 'full' :
                 lags_matrix is the full Toeplitz convolutional matrix with dimensions [lags+N-1,lags],
 
                 math:: out = [ [x,0..0]^T,[0,x,0..0]^T,...,[0,..0,x]^T ], where: N is the size of x.
             - mode = 'prew':
                 lags_matrix is the prewindowed matrix with the first N columns of the full matrix, and dimension = [N,lags];
-            - mode = 'postw': 
+            - mode = 'postw':
                 lags_matrix is the postwindowed matrix with the last N columns of the full matrix, and dimension = [N,lags];
-            - mode = 'covar' or 'valid': 
+            - mode = 'covar' or 'valid':
                 lags_matrix is the trimmed full matrix with the first and last m columns cut off
 
                 (out = full[lags:N-lags,:]), with dimension = [N-lags+1,lags];
-            - mode = 'same': 
+            - mode = 'same':
                 conv_matrix is the trimmed full matrix with the first and last m columns cut off
 
                 (out = full[(lags-1)//2:N+(lags-1)//2,:]), with dimension = [N,lags];
-            - mode = 'traj': 
+            - mode = 'traj':
                 lags_matrix is the trajectory or so-called caterpillar matrix with dimension = [N,lags];
-            - mode = 'hanekl': 
+            - mode = 'hanekl':
                 lags_matrix is the Hankel matrix with dimension = [N,N];
-            - mode = 'toeplitz': 
+            - mode = 'toeplitz':
                 lags_matrix is the symmetric Toeplitz matrix, with dimension = [N,N].
 
     :param lags: An integer or None, representing the number of columns in the lag matrix (default is N // 2, where N is the length of the input signal).
@@ -279,38 +279,38 @@ def covariance_matrix(
     :param x: the input signal of 1d ndarray
     :param mode: Specifies the type of lag matrix to be generated. The supported modes include:
 
-           - mode = 'full': 
+           - mode = 'full':
                 lags_matrix is the full Toeplitz convolutional matrix with dimensions [lags+N-1,lags],
 
                 math:: out = [ [x,0..0]^T,[0,x,0..0]^T,...,[0,..0,x]^T ], where: N is the size of x.
-           - mode =  'prew': 
+           - mode =  'prew':
                 lags_matrix is the prewindowed matrix with the first N columns of the full matrix, and dimension = [N,lags];
-           - mode = 'postw': 
+           - mode = 'postw':
                 lags_matrix is the postwindowed matrix with the last N columns of the full matrix, and dimension = [N,lags];
-           - mode = 'covar' or 'valid': 
+           - mode = 'covar' or 'valid':
                 lags_matrix is the trimmed full matrix with the first and last m columns cut off
 
                 (out = full[lags:N-lags,:]), with dimension = [N-lags+1,lags];
-           - mode = 'same': 
+           - mode = 'same':
                 conv_matrix is the trimmed full matrix with the first and last m columns cut off
 
                 (out = full[(lags-1)//2:N+(lags-1)//2,:]), with dimension = [N,lags];
-           - mode = 'traj': 
+           - mode = 'traj':
                 lags_matrix is the trajectory or so-called caterpillar matrix with dimension = [N,lags];
-           - mode = 'hanekl': 
+           - mode = 'hanekl':
                 lags_matrix is the Hankel matrix with dimension = [N,N];
-           - mode = 'toeplitz': 
+           - mode = 'toeplitz':
                 lags_matrix is the symmetric Toeplitz matrix, with dimension = [N,N].
     :param lags: An integer or None, representing the number of columns in the lag matrix (default is N // 2, where N is the length of the input signal).
     :param ret_base: if true, then the lag matrix will also be returned
     :param dtype: The numpy data type used, `None` means using the data type of the input signal
-    :return: - ret_base is False: 
+    :return: - ret_base is False:
                 * matrix: 2d ndarray.
-             - ret_base is True: 
+             - ret_base is True:
                 * matrix: 2d ndarray, covariance matrix.
                 * lags_matrix: lag matrix.
 
-    :Note: 
+    :Note:
         Lag matrices of different modes have different shapes and uses, and the choice of mode depends on the specific application scenario.
         The calculation of the covariance matrix is based on the dot product of the lag matrix, so its result reflects the correlation of the input signal at different lags.
         If the input signal is short, the value of lags may need to be adjusted to avoid generating an overly large lag matrix.
@@ -330,7 +330,7 @@ def index_of_orthogonality(signal: np.ndarray, IMFs: np.ndarray) -> float:
     Any pair of IMFs is locally orthogonal.
     To evaluate EMD performance, an Index of Orthogonality (IO) was proposed,
     so that the closer to zero, the more effective will be the decomposition.
-    
+
     :param signal: the row input signal.
     :param IMFs: Intrinsic Mode Function after decomposition.
     :return: the value of index of orthogonality

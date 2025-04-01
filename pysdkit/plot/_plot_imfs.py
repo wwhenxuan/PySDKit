@@ -44,7 +44,7 @@ def plot_IMFs(
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
-    
+
     You can choose to visualize on a 2D plane or in 3D space.
 
     The 2D plane visualization is more intuitive,

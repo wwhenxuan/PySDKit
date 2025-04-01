@@ -155,7 +155,7 @@ class EMD(object):
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Further processing of the maximum and minimum points of the input signal makes the upper and lower envelope spectra smoother.
-        
+
         :param time: position or time array of numpy
         :param signal: input signal of numpy ndarray
         :param max_pos: numpy array, Position of local maxima.
@@ -283,7 +283,7 @@ class EMD(object):
         """
         Evaluate if the current IMF (Intrinsic Mode Function) satisfies the end condition
         based on Huang's criteria, similar to the Cauchy convergence test.
-        
+
         This function ensures that consecutive siftings of the signal have minimal impact,
         indicating that the IMF component has been properly extracted. The criteria include
         checking if all local maxima are positive, all local minima are negative, and various
@@ -371,7 +371,7 @@ class EMD(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
-        
+
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).

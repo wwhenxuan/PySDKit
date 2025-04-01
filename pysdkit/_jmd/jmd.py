@@ -6,6 +6,8 @@ Created on 2025/02/05 13:31:52
 """
 import numpy as np
 
+from typing import Optional, Tuple
+
 
 class JMD(object):
     """
@@ -29,8 +31,34 @@ class JMD(object):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/169388-jump-plus-am-fm-mode-decomposition-jmd?s_tid=prof_contriblnk
     """
 
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        K: int,
+        alpha: Optional[float] = 5000,
+        init: Optional[str] = "zero",
+        tol: Optional[float] = 1e-6,
+        beta: Optional[float] = 0.03,
+        b_bar: Optional[float] = 0.45,
+        tau: Optional[float] = 0,
+    ) -> None:
+        """
+        :param K: the number of modes to be recovered
+        :param alpha: the balancing parameter of the mode bandwidth
+        :param init: - 'zero': all omegas start at 0
+                     - 'uniform': all omegas start uniformly distributed
+                     - 'random': all omegas initialized randomly
+        :param tol: tolerance of convergence criterion; typically around 1e-6
+        :param beta: the balancing parameter of the jump constraint (1/expected number of jumps)
+        :param b_bar: the balancing parameter related to the β parameter
+        :param tau: the dual ascent step (set to 0 for noisy signal)
+        """
+        self.K = K
+        self.alpha = alpha
+        self.init = init
+        self.tol = tol
+        self.beta = beta
+        self.b_bar = b_bar
+        self.tau = tau
 
     def __call__(self, *args, **kwargs):
         pass

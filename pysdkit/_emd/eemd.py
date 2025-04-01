@@ -229,7 +229,7 @@ class EEMD(object):
         :param max_imfs: The number of imf decomposed
         :param progress: the number of multiple processes
         :return: Set of ensemble IMFs produced from input signal of ndarray
-        
+
         In general, these do not have to be, and most likely will not be, same as IMFs produced using EMD
         """
         # The length of the input signal

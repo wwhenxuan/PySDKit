@@ -76,7 +76,7 @@ def plot_hilbert_complex_plane(
 ) -> plt.figure:
     """
     Plot the Hilbert transform of a signal on the complex plane.
-    
+
     :param analytical_signal: NumPy array containing the analytical signal (Hilbert transform of the original).
     :param return_figure: Whether to return the figure.
     :return: The plot figure or None.

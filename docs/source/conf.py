@@ -22,8 +22,8 @@ version = "0.4.15"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-#sys.path.append(str(Path('exts').resolve()))
-sys.path.insert(0, str(Path('..', '..').resolve()))
+# sys.path.append(str(Path('exts').resolve()))
+sys.path.insert(0, str(Path("..", "..").resolve()))
 
 import pysdkit
 
@@ -36,32 +36,29 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx_design",
-    'sphinx.ext.napoleon',
-
+    "sphinx.ext.napoleon",
     "sphinx_gitstamp",
 ]
 
 apidoc_modules = [
     {
-        'path': '../../pysdkit',
-        'destination': 'source/API',
-        'exclude_patterns': ['**/test*'],
-        'max_depth': 4,
-        'follow_links': False,
-        'separate_modules': False,
-        'include_private': True,
-        'no_headings': False,
-        'module_first': False,
-        'implicit_namespaces': True,
-        'automodule_options': {
-            'members', 'show-inheritance', 'undoc-members'
-        },
+        "path": "../../pysdkit",
+        "destination": "source/API",
+        "exclude_patterns": ["**/test*"],
+        "max_depth": 4,
+        "follow_links": False,
+        "separate_modules": False,
+        "include_private": True,
+        "no_headings": False,
+        "module_first": False,
+        "implicit_namespaces": True,
+        "automodule_options": {"members", "show-inheritance", "undoc-members"},
     },
 ]
 templates_path = ["_templates"]
 
 source_suffix = {".rst": "restructuredtext"}
-#__________________________________________________________________________
+# __________________________________________________________________________
 html_logo = "_static/logo.png"
 
 language = "en"
@@ -75,16 +72,16 @@ suppress_warnings = []
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
 
-html_css_files = ["theme_overrides.css","custom.css"]
+html_css_files = ["theme_overrides.css", "custom.css"]
 
 html_theme_options = {
-    "announcement": "",#You can specify an arbitrary URL that will be used as the HTML source for your announcement. 
+    "announcement": "",  # You can specify an arbitrary URL that will be used as the HTML source for your announcement.
     # Navigation bar
     "logo": {
         "text": "pysdkit",
         "link": "https://pysdkit.readthedocs.io/",
     },
-    "header_links_before_dropdown":6 ,
+    "header_links_before_dropdown": 6,
     "icon_links": [
         {
             "name": "GitHub",
@@ -100,20 +97,22 @@ html_theme_options = {
         },
     ],
     "navbar_align": "content",
-    "navbar_start": ["navbar-logo","version-switcher"],
+    "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_center": ["navbar-nav"],
-    #"navbar_end": ["navbar-icon-links"], 
-    #"navbar_persistent": ["search-button"],
-    #______________________________________________________________________________________
+    # "navbar_end": ["navbar-icon-links"],
+    # "navbar_persistent": ["search-button"],
+    # ______________________________________________________________________________________
     "switcher": {
-        "json_url": ("https://raw.githubusercontent.com/changewam/PySDKit/refs/heads/main/docs/source/_static/version_switcher.json"),#the persistent location of the JSON file
+        "json_url": (
+            "https://raw.githubusercontent.com/changewam/PySDKit/refs/heads/main/docs/source/_static/version_switcher.json"
+        ),  # the persistent location of the JSON file
         "version_match": "dev" if "dev" in version else version,
     },
     "show_version_warning_banner": True,
     # Secondary_sidebar
     "secondary_sidebar_items": {
-    "**": ["page-toc", "sourcelink"],
-    "index": [],
+        "**": ["page-toc", "sourcelink"],
+        "index": [],
     },
     "show_toc_level": 4,
     "collapse_navigation": True,
@@ -121,25 +120,19 @@ html_theme_options = {
     "footer_start": ["copyright"],
     "footer_end": ["sphinx-version", "theme-version"],
     # Color
-   "pygments_light_style": "xcode",
-   "pygments_dark_style": "monokai",
+    "pygments_light_style": "xcode",
+    "pygments_dark_style": "monokai",
     # Other
     "show_prev_next": False,
     "show_nav_level": 1,
     "back_to_top_button": True,
-    
-    #"use_edit_page_button": True,
-
-
+    # "use_edit_page_button": True,
 }
 
 remove_from_toctrees = []
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = {
-    "index": [] , # Hide sidebar in home page
-    "API/pysdkit.*": []
-}
+html_sidebars = {"index": [], "API/pysdkit.*": []}  # Hide sidebar in home page
 html_show_sourcelink = False
 
 # Output file base name for HTML help builder.

@@ -61,7 +61,7 @@ def savgol_smoothing(
 def exponential_smoothing(signal: np.ndarray, alpha: float = 0.4) -> np.ndarray:
     """
     Exponential Smoothing (Single Exponential Smoothing)
-    
+
     :param signal: Input signal (numpy array)
     :param alpha: Smoothing factor, range from 0 to 1 (default is 0.4)
     :return: Smoothed signal (numpy array)

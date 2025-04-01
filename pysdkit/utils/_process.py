@@ -108,7 +108,7 @@ def not_duplicate(ts: np.ndarray) -> np.ndarray:
     and can help avoid double calculations of consecutive repeated values in extreme value detection and other analyses.
     For example, when determining which points should be used to calculate the envelope in the EMD algorithm,
     continuously repeated data points can be excluded, thereby improving calculation efficiency and accuracy.
-    
+
     :param ts: Input 1D Signal 1 - Numpy Array
     :return: Index of distinct values in array
     """

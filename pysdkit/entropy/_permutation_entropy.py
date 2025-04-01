@@ -104,7 +104,7 @@ def multiscale_permutation_entropy(
     [2] X Li, G Ouyang, D Richards, Predictability analysis of absence seizures with permutation entropy, Epilepsy Research,  Vol. 77pp. 70-74, 2007.
 
     MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/37288-multiscale-permutation-entropy-mpe?s_tid=FX_rc2_behav
-    
+
     :param X: The input 1D time series or signal of numpy ndarray.
     :param m: The order of permutation entropy (pattern length).
     :param t: The delay time of permutation entropy.

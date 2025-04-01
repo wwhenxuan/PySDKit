@@ -39,7 +39,7 @@ def plot_IMFs_amplitude_spectra(
 ) -> plt.figure:
     """
     Plot amplitude spectra of Intrinsic Mode Functions (IMFs) obtained from signal decomposition
-    
+
     :param IMFs: Input Intrinsic Mode Functions
     :param norm: Whether to normalize the Fourier transform results
     :param smooth: Whether to smooth the amplitude spectra, and the method to use

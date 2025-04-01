@@ -274,7 +274,7 @@ class LMD(object):
     def fit_transform(self, signal: np.ndarray, K: Optional[int] = None) -> np.ndarray:
         """
         Signal decomposition using Local Mean Decomposition (LMD) algorithm
-        
+
         :param signal: the time domain signal (1D numpy array)  to be decomposed
         :param K: the maximum number of IFMs to be decomposed
         :return: IMFs

@@ -244,7 +244,7 @@ class INCMD(object):
 
         :Note: This algorithm is very sensitive to parameters. If you are not satisfied with the decomposition effect,
                please readjust the parameters `K`, `max_iter`, `mu` and `rho` to initialize the algorithm instance.
-               
+
         :param signal: The input numpy ndarray 1D univariate signal
         :param time: Timestamp array for the input signal,
                      initialized by the length of the signal if not specified explicitly

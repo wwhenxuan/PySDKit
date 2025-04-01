@@ -327,7 +327,7 @@ class FAEMD(object):
     def get_imfs_and_trend(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Provides access to separated imfs and trend from recently analysed signal.
-        
+
         Note that this may differ from the `get_imfs_and_residue` as the trend isn't
         necessarily the residue. Residue is a point-wise difference between input signal
         and all obtained components, whereas trend is the slowest component (can be zero).
