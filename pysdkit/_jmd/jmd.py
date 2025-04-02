@@ -218,7 +218,6 @@ class JMD(object):
         T = f.shape[0]
         half_T = T // 2
         t = np.arange(1, T + 1) / T
-        print(t)
 
         # Spectral Domain discretization
         freqs = t - 0.5 - 1 / T
@@ -267,7 +266,7 @@ class JMD(object):
             # Initialize sum_uk for k=1
             sum_uk = u_hat_plus[n, :, self.K - 1] + sum_uk - u_hat_plus[n, :, 0]
 
-            # 处理其他分量
+            # Processing other components
             for k in range(0, self.K):
                 # Update the accumulator for k > 0
                 if k > 0:
@@ -363,9 +362,7 @@ class JMD(object):
                 np.conj(j_hat_plus[n, :] - j_hat_plus[n - 1, :]).T,
             )
 
-            # uDiff = np.abs(uDiff)
-
-            print(n, uDiff)
+            uDiff = np.abs(uDiff)
 
         # Cleanup
 
