@@ -5,11 +5,12 @@ Created on 2025/02/05 13:31:52
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from numpy import linalg
+from numpy import linalg, ndarray, dtype, floating
 import scipy.sparse as sp
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
+from numpy._typing import _64Bit
 from plotnine.positions.position import position
 
 from pysdkit.utils import fft, fftshift, ifft, ifftshift
@@ -38,15 +39,15 @@ class JMD(object):
     """
 
     def __init__(
-            self,
-            K: int,
-            alpha: Optional[float] = 5000,
-            init: Optional[str] = "zero",
-            tol: Optional[float] = 1e-6,
-            beta: Optional[float] = 0.03,
-            b_bar: Optional[float] = 0.45,
-            tau: Optional[float] = 5,
-            max_iter: Optional[int] = 2000,
+        self,
+        K: int,
+        alpha: Optional[float] = 5000,
+        init: Optional[str] = "zero",
+        tol: Optional[float] = 1e-6,
+        beta: Optional[float] = 0.03,
+        b_bar: Optional[float] = 0.45,
+        tau: Optional[float] = 5,
+        max_iter: Optional[int] = 2000,
     ) -> None:
         """
         :param K: the number of modes to be recovered
@@ -76,10 +77,10 @@ class JMD(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Jump Plus AM-FM Mode Decomposition (JMD)"
 
-    def jump_step(self, freqs: np.ndarray, T: int):
+    def jump_step(self, freqs: np.ndarray, T: int) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, float, float, float]:
         """Init the Jump part"""
         # Define and calculate b using b_bar
-        b = 2 / (self.b_bar ** 2)
+        b = 2 / (self.b_bar**2)
 
         # Compute gamma using tau2 and b
         gamma = self.tau * (0.5 * b * self.beta)
@@ -92,7 +93,7 @@ class JMD(object):
 
         # Construct a sparse diagonal matrix D with sub-diagonal and super-diagonal
         diagonals = [-d.ravel(), d.ravel()]  # 主对角线和超对角线元素
-        D = sp.diags(diagonals, [0, 1], shape=(T, T), format='lil')
+        D = sp.diags(diagonals, [0, 1], shape=(T, T), format="lil")
 
         # Apply zero boundary condition to the last row of D
         D[-1, :] = 0
@@ -100,10 +101,8 @@ class JMD(object):
         # Compute the matrix product D' * D
         DTD = (D.T.dot(D)).toarray()
 
-        print(DTD)
-
         # Initialize vector tt with zeros, of same size as vector f
-        x = np.zeros(shape=(T, 1))
+        x = np.zeros(T)
         # Initialize rho with the same size as x
         rho = x.copy()
 
@@ -113,7 +112,7 @@ class JMD(object):
         mu = 2 * self.beta / gamma
 
         # Create a sparse diagonal matrix SPDiag with d as the diagonal
-        SPDiag = sp.diags(d.ravel(), 0, shape=(T, T)).toarray()
+        SPDiag = sp.diags(d.ravel(), offsets=0, shape=(T, T)).toarray()
 
         # matrix keeping track of every iterant // could be discarded for mem
         j_hat_plus = np.zeros(shape=[self.max_iter, len(freqs)])
@@ -122,73 +121,78 @@ class JMD(object):
 
     @staticmethod
     def enc_fmirror(signal: np.ndarray, T: int) -> np.ndarray:
-        """进行镜像映射的函数"""
-        # 前半部分：前半段逆序，中间原信号，后半段逆序
-        f_mirror = np.concatenate((
-            signal[:T // 2][::-1],  # 前T/2个元素（逆序）
-            signal,  # 原始信号
-            signal[T // 2:][::-1]  # 后T/2个元素（逆序）
-        ))
+        """Function for mirroring"""
+        # First half: first half reverse order, original signal in the middle, second half reverse order
+        f_mirror = np.concatenate(
+            (
+                signal[: T // 2][::-1],  # First T/2 elements (in reverse order)
+                signal,  # 原始信号
+                signal[T // 2 :][::-1],  # The last T/2 elements (in reverse order)
+            )
+        )
         return f_mirror
 
     @staticmethod
-    def dec_fmirror(u: np.ndarray, v: np.ndarray, T: int) -> Tuple[np.ndarray, np.ndarray]:
-        """去除信号的镜像映射部分"""
+    def dec_fmirror(u: np.ndarray, T: int) -> np.ndarray:
+        """Remove the mirror image portion of the signal"""
         pos = T // 4
-        return u[:, pos: 3 * pos].copy(), v[:, pos: 3 * pos].copy()
+        return u[:, pos : 3 * pos].copy()
 
     @staticmethod
     def _max(array: np.ndarray, number: int) -> np.ndarray:
-        """逐元素比较寻找最大值并进行替换"""
-        # 寻找小于指定值的位置
+        """Compare elements one by one to find the maximum value and replace it"""
+        # Find positions less than a specified value
         index = np.where(array < number)
-        # 进行指定值的替换
+        # Replace the specified value
         array[index] = number
 
         return array.copy()
 
     @staticmethod
     def _min(array: np.ndarray, number: int) -> np.ndarray:
-        """逐元素比较寻找最小值并进行替换"""
-        # 寻找大于指定值的位置
+        """Compare elements one by one to find the minimum value and replace it"""
+        # Find positions greater than a specified value
         index = np.where(array > number)
-        # 进行指定值的替换
+        # Replace the specified value
         array[index] = number
 
         return array.copy()
 
     def _init_omega(self, fs: float) -> np.ndarray:
         """Initialization of omega_k"""
-        # 初始化空数组
+        # Initialize an empty array
         omega_plus = np.zeros(shape=(self.max_iter, self.K))
 
         if self.init == "zero":
-            # 全零初始化
+            # All zero initialization
             return omega_plus
         elif self.init == "uniform":
-            # 通过均匀分布初始化
+            # Initialized by uniform distribution
             for i in range(1, self.K + 1):
                 omega_plus[0, i] = (0.5 / self.K) * (i - 1)
         elif self.init == "random":
-            # 随机初始化
-            omega_plus[0, :] = np.sort(np.exp(np.log(fs) + (np.log(0.5 - np.log(fs)) * np.random.rand(self.K))))
+            # Random Initialization
+            omega_plus[0, :] = np.sort(
+                np.exp(np.log(fs) + (np.log(0.5 - np.log(fs)) * np.random.rand(self.K)))
+            )
         else:
             raise ValueError("Initialization method not recognized")
 
         return omega_plus
 
-    def fit_transform(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def fit_transform(self, signal: np.ndarray, return_all: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using Jump Plus AM-FM Mode Decomposition algorithm
 
         :param signal: the time domain signal (1D numpy array) to be decomposed
+        :param return_all: whether to only return the IMFs results
         :return: the decomposed results of IMFs
         """
 
         # Preparations
         shift = np.mean(signal)
-        # Norm
-        signal = signal - np.mean(signal)
+        # # Norm
+        # signal = signal - np.mean(signal)
 
         # Period and sampling frequency of input signal
         save_T = signal.shape[0]
@@ -201,7 +205,8 @@ class JMD(object):
         # Time Domain 0 to T
         T = f.shape[0]
         half_T = T // 2
-        t = np.arange(0, T) / T
+        t = np.arange(1, T + 1) / T
+        print(t)
 
         # Spectral Domain discretization
         freqs = t - 0.5 - 1 / T
@@ -210,15 +215,18 @@ class JMD(object):
         a2 = 50
         t2 = np.arange(0.01, np.sqrt(2 / a2) + 0.001, 0.001)
 
-        phi1 = (-a2 / 2) * (t2 ** 2) + (np.sqrt(2 * a2) * t2)
-        phi = np.append(phi1, np.ones(self.max_iter - phi1.shape[0]))
+        phi1 = (-a2 / 2) * (t2**2) + (np.sqrt(2 * a2) * t2)
+        if self.max_iter > phi1.shape[0]:
+            phi = np.append(phi1, np.ones(self.max_iter - phi1.shape[0]))
+        else:
+            phi = phi1.copy()
 
         Alpha = self.alpha * phi
 
         # Construct and center f_hat
         f_hat = fftshift(ts=fft(ts=f))
         f_hat_plus = f_hat.copy()
-        f_hat_plus[: T // 2] = 0  # TODO: 这里要不要使用整除
+        f_hat_plus[:half_T] = 0
 
         # matrix keeping track of every iterant // could be discarded for mem
         u_hat_plus = np.zeros(shape=[self.max_iter, freqs.shape[0], self.K])
@@ -235,10 +243,12 @@ class JMD(object):
         sum_uk = 0
 
         # ----------- Jump part
-        b, v, x, D, DTD, SPDiag, j_hat_plus, rho, coef1, mu, gamma = self.jump_step(freqs=freqs, T=T)
+        b, v, x, D, DTD, SPDiag, j_hat_plus, rho, coef1, mu, gamma = self.jump_step(
+            freqs=freqs, T=T
+        )
 
         # ----------- Main loop for iterative updates
-        while uDiff > self.tol and n < self.max_iter:
+        while uDiff > self.tol and n < self.max_iter - 1:
             # not converged and below iterations limit
 
             # update first mode accumulator
@@ -252,72 +262,152 @@ class JMD(object):
                     sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
 
                 # Update the spectrum of the mode through Wiener filter of residuals
-                u_hat_plus[n + 1, :, k] = (f_hat_plus - sum_uk - j_hat_plus[n, :]) / (1 + Alpha[n] * (freqs - omega_plus[n, k] ** 2))
+                u_hat_plus[n + 1, :, k] = (f_hat_plus - sum_uk - j_hat_plus[n, :]) / (
+                    1 + Alpha[n] * ((freqs - omega_plus[n, k]) ** 2)
+                )
 
                 # Update omega
-                omega_plus[n + 1, k] = np.matmul(freqs[half_T: T], (np.abs(u_hat_plus[n + 1, half_T: T, k]) ** 2).T) / np.sum(np.abs(u_hat_plus[n + 1, half_T: T, k]) ** 2)
+                omega_plus[n + 1, k] = np.matmul(
+                    freqs[half_T:T], (np.abs(u_hat_plus[n + 1, half_T:T, k]) ** 2).T
+                ) / np.sum(np.abs(u_hat_plus[n + 1, half_T:T, k]) ** 2)
 
             # Back to time domain
             u_hat = np.zeros(shape=[T, self.K])
 
             for k in range(0, self.K):  # TODO: 这部分代码需要注意
-                u_hat[half_T: T, k] = np.squeeze(u_hat_plus[n + 1, half_T: T, k])
+                u_hat[half_T:T, k] = np.squeeze(u_hat_plus[n + 1, half_T:T, k])
 
-                conj_values = np.squeeze(np.conj(u_hat_plus[n + 1, half_T : T, k]))
-                # print(conj_values.shape, u_hat[1 : half_T, k].shape)
-                u_hat[1 : half_T + 1, k] = conj_values[::-1]  # 逆序排列  TODO: 这里是不是要+1
+                conj_values = np.squeeze(np.conj(u_hat_plus[n + 1, half_T:T, k]))
+                u_hat[1 : half_T + 1, k] = conj_values[
+                    ::-1
+                ]  # 逆序排列  TODO: 这里是不是要+1
 
                 u_hat[0, k] = np.conj(u_hat[-1, k])
 
             u = np.zeros(shape=(self.K, len(t)))
-            print(u.shape)
 
             for k in range(0, self.K):
                 u[k, :] = np.real(ifft(ts=ifftshift(ts=u_hat[:, k])))
 
             # Update jump
-            v = linalg.solve(a=(1 * SPDiag + gamma * DTD), b=((gamma * np.matmul(D.T, x) - np.matmul(D.T, rho)) + 1 * f.T - 1 * (np.sum(u, axis=0)).T))
-            print(v.shape)
+            v = linalg.solve(
+                a=(1 * SPDiag + gamma * DTD),
+                b=(
+                    (gamma * np.matmul(D.T, x) - np.matmul(D.T, rho))
+                    + 1 * f.T
+                    - 1 * (np.sum(u, axis=0))
+                ),
+            )
 
             # Update variable x
-            Dv = np.matmul(D.T, v[:])
+            Dv = np.matmul(D, v[:])
 
-            h = (Dv + coef1 * rho)
-
-            print("h", h.shape)
+            h = Dv + coef1 * rho
 
             # 这里的含义其实应该是逐一元素的比较
+            x = (
+                self._min(
+                    array=self._max(
+                        ((1 / (1 - mu * b)) * np.ones(shape=np.abs(h).shape))
+                        - (
+                            (mu * np.sqrt(2 * b) / (1 - mu * b))
+                            * np.ones(shape=np.abs(h).shape)
+                        )
+                        / np.abs(h),
+                        number=0,
+                    ),
+                    number=1,
+                )
+                * h
+            )
+
+            # Dual ascent rho
+            rho = rho - gamma * (x - Dv)
+
+            v = v.T
+            v = v - (np.mean(v[:] - np.mean(f[:])))
+
+            # To frequency domain
+            j_hat_plus[n + 1, :] = fftshift(ts=fft(v))
+            j_hat_plus[n + 1, :half_T] = 0
+
+            # loop counter
+            n += 1
+
+            # convergence
+            # Option 1:
+            uDiff = np.spacing(1)
+
+            # 遍历每一个模态计算与上次模型分离的差异
+            for i in range(self.K):
+                uDiff += (1 / T) * np.matmul(
+                    (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
+                    np.conj(u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]).T,
+                )
+
+            # 判断本次迭代的Jump与上次迭代的差异
+            uDiff += (1 / T) * np.matmul(
+                (j_hat_plus[n, :] - j_hat_plus[n - 1, :]),
+                np.conj(j_hat_plus[n, :] - j_hat_plus[n - 1, :]).T,
+            )
+
+            # uDiff = np.abs(uDiff)
+
+            print(n, uDiff)
+
+        # Cleanup
+
+        # discard empty space if converged early
+        N = min(n, self.max_iter)
+        omega = omega_plus[N, :]
+
+        # Signal reconstruction
+        u_hat = np.zeros(shape=(T, self.K))
+
+        for k in range(0, self.K):
+            u_hat[half_T:T, k] = np.squeeze(u_hat_plus[N, half_T:T, k])
+            conj_values = np.squeeze(np.conj(u_hat_plus[N, half_T:T, k]))
+            u_hat[1 : half_T + 1, k] = conj_values[::-1]
+            u_hat[0, k] = np.conj(u_hat[-1, k])
+
+        # 获得重构的最终信号
+        u = np.zeros(shape=(self.K, T))
+
+        # 迭代处理每一个本征模态函数
+        for k in range(0, self.K):
+            u[k, :] = np.real(ifft(ts=ifftshift(ts=u_hat[:, k])))
+
+        # remove mirror part
+        u = self.dec_fmirror(u=u, T=T)
+        v = v[T // 4: 3 * T // 4] + shift
+
+        if return_all is True:
+            return u, v, omega
+        return u
 
 
-            maxi = self._max(((1 / (1 - mu * b)) * np.ones(shape=np.abs(h).shape)) - ((mu * np.sqrt(2 * b) / (1 - mu * b)) * np.ones(shape=np.abs(h).shape)) / np.abs(h), number=0)
-            print(np.min(maxi, axis=1))
-            # x = np.min(np.max(((1 / (1 - mu * b)) * np.ones(shape=np.abs(h).shape)) - ((mu * np.sqrt(2 * b) / (1 - mu * b)) * np.ones(shape=np.abs(h).shape)) / np.abs(h), axis=0), axis=1) * h
+if __name__ == "__main__":
+    from pysdkit.data import test_emd
+    from pysdkit.plot import plot_IMFs
+    from matplotlib import pyplot as plt
+    import pandas as pd
 
+    df = pd.read_csv(r"C:\Users\whenx\Desktop\JMD\data1.csv", header=None)
+    signal = df.values[:, 0]
 
+    t, signal = test_emd()
 
+    s1 = np.cos(5 * t)
+    s2 = 2 * np.cos(20 * t)
 
-if __name__ == '__main__':
-    # a2 = 50
-    # t2 = np.arange(0.01, np.sqrt(2 / a2) + 0.001, 0.001)
-    # print(t2, len(t2))
-    # phi1 = (-a2 / 2) * (t2 ** 2) + (np.sqrt(2 * a2) * t2)
-    # phi = np.append(phi1, np.ones(1000 - phi1.shape[0]))
-    #
-    # print(phi)
-    a = np.ones(shape=(10, 15))
-    b = np.ones(shape=(15, 10))
+    # signal = s1 + s2
 
-    print(np.where(a > 0))
+    jmd = JMD(K=2, alpha=2000, init="random", max_iter=200)
 
-    index = np.where(a > 0)
+    IMFs = jmd.fit_transform(signal=signal)
 
-    a[index] = 2
-    print(a)
+    print(IMFs.shape)
 
-    # print(np.matmul(a, b).shape)
-    #
-    # signal = np.random.rand(1024)
-    #
-    # jmd = JMD(K=3)
-    #
-    # jmd.fit_transform(signal=signal)
+    plot_IMFs(signal=signal, IMFs=IMFs)
+
+    plt.show()
