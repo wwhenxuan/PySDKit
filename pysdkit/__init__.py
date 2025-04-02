@@ -21,11 +21,13 @@ __all__ = [
     "VMD",
     "ACMD",
     "MVMD",
+    "VME",
     "CVMD2D",
     "VNCMD",
     "INCMD",
     "ewt",
     "EWT",
+    "JMD",
     "Moving_Decomp",
     "data",
     "entropy",
@@ -81,6 +83,9 @@ from ._vmd import ACMD
 # 多元变分模态分解算法
 from ._vmd import MVMD
 
+# 变分模态提取
+from ._vmd import VME
+
 # 适用于二维图像的变分模态分解算法
 from ._vmd2d import VMD2D
 
@@ -95,6 +100,9 @@ from ._vncmd import INCMD
 
 # 经验小波变换
 from ._ewt import ewt, EWT
+
+# Jump Plus AM-FM Mode Decomposition
+from ._jmd import JMD
 
 # 滑动平均分解
 from .tsa import Moving_Decomp
