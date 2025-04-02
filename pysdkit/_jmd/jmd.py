@@ -67,7 +67,9 @@ class JMD(object):
         self.tau = tau
         self.max_iter = max_iter
 
-    def __call__(self, signal: np.ndarray, return_all: bool = True) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def __call__(
+        self, signal: np.ndarray, return_all: bool = True
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -136,7 +138,7 @@ class JMD(object):
         f_mirror = np.concatenate(
             (
                 signal[: T // 2][::-1],  # First T/2 elements (in reverse order)
-                signal,  # 原始信号
+                signal,  # original signal
                 signal[T // 2 :][::-1],  # The last T/2 elements (in reverse order)
             )
         )
@@ -191,7 +193,7 @@ class JMD(object):
         return omega_plus
 
     def fit_transform(
-        self, signal: np.ndarray, return_all: bool = False
+        self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using Jump Plus AM-FM Mode Decomposition algorithm
@@ -218,7 +220,6 @@ class JMD(object):
         T = f.shape[0]
         half_T = T // 2
         t = np.arange(1, T + 1) / T
-        print(t)
 
         # Spectral Domain discretization
         freqs = t - 0.5 - 1 / T
@@ -267,7 +268,7 @@ class JMD(object):
             # Initialize sum_uk for k=1
             sum_uk = u_hat_plus[n, :, self.K - 1] + sum_uk - u_hat_plus[n, :, 0]
 
-            # 处理其他分量
+            # Processing other components
             for k in range(0, self.K):
                 # Update the accumulator for k > 0
                 if k > 0:
@@ -290,9 +291,7 @@ class JMD(object):
                 u_hat[half_T:T, k] = np.squeeze(u_hat_plus[n + 1, half_T:T, k])
 
                 conj_values = np.squeeze(np.conj(u_hat_plus[n + 1, half_T:T, k]))
-                u_hat[1 : half_T + 1, k] = conj_values[
-                    ::-1
-                ]  # Reverse order
+                u_hat[1 : half_T + 1, k] = conj_values[::-1]  # Reverse order
 
                 u_hat[0, k] = np.conj(u_hat[-1, k])
 
@@ -363,9 +362,7 @@ class JMD(object):
                 np.conj(j_hat_plus[n, :] - j_hat_plus[n - 1, :]).T,
             )
 
-            # uDiff = np.abs(uDiff)
-
-            print(n, uDiff)
+            uDiff = np.abs(uDiff)
 
         # Cleanup
 
