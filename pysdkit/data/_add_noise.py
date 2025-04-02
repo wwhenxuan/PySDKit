@@ -14,7 +14,7 @@ def add_noise(N: int, Mean: float, STD: float) -> np.ndarray:
     :param N: The number of samples.
     :param Mean: The mean value of the noise.
     :param STD: The standard deviation of the noise.
-    
+
     :return: numpy.ndarray: Generated Gaussian white noise.
     """
     # Generate noise using the given mean and standard deviation

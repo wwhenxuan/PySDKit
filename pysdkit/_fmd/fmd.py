@@ -71,7 +71,7 @@ def xcorr(x: np.ndarray, lags: int) -> np.ndarray:
 def TT(y: np.ndarray, fs: int):
     """
     Estimate the period in y based on auto-correlation function.
-    
+
     :param y: the input numpy ndarray signal.
     :param fs: the sampling frequency of the input signal.
     :return: the estimated period.

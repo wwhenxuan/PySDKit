@@ -20,7 +20,7 @@ class CVMD2D(object):
     Spatially Compact and Spectrally Sparse Image Decomposition and Segmentation.
     Decomposing multidimensional signals, such as images, into spatially compact,
     potentially overlapping modes of essentially wavelike nature makes these components accessible for further downstream analysis.
-    
+
     This decomposition enables space-frequency analysis, demodulation, estimation of local orientation, edge and corner detection,
     texture analysis, denoising, inpainting, or curvature estimation.
 

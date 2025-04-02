@@ -445,7 +445,7 @@ def test_multivariate_1D_3(
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
     :param random_state: Random seed for the noise generation.
-    
+
     :return: Tuple containing time array and the multivariate signals of shape [num_vars, seq_len] with noise.
     """
     np.random.seed(seed=random_state)

@@ -264,7 +264,7 @@ class TVF_EMD(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Execute the Time Varying Filter based Empirical Mode Decomposition algorithm
-        
+
         :param signal: 1D numpy ndarray signal to be decomposed
         :return: IMF decomposition [num_imf, seq_len]
         """

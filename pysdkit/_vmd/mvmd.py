@@ -54,7 +54,7 @@ class MVMD(Base):
             across iterations is below this threshold. Typically around 1e-6 to 1e-7. Defaults to 1e-7.
         :param max_iter: int, optional
             Maximum number of iterations if convergence is not reached. Defaults to 100.
-            
+
         Attributes:
         -----------
         DTYPE : numpy.dtype

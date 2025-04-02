@@ -118,7 +118,7 @@ def pchip(X, Y, x):
     Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) Interpolation.
 
     This function uses the PCHIP interpolation method to interpolate values at specified points x.
-    
+
     PCHIP interpolation ensures that the interpolated curve is monotonic in regions where the data is monotonic.
 
     :param X: Array-like, the x-coordinates of the data points.

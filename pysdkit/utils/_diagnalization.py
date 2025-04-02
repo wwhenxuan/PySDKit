@@ -25,7 +25,7 @@ def diagonal_average(
         The resulting vector after diagonal averaging.
 
     :Note:
-    
+
     * If samesize = False:
         - If reverse = False, diagonals from the bottom-left to the top-right are taken.
         - If reverse = True, diagonals from the bottom-right to the top-left are taken.
@@ -111,7 +111,7 @@ def get_diagonal(
         - idx < 0: diagonals to the left of the main backward diagonal
 
     :Example:
-    
+
     >>> a = [1, 2, 3, 4, 5]
     >>> b = signals.matrix.toeplitz(a)[:3, :]
     >>> print(b)

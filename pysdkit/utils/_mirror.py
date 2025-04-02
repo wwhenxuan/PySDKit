@@ -24,11 +24,11 @@ def fmirror(ts: np.ndarray, sym: int) -> np.ndarray:
 
     >>> array = np.array([1, 2, 3, 4, 5])
     >>> fmirror(array, 2)
-    
+
         array([2, 1, 1, 2, 3, 4, 5, 5, 4])
-    
+
     :Note:
-    
+
     If 'sym' exceeds half the length of the array,
     the function may not work as expected, so it's recommended to check the value of 'sym' beforehand.
     """

@@ -68,7 +68,7 @@ class SSA(object):
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
         Execute the Singular Spectral Analysis (SSA) algorithm to perform signal decomposition
-        
+
         :param signal: input signal of 1D ndarray
         :return: the decomposed results of IMFs
         """

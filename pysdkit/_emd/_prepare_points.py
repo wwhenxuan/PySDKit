@@ -32,7 +32,7 @@ def prepare_points_parabol(
     Used to perform a mirror operation at the extreme points of the signal so that smoother and more complete boundaries can be obtained when constructing the upper and lower envelopes of the signal.
 
     This processing is especially important at the beginning and end edges of the signal, because these areas may lack enough data points to accurately estimate the extreme values.
-    
+
     The mirror operation helps provide enough data points to make interpolation (such as spline interpolation) more accurate and natural.
     """
 

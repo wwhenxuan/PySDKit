@@ -17,7 +17,7 @@ def test_grayscale() -> np.ndarray | None:
     Load a sample 2D grayscale image for testing, the size is [256, 256]
 
     We download the data from https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/pysdkit/data/texture.txt
-    
+
     This data comes from https://www.mathworks.com/matlabcentral/fileexchange/45918-two-dimensional-variational-mode-decomposition
     Konstantin, Dragomiretskiy, and Dominique Zosso. "Two-dimensional variational mode decomposition."
     Energy Minimization Methods in Computer Vision and Pattern Recognition. Vol. 8932. 2015.
@@ -120,7 +120,7 @@ def test_multivariate_image(
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
-    
+
     :return: the generated image for 2D decomposition
     """
     # The number of generated images

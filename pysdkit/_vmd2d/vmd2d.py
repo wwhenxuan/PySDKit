@@ -96,7 +96,7 @@ class VMD2D(object):
     ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Image decomposition using VMD algorithm
-        
+
         :param img: the input image of 2D ndarray in numpy
         :param K: the maximum number of modes to be decomposed
         :param return_all: Whether to return all results of the algorithm, False only return the collection of decomposed modes,

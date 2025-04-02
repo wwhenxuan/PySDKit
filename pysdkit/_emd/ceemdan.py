@@ -333,7 +333,7 @@ class CEEMDAN(object):
     ) -> np.ndarray:
         """
         Perform the CEEMDAN method for signal decomposition.
-        
+
         :param signal: the original signal on which CEEMDAN is to be performed
         :param time: the time array of the original input signal
         :param max_imfs: the maximum number of components to extract
