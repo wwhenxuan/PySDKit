@@ -67,7 +67,9 @@ class JMD(object):
         self.tau = tau
         self.max_iter = max_iter
 
-    def __call__(self, signal: np.ndarray, return_all: bool = True) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def __call__(
+        self, signal: np.ndarray, return_all: bool = True
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -289,9 +291,7 @@ class JMD(object):
                 u_hat[half_T:T, k] = np.squeeze(u_hat_plus[n + 1, half_T:T, k])
 
                 conj_values = np.squeeze(np.conj(u_hat_plus[n + 1, half_T:T, k]))
-                u_hat[1 : half_T + 1, k] = conj_values[
-                    ::-1
-                ]  # Reverse order
+                u_hat[1 : half_T + 1, k] = conj_values[::-1]  # Reverse order
 
                 u_hat[0, k] = np.conj(u_hat[-1, k])
 

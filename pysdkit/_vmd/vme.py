@@ -29,8 +29,15 @@ class VME(object):
     MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/76003-variational-mode-extraction-vme-m?s_tid=srchtitle
     """
 
-    def __init__(self, alpha: Optional[float] = 20000, omega_init: Optional[float] = 0.0, fs: Optional[int] = None, tau: Optional[float] = 0, tol: Optional[float] = 1e-7,
-                 max_iter: Optional[int] = 300) -> None:
+    def __init__(
+        self,
+        alpha: Optional[float] = 20000,
+        omega_init: Optional[float] = 0.0,
+        fs: Optional[int] = None,
+        tau: Optional[float] = 0,
+        tol: Optional[float] = 1e-7,
+        max_iter: Optional[int] = 300,
+    ) -> None:
         """
         :param alpha: compactness of mode constraint
         :param omega_init: initial guess of mode center-frequency (Hz)
@@ -54,7 +61,9 @@ class VME(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Variational Mode Extraction (VME)"
 
-    def fit_transform(self, signal: np.ndarray, return_all: Optional[bool] = False) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def fit_transform(
+        self, signal: np.ndarray, return_all: Optional[bool] = False
+    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Signal decomposition using VME algorithm
 
@@ -95,7 +104,7 @@ class VME(object):
         # FFT of signal(and Hilbert transform concept=making it one-sided)
         f_hat = fftshift(ts=fft(ts=f))
         f_hat_onesided = f_hat
-        f_hat_onesided[: half_T] = 0
+        f_hat_onesided[:half_T] = 0
 
         # Initializing omega_d
         omega_d = np.zeros(self.max_iter)
@@ -116,13 +125,35 @@ class VME(object):
         # ----- Part 2: Main loop for iterative updates
         while uDiff > self.tol and n < self.max_iter - 1:
             # update u_d
-            u_hat_d[n + 1, :] = (f_hat_onesided + (u_hat_d[n, :] * (self.alpha ** 2) * (omega_axis - omega_d[n]) ** 4) + Lambda[n, :] / 2) / ((1 + (self.alpha ** 2) * (omega_axis - omega_d[n]) ** 4) * (1 + 2 * self.alpha ** 2 * (omega_axis - omega_d[n]) ** 4))
+            u_hat_d[n + 1, :] = (
+                f_hat_onesided
+                + (u_hat_d[n, :] * (self.alpha**2) * (omega_axis - omega_d[n]) ** 4)
+                + Lambda[n, :] / 2
+            ) / (
+                (1 + (self.alpha**2) * (omega_axis - omega_d[n]) ** 4)
+                * (1 + 2 * self.alpha**2 * (omega_axis - omega_d[n]) ** 4)
+            )
 
             # update omega_d
-            omega_d[n + 1] = np.matmul(omega_axis[half_T : T], (np.abs(u_hat_d[n + 1, half_T : T]) ** 2).T) / np.sum(np.abs(u_hat_d[n + 1, half_T : T]) ** 2, axis=0)
+            omega_d[n + 1] = np.matmul(
+                omega_axis[half_T:T], (np.abs(u_hat_d[n + 1, half_T:T]) ** 2).T
+            ) / np.sum(np.abs(u_hat_d[n + 1, half_T:T]) ** 2, axis=0)
 
             # update lambda (dual ascent) ===> lambda = lambda + tau*(f(t)-(Ud+Fr))
-            Lambda[n + 1, :] = Lambda[n, :] + (self.tau * (f_hat_onesided - (u_hat_d[n + 1, :] + ((self.alpha ** 2 * (omega_axis - omega_d[n + 1]) ** 4) * (f_hat_onesided - (u_hat_d[n + 1, :]))) / (1 + 2 * self.alpha ** 2 * (omega_axis - omega_d[n + 1]) ** 4))))
+            Lambda[n + 1, :] = Lambda[n, :] + (
+                self.tau
+                * (
+                    f_hat_onesided
+                    - (
+                        u_hat_d[n + 1, :]
+                        + (
+                            (self.alpha**2 * (omega_axis - omega_d[n + 1]) ** 4)
+                            * (f_hat_onesided - (u_hat_d[n + 1, :]))
+                        )
+                        / (1 + 2 * self.alpha**2 * (omega_axis - omega_d[n + 1]) ** 4)
+                    )
+                )
+            )
 
             # add the main loop counter
             n += 1
@@ -130,7 +161,10 @@ class VME(object):
             uDiff = np.spacing(1)
 
             # 1st loop criterion
-            uDiff = uDiff + 1 / T * np.matmul((u_hat_d[n, :] - u_hat_d[n - 1, :]), np.conj((u_hat_d[n, :] - u_hat_d[n - 1, :])).T)
+            uDiff = uDiff + 1 / T * np.matmul(
+                (u_hat_d[n, :] - u_hat_d[n - 1, :]),
+                np.conj((u_hat_d[n, :] - u_hat_d[n - 1, :])).T,
+            )
             uDiff = np.abs(uDiff)
 
         # ----- Part 3: Signal Reconstruction
@@ -138,8 +172,8 @@ class VME(object):
         omega = omega_d[N]
 
         u_hat = np.zeros(T)
-        u_hat[half_T : T] = np.squeeze(u_hat_d[N, half_T : T])
-        conj_values = np.squeeze(np.conj(u_hat_d[N, half_T : T]))
+        u_hat[half_T:T] = np.squeeze(u_hat_d[N, half_T:T])
+        conj_values = np.squeeze(np.conj(u_hat_d[N, half_T:T]))
         u_hat[1 : half_T + 1] = conj_values[::-1]
         u_hat[0] = np.conj(u_hat[-1])
 
@@ -147,7 +181,7 @@ class VME(object):
         u_d[:] = np.real(ifftshift(ts=ifft(ts=u_hat[:])))
 
         # Remove mirror part
-        u_d = u_d[T // 4: 3 * T // 4]
+        u_d = u_d[T // 4 : 3 * T // 4]
 
         u_hat = fftshift(ts=fft(u_d)).T
 
@@ -156,9 +190,7 @@ class VME(object):
         return u_d
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     from matplotlib import pyplot as plt
 
     t = np.arange(1, 1000 + 1) / 1000
@@ -169,8 +201,13 @@ if __name__ == '__main__':
 
     signal = s1 + s2 + s3
 
-    vme = VME(alpha=20000, max_iter=1000, fs=1000,
-              omega_init=10, tau=0.0, )
+    vme = VME(
+        alpha=20000,
+        max_iter=1000,
+        fs=1000,
+        omega_init=10,
+        tau=0.0,
+    )
     u = vme.fit_transform(signal)
 
     print(u.shape)
