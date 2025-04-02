@@ -5,13 +5,10 @@ Created on 2025/02/05 13:31:52
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from numpy import linalg, ndarray, dtype, floating
+from numpy import linalg
 import scipy.sparse as sp
 
-from typing import Optional, Tuple, Any
-
-from numpy._typing import _64Bit
-from plotnine.positions.position import position
+from typing import Optional, Tuple
 
 from pysdkit.utils import fft, fftshift, ifft, ifftshift
 
@@ -70,14 +67,27 @@ class JMD(object):
         self.tau = tau
         self.max_iter = max_iter
 
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(self, signal: np.ndarray, return_all: bool = True) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+        """allow instances to be called like functions"""
+        return self.fit_transform(signal=signal, return_all=return_all)
 
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
         return "Jump Plus AM-FM Mode Decomposition (JMD)"
 
-    def jump_step(self, freqs: np.ndarray, T: int) -> Tuple[float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, float, float, float]:
+    def jump_step(self, freqs: np.ndarray, T: int) -> Tuple[
+        float,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        float,
+        float,
+        float,
+    ]:
         """Init the Jump part"""
         # Define and calculate b using b_bar
         b = 2 / (self.b_bar**2)
@@ -180,7 +190,9 @@ class JMD(object):
 
         return omega_plus
 
-    def fit_transform(self, signal: np.ndarray, return_all: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    def fit_transform(
+        self, signal: np.ndarray, return_all: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using Jump Plus AM-FM Mode Decomposition algorithm
 
@@ -274,13 +286,13 @@ class JMD(object):
             # Back to time domain
             u_hat = np.zeros(shape=[T, self.K])
 
-            for k in range(0, self.K):  # TODO: 这部分代码需要注意
+            for k in range(0, self.K):
                 u_hat[half_T:T, k] = np.squeeze(u_hat_plus[n + 1, half_T:T, k])
 
                 conj_values = np.squeeze(np.conj(u_hat_plus[n + 1, half_T:T, k]))
                 u_hat[1 : half_T + 1, k] = conj_values[
                     ::-1
-                ]  # 逆序排列  TODO: 这里是不是要+1
+                ]  # Reverse order
 
                 u_hat[0, k] = np.conj(u_hat[-1, k])
 
@@ -304,7 +316,7 @@ class JMD(object):
 
             h = Dv + coef1 * rho
 
-            # 这里的含义其实应该是逐一元素的比较
+            # The meaning here should actually be a comparison of elements one by one
             x = (
                 self._min(
                     array=self._max(
@@ -338,14 +350,14 @@ class JMD(object):
             # Option 1:
             uDiff = np.spacing(1)
 
-            # 遍历每一个模态计算与上次模型分离的差异
+            # Iterate through each mode and calculate the difference with the last model separation
             for i in range(self.K):
                 uDiff += (1 / T) * np.matmul(
                     (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
                     np.conj(u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]).T,
                 )
 
-            # 判断本次迭代的Jump与上次迭代的差异
+            # Determine the difference between the Jump of this iteration and the previous iteration
             uDiff += (1 / T) * np.matmul(
                 (j_hat_plus[n, :] - j_hat_plus[n - 1, :]),
                 np.conj(j_hat_plus[n, :] - j_hat_plus[n - 1, :]).T,
@@ -370,44 +382,17 @@ class JMD(object):
             u_hat[1 : half_T + 1, k] = conj_values[::-1]
             u_hat[0, k] = np.conj(u_hat[-1, k])
 
-        # 获得重构的最终信号
+        # Get the final reconstructed signal
         u = np.zeros(shape=(self.K, T))
 
-        # 迭代处理每一个本征模态函数
+        # Iterate each eigenmode function
         for k in range(0, self.K):
             u[k, :] = np.real(ifft(ts=ifftshift(ts=u_hat[:, k])))
 
         # remove mirror part
         u = self.dec_fmirror(u=u, T=T)
-        v = v[T // 4: 3 * T // 4] + shift
+        v = v[T // 4 : 3 * T // 4] + shift
 
         if return_all is True:
             return u, v, omega
         return u
-
-
-if __name__ == "__main__":
-    from pysdkit.data import test_emd
-    from pysdkit.plot import plot_IMFs
-    from matplotlib import pyplot as plt
-    import pandas as pd
-
-    df = pd.read_csv(r"C:\Users\whenx\Desktop\JMD\data1.csv", header=None)
-    signal = df.values[:, 0]
-
-    t, signal = test_emd()
-
-    s1 = np.cos(5 * t)
-    s2 = 2 * np.cos(20 * t)
-
-    # signal = s1 + s2
-
-    jmd = JMD(K=2, alpha=2000, init="random", max_iter=200)
-
-    IMFs = jmd.fit_transform(signal=signal)
-
-    print(IMFs.shape)
-
-    plot_IMFs(signal=signal, IMFs=IMFs)
-
-    plt.show()
