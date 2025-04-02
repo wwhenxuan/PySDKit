@@ -136,7 +136,7 @@ class JMD(object):
         f_mirror = np.concatenate(
             (
                 signal[: T // 2][::-1],  # First T/2 elements (in reverse order)
-                signal,  # 原始信号
+                signal,  # original signal
                 signal[T // 2 :][::-1],  # The last T/2 elements (in reverse order)
             )
         )
