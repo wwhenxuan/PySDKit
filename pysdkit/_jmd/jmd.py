@@ -191,7 +191,7 @@ class JMD(object):
         return omega_plus
 
     def fit_transform(
-        self, signal: np.ndarray, return_all: bool = False
+        self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
         """
         Signal decomposition using Jump Plus AM-FM Mode Decomposition algorithm
