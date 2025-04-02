@@ -54,7 +54,7 @@ class VME(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Variational Mode Extraction (VME)"
 
-    def fit_transform(self, signal: np.ndarray, return_all: Optional[bool] = False) -> np.ndarray:
+    def fit_transform(self, signal: np.ndarray, return_all: Optional[bool] = False) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Signal decomposition using VME algorithm
 
@@ -119,7 +119,7 @@ class VME(object):
             u_hat_d[n + 1, :] = (f_hat_onesided + (u_hat_d[n, :] * (self.alpha ** 2) * (omega_axis - omega_d[n]) ** 4) + Lambda[n, :] / 2) / ((1 + (self.alpha ** 2) * (omega_axis - omega_d[n]) ** 4) * (1 + 2 * self.alpha ** 2 * (omega_axis - omega_d[n]) ** 4))
 
             # update omega_d
-            omega_d[n + 1] = (omega_axis[half_T : T] * (np.abs(u_hat_d[n + 1, half_T : T]) ** 2).T) / np.sum(np.abs(u_hat_d[n + 1, half_T : T]) ** 2, axis=0)
+            omega_d[n + 1] = np.matmul(omega_axis[half_T : T], (np.abs(u_hat_d[n + 1, half_T : T]) ** 2).T) / np.sum(np.abs(u_hat_d[n + 1, half_T : T]) ** 2, axis=0)
 
             # update lambda (dual ascent) ===> lambda = lambda + tau*(f(t)-(Ud+Fr))
             Lambda[n + 1, :] = Lambda[n, :] + (self.tau * (f_hat_onesided - (u_hat_d[n + 1, :] + ((self.alpha ** 2 * (omega_axis - omega_d[n + 1]) ** 4) * (f_hat_onesided - (u_hat_d[n + 1, :]))) / (1 + 2 * self.alpha ** 2 * (omega_axis - omega_d[n + 1]) ** 4))))
@@ -135,27 +135,48 @@ class VME(object):
 
         # ----- Part 3: Signal Reconstruction
         N = min(self.max_iter, n)
-        omega = omega_d[T]
+        omega = omega_d[N]
 
         u_hat = np.zeros(T)
         u_hat[half_T : T] = np.squeeze(u_hat_d[N, half_T : T])
         conj_values = np.squeeze(np.conj(u_hat_d[N, half_T : T]))
         u_hat[1 : half_T + 1] = conj_values[::-1]
-        u_hat[0, :] = np.conj(u_hat[-1, :])
+        u_hat[0] = np.conj(u_hat[-1])
 
         u_d = np.zeros(T)
-        u_d[:] = np.real(ifftshift(ts=ifft(ts=u_hat[:, 0])))
+        u_d[:] = np.real(ifftshift(ts=ifft(ts=u_hat[:])))
 
         # Remove mirror part
-        u_d = u_d[:, T // 4: 3 * T // 4]
+        u_d = u_d[T // 4: 3 * T // 4]
 
         u_hat = fftshift(ts=fft(u_d)).T
+
+        if return_all is True:
+            return u_d, u_hat, omega
+        return u_d
 
 
 
 
 if __name__ == '__main__':
-    a = np.array([1, 2, 3, 4, 5])
+    from matplotlib import pyplot as plt
 
-    print(a[::-1])
+    t = np.arange(1, 1000 + 1) / 1000
 
+    s1 = 2 * np.cos(4 * np.pi * t)
+    s2 = np.cos(30 * np.pi * t) * (1 + np.cos(2 * np.pi * t)) / 2
+    s3 = np.cos(80 * np.pi * t) * (1 + np.sin(2 * np.pi * t)) / 2
+
+    signal = s1 + s2 + s3
+
+    vme = VME(alpha=20000, max_iter=1000, fs=1000,
+              omega_init=10, tau=0.0, )
+    u = vme.fit_transform(signal)
+
+    print(u.shape)
+
+    fig, ax = plt.subplots(2, 1, figsize=(10, 5), dpi=400)
+
+    ax[0].plot(signal)
+    ax[1].plot(u / np.max(u))
+    plt.show()
