@@ -12,6 +12,7 @@ __all__ = [
     "MEMD",
     "TVF_EMD",
     "FAEMD",
+    "EMD2D",
     "HVD",
     "ITD",
     "LMD",
@@ -38,71 +39,74 @@ __all__ = [
     "__version__",
 ]
 
-# 经验模态分解算法
+# Empirical Mode Decomposition
 from ._emd import EMD
 
-# 集成经验模态分解算法
+# Ensemble Empirical Mode Decomposition
 from ._emd import EEMD
 
-# 具有自适应噪声的完全集合经验模态分解
+# Complete Ensemble Empirical Mode Decomposition with Adaptive Noise
 from ._emd import CEEMDAN
 
-# 稳健经验模态分解
+# Robust Empirical Mode Decomposition
 from ._emd import REMD
 
-# 多元变分模态分解算法
+# Multivariate Empirical Mode Decomposition
 from ._emd import MEMD
 
-# 基于时变滤波器的经验模态分解
+# Time Varying Filter based Empirical Mode Decomposition
 from ._emd import TVF_EMD
 
-# 快速自适应经验模态分解
+# Fast and Adaptive Empirical Mode Decomposition
 from ._faemd import FAEMD
 
-# 希尔伯特震动分解
+# Empirical Mode Decomposition 2D for images
+from ._emd2d import EMD2D
+
+# Hilbert Vibration Decomposition
 from ._hvd import HVD
 
-# 本征时间尺度分解
+# Intrinsic Time-Scale Decomposition
 from ._itd import ITD
 
-# 局部均值分解
+# Local Mean Decomposition
 from ._lmd import LMD
 
-# 稳健局部均值分解
+# Robust Local Mean Decomposition
 from ._lmd import RLMD
 
-# 奇异谱分析
+# Singular Spectral Analysis (SSA) algorithm
 from ._ssa import SSA
 
-# 变分模态分解算法
+# Variational mode decomposition
 from ._vmd import vmd, VMD
 
-# 自适应调频模态分解
+# Adaptive Chirp Mode Decomposition
 from ._vmd import ACMD
 
-# 多元变分模态分解算法
+# Multivariate Variational mode decomposition
 from ._vmd import MVMD
 
-# 变分模态提取
+# Variational Mode Extraction, to extract a specific mode from the signal
 from ._vmd import VME
 
-# 适用于二维图像的变分模态分解算法
+# Variational Mode Decomposition for 2D Image
 from ._vmd2d import VMD2D
 
-# 2D 紧凑变分模态分解
+# Compact Variational Mode Decomposition for 2D Images
 from ._vmd2d import CVMD2D
 
-# 非线性啁啾模式分解
+# Variational Nonlinear Chirp Mode Decomposition
 from ._vncmd import VNCMD
 
-# 迭代非线性线性调频模式分解
+# Iterative nonlinear chirp mode decomposition
 from ._vncmd import INCMD
 
-# 经验小波变换
+# Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
 # Jump Plus AM-FM Mode Decomposition
 from ._jmd import JMD
 
-# 滑动平均分解
+# Moving Average decomposition
 from .tsa import Moving_Decomp
