@@ -28,8 +28,13 @@ class EMD2D(object):
     MATLAB code: https://www.mathworks.com/help/signal/ref/emd.html
     """
 
-    def __init__(self, max_imfs: Optional[int] = -1, mse_thr: Optional[float] = 0.01, mean_thr: Optional[float] = 0.01,
-                 max_iter: Optional[int] = 1000) -> None:
+    def __init__(
+        self,
+        max_imfs: Optional[int] = -1,
+        mse_thr: Optional[float] = 0.01,
+        mean_thr: Optional[float] = 0.01,
+        max_iter: Optional[int] = 1000,
+    ) -> None:
         """
         :param max_imfs: IMF number to which decomposition should be performed and Negative value means *all*.
         :param mse_thr: proto-IMF check whether small mean square error.
@@ -73,7 +78,9 @@ class EMD2D(object):
         background = image == 0
 
         # appear along the bg border (artifact of the local max filter)
-        eroded_background = binary_erosion(background, structure=neighborhood, border_value=1)
+        eroded_background = binary_erosion(
+            background, structure=neighborhood, border_value=1
+        )
 
         # we obtain the final mask, containing only peaks,
         # by removing the background from the local_max mask (xor operation)
@@ -145,7 +152,9 @@ class EMD2D(object):
         return big_image
 
     @classmethod
-    def spline_points(cls, X: np.ndarray, Y: np.ndarray, Z: np.ndarray, xi: np.ndarray, yi: np.ndarray) -> np.ndarray:
+    def spline_points(
+        cls, X: np.ndarray, Y: np.ndarray, Z: np.ndarray, xi: np.ndarray, yi: np.ndarray
+    ) -> np.ndarray:
         """Interpolates for given set of points"""
 
         # SBS requires at least m=(kx+1)*(ky+1) points,
@@ -172,7 +181,9 @@ class EMD2D(object):
 
         return False
 
-    def check_proto_imf(self, proto_imf: np.ndarray, proto_imf_prev: np.ndarray, mean_env: np.ndarray) -> bool:
+    def check_proto_imf(
+        self, proto_imf: np.ndarray, proto_imf_prev: np.ndarray, mean_env: np.ndarray
+    ) -> bool:
         """
         Check whether passed (proto) IMF is actual IMF.
         Current condition is solely based on checking whether the mean is below threshold.
@@ -206,7 +217,9 @@ class EMD2D(object):
 
         return False
 
-    def extract_max_min_spline(self, image: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def extract_max_min_spline(
+        self, image: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Calculates top and bottom envelopes for image.
 
@@ -224,8 +237,12 @@ class EMD2D(object):
 
         big_min_image_val = big_image[big_min_peaks]
         big_max_image_val = big_image[big_max_peaks]
-        min_env = self.spline_points(big_min_peaks[0], big_min_peaks[1], big_min_image_val, xi, yi)
-        max_env = self.spline_points(big_max_peaks[0], big_max_peaks[1], big_max_image_val, xi, yi)
+        min_env = self.spline_points(
+            big_min_peaks[0], big_min_peaks[1], big_min_image_val, xi, yi
+        )
+        max_env = self.spline_points(
+            big_max_peaks[0], big_max_peaks[1], big_max_image_val, xi, yi
+        )
 
         return min_env, max_env
 
@@ -261,7 +278,7 @@ class EMD2D(object):
             # 开始经验模态分解的迭代算法
 
             # 获取当前分解的子信号
-            res = image_norm - np.sum(IMFs[: imfNo], axis=0)
+            res = image_norm - np.sum(IMFs[:imfNo], axis=0)
             imf = res.copy()
 
             # 初始化带分解图像的包络谱中值
@@ -332,7 +349,9 @@ class EMD2D(object):
             IMFs = np.vstack([IMFs, imf.copy()[None, :]])
             imfNo += 1
 
-            if self.stop_condition(image=image, IMFs=IMFs) or (0 < self.max_imfs <= imfNo):
+            if self.stop_condition(image=image, IMFs=IMFs) or (
+                0 < self.max_imfs <= imfNo
+            ):
                 notFinished = False
                 break
 
@@ -350,7 +369,7 @@ class EMD2D(object):
         return IMFs
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pysdkit.data import test_univariate_image
     from matplotlib import pyplot as plt
 
@@ -388,6 +407,3 @@ if __name__ == '__main__':
 
     # plt.savefig("image_decomp")
     print("Done")
-
-
-
