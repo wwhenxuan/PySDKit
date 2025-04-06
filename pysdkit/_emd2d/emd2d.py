@@ -48,8 +48,9 @@ class EMD2D(object):
         self.fix_epochs_h = 0
         self.max_iter = max_iter
 
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(self, image: np.ndarray) -> np.ndarray:
+        """allow instances to be called like functions"""
+        return self.fit_transform(image=image)
 
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
