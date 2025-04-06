@@ -5,13 +5,12 @@ Created on 2025/02/04 13:13:52
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from numpy import ndarray, dtype, signedinteger
 
 from scipy.interpolate import SmoothBivariateSpline
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import binary_erosion, generate_binary_structure
 
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple
 
 
 class EMD2D(object):
@@ -255,37 +254,37 @@ class EMD2D(object):
         :return: Set of IMFs in form of numpy array where the first dimension relates to IMF's ordinary number.
                  NumPy 3D array of [num_imfs, Height, Width].
         """
-        # 获取输入图像的最大值和最小值
+        # Get the maximum and minimum values ​​of the input image
         image_min, image_max = np.min(image), np.max(image)
 
-        # 获取偏置与尺度
+        # Get bias and scale
         offset, scale = image_min, image_max - image_min
 
-        # 对图像进行归一化
+        # Normalize the image
         image_norm = (image - offset) / scale
 
-        # 初始化一个本征模态函数
+        # Initialize an intrinsic mode function
         imf = np.zeros_like(image_norm)
         imf_old = imf.copy()
 
-        # 初始化所有带分解的本征模态函数
+        # Initialize all IMFs with decomposition
         imfNo = 0
         IMFs = np.empty((imfNo,) + image.shape)
 
-        # 算法分解的停止标识
+        # Stop sign for algorithm decomposition
         notFinished = True
 
         while notFinished is True:
-            # 开始经验模态分解的迭代算法
+            # Start the iterative algorithm for EMD
 
-            # 获取当前分解的子信号
+            # Get the sub-signal of the current decomposition
             res = image_norm - np.sum(IMFs[:imfNo], axis=0)
             imf = res.copy()
 
-            # 初始化带分解图像的包络谱中值
+            # Initialize the median of the envelope spectrum with the decomposed image
             mean_env = np.zeros_like(image)
 
-            # 本轮分解的停止标识
+            # Stop sign for this round of decomposition
             stop_sifting = False
 
             # Counters
@@ -296,24 +295,25 @@ class EMD2D(object):
                 # Update the counter
                 n += 1
 
-                # 寻找输入待分解图像的极大值和极小值
+                # Find the maximum and minimum values of the input image to be decomposed
                 min_peaks, max_peaks = self.find_extrema(imf)
 
-                # 确保有足够多的极值点
+                # Make sure there are enough extreme points
                 if len(min_peaks[0]) > 4 and len(max_peaks[0]) > 4:
 
-                    # 记录上一次输入的数据
+                    # Record the last input data
                     imf_old = imf.copy()
 
-                    # 将原本的输入减去包络谱均值
+                    # Subtract the envelope spectrum mean from the original input
                     imf = imf - mean_env
 
-                    # 计算输入图像的上下包络谱
+                    # Calculate the upper and lower envelope spectra of the input image
                     min_env, max_env = self.extract_max_min_spline(imf)
 
-                    # 计算包络谱中值
+                    # Calculate the median of the envelope spectrum
                     mean_env = (min_env + max_env) / 2
 
+                    # Subtract the mean of the envelope spectrum from the original image
                     imf_old = imf.copy()
                     imf = imf - mean_env
 
@@ -342,11 +342,11 @@ class EMD2D(object):
                             stop_sifting = True
 
                 else:
-                    # 算法停止迭代
+                    # The algorithm stops iterating
                     notFinished = False
                     stop_sifting = True
 
-            # 记录本次分解的结果
+            # Record the results of this decomposition
             IMFs = np.vstack([IMFs, imf.copy()[None, :]])
             imfNo += 1
 
@@ -356,14 +356,15 @@ class EMD2D(object):
                 notFinished = False
                 break
 
-        # 获取剩余的残差分量
+        # Get the remaining residual components
         res = image_norm - np.sum(IMFs[:imfNo], axis=0)
+
         if not np.allclose(res, 0):
-            # 如果残差不为零则将残差分量合并到分解的模态中
+            # If the residual is not zero, the residual component is incorporated into the decomposed mode
             IMFs = np.vstack((IMFs, res[None, :]))
             imfNo += 1
 
-        # 进行去归一化
+        # Denormalize
         IMFs = IMFs * scale
         IMFs[-1] += offset
 
