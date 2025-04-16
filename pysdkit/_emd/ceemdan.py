@@ -119,7 +119,7 @@ class CEEMDAN(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = None,
+        max_imfs: Optional[int] = -1,
         progress: bool = False,
     ) -> np.ndarray:
         """allow instances to be called like functions"""
