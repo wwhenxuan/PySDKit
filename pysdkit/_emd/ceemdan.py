@@ -177,7 +177,7 @@ class CEEMDAN(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = None,
+        max_imfs: Optional[int] = -1,
         progress: Optional[bool] = True,
     ) -> np.ndarray:
         """Perform the specified EEMD algorithm to obtain the corresponding signal decomposition results."""
@@ -328,7 +328,7 @@ class CEEMDAN(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = None,
+        max_imfs: Optional[int] = -1,
         progress: bool = False,
     ) -> np.ndarray:
         """
