@@ -50,16 +50,43 @@ class EFD(object):
         # We compute the Fourier transform of input signal
         ff = fft(signal)
 
+        print("len(ff)", len(ff))
+
         # We extract the boundaries of Fourier segments
-        bounds, cerf = segm_tec(f=ff, N=self.max_imfs)
+        bounds, cerf = segm_tec(f=np.abs(ff[0: int(np.round(len(ff) / 2))]), N=self.max_imfs)
 
         # We trun the boundaries to [0,pi]
-        bounds = bounds * np.pi / np.round(len(ff / 2))
+        bounds = bounds * np.pi / np.round(len(ff) / 2)
 
         # Filtering
         # We extend the signal by miroring to deal with the boundaries
-        signal = fmirror(ts=signal, sym=len(signal) // 2)
-        ff = fft(signal)
+        l = len(signal) // 2
+        x = np.concatenate([signal[0:l][::-1], signal, signal[l:][::-1]])
+        print("x", len(x))
+
+        print(x)
+
+        # x = fmirror(ts=signal, sym=len(signal) // 2)
+
+        ff = fft(x)
+        print("len(ff)", len(ff))
+
+        # We obtain the boundaries in the extend f
+        bound2 = np.ceil(bounds * np.round(len(ff) / 2) / np.pi)
+        print("bounds: ", bounds)
+        print("bound2", bound2)  # TODO: 这里大了1
+
+        # We get the core of filtering
+        efd = np.empty((len(bound2)-1, 1), dtype=object)  # 创建空对象数组
+
+        ft = np.zeros([len(efd),len(ff)])
+
+        # We define an ideal functions and extract components
+
+
+
+
+
 
 
 def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
@@ -79,12 +106,16 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     locmax = np.zeros(f.shape)
     locmin = np.max(f) * np.ones(f.shape)
 
+    # 遍历整个序列寻找局部极大值和局部极小值
     for i in range(1, len(f) - 1):
         if f[i - 1] < f[i] and f[i] > f[i + 1]:
+            # 局部极大值
             locmax[i] = f[i]
         if f[i - 1] > f[i] and f[i] < f[i + 1]:
+            # 局部极小值
             locmin[i] = f[i]
 
+    # 处理最后的边缘
     locmax[0] = f[0]
     locmax[-1] = f[-1]
 
@@ -92,6 +123,8 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     if N != 0:
         lmax = np.sort(locmax)[::-1]  # 按列降序排序
         Imax = np.argsort(locmax)[::-1]  # 获取排序后的索引
+        print("lmax", lmax)
+        print("Imax", Imax)
 
         if len(lmax) > N:
             Imax = np.sort(Imax[0:N])
@@ -101,25 +134,25 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
 
         # detect the lowest minima between two consecutive maxima
         M = N + 1  # numbers of the boundaries
-        print(Imax)
+        print("Imax", Imax)
         omega = np.concatenate([np.array([0]), Imax, np.array([len(f)])])  # location
 
-        print(omega)
+        print("omega", omega)
 
         bounds = np.zeros(M)
 
-        print(f.shape)
-
         for i in range(0, M):
             if (i == 0 or i == M - 1) and omega[i] == omega[i + 1]:
-                bounds[i] = omega[i] - 1
+                bounds[i] = omega[i]
             else:
-                print(omega[i], omega[i + 1])
+                # print(omega[i], omega[i + 1])
                 lmin = np.min(f[omega[i] : omega[i + 1]])
                 ind = np.argmin(f[omega[i] : omega[i + 1]])
                 print("ind", ind)
-                bounds[i] = omega[i] + ind - 2
+                bounds[i] = omega[i] + ind
             cerf = Imax * np.pi / np.round(len(f))
+
+    print("bounds", bounds)
 
     return bounds, cerf
 
@@ -127,12 +160,14 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
 if __name__ == "__main__":
     T = 1
     fs = 1000
-    t = np.arange(0, T, 1 / fs)
+    t = np.arange(0, T + 1 / fs, 1 / fs)
     f11 = 6 * t
     f12 = 2 * np.cos(8 * np.pi * t)
     f13 = np.cos(40 * np.pi * t)
 
     s = f11 + f12 + f13
+
+    print("len(s)", s.shape)
 
     efd = EFD(max_imfs=3)
     efd.fit_transform(s)
