@@ -31,7 +31,9 @@ class EFD(object):
     def __init__(self, max_imfs: Optional[int] = 3) -> None:
         self.max_imfs = max_imfs
 
-    def __call__(self, signal: np.ndarray, return_all: Optional[bool] = False) -> np.ndarray | Tuple[np.ndarray, float]:
+    def __call__(
+        self, signal: np.ndarray, return_all: Optional[bool] = False
+    ) -> np.ndarray | Tuple[np.ndarray, float]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -39,7 +41,9 @@ class EFD(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Empirical Fourier Decomposition (EFD)"
 
-    def fit_transform(self, signal: np.ndarray, return_all: Optional[bool] = False) -> np.ndarray | Tuple[np.ndarray, float]:
+    def fit_transform(
+        self, signal: np.ndarray, return_all: Optional[bool] = False
+    ) -> np.ndarray | Tuple[np.ndarray, float]:
         """
         Signal decomposition using EFD algorithm
 
@@ -90,15 +94,19 @@ class EFD(object):
         # We define an ideal functions and extract components
         for k in range(0, number):
             if bound2[k] == 0:
-                ft[k, 0:bound2[k + 1]] = ff[0: bound2[k + 1]]
-                ft[k, len(ff) + 2 - bound2[k + 1]: len(ff)] = ff[len(ff) + 2 - bound2[k + 1]: len(ff)]
+                ft[k, 0 : bound2[k + 1]] = ff[0 : bound2[k + 1]]
+                ft[k, len(ff) + 2 - bound2[k + 1] : len(ff)] = ff[
+                    len(ff) + 2 - bound2[k + 1] : len(ff)
+                ]
             else:
-                ft[k, bound2[k]: bound2[k + 1]] = ff[bound2[k]: bound2[k + 1]]
-                ft[k, len(ff) + 2 - bound2[k + 1]: len(ff) + 2 - bound2[k]] = ff[len(ff) + 2 - bound2[k + 1]: len(ff) + 2 - bound2[k]]
+                ft[k, bound2[k] : bound2[k + 1]] = ff[bound2[k] : bound2[k + 1]]
+                ft[k, len(ff) + 2 - bound2[k + 1] : len(ff) + 2 - bound2[k]] = ff[
+                    len(ff) + 2 - bound2[k + 1] : len(ff) + 2 - bound2[k]
+                ]
 
             # Recover the original signal from the frequency domain
             efd[k, :] = np.real(ifft(ft[k, :]))
-            imfs[k, :] = efd[k][T // 2: 3 * T // 2]
+            imfs[k, :] = efd[k][T // 2 : 3 * T // 2]
 
         if return_all is True:
             return imfs, cerf
@@ -164,10 +172,10 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     return bounds, cerf
 
 
-
 if __name__ == "__main__":
     from pysdkit.plot import plot_IMFs
     from matplotlib import pyplot as plt
+
     T = 1
     fs = 1000
     t = np.arange(0, T + 1 / fs, 1 / fs)
