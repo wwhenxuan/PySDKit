@@ -11,81 +11,6 @@ from typing import Optional, Tuple
 from pysdkit.utils import fft, ifft, fmirror
 
 
-class EFD(object):
-    """
-    Empirical Fourier Decomposition
-
-    The proposed EFD combines the uses of an improved Fourier spectrum segmentation technique and an ideal filter bank.
-    The segmentation technique can solve the inconsistency problem by predefining the number of modes in a signal to be
-    decomposed and filter functions in the ideal filter bank have no transition phases, which can solve the mode mixing problem.
-    Numerical investigations are conducted to study the accuracy of the EFD. It is shown that the EFD can yield accurate
-    and consistent decomposition results for signals with multiple non-stationary modes and those with closely-spaced modes,
-    compared with decomposition results by the EWT, FDM, variational mode decomposition and empirical mode decomposition.
-
-    Wei Zhou, Zhongren Feng, Y.F. Xu, Xiongjiang Wang, Hao Lv,
-    Empirical Fourier decomposition: An accurate signal decomposition method for nonlinear and non-stationary time series analysis,
-    Mechanical Systems and Signal Processing,
-    Volume 163, 2022, 108155, ISSN 0888-3270, https://doi.org/10.1016/j.ymssp.2021.108155.
-    """
-
-    def __init__(self, max_imfs: Optional[int] = 3) -> None:
-        self.max_imfs = max_imfs
-
-    def __call__(self, *args, **kwargs):
-        """allow instances to be called like functions"""
-        pass
-
-    def __str__(self) -> str:
-        """Get the full name and abbreviation of the algorithm"""
-        return "Empirical Fourier Decomposition (EFD)"
-
-    def fit_transform(self, signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """
-        Signal decomposition using EFD algorithm
-
-        :param signal: the time domain signal (1D numpy array) to be decomposed
-        :return: the decomposed results of IMFs
-        """
-
-        # We compute the Fourier transform of input signal
-        ff = fft(signal)
-
-        print("len(ff)", len(ff))
-
-        # We extract the boundaries of Fourier segments
-        bounds, cerf = segm_tec(
-            f=np.abs(ff[0 : int(np.round(len(ff) / 2))]), N=self.max_imfs
-        )
-
-        # We trun the boundaries to [0,pi]
-        bounds = bounds * np.pi / np.round(len(ff) / 2)
-
-        # Filtering
-        # We extend the signal by miroring to deal with the boundaries
-        l = len(signal) // 2
-        x = np.concatenate([signal[0:l][::-1], signal, signal[l:][::-1]])
-        print("x", len(x))
-
-        print(x)
-
-        # x = fmirror(ts=signal, sym=len(signal) // 2)
-
-        ff = fft(x)
-        print("len(ff)", len(ff))
-
-        # We obtain the boundaries in the extend f
-        bound2 = np.ceil(bounds * np.round(len(ff) / 2) / np.pi)
-        print("bounds: ", bounds)
-        print("bound2", bound2)  # TODO: 这里大了1
-
-        # We get the core of filtering
-        efd = np.empty((len(bound2) - 1, 1), dtype=object)  # 创建空对象数组
-
-        ft = np.zeros([len(efd), len(ff)])
-
-        # We define an ideal functions and extract components
-
-
 def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     """
     This function is used to implement the improved segmentation technique.
@@ -120,8 +45,6 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     if N != 0:
         lmax = np.sort(locmax)[::-1]  # 按列降序排序
         Imax = np.argsort(locmax)[::-1]  # 获取排序后的索引
-        print("lmax", lmax)
-        print("Imax", Imax)
 
         if len(lmax) > N:
             Imax = np.sort(Imax[0:N])
@@ -131,10 +54,7 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
 
         # detect the lowest minima between two consecutive maxima
         M = N + 1  # numbers of the boundaries
-        print("Imax", Imax)
         omega = np.concatenate([np.array([0]), Imax, np.array([len(f)])])  # location
-
-        print("omega", omega)
 
         bounds = np.zeros(M)
 
@@ -154,7 +74,98 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     return bounds, cerf
 
 
+class EFD(object):
+    """
+    Empirical Fourier Decomposition
+
+    The proposed EFD combines the uses of an improved Fourier spectrum segmentation technique and an ideal filter bank.
+    The segmentation technique can solve the inconsistency problem by predefining the number of modes in a signal to be
+    decomposed and filter functions in the ideal filter bank have no transition phases, which can solve the mode mixing problem.
+    Numerical investigations are conducted to study the accuracy of the EFD. It is shown that the EFD can yield accurate
+    and consistent decomposition results for signals with multiple non-stationary modes and those with closely-spaced modes,
+    compared with decomposition results by the EWT, FDM, variational mode decomposition and empirical mode decomposition.
+
+    Wei Zhou, Zhongren Feng, Y.F. Xu, Xiongjiang Wang, Hao Lv,
+    Empirical Fourier decomposition: An accurate signal decomposition method for nonlinear and non-stationary time series analysis,
+    Mechanical Systems and Signal Processing,
+    Volume 163, 2022, 108155, ISSN 0888-3270, https://doi.org/10.1016/j.ymssp.2021.108155.
+    """
+
+    def __init__(self, max_imfs: Optional[int] = 3) -> None:
+        self.max_imfs = max_imfs
+
+    def __call__(self, *args, **kwargs):
+        """allow instances to be called like functions"""
+        pass
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Empirical Fourier Decomposition (EFD)"
+
+    def fit_transform(self, signal: np.ndarray) -> np.ndarray:
+        """
+        Signal decomposition using EFD algorithm
+
+        :param signal: the time domain signal (1D numpy array) to be decomposed
+        :return: the decomposed results of IMFs
+        """
+        # 确保输入信号长度为偶数否则镜像拓展无法进行
+        if len(signal) % 2 == 1:
+            signal = signal[:-1]
+
+        print("signal", len(signal))
+
+        # We compute the Fourier transform of input signal
+        ff = fft(signal)
+        # We extract the boundaries of Fourier segments
+        bounds, cerf = segm_tec(
+            f=np.abs(ff[0 : int(np.round(len(ff) / 2))]), N=self.max_imfs
+        )
+
+        # We trun the boundaries to [0,pi]
+        bounds = bounds * np.pi / np.round(len(ff) / 2)
+
+        # Filtering
+        # We extend the signal by miroring to deal with the boundaries
+        x = fmirror(ts=signal, sym=len(signal) // 2)
+        T = len(x) // 2
+
+        ff = fft(x)
+        print("len(ff)", len(ff))
+
+        # We obtain the boundaries in the extend f
+        bound2 = np.ceil(bounds * np.round(len(ff) / 2) / np.pi).astype(int)
+        print("bounds: ", bounds)
+        print("bound2", bound2)   # TODO: 这里大了1
+
+        # We get the core of filtering
+        number = len(bound2) - 1
+        efd = np.zeros(shape=(number, len(ff)))
+        imfs = np.zeros(shape=(number, len(signal)))
+
+        print("efd.shape", efd.shape)
+
+        ft = np.zeros([number, len(ff)])
+
+        # We define an ideal functions and extract components
+        for k in range(0, number):
+            if bound2[k] == 0:
+                ft[k, 0:bound2[k + 1]] = ff[0: bound2[k + 1]]
+                ft[k, len(ff) + 2 - bound2[k + 1]: len(ff)] = ff[len(ff) + 2 - bound2[k + 1]: len(ff)]
+            else:
+                ft[k, bound2[k]: bound2[k + 1]] = ff[bound2[k]: bound2[k + 1]]
+                ft[k, len(ff) + 2 - bound2[k + 1]: len(ff) + 2 - bound2[k]] = ff[len(ff) + 2 - bound2[k + 1]: len(ff) + 2 - bound2[k]]
+
+            efd[k, :] = np.real(ifft(ft[k, :]))
+            imfs[k, :] = efd[k][T // 2: 3 * T // 2]
+
+        return imfs
+
+
+
 if __name__ == "__main__":
+    from pysdkit.plot import plot_IMFs
+    from matplotlib import pyplot as plt
     T = 1
     fs = 1000
     t = np.arange(0, T + 1 / fs, 1 / fs)
@@ -167,4 +178,17 @@ if __name__ == "__main__":
     print("len(s)", s.shape)
 
     efd = EFD(max_imfs=3)
-    efd.fit_transform(s)
+    imfs = efd.fit_transform(s)
+    plot_IMFs(s, imfs)
+    plt.show()
+
+    from pysdkit.data import test_emd
+
+    print("\n")
+
+    t, s = test_emd()
+    print("len(s)", s.shape)
+
+    imfs = efd.fit_transform(s)
+    plot_IMFs(s, imfs)
+    plt.show()
