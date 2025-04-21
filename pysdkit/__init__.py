@@ -114,3 +114,19 @@ from ._jmd import JMD
 
 # Moving Average decomposition
 from .tsa import Moving_Decomp
+
+
+def greet():
+    print(
+        """
+ ____          ____   ____   _  __ _  _   
+|  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
+| |_) || | | |\___ \ | | | || ' / | || __|
+|  __/ | |_| | ___) || |_| || . \ | || |_ 
+|_|     \__, ||____/ |____/ |_|\_\|_| \__|
+        |___/                                            
+    
+A Python library for signal decomposition algorithms.
+https://github.com/wwhenxuan/PySDKit
+"""
+    )
