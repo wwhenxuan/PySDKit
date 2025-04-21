@@ -6,7 +6,10 @@ Created on 2025/02/12 12:31:39
 """
 import numpy as np
 from scipy import linalg
-from scipy.integrate import cumtrapz
+try:
+    from scipy.integrate import cumulative_trapezoid
+except ImportError:
+    from scipy.integrate import cumtrapz as cumulative_trapezoid
 from scipy.sparse import spdiags, diags, identity, csc_matrix
 from scipy.signal import welch
 from scipy.sparse.linalg import inv as sparseinv
@@ -165,14 +168,14 @@ class INCMD(object):
     @staticmethod
     def _compute_new_phi_1(new_f: np.ndarray, time: np.ndarray) -> np.ndarray:
         """Compute new phi_1"""
-        integrated_f = cumtrapz(new_f, time, initial=0)
+        integrated_f = cumulative_trapezoid(new_f, time, initial=0)
         phi_diag = np.cos(2 * np.pi * integrated_f)
         return diags(phi_diag)
 
     @staticmethod
     def _compute_new_phi_2(new_f: np.ndarray, time: np.ndarray) -> np.ndarray:
         """Compute new phi_2"""
-        integrated_f = cumtrapz(new_f, time, initial=0)
+        integrated_f = cumulative_trapezoid(new_f, time, initial=0)
         phi_diag = np.sin(2 * np.pi * integrated_f)
         return diags(phi_diag)
 

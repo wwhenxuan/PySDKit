@@ -2,7 +2,7 @@
 A Python library for signal decomposition algorithms.
 """
 
-__version__ = "0.4.16"
+__version__ = "0.4.17"
 
 __all__ = [
     "EMD",
@@ -11,6 +11,7 @@ __all__ = [
     "REMD",
     "MEMD",
     "TVF_EMD",
+    "EFD",
     "FAEMD",
     "EMD2D",
     "HVD",
@@ -56,6 +57,9 @@ from ._emd import MEMD
 
 # Time Varying Filter based Empirical Mode Decomposition
 from ._emd import TVF_EMD
+
+# Empirical Fourier Decomposition
+from ._emd import EFD
 
 # Fast and Adaptive Empirical Mode Decomposition
 from ._faemd import FAEMD
@@ -110,3 +114,19 @@ from ._jmd import JMD
 
 # Moving Average decomposition
 from .tsa import Moving_Decomp
+
+
+def greet():
+    print(
+        """
+ ____          ____   ____   _  __ _  _   
+|  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
+| |_) || | | |\___ \ | | | || ' / | || __|
+|  __/ | |_| | ___) || |_| || . \ | || |_ 
+|_|     \__, ||____/ |____/ |_|\_\|_| \__|
+        |___/                                            
+    
+A Python library for signal decomposition algorithms.
+https://github.com/wwhenxuan/PySDKit
+"""
+    )
