@@ -11,6 +11,7 @@ __all__ = [
     "REMD",
     "MEMD",
     "TVF_EMD",
+    "EFD",
     "FAEMD",
     "EMD2D",
     "HVD",
@@ -56,6 +57,9 @@ from ._emd import MEMD
 
 # Time Varying Filter based Empirical Mode Decomposition
 from ._emd import TVF_EMD
+
+# Empirical Fourier Decomposition
+from ._emd import EFD
 
 # Fast and Adaptive Empirical Mode Decomposition
 from ._faemd import FAEMD
