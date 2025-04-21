@@ -64,6 +64,8 @@ class EFD(object):
 
 
 
+
+
 def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     """
     This function is used to implement the improved segmentation technique.
