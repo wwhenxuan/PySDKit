@@ -53,7 +53,9 @@ class EFD(object):
         print("len(ff)", len(ff))
 
         # We extract the boundaries of Fourier segments
-        bounds, cerf = segm_tec(f=np.abs(ff[0: int(np.round(len(ff) / 2))]), N=self.max_imfs)
+        bounds, cerf = segm_tec(
+            f=np.abs(ff[0 : int(np.round(len(ff) / 2))]), N=self.max_imfs
+        )
 
         # We trun the boundaries to [0,pi]
         bounds = bounds * np.pi / np.round(len(ff) / 2)
@@ -77,16 +79,11 @@ class EFD(object):
         print("bound2", bound2)  # TODO: 这里大了1
 
         # We get the core of filtering
-        efd = np.empty((len(bound2)-1, 1), dtype=object)  # 创建空对象数组
+        efd = np.empty((len(bound2) - 1, 1), dtype=object)  # 创建空对象数组
 
-        ft = np.zeros([len(efd),len(ff)])
+        ft = np.zeros([len(efd), len(ff)])
 
         # We define an ideal functions and extract components
-
-
-
-
-
 
 
 def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
