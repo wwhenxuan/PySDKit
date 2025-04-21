@@ -54,16 +54,12 @@ class EFD(object):
         bounds, cerf = segm_tec(f=ff, N=self.max_imfs)
 
         # We trun the boundaries to [0,pi]
-        bounds = bounds * np.pi  / np.round(len(ff / 2))
+        bounds = bounds * np.pi / np.round(len(ff / 2))
 
         # Filtering
         # We extend the signal by miroring to deal with the boundaries
         signal = fmirror(ts=signal, sym=len(signal) // 2)
         ff = fft(signal)
-
-
-
-
 
 
 def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
@@ -98,7 +94,7 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
         Imax = np.argsort(locmax)[::-1]  # 获取排序后的索引
 
         if len(lmax) > N:
-            Imax = np.sort(Imax[0: N])
+            Imax = np.sort(Imax[0:N])
         else:
             Imax = np.sort(Imax)
             N = len(lmax)
@@ -119,8 +115,8 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
                 bounds[i] = omega[i] - 1
             else:
                 print(omega[i], omega[i + 1])
-                lmin = np.min(f[omega[i]:omega[i + 1]])
-                ind = np.argmin(f[omega[i]:omega[i + 1]])
+                lmin = np.min(f[omega[i] : omega[i + 1]])
+                ind = np.argmin(f[omega[i] : omega[i + 1]])
                 print("ind", ind)
                 bounds[i] = omega[i] + ind - 2
             cerf = Imax * np.pi / np.round(len(f))
@@ -128,7 +124,7 @@ def segm_tec(f: np.ndarray, N: Optional[int] = 3) -> Tuple[np.ndarray, float]:
     return bounds, cerf
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     T = 1
     fs = 1000
     t = np.arange(0, T, 1 / fs)

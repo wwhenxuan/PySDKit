@@ -10,6 +10,7 @@ import numpy as np
 from pysdkit import CEEMDAN
 from pysdkit.data import test_emd, test_univariate_signal
 
+
 class CEEMDANTest(unittest.TestCase):
     """
     Test whether CEEMDAN can run normally
@@ -26,10 +27,18 @@ class CEEMDANTest(unittest.TestCase):
             IMFs = ceemdan.fit_transform(signal)
             # Determine the output dimension
             dim = len(IMFs.shape)
-            self.assertEqual(first=dim, second=2, msg="The output shape of the decomposed signal is wrong")
+            self.assertEqual(
+                first=dim,
+                second=2,
+                msg="The output shape of the decomposed signal is wrong",
+            )
             # Determine the length of the output signal
             _, length = IMFs.shape
-            self.assertEqual(first=len(signal), second=length, msg="Wrong length of decomposed signal")
+            self.assertEqual(
+                first=len(signal),
+                second=length,
+                msg="Wrong length of decomposed signal",
+            )
 
     def test_default_call(self) -> None:
         """Verify that the call method can run normally"""
@@ -41,10 +50,16 @@ class CEEMDANTest(unittest.TestCase):
 
         # Determine the output dimension
         dim = len(IMFs.shape)
-        self.assertEqual(first=dim, second=2, msg="The output shape of the decomposed signal is wrong")
+        self.assertEqual(
+            first=dim,
+            second=2,
+            msg="The output shape of the decomposed signal is wrong",
+        )
         # Determine the length of the output signal
         _, length = IMFs.shape
-        self.assertEqual(first=len(signal), second=length, msg="Wrong length of decomposed signal")
+        self.assertEqual(
+            first=len(signal), second=length, msg="Wrong length of decomposed signal"
+        )
 
     def test_different_length_inputs(self) -> None:
         """Verify the exception when the timestamp array and the input signal length are inconsistent"""
@@ -252,9 +267,9 @@ class CEEMDANTest(unittest.TestCase):
         time = np.linspace(0, 2 * np.pi, 100)
         expected_trend = 5 * time
         signal = (
-                2 * np.sin(4.1 * 6.28 * time)
-                + 1.2 * np.cos(7.4 * 6.28 * time)
-                + expected_trend
+            2 * np.sin(4.1 * 6.28 * time)
+            + 1.2 * np.cos(7.4 * 6.28 * time)
+            + expected_trend
         )
 
         # Execute the signal decomposition algorithm
@@ -265,9 +280,7 @@ class CEEMDANTest(unittest.TestCase):
         # Further numerical verification of the trend component
         onset_trend = trend - trend.mean()
         onset_expected_trend = expected_trend - expected_trend.mean()
-        self.assertEqual(
-            IMFs.shape[0], imfs.shape[0], "Compare number of components"
-        )
+        self.assertEqual(IMFs.shape[0], imfs.shape[0], "Compare number of components")
         # self.assertTrue(
         #     np.array_equal(IMFs[:-1], imfs), "Shouldn't matter where imfs are from"
         # )
