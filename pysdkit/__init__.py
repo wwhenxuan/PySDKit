@@ -130,3 +130,6 @@ A Python library for signal decomposition algorithms.
 https://github.com/wwhenxuan/PySDKit
 """
     )
+
+function_list = __all__
+function_dict = {}
