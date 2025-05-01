@@ -88,11 +88,11 @@ class HHT(object):
         """
         Record the results of this Hilbert-Huang transform
 
-        :param imfs:
+        :param imfs: The intrinsic mode functions obtained by decomposing the signal.
         :param signal: Input Numpy signal.
-        :param fs:
-        :param imfs_env:
-        :param imfs_freq:
+        :param fs: Sampling frequency of the input signal.
+        :param imfs_env: Envelope spectrum of the intrinsic mode function.
+        :param imfs_freq: Frequency of the intrinsic mode function.
 
         :return: None
         """
