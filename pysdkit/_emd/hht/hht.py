@@ -16,7 +16,7 @@ from pysdkit.utils import (
     hilbert_transform,
     hilbert_spectrum,
 )
-from pysdkit import EMD, REMD, EEMD, CEEMDAN
+from pysdkit._emd import EMD, REMD, EEMD, CEEMDAN
 from pysdkit._emd.hht.frequency import get_envelope_frequency
 
 
