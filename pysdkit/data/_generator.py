@@ -5,7 +5,7 @@ Created on Sat Mar 8 21:45:02 2024
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from scipy.signal import sawtooth
+from scipy.signal import sawtooth, chirp
 from matplotlib import pyplot as plt
 
 from typing import Tuple, Optional
@@ -336,6 +336,24 @@ def test_emd(
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
     return t, noise_signal
+
+
+def test_hht(duration: float = 2.0, sampling_rate: int = 1000):
+    """
+    Generate data generation function to verify Hilbert-Huang transform.
+
+    :param duration: Length of the signal in seconds.
+    :param sampling_rate: Number of samples per second.
+
+    :return: Tuple of time array and signal for hht testing.
+    """
+    # Generate a sequence of time-stamped samples
+    time = np.arange(sampling_rate * duration) / sampling_rate
+    # Generate the signal to be decomposed
+    signal = chirp(time, 5, 0.8, 10, method="quadratic", phi=100) * np.exp(
+        -4 * (time - 1) ** 2
+    ) + chirp(time, 40, 1.2, 50, method="linear") * np.exp(-4 * (time - 1) ** 2)
+    return time, signal
 
 
 def test_multivariate_signal(

@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on 2025/02/06 10:30:01
+@author: Whenxuan Wang
+@email: wwhenxuan@gmail.com
+"""
+
 # Fourier Transform
 from ._fft import (
     fft,
@@ -17,6 +24,7 @@ from ._hilbert import (
     hilbert_transform,
     hilbert_real,
     hilbert_imaginary,
+    hilbert_spectrum,
 )
 from ._hilbert import (
     plot_hilbert,

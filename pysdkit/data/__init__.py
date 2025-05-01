@@ -17,8 +17,11 @@ from ._generator import generate_am_signal, generate_exponential_signal
 # Generator for 1D univariate time series data
 from ._time_series import generate_time_series
 
-# Generates the main test sample signal
+# Generate the main test sample signal
 from ._generator import test_emd
+
+# Generate the test function for HHT
+from ._generator import test_hht
 
 # Generator for 1D univariate
 from ._generator import test_univariate_signal

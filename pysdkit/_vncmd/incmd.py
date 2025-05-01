@@ -6,6 +6,7 @@ Created on 2025/02/12 12:31:39
 """
 import numpy as np
 from scipy import linalg
+
 try:
     from scipy.integrate import cumulative_trapezoid
 except ImportError:
