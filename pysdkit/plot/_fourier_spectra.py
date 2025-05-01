@@ -145,3 +145,96 @@ def plot_IMFs_amplitude_spectra(
     # Return the figure if requested
     if return_figure is True:
         return fig
+
+
+def plot_HilbertSpectrum(
+        spectrum,
+        time_axis,
+        freq_axis,
+        energy_scale="log",
+        save_spectrum=None,
+        save_marginal=None,
+        title=None,
+):
+    """
+    Visualize the Hilbert spectrum, by plotting all the IMFs on a time-frequency plane.
+
+    Parameters:
+    ------------
+    spectrum : Tensor, of shape ( ..., # time_bins, # freq_bins ).
+        A pytorch tensor, representing the Hilbert spectrum H(t, f).
+        The tensor will be on the same device as `imfs_env` and `imfs_freq`.
+    time_axis : Tensor, 1D, of shape ( # time_bins )
+        The label for the time axis of the spectrum.
+    freq_axis : Tensor, 1D, of shape ( # freq_bins )
+        The label for the frequency axis (in `freq_unit`) of the spectrum.
+    energy_scale : string ('linear' or 'log')
+        Specifying whether to visualize the energy in linear/log scale.
+    save_spectrum : string or list of string, Optional.
+        If specified, the Hilbert spectrum will be saved as a file named `save_spectrum`.
+    save_maeginal : string or list of string, Optional.
+        If specified, the Hilbert marginal spectrum will be saved as a file named `save_marginal`.
+    title : string, optional.
+        Specifying the title of the figure.
+    """
+    spectrum = spectrum.view(-1, spectrum.shape[-2], spectrum.shape[-1])
+    time_axis = time_axis
+    freq_axis = freq_axis
+
+    for batch_idx in range(spectrum.shape[0]):
+
+        if energy_scale == "log":
+            eps = spectrum[batch_idx, :, :].max() * (1e-5)
+            coutour = plt.pcolormesh(
+                time_axis,
+                freq_axis,
+                10 * np.log10(spectrum[batch_idx, :, :].T + eps),
+                shading="auto",
+                cmap=plt.cm.jet,
+                )
+            plt.colorbar(coutour, label="energy (dB)")
+        else:
+            coutour = plt.pcolormesh(
+                time_axis,
+                freq_axis,
+                spectrum[batch_idx, :, :].T,
+                shading="auto",
+                cmap=plt.cm.jet,
+            )
+            plt.colorbar(coutour, label="energy")
+
+        plt.xlabel("time")
+        plt.ylabel("frequency (Hz)")
+        plt.title("Hilbert spectrum" if title is None else title)
+        if save_spectrum is not None:
+            plt.savefig(
+                (
+                    save_spectrum
+                    if type(save_spectrum) is str
+                    else save_spectrum[batch_idx]
+                ),
+                dpi=600,
+            )
+        plt.show()
+
+    if save_marginal is None:
+        return
+
+    marginal = spectrum.sum(dim=-2)
+    for batch_idx in range(spectrum.shape[0]):
+        if energy_scale == "log":
+            eps = marginal[batch_idx, :].max() * (1e-5)
+            plt.plot(
+                freq_axis, 10 * np.log10(marginal[batch_idx, :] + eps)
+            )
+            plt.ylabel("energy (dB)")
+        else:
+            plt.plot(freq_axis, marginal[batch_idx, :])
+            plt.ylabel("energy")
+        plt.xlabel("frequency (Hz)")
+        plt.title("Marginal spectrum" if title is None else title + " (marginal)")
+        plt.savefig(
+            save_marginal if type(save_marginal) is str else save_marginal[batch_idx],
+            dpi=600,
+        )
+        plt.show()

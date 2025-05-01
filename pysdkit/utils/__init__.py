@@ -17,6 +17,7 @@ from ._hilbert import (
     hilbert_transform,
     hilbert_real,
     hilbert_imaginary,
+    hilbert_spectrum
 )
 from ._hilbert import (
     plot_hilbert,
