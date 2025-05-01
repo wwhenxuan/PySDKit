@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import hilbert
 
-from typing import Optional
+from typing import Optional, Tuple
 
 
 def hilbert_transform(signal: np.ndarray) -> np.ndarray:
@@ -33,43 +33,35 @@ def hilbert_imaginary(signal: np.ndarray) -> np.ndarray:
 
 
 def hilbert_spectrum(
-    imfs_env, imfs_freq, fs, freq_lim=None, freq_res=None, time_range=None, time_scale=1
-):
+    imfs_env: np.ndarray,
+    imfs_freq: np.ndarray,
+    fs: int,
+    freq_lim: Optional[tuple[float, float]] = None,
+    freq_res: Optional[float] = None,
+    time_range: Optional[tuple[float, float]] = None,
+    time_scale: Optional[int] = 1,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute the Hilbert spectrum H(t, f) using numpy.
 
-    Parameters:
-    ------------
-    imfs_env : array_like, shape (..., # IMFs, # sampling points)
-        The envelope functions of all IMFs.
-    imfs_freq : array_like, shape (..., # IMFs, # sampling points)
-        The instantaneous frequency functions.
-    fs : float
-        Sampling frequency in Hz.
-    freq_lim : tuple (float, float), optional
-        Frequency range (min, max). Defaults to (0, fs/2).
-    freq_res : float, optional
-        Frequency resolution. Defaults to (freq_max - freq_min)/200.
-    time_range : tuple (float, float), optional
-        Time range (start, end) in seconds.
-    time_scale : int, optional
-        Temporal scaling factor (Default: 1).
+    :param imfs_env: The envelope functions of all IMFs.
+    :param imfs_freq: The instantaneous frequency functions.
+    :param fs: Sampling frequency in Hz.
+    :param freq_lim: Frequency range (min, max). Defaults to (0, fs/2).
+    :param freq_res: Frequency resolution. Defaults to (freq_max - freq_min)/200.
+    :param time_range: Time range (start, end) in seconds.
+    :param time_scale: Temporal scaling factor (Default: 1).
 
-    Returns:
-    ----------
-    (spectrum, time_axis, freq_axis)
-
-    spectrum : ndarray, shape (..., time_bins, freq_bins)
-        Hilbert spectrum matrix
-    time_axis : ndarray, 1D
-        Time axis labels
-    freq_axis : ndarray, 1D
-        Frequency axis labels
+    :return: (spectrum, time_axis, freq_axis)
+            - spectrum : ndarray, shape (..., time_bins, freq_bins), Hilbert spectrum matrix
+            - time_axis : ndarray, 1D, Time axis labels
+            - freq_axis : ndarray, 1D, Frequency axis labels
     """
     imfs_env = np.asarray(imfs_env, dtype=np.float64)
     imfs_freq = np.asarray(imfs_freq, dtype=np.float64)
 
-    N = imfs_freq.shape[-1]  # Number of sampling points
+    # Number of sampling points
+    N = imfs_freq.shape[-1]
     original_shape = imfs_env.shape[:-2]
     num_imfs = imfs_env.shape[-2]
 
