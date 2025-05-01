@@ -9,6 +9,7 @@ MATLAB code source https://www.mathworks.com/matlabcentral/fileexchange/64292-va
 import numpy as np
 from numpy.linalg import solve, norm
 from scipy.sparse import diags, eye
+
 try:
     from scipy.integrate import cumulative_trapezoid
 except ImportError:
@@ -199,10 +200,12 @@ class VNCMD(Base):
         # Initialize the variables defined above through loops
         for i in range(K):
             sinm[i, :] = np.sin(
-                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0), dtype=self.DTYPE
+                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0),
+                dtype=self.DTYPE,
             )
             cosm[i, :] = np.cos(
-                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0), dtype=self.DTYPE
+                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0),
+                dtype=self.DTYPE,
             )
 
             Bm = diags(

@@ -98,7 +98,8 @@ https://github.com/wwhenxuan/PySDKit
 
 def print_functions():
     """"""
-    print("""
+    print(
+        """
 _______________________________________________________________
 Algorithm Name                                  | Abbreviation
 _______________________________________________________________
@@ -127,7 +128,8 @@ Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Moving Average Decomposition                    |    Moving
 _______________________________________________________________
-""")
+"""
+    )
 
 
 __all__ = [
