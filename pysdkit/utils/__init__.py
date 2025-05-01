@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on 2025/02/06 10:30:01
+@author: Whenxuan Wang
+@email: wwhenxuan@gmail.com
+"""
+
 # Fourier Transform
 from ._fft import (
     fft,
