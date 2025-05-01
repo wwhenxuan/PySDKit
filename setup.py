@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="PySDKit",  # 使用包的名称
     packages=setuptools.find_packages(),
-    version="0.4.17",  # 包的版本号，应遵循语义版本控制规则
+    version="0.4.18",  # 包的版本号，应遵循语义版本控制规则
     description="A Python library for signal decomposition algorithms with a unified interface.",  # 包的简短描述
     url="https://github.com/wwhenxuan/PySDKit",  # 项目的地址通常来说是github
     author="whenxuan",
