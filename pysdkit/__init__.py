@@ -88,7 +88,7 @@ from ._vmd import vmd, VMD
 # Adaptive Chirp Mode Decomposition
 from ._vmd import ACMD
 
-# Multivariate Variational mode decomposition
+# Multivariate Variational Mode Decomposition
 from ._vmd import MVMD
 
 # Variational Mode Extraction, to extract a specific mode from the signal
@@ -103,7 +103,7 @@ from ._vmd2d import CVMD2D
 # Variational Nonlinear Chirp Mode Decomposition
 from ._vncmd import VNCMD
 
-# Iterative nonlinear chirp mode decomposition
+# Iterative Nonlinear Chirp Mode Decomposition
 from ._vncmd import INCMD
 
 # Empirical Wavelet Transform
@@ -112,7 +112,7 @@ from ._ewt import ewt, EWT
 # Jump Plus AM-FM Mode Decomposition
 from ._jmd import JMD
 
-# Moving Average decomposition
+# Moving Average Decomposition
 from .tsa import Moving_Decomp
 
 
@@ -131,28 +131,36 @@ https://github.com/wwhenxuan/PySDKit
 """
     )
 
-function_list = __all__
-function_dict = {}
 
 def print_functions():
     """"""
     print("""
-    _______________________________________________________________
-    Algorithm Name                                  | Abbreviation
-    _______________________________________________________________
-    Empirical Mode Decomposition                    |     EMD
-    Ensemble Empirical Mode Decomposition           |     EEMD     
-    Complete Ensemble EMD with Adaptive Noise       |    CEEMDAN
-    Robust Empirical Mode Decomposition             |     REMD
-    Multivariate Empirical Mode Decomposition       |     MEMD
-    Time Varying Filter based EMD                   |    TVF_EMD
-    Empirical Fourier Decomposition                 |     EFD
-    Fast and Adaptive Empirical Mode Decomposition  |     FAEMD
-    Empirical Mode Decomposition 2D for images      |     EMD2D
-    Hilbert Vibration Decomposition                 |     HVD
-    Intrinsic Time-Scale Decomposition              |     ITD
-    Local Mean Decomposition                        |     LMD
-    Robust Local Mean Decomposition                 |     RLMD
-    Singular Spectral Analysis                      |     SSA
-    Variational Mode Decomposition
-    """)
+_______________________________________________________________
+Algorithm Name                                  | Abbreviation
+_______________________________________________________________
+Empirical Mode Decomposition                    |    EMD
+Ensemble Empirical Mode Decomposition           |    EEMD     
+Complete Ensemble EMD with Adaptive Noise       |    CEEMDAN
+Robust Empirical Mode Decomposition             |    REMD
+Multivariate Empirical Mode Decomposition       |    MEMD
+Time Varying Filter based EMD                   |    TVF_EMD
+Empirical Fourier Decomposition                 |    EFD
+Fast and Adaptive Empirical Mode Decomposition  |    FAEMD
+Empirical Mode Decomposition 2D for images      |    EMD2D
+Hilbert Vibration Decomposition                 |    HVD
+Intrinsic Time-Scale Decomposition              |    ITD
+Local Mean Decomposition                        |    LMD
+Robust Local Mean Decomposition                 |    RLMD
+Singular Spectral Analysis                      |    SSA
+Variational Mode Decomposition                  |    VMD
+Multivariate Variational Mode Decomposition     |    MVMD
+Variational Mode Extraction                     |    VME
+Variational Mode Decomposition for 2D Image     |    VMD2D
+Compact VMD for 2D Image                        |    CVMD2D
+Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
+Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
+Empirical Wavelet Transform                     |    EWT
+Jump Plus AM-FM Mode Decomposition              |    JMD
+Moving Average Decomposition                    |    Moving
+_______________________________________________________________
+""")
