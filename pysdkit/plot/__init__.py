@@ -11,6 +11,9 @@ from ._plot_imfs import plot_IMFs
 # 单独绘制分解得到的每个本征模态函数的频谱
 from ._fourier_spectra import plot_IMFs_amplitude_spectra
 
+# 绘制希尔伯特谱
+from ._fourier_spectra import plot_HilbertSpectrum
+
 # 用于可视化二维灰度图
 from ._plot_images import plot_grayscale_image, plot_grayscale_spectrum
 

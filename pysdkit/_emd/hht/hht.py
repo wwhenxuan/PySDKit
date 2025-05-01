@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 from typing import Optional, Tuple
 
-from pysdkit.plot import plot_IMFs
+from pysdkit.plot import plot_IMFs, plot_HilbertSpectrum
 from pysdkit.utils import hilbert_real, hilbert_imaginary, hilbert_transform, hilbert_spectrum
 from pysdkit import EMD, REMD, EEMD, CEEMDAN
 from pysdkit._emd.hht.frequency import get_envelope_frequency
@@ -161,6 +161,7 @@ class HHT(object):
                                                freq_lim=freq_lim,
                                                time_scale=time_scale,
                                                freq_res=freq_res)
+        plot_HilbertSpectrum(spectrum, t, f)
 
 if __name__ == '__main__':
     from pysdkit.data import test_hht
@@ -173,4 +174,5 @@ if __name__ == '__main__':
     imfs, imfs_env, imfs_freq = hht.fit_transform(s, fs=fs, return_all=True)
     plot_IMFs(s, imfs)
     hht.hilbert_spectrum()
+    hht.plot_spectrum(imfs_env=imfs_env, imfs_freq=imfs_freq)
     plt.show()
