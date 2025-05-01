@@ -7,7 +7,7 @@ Created on 2024/6/2 21:12
 import numpy as np
 from numpy import fft as f
 from matplotlib import pyplot as plt
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Any
 from ._functions import set_themes
 from ._functions import generate_random_hex_color
 from pysdkit.utils import simple_moving_average, weighted_moving_average
@@ -148,33 +148,24 @@ def plot_IMFs_amplitude_spectra(
 
 
 def plot_HilbertSpectrum(
-        spectrum,
-        time_axis,
-        freq_axis,
-        energy_scale="log",
-        save_spectrum=None,
-        save_marginal=None,
-        title=None,
-):
+    spectrum: np.ndarray,
+    time_axis: np.ndarray,
+    freq_axis: np.ndarray,
+    energy_scale: Optional[str] = "log",
+    plot_marginal: Optional[bool] = False,
+    dpi: Optional[int] = 500,
+) -> tuple[list[Any] | Any, list[Any]] | list[Any] | Any:
     """
     Visualize the Hilbert spectrum using numpy and matplotlib.
 
-    Parameters:
-    ------------
-    spectrum : array_like, shape (..., time_bins, freq_bins)
-        Hilbert spectrum matrix
-    time_axis : array_like, 1D
-        Time axis labels
-    freq_axis : array_like, 1D
-        Frequency axis labels
-    energy_scale : str ('linear' or 'log')
-        Energy display scale (Default: "log")
-    save_spectrum : str or list, optional
-        Filename(s) for saving spectrum plots
-    save_marginal : str or list, optional
-        Filename(s) for saving marginal spectrum plots
-    title : str, optional
-        Figure title
+    :param spectrum: Hilbert spectrum matrix, shape (..., time_bins, freq_bins),
+    :param time_axis: Time axis labels 1D,
+    :param freq_axis: Frequency axis labels 1D,
+    :param energy_scale: Energy display scale (Default: "log") ('linear' or 'log'),
+    :param plot_marginal: Whether to plot marginal spectrum,
+    :param dpi: Resolution of the created figure (default is 500).
+
+    :return: Figure object or Figure list
     """
     # Convert to numpy arrays and reshape
     spectrum = np.asarray(spectrum)
@@ -186,8 +177,9 @@ def plot_HilbertSpectrum(
     spectrum = spectrum.reshape(-1, spectrum.shape[-2], spectrum.shape[-1])
 
     # Plot Hilbert spectrum
+    spectrum_list = []
     for batch_idx in range(spectrum.shape[0]):
-        plt.figure(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(8, 6), dpi=dpi)
 
         # Prepare data
         data = spectrum[batch_idx].T
@@ -200,51 +192,35 @@ def plot_HilbertSpectrum(
             label = "energy"
 
         # Create plot
-        pc = plt.pcolormesh(
-            time_axis,
-            freq_axis,
-            data,
-            shading="auto",
-            cmap=plt.cm.jet
-        )
+        pc = ax.pcolormesh(time_axis, freq_axis, data, shading="auto", cmap=plt.cm.jet)
         plt.colorbar(pc, label=label)
-        plt.xlabel("Time (s)")
-        plt.ylabel("Frequency (Hz)")
-        plt.title("Hilbert Spectrum" if title is None else title)
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Frequency (Hz)")
 
-        # Save handling
-        if save_spectrum is not None:
-            if isinstance(save_spectrum, str):
-                fname = save_spectrum
-            else:
-                fname = save_spectrum[batch_idx]
-            # plt.savefig(fname, dpi=600, bbox_inches="tight")
-        plt.show()
-        plt.close()
+        spectrum_list.append(fig)
 
     # Plot marginal spectrum
-    if save_marginal is not None:
-        marginal = np.sum(spectrum, axis=-2)  # Sum over time bins
+    if plot_marginal is True:
+        marginal_list = []
+
+        # Sum over time bins
+        marginal = np.sum(spectrum, axis=-2)
 
         for batch_idx in range(spectrum.shape[0]):
-            plt.figure(figsize=(10, 4))
+            fig, ax = plt.subplots(figsize=(10, 6), dpi=dpi)
 
             data = marginal[batch_idx]
             if energy_scale == "log":
                 eps = data.max() * 1e-5
-                plt.plot(freq_axis, 10 * np.log10(data + eps))
-                plt.ylabel("Energy (dB)")
+                ax.plot(freq_axis, 10 * np.log10(data + eps))
+                ax.set_ylabel("Energy (dB)")
             else:
-                plt.plot(freq_axis, data)
-                plt.ylabel("Energy")
+                ax.plot(freq_axis, data)
+                ax.set_ylabel("Energy")
 
-            plt.xlabel("Frequency (Hz)")
-            plt.title("Marginal Spectrum" if title is None else f"{title} (Marginal)")
+            ax.set_xlabel("Frequency (Hz)")
 
-            # Save handling
-            if isinstance(save_marginal, str):
-                fname = save_marginal
-            else:
-                fname = save_marginal[batch_idx]
-            # plt.savefig(fname, dpi=600, bbox_inches="tight")
-            plt.show()
+        return spectrum_list if len(spectrum_list) > 1 else spectrum_list[0], (
+            marginal_list if len(marginal_list) > 1 else marginal_list
+        )
+    return spectrum_list if len(spectrum_list) > 1 else spectrum_list[0]

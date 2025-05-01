@@ -27,11 +27,11 @@ def hilbert(signal: np.ndarray) -> np.ndarray:
 
     # Get the spectrum of the analytical signal
     if N % 2 == 0:
-        Xf[..., 1: N // 2] *= 2
-        Xf[..., N // 2 + 1:] = 0
+        Xf[..., 1 : N // 2] *= 2
+        Xf[..., N // 2 + 1 :] = 0
     else:
-        Xf[..., 1: (N + 1) // 2] *= 2
-        Xf[..., (N + 1) // 2:] = 0
+        Xf[..., 1 : (N + 1) // 2] *= 2
+        Xf[..., (N + 1) // 2 :] = 0
     return ifft(Xf)
 
 
@@ -82,7 +82,9 @@ def get_envelope_frequency(signal: np.ndarray, fs: float, ret_analytic: bool = F
     diff = np.diff(analytic, axis=-1)
     sub[..., :-1] = diff
     # Handle last element (repeat last difference)
-    sub[..., -1] = analytic[..., -1] - analytic[..., -2] if analytic.shape[-1] >= 2 else 0.0
+    sub[..., -1] = (
+        analytic[..., -1] - analytic[..., -2] if analytic.shape[-1] >= 2 else 0.0
+    )
 
     # Compute add (discrete sum with edge extension)
     add = np.empty_like(analytic)
@@ -92,10 +94,10 @@ def get_envelope_frequency(signal: np.ndarray, fs: float, ret_analytic: bool = F
     add[..., -1] = 2 * analytic[..., -1]
 
     # Calculate instantaneous frequency (handle division safely)
-    with np.errstate(divide='ignore', invalid='ignore'):
+    with np.errstate(divide="ignore", invalid="ignore"):
         freq = 2 * fs * np.imag(sub / add)
     freq[np.isinf(freq)] = 0  # Replace infs
-    freq /= (2 * np.pi)  # Convert to Hz
+    freq /= 2 * np.pi  # Convert to Hz
 
     if ret_analytic:
         return envelope, freq, analytic

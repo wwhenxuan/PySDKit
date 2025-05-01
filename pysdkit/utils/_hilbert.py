@@ -130,7 +130,7 @@ def hilbert_imaginary(signal: np.ndarray) -> np.ndarray:
 
 
 def hilbert_spectrum(
-        imfs_env, imfs_freq, fs, freq_lim=None, freq_res=None, time_range=None, time_scale=1
+    imfs_env, imfs_freq, fs, freq_lim=None, freq_res=None, time_range=None, time_scale=1
 ):
     """
     Compute the Hilbert spectrum H(t, f) using numpy.
@@ -182,8 +182,8 @@ def hilbert_spectrum(
     # Time range handling
     L, R = 0, N
     if time_range is not None:
-        L = int(np.clip(time_range[0] * fs, 0, N-1))
-        R = int(np.clip(time_range[1] * fs + 1, L+1, N))
+        L = int(np.clip(time_range[0] * fs, 0, N - 1))
+        R = int(np.clip(time_range[1] * fs + 1, L + 1, N))
         imfs_env = imfs_env[..., L:R]
         imfs_freq = imfs_freq[..., L:R]
         N = R - L
@@ -207,13 +207,13 @@ def hilbert_spectrum(
     freq_idx = np.clip(freq_idx, 0, freq_bins)
 
     # Accumulate energy (using np.add.at for index accumulation)
-    imfs_energy = imfs_env ** 2
+    imfs_energy = imfs_env**2
     for b in range(num_batches):
         for i in range(num_imfs):
             np.add.at(
                 spectrum[b, :, :],
-                (time_idx[0,0,:], freq_idx[b,i,:]),
-                imfs_energy[b,i,:]
+                (time_idx[0, 0, :], freq_idx[b, i, :]),
+                imfs_energy[b, i, :],
             )
 
     # Remove overflow bin and reshape
