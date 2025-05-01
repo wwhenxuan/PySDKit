@@ -28,6 +28,10 @@ class HHT(object):
         algorithm: Optional[str] = "EMD",
         max_imfs: Optional[int] = -1,
     ) -> None:
+        """
+        :param algorithm: Type of Empirical Mode Decomposition algorithm used, (EMD, REMD, CEEMDAN)
+        :param max_imfs: maximum number of the IMFs to be decomposed.
+        """
         self.algorithm = algorithm
         self.max_imfs = max_imfs
 
