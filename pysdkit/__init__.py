@@ -79,10 +79,10 @@ from ._lmd import LMD
 # Robust Local Mean Decomposition
 from ._lmd import RLMD
 
-# Singular Spectral Analysis (SSA) algorithm
+# Singular Spectral Analysis
 from ._ssa import SSA
 
-# Variational mode decomposition
+# Variational Mode Decomposition
 from ._vmd import vmd, VMD
 
 # Adaptive Chirp Mode Decomposition
@@ -136,4 +136,23 @@ function_dict = {}
 
 def print_functions():
     """"""
-    pass
+    print("""
+    _______________________________________________________________
+    Algorithm Name                                  | Abbreviation
+    _______________________________________________________________
+    Empirical Mode Decomposition                    |     EMD
+    Ensemble Empirical Mode Decomposition           |     EEMD     
+    Complete Ensemble EMD with Adaptive Noise       |    CEEMDAN
+    Robust Empirical Mode Decomposition             |     REMD
+    Multivariate Empirical Mode Decomposition       |     MEMD
+    Time Varying Filter based EMD                   |    TVF_EMD
+    Empirical Fourier Decomposition                 |     EFD
+    Fast and Adaptive Empirical Mode Decomposition  |     FAEMD
+    Empirical Mode Decomposition 2D for images      |     EMD2D
+    Hilbert Vibration Decomposition                 |     HVD
+    Intrinsic Time-Scale Decomposition              |     ITD
+    Local Mean Decomposition                        |     LMD
+    Robust Local Mean Decomposition                 |     RLMD
+    Singular Spectral Analysis                      |     SSA
+    Variational Mode Decomposition
+    """)
