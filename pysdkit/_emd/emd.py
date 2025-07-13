@@ -40,18 +40,18 @@ class EMD(object):
     """
 
     def __init__(
-        self,
-        spline_kind: str = "cubic",
-        energy_ratio_thr: Optional[float] = 0.2,
-        nbsym: int = 2,
-        std_thr: Optional[float] = 0.2,
-        svar_thr: Optional[float] = 0.001,
-        total_power_thr: Optional[float] = 0.005,
-        range_thr: Optional[float] = 0.001,
-        extrema_detection: Optional[str] = "simple",
-        max_imfs: Optional[int] = -1,
-        max_iteration: int = 1000,
-        **kwargs,
+            self,
+            spline_kind: str = "cubic",
+            energy_ratio_thr: Optional[float] = 0.2,
+            nbsym: int = 2,
+            std_thr: Optional[float] = 0.2,
+            svar_thr: Optional[float] = 0.001,
+            total_power_thr: Optional[float] = 0.005,
+            range_thr: Optional[float] = 0.001,
+            extrema_detection: Optional[str] = "simple",
+            max_imfs: Optional[int] = -1,
+            max_iteration: int = 1000,
+            **kwargs,
     ) -> None:
         """
         Configuration, such as threshold values, can be passed as kwargs (keyword arguments).
@@ -92,7 +92,7 @@ class EMD(object):
         self.max_imfs = max_imfs
 
     def __call__(
-        self, signal, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None
+            self, signal, time: Optional[np.ndarray] = None, max_imfs: Optional[int] = None
     ) -> np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, time=time, max_imfs=max_imfs)
@@ -118,7 +118,7 @@ class EMD(object):
             )
 
     def find_extrema(
-        self, time: np.ndarray, signal: np.ndarray
+            self, time: np.ndarray, signal: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """
         Returns extrema (minima and maxima) for given signal S.
@@ -145,13 +145,13 @@ class EMD(object):
             )
 
     def prepare_points(
-        self,
-        time: np.ndarray,
-        signal: np.ndarray,
-        max_pos: np.ndarray,
-        max_val: np.ndarray,
-        min_pos: np.ndarray,
-        min_val: np.ndarray,
+            self,
+            time: np.ndarray,
+            signal: np.ndarray,
+            max_pos: np.ndarray,
+            max_val: np.ndarray,
+            min_pos: np.ndarray,
+            min_val: np.ndarray,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Further processing of the maximum and minimum points of the input signal makes the upper and lower envelope spectra smoother.
@@ -185,7 +185,7 @@ class EMD(object):
             )
 
     def spline_points(
-        self, time: np.ndarray, extrema: np.ndarray
+            self, time: np.ndarray, extrema: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Constructs spline over given points.
@@ -230,7 +230,7 @@ class EMD(object):
             raise ValueError("No such interpolation method!")
 
     def extract_max_min_spline(
-        self, time: np.ndarray, signal: np.ndarray
+            self, time: np.ndarray, signal: np.ndarray
     ) -> list[int] | tuple[ndarray, ndarray, ndarray, ndarray]:
         """
         Extracts top and bottom envelopes based on the signal,
@@ -274,11 +274,11 @@ class EMD(object):
         return max_spline, min_spline, max_extrema, min_extrema
 
     def check_imf(
-        self,
-        imf_new: np.ndarray,
-        imf_old: np.ndarray,
-        eMax: np.ndarray,
-        eMin: np.ndarray,
+            self,
+            imf_new: np.ndarray,
+            imf_old: np.ndarray,
+            eMax: np.ndarray,
+            eMin: np.ndarray,
     ) -> bool:
         """
         Evaluate if the current IMF (Intrinsic Mode Function) satisfies the end condition
@@ -302,7 +302,7 @@ class EMD(object):
             return False
 
         # Convergence check based on the energy of the new IMF
-        if np.sum(imf_new**2) < 1e-10:
+        if np.sum(imf_new ** 2) < 1e-10:
             return False
 
         # Precompute differences between the new and old IMF
@@ -392,10 +392,10 @@ class EMD(object):
             return imfs, residue
 
     def fit_transform(
-        self,
-        signal: np.ndarray,
-        time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = None,
+            self,
+            signal: np.ndarray,
+            time: Optional[np.ndarray] = None,
+            max_imfs: Optional[int] = None,
     ) -> np.ndarray:
         """
         Signal decomposition using EMD algorithm
@@ -510,7 +510,8 @@ class EMD(object):
                         if f1 and f2:
                             break
 
-                else:  # Less than 2 ext, i.e. trend
+                else:
+                    # Less than 2 ext, i.e. trend
                     finished = True
                     break
 
@@ -535,3 +536,17 @@ class EMD(object):
             IMF = np.vstack((IMF, self.residue))
 
         return IMF
+
+
+if __name__ == '__main__':
+    from pysdkit.data import test_hht, test_univariate_signal
+    from matplotlib import pyplot as plt
+    from pysdkit.plot import plot_IMFs
+
+    time, signal = test_univariate_signal(case=1)
+    emd = EMD(max_imfs=5)
+    imfs = emd.fit_transform(signal, max_imfs=6)
+    print(imfs.shape)
+
+    plot_IMFs(signal, imfs)
+    plt.show()
