@@ -152,7 +152,7 @@ class ITD(object):
         return H
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from pysdkit.data import test_univariate_signal
     from pysdkit.plot import plot_IMFs
 
@@ -164,5 +164,3 @@ if __name__ == '__main__':
     imfs = itd.fit_transform(signal=signal)
 
     plot_IMFs(signal, IMFs=imfs)
-
-

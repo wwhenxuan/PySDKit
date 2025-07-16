@@ -35,20 +35,20 @@ class CEEMDAN(object):
     """
 
     def __init__(
-            self,
-            ext_EMD=None,
-            max_imfs: int = -1,
-            trials: int = 100,
-            epsilon: float = 0.005,
-            parallel: bool = False,
-            noise_scale: float = 1.0,
-            noise_kind: Optional[str] = "normal",
-            range_thr: Optional[float] = 0.01,
-            total_power_thr: Optional[float] = 0.05,
-            beta_progress: Optional[bool] = True,
-            processes: Optional[int] = None,
-            max_iter: Optional[int] = 1000,
-            random_seed: Optional[int] = 42,
+        self,
+        ext_EMD=None,
+        max_imfs: int = -1,
+        trials: int = 100,
+        epsilon: float = 0.005,
+        parallel: bool = False,
+        noise_scale: float = 1.0,
+        noise_kind: Optional[str] = "normal",
+        range_thr: Optional[float] = 0.01,
+        total_power_thr: Optional[float] = 0.05,
+        beta_progress: Optional[bool] = True,
+        processes: Optional[int] = None,
+        max_iter: Optional[int] = 1000,
+        random_seed: Optional[int] = 42,
     ) -> None:
         """
         :param ext_EMD: pre-defined EMD algorithms to be integrated
@@ -116,11 +116,11 @@ class CEEMDAN(object):
         self._signal, self._time, self._seq_len, self._scale = None, None, None, None
 
     def __call__(
-            self,
-            signal: np.ndarray,
-            time: Optional[np.ndarray] = None,
-            max_imfs: Optional[int] = -1,
-            progress: bool = False,
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = -1,
+        progress: bool = False,
     ) -> np.ndarray:
         """allow instances to be called like functions"""
         return self.fit_transform(
@@ -132,7 +132,7 @@ class CEEMDAN(object):
         return "Complete Ensemble Empirical Mode Decomposition with Adaptive Noise (CEEMDAN)"
 
     def generate_noise(
-            self, scale: float, size: Union[int, Sequence[int]]
+        self, scale: float, size: Union[int, Sequence[int]]
     ) -> np.ndarray:
         """
         Generate noise with specified standard deviation and size.
@@ -174,11 +174,11 @@ class CEEMDAN(object):
         return all_noise_EMD
 
     def _run_eemd(
-            self,
-            signal: np.ndarray,
-            time: Optional[np.ndarray] = None,
-            max_imfs: Optional[int] = -1,
-            progress: Optional[bool] = True,
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = -1,
+        progress: Optional[bool] = True,
     ) -> np.ndarray:
         """Perform the specified EEMD algorithm to obtain the corresponding signal decomposition results."""
         # Length of the signal
@@ -234,10 +234,10 @@ class CEEMDAN(object):
         return self._emd(self._signal + noise, self._time, self.max_imfs)
 
     def _emd(
-            self,
-            signal: np.ndarray,
-            time: Optional[np.ndarray] = None,
-            max_imfs: Optional[int] = None,
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = None,
     ) -> np.ndarray:
         """
         Vanilla Empirical Mode Decomposition method
@@ -284,7 +284,7 @@ class CEEMDAN(object):
             return imfs, residue
 
     def end_condition(
-            self, signal: np.ndarray, cIMFs: np.ndarray, max_imf: int
+        self, signal: np.ndarray, cIMFs: np.ndarray, max_imf: int
     ) -> bool:
         """
         Test for end condition for CEEMDAN method.
@@ -327,11 +327,11 @@ class CEEMDAN(object):
         return False
 
     def fit_transform(
-            self,
-            signal: np.ndarray,
-            time: Optional[np.ndarray] = None,
-            max_imfs: Optional[int] = None,
-            progress: bool = False,
+        self,
+        signal: np.ndarray,
+        time: Optional[np.ndarray] = None,
+        max_imfs: Optional[int] = None,
+        progress: bool = False,
     ) -> np.ndarray:
         """
         Perform the CEEMDAN method for signal decomposition.
@@ -403,9 +403,7 @@ class CEEMDAN(object):
             prev_res = local_mean.copy()
 
             # Determine whether the decomposition algorithm should stop iterating
-            if self.end_condition(
-                    signal=signal, cIMFs=all_cimfs, max_imf=max_imfs
-            ):
+            if self.end_condition(signal=signal, cIMFs=all_cimfs, max_imf=max_imfs):
                 # Reached the stopping condition
                 print("End Decomposition")
                 break
