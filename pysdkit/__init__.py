@@ -156,6 +156,7 @@ __all__ = [
     "ACMD",
     "MVMD",
     "VME",
+    "VMD2D",
     "CVMD2D",
     "VNCMD",
     "INCMD",
