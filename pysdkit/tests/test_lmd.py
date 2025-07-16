@@ -5,14 +5,13 @@ Created on 2025/07/16 15:54:22
 @email: wwhenxuan@gmail.com
 """
 import unittest
-import numpy as np
 
 from pysdkit import LMD
 from pysdkit.data import test_emd, test_univariate_signal
 
 
 class LMDTest(unittest.TestCase):
-    """测试经验模态分解算法(EMD)能否正常运行"""
+    """测试局部均值分解(LMD)算法能否正常运行"""
 
     def test_fit_transform(self) -> None:
         """验证能否正常进行信号分解"""
@@ -43,6 +42,20 @@ class LMDTest(unittest.TestCase):
         _, length = IMFs.shape
         self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
 
+    def test_imfs_number(self) -> None:
+        """验证算法分解得到的本征模态函数的数目和指定的超参数是否一致"""
+        time, signal = test_emd()
+
+        # 遍历多个超参数
+        for k in [2, 3, 5]:
+            # 创建算法实例并执行算法
+            lmd = LMD(K=k)
+            IMFs = lmd.fit_transform(signal)
+
+            # 判断分解得到的模态数目和指定的超参数数目是否一致
+            number = IMFs.shape[0]
+            # 考虑到有残差的存在因此应该要+1
+            self.assertEqual(first=number, second=k + 1, msg="分解得到的本征模态函数的数目和指定的超参数不一致")
 
 
 
