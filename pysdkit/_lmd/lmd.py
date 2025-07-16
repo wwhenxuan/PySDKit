@@ -23,14 +23,14 @@ class LMD(object):
     """
 
     def __init__(
-        self,
-        K: int = 5,
-        endpoints: bool = True,
-        max_smooth_iter: int = 15,
-        max_envelope_iter: int = 200,
-        envelope_epsilon: float = 0.01,
-        convergence_epsilon: float = 0.01,
-        min_extrema: int = 5,
+            self,
+            K: int = 5,
+            endpoints: bool = True,
+            max_smooth_iter: int = 15,
+            max_envelope_iter: int = 200,
+            envelope_epsilon: float = 0.01,
+            convergence_epsilon: float = 0.01,
+            min_extrema: int = 5,
     ) -> None:
         """
         :param K: the maximum number of IFMs to be decomposed
@@ -136,7 +136,7 @@ class LMD(object):
         # Initialize the parameters of the sliding average decomposition
         weight = np.array(list(range(1, half + 2)) + list(range(half, 0, -1)))
         assert (
-            len(weight) == window
+                len(weight) == window
         )  # Make sure the parameter length is the size of the window
 
         smoothed = signal
@@ -307,3 +307,17 @@ class LMD(object):
         pf.append(residue)
 
         return np.array(pf)
+
+
+if __name__ == "__main__":
+    from pysdkit.data import test_univariate_signal
+    from pysdkit.plot import plot_IMFs
+    from matplotlib import pyplot as plt
+
+    time, signal = test_univariate_signal()
+
+    rlmd = LMD()
+    imfs = rlmd.fit_transform(signal)
+
+    plot_IMFs(signal, imfs)
+    plt.show()
