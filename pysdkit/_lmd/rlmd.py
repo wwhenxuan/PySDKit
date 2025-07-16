@@ -29,21 +29,23 @@ class RLMD(object):
     """
 
     def __init__(
-            self,
-            max_imfs: Optional[int] = 10,
-            max_iter: Optional[int] = 30,
-            smooth_mode: Optional[str] = "ma",
-            ma_span: Optional[str] = "liu",
-            ma_iter_mode: Optional[str] = "fixed",
-            stop_threshold: Optional[Tuple[float, float, float]] = (0.005, 0.7, 0.005),
-            extd_r: Optional[float] = 0.2,
-            sifting_stopping_mode: Optional[str] = "liu",
-            min_peak: Optional[int] = 3,
-            min_ratio: Optional[float] = 0.001,
+        self,
+        max_imfs: Optional[int] = 10,
+        max_iter: Optional[int] = 30,
+        smooth_mode: Optional[str] = "ma",
+        ma_span: Optional[str] = "liu",
+        ma_iter_mode: Optional[str] = "fixed",
+        stop_threshold: Optional[Tuple[float, float, float]] = (0.005, 0.7, 0.005),
+        extd_r: Optional[float] = 0.2,
+        sifting_stopping_mode: Optional[str] = "liu",
+        min_peak: Optional[int] = 3,
+        min_ratio: Optional[float] = 0.001,
     ):
         """
-        上述参数均为该算法的默认参数，在使用时请针对具体的数据进行修改和调整
-        :param max_imfs: 待分解的最大本征模态函数数目。
+        The above parameters are the default parameters of the algorithm.
+        Please modify and adjust them according to the specific data when using them.
+
+        :param max_imfs: Maximum number of intrinsic mode functions to be decomposed.
         :param max_iter: max iteration number in a PF sifting process.
         :param smooth_mode: ma - moving average, spline - pchip.
         :param ma_span: pdmax span method, see function ma_span.
@@ -51,8 +53,10 @@ class RLMD(object):
         :param stop_threshold: sifting stopping thresholds for Rilling's criterion.
         :param extd_r: end extension length to original data.
         :param sifting_stopping_mode: the sifting stoppling optimizaion.
-        :param min_peak: 当输入信号的剩余极值点数目少于多少时停止算法的迭代更新。
-        :param min_ratio: 当剩余信号的能量小于多少时停止算法的迭代更新。
+        :param min_peak: When the number of remaining extreme points of the input signal is less than a certain value,
+                         the algorithm stops iterating.
+        :param min_ratio: When the energy of the remaining signal is less than a certain value,
+                          the algorithm stops iterative updating.
         """
         self.max_imfs = max_imfs
         self.max_iter = max_iter
@@ -69,32 +73,36 @@ class RLMD(object):
         self.min_peak = min_peak
         self.min_ratio = min_ratio
 
-    def __call__(self, *args, **kwargs):
-        pass
+    def __call__(self, signal: np.ndarray) -> np.ndarray:
+        """Allow instances to be called like functions"""
+        return self.fit_transform(signal)
 
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
         return "Robust Local Mean Decomposition (RLMD)"
 
     def _initial_inputs(
-            self, signal: np.ndarray
+        self, signal: np.ndarray
     ) -> Tuple[
         np.ndarray | float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray
     ]:
         """"""
-        # 获取输入信号的长度
+        # get the length of inputs signal
         nx = signal.shape[0]
 
-        #
+        # 初始化存放中间结果的数组
         ams = np.zeros(shape=(self.max_imfs, nx))
         fms = np.zeros(shape=(self.max_imfs, nx))
+
+        # 初始化本征模态函数
         pfs = np.zeros(shape=(self.max_imfs, nx))
 
+        # 每轮迭代
         iterNum = np.zeros(self.max_imfs)
         fvs = np.zeros(shape=(self.max_imfs, self.max_iter))
 
         # energy = square summation.
-        signal_energy = np.sum(signal ** 2)
+        signal_energy = np.sum(signal**2)
 
         return signal_energy, ams, fms, pfs, iterNum, fvs
 
@@ -113,7 +121,7 @@ class RLMD(object):
         # 计算极值点的数目
         number_peak = len(indmax) + len(indmin)
 
-        ratio = np.sum(signal ** 2) / signal_energy
+        ratio = np.sum(signal**2) / signal_energy
 
         # 判断是否可以停止算法
         stop = number_peak < self.min_peak or ratio < self.min_ratio
@@ -123,7 +131,7 @@ class RLMD(object):
         return False
 
     def _lmd_mean_amp(
-            self, x: np.ndarray
+        self, x: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray | int]:
         """
         Compute mean function and amplitude function of x in LMD
@@ -171,16 +179,10 @@ class RLMD(object):
             m = self._itrma(x=m0, span=span, smax=smax)
             a = self._itrma(x=a0, span=span, smax=smax)
 
-            # print("m和a的长度", len(m), len(a))
-
-            # make m and a row vectors TODO: 这里是有用
-            # m = m.T
-            # a = a.T
-
             # cut extension
             # TODO: 这里在索引位置上进行了+1
-            m = m[cut_index[0]: cut_index[1] + 1]
-            a = a[cut_index[0]: cut_index[1] + 1]
+            m = m[cut_index[0] : cut_index[1] + 1]
+            a = a[cut_index[0] : cut_index[1] + 1]
 
         else:
             raise ValueError(f"No specifications {self.smooth_mode} for smooth_mode!")
@@ -224,7 +226,7 @@ class RLMD(object):
         return x
 
     def _get_best_span(
-            self, ind_extr: np.ndarray, x: np.ndarray
+        self, ind_extr: np.ndarray, x: np.ndarray
     ) -> Tuple[np.ndarray | int, int]:
         """
         Moving average span selection.
@@ -273,7 +275,7 @@ class RLMD(object):
         return span, smax
 
     def _is_sifting_stopping(
-            self, a_j: np.ndarray, j: np.ndarray, fv_i: np.ndarray
+        self, a_j: np.ndarray, j: np.ndarray, fv_i: np.ndarray
     ) -> Tuple[bool, np.ndarray]:
         """
         Sifting stopping criterion of Robust Local Mean Decomposition.
@@ -327,9 +329,8 @@ class RLMD(object):
         nx = signal.shape[0]
 
         # start the main loop
-        # TODO: 索引-1
         while i < self.max_imfs and not self._stop_lmd(
-                signal=xs, signal_energy=signal_energy
+            signal=xs, signal_energy=signal_energy
         ):
 
             # initialize variables used in PF sifting loop
@@ -342,11 +343,10 @@ class RLMD(object):
             stop_sifting = False
             s = xs.copy()
 
-            # TODO: 索引-1
             while j < self.max_imfs and not stop_sifting:
                 # inner loop for sifting process
 
-
+                # Compute mean function and amplitude function
                 m_j, a_j, n_extr = self._lmd_mean_amp(x=s)
 
                 # force to stop iter if number of extrema of s is smaller than 3.
@@ -368,23 +368,19 @@ class RLMD(object):
                 s_j[j, :] = s
 
                 # 判断算法的停止准则
-                # print("索引", fvs.shape, i)
                 stop_sifting, fvs_array = self._is_sifting_stopping(
                     a_j=a_j, j=j, fv_i=fvs[i, :]
                 )
-                # print("数组", len(fvs[i, :]), len(fvs_array))
                 fvs[i, :] = fvs_array
 
                 j = j + 1
 
             if self.sifting_stopping_mode.lower() == "liu":
                 # 获得最小值位置处的索引
-                print(fvs[i, :j])
                 opt0 = np.argmin(fvs[i, :j])
 
                 # in case iteration stop for n_extr<3
                 opt_IterNum = min(j, opt0)
-                print(opt_IterNum)
 
             else:
                 raise ValueError("No specifications for sifting_stopping_mode.")
@@ -486,32 +482,20 @@ def extr(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     return indmin.astype(int), indmax.astype(int), indzer.astype(int)
 
 
-def extend(x, indmin, indmax, extd_r):
+def extend(
+    x: np.ndarray, indmin: np.ndarray, indmax: np.ndarray, extd_r: np.ndarray
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Python implementation of the MATLAB `extend` routine from the EMD toolbox.
 
-    Parameters
-    ----------
-    x : 1-D ndarray
-        Original signal.
-    indmin : 1-D array_like
-        Indices of local minima (0-based).
-    indmax : 1-D array_like
-        Indices of local maxima (0-based).
-    extd_r : float
-        Extension ratio.  0 → no extension.
-
-    Returns
-    -------
-    ext_indmin : ndarray
-        Indices of minima in the extended signal.
-    ext_indmax : ndarray
-        Indices of maxima in the extended signal.
-    ext_x : ndarray
-        Extended signal.
-    cut_index : ndarray
-        Two-element array [start, end] giving indices to cut back to the
-        original range in the extended signal.
+    :param x: 1-D ndarray, Original signal.
+    :param indmin: 1-D array_like, Indices of local minima (0-based).
+    :param indmax: 1-D array_lik, Extension ratio.  0 → no extension.
+    :param extd_r: float, Extension ratio.  0 → no extension.
+    :return: - ext_indmin : ndarray, Indices of minima in the extended signal.
+             - ext_indmax : ndarray, Indices of maxima in the extended signal.
+             - ext_x : ndarray, Extended signal.
+             - cut_index : ndarray, Two-element array [start, end] giving indices to cut back to the original range in the extended signal.
     """
     x = np.asarray(x, dtype=float)
     indmin = np.asarray(indmin, dtype=int)
@@ -533,21 +517,21 @@ def extend(x, indmin, indmax, extd_r):
     if indmax[0] < indmin[0]:
         # first extremum is a maximum
         if x[0] > x[indmin[0]]:
-            lmax = indmax[2: min(indmax.size, nbsym + 1)][::-1]
-            lmin = indmin[1: min(indmin.size, nbsym)][::-1]
+            lmax = indmax[2 : min(indmax.size, nbsym + 1)][::-1]
+            lmin = indmin[1 : min(indmin.size, nbsym)][::-1]
             lsym = indmax[0]
         else:
-            lmax = indmax[1: min(indmax.size, nbsym + 1)][::-1]
-            lmin = np.r_[indmin[1: min(indmin.size, nbsym)][::-1], 0]
+            lmax = indmax[1 : min(indmax.size, nbsym + 1)][::-1]
+            lmin = np.r_[indmin[1 : min(indmin.size, nbsym)][::-1], 0]
             lsym = 0
     else:  # first extremum is a minimum
         if x[0] < x[indmax[0]]:
-            lmax = indmax[1: min(indmax.size, nbsym)][::-1]
-            lmin = indmin[2: min(indmin.size, nbsym + 1)][::-1]
+            lmax = indmax[1 : min(indmax.size, nbsym)][::-1]
+            lmin = indmin[2 : min(indmin.size, nbsym + 1)][::-1]
             lsym = indmin[0]
         else:
-            lmax = np.r_[indmax[1: min(indmax.size, nbsym)][::-1], 0]
-            lmin = indmin[1: min(indmin.size, nbsym + 1)][::-1]
+            lmax = np.r_[indmax[1 : min(indmax.size, nbsym)][::-1], 0]
+            lmin = indmin[1 : min(indmin.size, nbsym + 1)][::-1]
             lsym = 0
 
     # ------------------------------------------------------------
@@ -555,21 +539,21 @@ def extend(x, indmin, indmax, extd_r):
     # ------------------------------------------------------------
     if indmax[-1] < indmin[-1]:  # last extremum is a minimum
         if x[-1] < x[indmax[-1]]:
-            rmax = indmax[max(indmax.size - nbsym, 0):][::-1]
-            rmin = indmin[max(indmin.size - nbsym, 0): -1][::-1]
+            rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
+            rmin = indmin[max(indmin.size - nbsym, 0) : -1][::-1]
             rsym = indmin[-1]
         else:
-            rmax = np.r_[xlen - 1, indmax[max(indmax.size - nbsym + 1, 0):][::-1]]
-            rmin = indmin[max(indmin.size - nbsym, 0):][::-1]
+            rmax = np.r_[xlen - 1, indmax[max(indmax.size - nbsym + 1, 0) :][::-1]]
+            rmin = indmin[max(indmin.size - nbsym, 0) :][::-1]
             rsym = xlen - 1
     else:  # last extremum is a maximum
         if x[-1] > x[indmin[-1]]:
-            rmax = indmax[max(indmax.size - nbsym, 0): -1][::-1]
-            rmin = indmin[max(indmin.size - nbsym + 1, 0):][::-1]
+            rmax = indmax[max(indmax.size - nbsym, 0) : -1][::-1]
+            rmin = indmin[max(indmin.size - nbsym + 1, 0) :][::-1]
             rsym = indmax[-1]
         else:
-            rmax = indmax[max(indmax.size - nbsym, 0):][::-1]
-            rmin = np.r_[xlen - 1, indmin[max(indmin.size - nbsym + 1, 0):][::-1]]
+            rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
+            rmin = np.r_[xlen - 1, indmin[max(indmin.size - nbsym + 1, 0) :][::-1]]
             rsym = xlen - 1
 
     # Mirror locations
@@ -581,18 +565,18 @@ def extend(x, indmin, indmax, extd_r):
     # Ensure the extension reaches far enough
     if tlmin.size and tlmin[0] > t[0] or tlmax.size and tlmax[0] > t[0]:
         if lsym == indmax[0]:
-            lmax = indmax[1: min(indmax.size, nbsym + 1)][::-1]
+            lmax = indmax[1 : min(indmax.size, nbsym + 1)][::-1]
         else:
-            lmin = indmin[1: min(indmin.size, nbsym + 1)][::-1]
+            lmin = indmin[1 : min(indmin.size, nbsym + 1)][::-1]
         if lsym == 0:
             raise RuntimeError("Left extension bug")
         lsym = 0
 
     if trmin.size and trmin[-1] < t[-1] or trmax.size and trmax[-1] < t[-1]:
         if rsym == indmax[-1]:
-            rmax = indmax[max(indmax.size - nbsym, 0):][::-1]
+            rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
         else:
-            rmin = indmin[max(indmin.size - nbsym, 0):][::-1]
+            rmin = indmin[max(indmin.size - nbsym, 0) :][::-1]
         if rsym == xlen - 1:
             raise RuntimeError("Right extension bug")
         rsym = xlen - 1
@@ -612,10 +596,10 @@ def extend(x, indmin, indmax, extd_r):
     new_rmin = rsym - rmin
 
     lx_len = l_end - lsym
-    lx = x[lsym + 1: l_end + 1][::-1]
+    lx = x[lsym + 1 : l_end + 1][::-1]
     rx = x[r_end:rsym][::-1]
 
-    ext_x = np.r_[lx, x[lsym: rsym + 1], rx]
+    ext_x = np.r_[lx, x[lsym : rsym + 1], rx]
 
     lx_shift = lx_len - lsym
     ext_indmin = np.r_[
@@ -630,19 +614,13 @@ def extend(x, indmin, indmax, extd_r):
     return ext_indmin, ext_indmax, ext_x, cut_index
 
 
-def smooth(x, span):
+def smooth(x: np.ndarray, span: int) -> np.ndarray:
     """
-    Python 版 MATLAB smooth(x, span) —— centered moving average
-    Parameters
-    ----------
-    x : 1-D array_like
-        原始序列
-    span : int
-        窗宽（点数）。必须是奇数；若为偶数自动加 1
-    Returns
-    -------
-    y : np.ndarray
-        平滑后序列，长度与 x 相同
+    Python 版 MATLAB smooth(x, span) —— centered moving average.
+
+    :param x: 1-D array_like
+    :param span: int, 窗宽（点数）。必须是奇数；若为偶数自动加 1
+    :return: y: np.ndarray, 平滑后的输入序列
     """
     x = np.asarray(x, dtype=float).ravel()
     N = x.size
@@ -663,13 +641,19 @@ def smooth(x, span):
         # 计算当前左右可取的点数
         left = min(i, k)
         right = min(N - 1 - i, k)
-        win = x[i - left: i + right + 1]
+        win = x[i - left : i + right + 1]
         y[i] = win.mean()
 
     return y
 
 
-def rms(x, dim=0, *, keepdims=False, omitnan=False):
+def rms(
+    x: np.ndarray,
+    dim: Optional[int] = 0,
+    *,
+    keepdims: bool = False,
+    omitnan: bool = False,
+) -> np.ndarray | float:
     """
     等效 MATLAB 的 rms 函数
     Parameters
@@ -691,14 +675,19 @@ def rms(x, dim=0, *, keepdims=False, omitnan=False):
 
     if omitnan:
         # 跳过 NaN：用 nanmean / nanstd 思路
-        mean_sq = np.nanmean(x ** 2, axis=dim, keepdims=keepdims)
+        mean_sq = np.nanmean(x**2, axis=dim, keepdims=keepdims)
     else:
-        mean_sq = np.mean(x ** 2, axis=dim, keepdims=keepdims)
+        mean_sq = np.mean(x**2, axis=dim, keepdims=keepdims)
 
     return np.sqrt(mean_sq)
 
 
-def kurtosis(x, axis=0, bias=False, nan_policy="propagate"):
+def kurtosis(
+    x: np.ndarray,
+    axis: Optional[int] = 0,
+    bias: bool = False,
+    nan_policy: Optional[str] = "propagate",
+) -> np.ndarray | float:
     """
     复现 MATLAB kurtosis(x) 行为（总体公式，flag=0）
     Parameters
@@ -739,12 +728,6 @@ def kurtosis(x, axis=0, bias=False, nan_policy="propagate"):
 
     return k
 
-
-# 示例
-# if __name__ == '__main__':
-#     rng = np.random.default_rng(42)
-#     A = rng.normal(size=(100, 3))
-#     print("NumPy  kurtosis (列):", kurtosis(A))
 
 if __name__ == "__main__":
     from pysdkit.data import test_univariate_signal
