@@ -55,7 +55,11 @@ class RLMDTest(unittest.TestCase):
             # 判断分解得到的模态数目和指定的超参数数目是否一致
             number = IMFs.shape[0]
             # 考虑到有残差的存在因此应该要+1
-            self.assertEqual(first=number, second=k + 1, msg="分解得到的本征模态函数的数目和指定的超参数不一致")
+            self.assertEqual(
+                first=number,
+                second=k + 1,
+                msg="分解得到的本征模态函数的数目和指定的超参数不一致",
+            )
 
 
 if __name__ == "__main__":
