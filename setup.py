@@ -9,7 +9,7 @@ setuptools.setup(
     version="0.4.19",  # 包的版本号，应遵循语义版本控制规则
     description="A Python library for signal decomposition algorithms with a unified interface.",  # 包的简短描述
     url="https://github.com/wwhenxuan/PySDKit",  # 项目的地址通常来说是github
-    author="whenxuan, changewam",
+    author="whenxuan, changewam, josefinez",
     author_email="wwhenxuan@gmail.com",
     keywords=[
         "signal decomposition",
