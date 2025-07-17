@@ -375,9 +375,6 @@ class CEEMDAN(object):
 
         # Begin the algorithm's iteration
         for i in it(range(max_imfs - 1)):
-            print(max_imfs)
-            print(i)
-
             # Number of IMFs currently decomposed
             imf_number = all_cimfs.shape[0]
 
@@ -405,7 +402,7 @@ class CEEMDAN(object):
             # Determine whether the decomposition algorithm should stop iterating
             if self.end_condition(signal=signal, cIMFs=all_cimfs, max_imf=max_imfs):
                 # Reached the stopping condition
-                print("End Decomposition")
+                # print("End Decomposition")
                 break
 
         # Clear all IMF noise
@@ -418,3 +415,16 @@ class CEEMDAN(object):
         self.residue = signal * scale_s - np.sum(self.imfs, axis=0)
 
         return all_cimfs
+
+
+if __name__ == '__main__':
+    from pysdkit.data import test_univariate_signal
+    from pysdkit.plot import plot_IMFs
+
+    time, signal = test_univariate_signal()
+
+    for max_imfs in [2, 3, 4, 5, 6, 7]:
+        ceemdan = CEEMDAN(max_imfs=max_imfs)
+        imfs = ceemdan.fit_transform(signal)
+
+        print(max_imfs, imfs.shape)
