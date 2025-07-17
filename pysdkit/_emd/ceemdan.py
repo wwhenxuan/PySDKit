@@ -71,24 +71,24 @@ class CEEMDAN(object):
         :param max_iter: maximum number of decomposition iterations
         :param random_seed: create a random seed for the random number generator
         """
-        # EMD算法的固定配置
+        # Fixed configuration of the EMD algorithm
         self.max_imfs = max_imfs
         self.trials = trials
         self.epsilon = epsilon
         self.max_iter = max_iter
 
-        # 与多进程相关的配置参数
+        # Configuration parameters related to multi-process
         self.parallel = parallel
         self.processes = processes
 
-        # 创建噪声的参数
+        # Parameters for creating noise
         self.noise_scale = noise_scale
         self.noise_kind = noise_kind
         self.noise_list = ["normal", "uniform"]
-        # 是否对分解的噪声进行标准化
+        # Whether to normalize the decomposed noise
         self.beta_progress = beta_progress
 
-        # 与算法停止有关的阈值
+        # Thresholds related to algorithm stopping
         self.range_thr = range_thr
         self.total_power_thr = total_power_thr
 
@@ -99,16 +99,16 @@ class CEEMDAN(object):
             else ext_EMD
         )
 
-        # 创建随机数生成器
+        # Creating a random number generator
         self.rng = np.random.RandomState(seed=random_seed)
 
-        # 生成的噪声序列
+        # Generated noise sequence
         self.all_noises = None
 
-        # 存放用于分解的噪声的列表
+        # List of noises to be decomposed
         self.all_noise_EMD = []
 
-        # 记录本次算法分解的结果
+        # Record the results of this algorithm decomposition
         self.imfs = None
         self.residue = None
 
@@ -231,13 +231,13 @@ class CEEMDAN(object):
         noise = self.epsilon * self.all_noise_EMD[trial][0]
 
         # Return the result of a single EMD execution
-        return self.emd(self._signal + noise, self._time, self.max_imfs)
+        return self._emd(self._signal + noise, self._time, self.max_imfs)
 
-    def emd(
+    def _emd(
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = -1,
+        max_imfs: Optional[int] = None,
     ) -> np.ndarray:
         """
         Vanilla Empirical Mode Decomposition method
@@ -277,6 +277,7 @@ class CEEMDAN(object):
 
         # Get the intrinsic mode function and residual respectively
         imfs, residue = self.get_imfs_and_residue()
+
         if np.allclose(residue, 0):
             return imfs[:-1].copy(), imfs[-1].copy()
         else:
@@ -304,12 +305,13 @@ class CEEMDAN(object):
 
         # Compute the Empirical Mode Decomposition (EMD) for the residue
         R = signal - np.sum(cIMFs, axis=0)
-        _test_imfs = self.emd(signal=R, time=None, max_imfs=1)
-
-        # Check if the residue is an IMF or has no extrema
-        if _test_imfs.shape[0] == 1:
-            print("Not enough extrema")
-            return True
+        # _test_imfs = self._emd(signal=R, time=None, max_imfs=2)
+        # print("test imfs", _test_imfs.shape)
+        #
+        # # Check if the residue is an IMF or has no extrema
+        # if _test_imfs.shape[0] == 1:
+        #     print("Not enough extrema")
+        #     return True
 
         # Check for range threshold
         if np.max(R) - np.min(R) < self.range_thr:
@@ -328,7 +330,7 @@ class CEEMDAN(object):
         self,
         signal: np.ndarray,
         time: Optional[np.ndarray] = None,
-        max_imfs: Optional[int] = -1,
+        max_imfs: Optional[int] = None,
         progress: bool = False,
     ) -> np.ndarray:
         """
@@ -344,8 +346,7 @@ class CEEMDAN(object):
         scale_s = np.std(signal)
         signal = signal / scale_s
 
-        if max_imfs is not None:
-            self.max_imfs = max_imfs
+        max_imfs = self.max_imfs if max_imfs is None else max_imfs
 
         # Define the noise sequences to be added
         self.all_noises = self.generate_noise(
@@ -364,6 +365,7 @@ class CEEMDAN(object):
 
         # Begin executing the specific decomposition algorithm
         total = (max_imfs - 1) if max_imfs != -1 else None
+
         # Create an iterator object for signal decomposition
         it = (
             iter
@@ -372,8 +374,7 @@ class CEEMDAN(object):
         )
 
         # Begin the algorithm's iteration
-        for _ in it(range(self.max_imfs)):
-
+        for i in it(range(max_imfs - 1)):
             # Number of IMFs currently decomposed
             imf_number = all_cimfs.shape[0]
 
@@ -385,11 +386,12 @@ class CEEMDAN(object):
                 # Skip if noise[trial] didn't have k'th mode
                 noise_imf = self.all_noise_EMD[trial]
                 res = prev_res.copy()
+
                 if len(noise_imf) > imf_number:
                     res += beta * noise_imf[imf_number]
 
                 # Extract the local mean, which is at the 2nd position
-                imfs = self.emd(res, time, max_imfs=1)
+                imfs = self._emd(res, time, max_imfs=1)
                 local_mean += imfs[-1] / self.trials
 
             # Record the results of this decomposition
@@ -398,11 +400,9 @@ class CEEMDAN(object):
             prev_res = local_mean.copy()
 
             # Determine whether the decomposition algorithm should stop iterating
-            if self.end_condition(
-                signal=signal, cIMFs=all_cimfs, max_imf=self.max_imfs
-            ):
+            if self.end_condition(signal=signal, cIMFs=all_cimfs, max_imf=max_imfs):
                 # Reached the stopping condition
-                print("End Decomposition")
+                # print("End Decomposition")
                 break
 
         # Clear all IMF noise
@@ -410,6 +410,21 @@ class CEEMDAN(object):
 
         # Record the results of this decomposition
         self.imfs = all_cimfs
+
+        # Calculate the remaining residual components
         self.residue = signal * scale_s - np.sum(self.imfs, axis=0)
 
         return all_cimfs
+
+
+if __name__ == '__main__':
+    from pysdkit.data import test_univariate_signal
+    from pysdkit.plot import plot_IMFs
+
+    time, signal = test_univariate_signal()
+
+    for max_imfs in [2, 3, 4, 5, 6, 7]:
+        ceemdan = CEEMDAN(max_imfs=max_imfs)
+        imfs = ceemdan.fit_transform(signal)
+
+        print(max_imfs, imfs.shape)

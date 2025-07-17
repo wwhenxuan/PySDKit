@@ -307,3 +307,17 @@ class LMD(object):
         pf.append(residue)
 
         return np.array(pf)
+
+
+if __name__ == "__main__":
+    from pysdkit.data import test_univariate_signal
+    from pysdkit.plot import plot_IMFs
+    from matplotlib import pyplot as plt
+
+    time, signal = test_univariate_signal()
+
+    rlmd = LMD()
+    imfs = rlmd.fit_transform(signal)
+
+    plot_IMFs(signal, imfs)
+    plt.show()

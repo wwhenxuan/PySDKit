@@ -26,3 +26,6 @@ class STL(object):
 
     def __str__(self) -> str:
         return "Seasonal-Trend decomposition using LOESS (STL)"
+
+    def fit_transform(self):
+        pass
