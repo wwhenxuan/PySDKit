@@ -5,7 +5,6 @@ Created on 2025/07/18 11:17:41
 @email: wwhenxuan@gmail.com
 """
 import unittest
-import numpy as np
 
 from pysdkit.data import (
     test_emd,
