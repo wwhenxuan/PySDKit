@@ -212,108 +212,6 @@ def generate_exponential_signal(
     return t, noisy_exp_signal
 
 
-def test_univariate_signal(
-    case: int = 1,
-    duration: float = 1.0,
-    sampling_rate: int = 1000,
-) -> Tuple[np.array, np.array]:
-    """
-    Select a test case for a one-dimensional univariate signal based on the input `case`
-
-    :param case: the test number in [1, 2, 3]
-    :param duration: Length of the signal in seconds.
-    :param sampling_rate: Number of samples per second.
-
-    :return: Tuple containing time array and the generated signal.
-    :return: the generated signal for univariate 1D.
-    """
-    if case == 1:
-        return test_1D_1(duration, sampling_rate)
-    elif case == 2:
-        return test_1D_2(duration, sampling_rate)
-    elif case == 3:
-        return test_1D_3(duration, sampling_rate)
-    else:
-        # 当没有这个测试实例是返回`test_emd`这个函数
-        print(f"There is no case {case}, so it will return test_emd!")
-        return test_emd(duration, sampling_rate)
-
-
-def test_1D_1(
-    duration: float = 1.0, sampling_rate: int = 1000
-) -> Tuple[np.array, np.array]:
-    """
-    4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
-
-    :param duration: Length of the signal in seconds.
-    :param sampling_rate: Number of samples per second.
-
-    :return: Tuple containing time array and the generated signal.
-    """
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = (
-        4
-        / np.pi
-        * (
-            np.sin(2 * np.pi * 10 * t)
-            + np.sin(2 * np.pi * 30 * t) / 3
-            + np.sin(2 * np.pi * (50 * t + 20 * t**2)) / 2
-        )
-    )
-    return t, signal
-
-
-def test_1D_2(
-    duration: float = 10.0, sampling_rate: int = 128
-) -> Tuple[np.array, np.array]:
-    """
-    Generate 3 * 2 ^ (-t) * sin(sin(2 * pi * t))
-
-    :param duration: Length of the signal in seconds.
-    :param sampling_rate: Number of samples per second.
-
-    :return: Tuple containing time array and the 3 * 2 ^ (-t) * sin(sin(2 * pi * t)) signal.
-    """
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = (
-        3 * 2 ** (-t) * np.sin(np.sin(2 * np.pi * t))
-        + np.cos(2 * np.pi * t * 5)
-        + np.sin(2 * np.pi * (t + 2 * t**2))
-        + np.sin(2 * np.pi * t * 30)
-    )
-    return t, signal
-
-
-def test_1D_3(
-    duration: float = 6.0,
-    sampling_rate: int = 128,
-    noise_level: float = 0.0,
-    random_state: int = 42,
-) -> Tuple[np.array, np.array]:
-    """
-    Generate 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t)
-
-    :param duration: Length of the signal in seconds.
-    :param sampling_rate: Number of samples per second.
-    :param noise_level: Standard deviation of the Gaussian noise.
-    :param random_state: Random seed for the noise generation.
-
-    :return: Tuple containing time array and the 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t) signal with noise.
-    """
-    np.random.seed(seed=random_state)
-    t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = (
-        5 * np.sin(2 * np.pi * t)
-        + 3 * np.cos(2 * np.pi * t)
-        + 2 * np.cos(2 * np.pi * t**2)
-        + np.sin(2 * np.pi * t**3)
-        + np.sin(2 * np.pi * (t * 30 + t**2 * 2))
-    )
-    noise = np.random.normal(0, noise_level, signal.shape)
-    noise_signal = signal + noise
-    return t, noise_signal
-
-
 def test_emd(
     duration: float = 1.0,
     sampling_rate: int = 1000,
@@ -506,17 +404,17 @@ def test_multivariate_1D_3(
     return t, f
 
 
-if __name__ == "__main__":
-    from pysdkit.data import test_emd, test_multivariate_signal
-    from pysdkit.plot import plot_signal
-
-    t, signal = test_univariate_signal(case=1)
-    print(signal.shape)
-
-    fig = plot_signal(t, signal)
-
-    t, signal = test_multivariate_signal(case=2)
-    print(signal.shape)
-
-    fig = plot_signal(t, signal, save=False)
-    plt.show()
+# if __name__ == "__main__":
+#     from pysdkit.data import test_emd, test_multivariate_signal
+#     from pysdkit.plot import plot_signal
+#
+#     t, signal = test_univariate_signal(case=1)
+#     print(signal.shape)
+#
+#     fig = plot_signal(t, signal)
+#
+#     t, signal = test_multivariate_signal(case=2)
+#     print(signal.shape)
+#
+#     fig = plot_signal(t, signal, save=False)
+#     plt.show()

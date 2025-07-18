@@ -5,7 +5,10 @@
 # @email: wwhenxuan@gmail.com
 # """
 # import numpy as np
+# from scipy.sparse import diags
 # from scipy.sparse import block_diag
+# from scipy.sparse import spdiags
+# from scipy.linalg import solve
 #
 # try:
 #     from scipy.integrate import cumulative_trapezoid
@@ -32,7 +35,7 @@
 #                  tol: Optional[float] = 1e-5,
 #                  max_iter: Optional[int] = 300,
 #                  random_state: Optional[int] = 42,
-#                  dtype: np.dtype = np.float64, ):
+#                  dtype: np.dtype = np.float64, ) -> None:
 #         """
 #         :param max_imfs:
 #         :param beta: filter parameter
@@ -60,9 +63,9 @@
 #         if iniIF is None:
 #             # 如果用户未传入初始化的本征函数
 #             iniIF = np.ones(shape=(self.max_imfs, length))
-#             for row in range(length):
+#             for row in range(self.max_imfs):
 #                 # 遍历其中的每一行信息表示一个本征模态函数
-#                 iniIF[row, :] = self.rng.randint(10, 500)
+#                 iniIF[row, :] = iniIF[row, :] * self.rng.randint(10, 500)
 #         elif iniIF is not None and isinstance(iniIF, np.ndarray):
 #             # 如果用户传入了初始化的本征函数并且不为空
 #             num_imfs, len_iniIF = iniIF.shape
@@ -123,8 +126,12 @@
 #         # Construct the second-order difference matrix H
 #         H, HtH = build_second_order_diff(N=length)
 #
+#         print("H", H.shape)
+#         print("HtH", HtH.shape)
+#
 #         # Form the 2K block second-order difference matrix D
 #         D = build_block_second_order_diff(H=H, K=max_imfs)
+#         print("D", D.shape)
 #
 #         # Initialization
 #         sinm, cosm = np.zeros(shape=(max_imfs, length)), np.zeros(shape=(max_imfs, length))
@@ -157,17 +164,7 @@
 #                 beta_thin = self.beta
 #
 #             # Estimating the Nonlinear Chirp Signal
-#
-#
-# # if __name__ == '__main__':
-# #     a = np.ones((2, 10))
-# #     print(np.hstack([a, a]).shape)
-# #     print(a * np.array([[1], [2]]))
-# #     print(np.array([[1], [2]]).shape)
-#
-#
-# import numpy as np
-# from scipy.sparse import spdiags
+#             x = estimate_NCS(A=A, D=D, g=signal, K=max_imfs, N=length)
 #
 #
 # def build_second_order_diff(N: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -184,10 +181,10 @@
 #     ones = np.ones(N)
 #     twos = -2 * ones
 #     data = np.vstack((ones, twos, ones))  # 3 × N
-#     diags = np.array([0, 1, 2])  # 对应 0, 1, 2 对角线
+#     diags_ = np.array([0, 1, 2])  # 对应 0, 1, 2 对角线
 #
 #     # spdiags 在 SciPy 中的顺序是 (data, diags, m, n)
-#     H = spdiags(data, diags, N - 2, N, format='csr')
+#     H = spdiags(data, diags_, N - 2, N, format='csr')
 #
 #     HtH = H.T @ H
 #     return H, HtH
@@ -212,10 +209,9 @@
 #     # 将 H 重复 2*K 次，然后沿对角线拼接
 #     blocks = [H] * (2 * K)
 #     D = block_diag(blocks, format='csr')
-#     return D
 #
-#
-# from scipy.sparse import diags
+#     # 将系数矩阵转化为稠密矩阵并返回
+#     return D.toarray()
 #
 #
 # def initialize_A(t, iniIF, sinm, cosm, N, K):
@@ -264,19 +260,53 @@
 #     return A, sinm, cosm
 #
 #
-# # # ------------------ 示例用法 ------------------
-# # if __name__ == "__main__":
-# #     # 假设 N=1000, K=3
-# #     N = 1000
-# #     K = 3
-# #     t = np.linspace(0, 1, N)
-# #
-# #     # 随机生成 3 条瞬时频率曲线作为示例
-# #     np.random.seed(0)
-# #     iniIF = np.random.rand(K, N) * 10  # 10 Hz 以内
-# #
-# #     A = initialize_A(t, iniIF, None, None, N, K)
-# #     print("A shape:", A.shape)  # (N, 2*K*N)
+# def estimate_NCS(A: np.ndarray, D: np.ndarray, g: np.ndarray, K: int, N: int):
+#     """
+#     This code implements the Section 3.1 "Estimating the Nonlinear Chirp Signal"
+#     The optimization problem may be expressed as
+#     minimize   alpha*|| g - Ax ||_2^2 + || Dx ||_2^2
+#
+#     :param A: dictionary.
+#     :param D: 2K block second-order difference matrix.
+#     :param g: sampled signal.
+#     :param K: number of modes.
+#     :param N: number of samples.
+#     :return: x:  solution of the above optimization problem.
+#     """
+#     # Find a matrix M whose rows are orthogonal to those in D
+#     M = np.zeros(shape=(4 * K, 2 * K * N))
+#     ii = 0
+#
+#     # TODO: 这里注意索引的起始位置
+#     for i in range(1, 2 * K):
+#         M[ii, i * N - 1 - 1] = 1
+#         M[ii + 1, i * N - 1] = 1
+#         ii += 2
+#
+#     # Construct a full rank matrix D_title
+#     D_tilde = np.concatenate([D, M], axis=0)  # TODO: 注意这里是列向量合并
+#
+#     # Parameter Setting
+#     print("A", A.shape)
+#     print("D_tilde", D_tilde.shape)
+#
+#     print(A)
+#
+#     Lambda = solve(D_tilde.T, A.T).T  # TODO: 这里进行的是矩阵的除法
+#
+#     print(Lambda.shape)
+#
+#     Lambda1 = Lambda[:, :2 * K * (N - 2)]
+#     Lambda2 = Lambda[:, 2 * K * (N - 2):]
+#     theta_matrix = solve(a=np.matmul(Lambda1.T, Lambda2), b=Lambda2.T)
+#
+#     w_matrix = np.eye(N, N) - np.matmul(Lambda2, theta_matrix)
+#     y = np.matmul(w_matrix, g)
+#
+#     Phi = np.matmul(w_matrix, Lambda1)
+#
+#     # Update w
+#     w = bayesian_strategy(Phi, y)
 #
 #
 # def bayesian_strategy(Phi, y):
@@ -325,23 +355,147 @@
 #     S = PHI2 / gamma_0 - Sig * (left ** 2)
 #     Q = PHIt / gamma_0 - Sig * PHIt[index] / gamma_0 * left
 #
+#     ML = []
+#
 #     for count in range(maxIter):
 #         # Calculate si and qi
-#         s, q = S, Q
+#         s, q = S.copy(), Q.copy()
 #
 #         s[index] = gamma * S[index] / (gamma - S[index])
 #         q[index] = gamma * Q[index] / (gamma - Q[index])
 #         theta = q ** 2 - s
 #
 #         # Choice the next alpha that maximizes marginal likelihood
-#         ml = -np.inf * np.ones(m)
-#         ig0 = np.where(theta > 0)
+#         # ml = -np.inf * np.ones(m)
+#         ml = np.full(m, -np.inf)
+#         ig0 = np.where(theta > 0)[1]  # TODO: 这里注意是1还是0
 #
 #         # Index for re-estimate
+#         ire, _, which = intersect_mimic(a=ig0, b=index)
+#
+#         if np.size(ire) > 0:
+#             # if not empty
+#             Gamma = s[ire] ** 2 / theta[ire]
+#             delta = (gamma[which] - Gamma) / (Gamma * gamma[which])
+#             ml[ire] = Q[ire] ** 2 * delta / (S[ire] * delta + 1) - np.log(1 + S[ire] * delta)
+#
+#         # Index for adding
+#         iad = np.setdiff1d(ig0, ire)
+#
+#         if np.size(iad) > 0:
+#             ml[iad] = (Q[iad] ** 2 - S[iad]) / S[iad] + np.log(S[iad] / (Q[iad] ** 2))
+#
+#         is0 = np.setdiff1d(range(m), ig0)
+#
+#         # Index for deleting
+#         ide, _, which = intersect_mimic(a=is0, b=index)
+#         if np.size(ide) > 0:
+#             ml[ide] = Q[ide] ** 2 / (S[ide] - gamma[which]) - np.log(1 - S[ide] / gamma[which])
+#
+#         idx = np.argmax(ml)
+#         ML.append(idx)
+#
+#         # Stopping criteria
+#         if count > 2 and np.abs(ML[count] - ML[count - 1]) < np.abs(ML[count] - ML[0]) * eta:
+#             break
+#
+#         # Update gamma
+#         which = np.where(index == idx)[1]  # TODO: 这里注意一下索引位置
+#
+#         if theta[idx] > 0:
+#             if np.size(which) > 0:
+#                 # Re-estimate
+#                 Gamma = s[idx] ** 2 / theta[idx]
+#                 Sigii = Sig[which, which]
+#                 mui = mu[which]
+#                 Sigi = Sig[:, which]
+#
+#                 delta = Gamma - gamma[which]
+#                 ki = delta / (1 + Sigii @ delta)  # TODO: 这里是否是矩阵的乘法
+#
+#                 mu = mu - ki * (mui @ Sigi)
+#                 Sig = Sig - ki * (Sigi @ Sigi.T)
+#                 comm = Phi.T @ (np.matmul(phi * Sigi)) / gamma_0
+#
+#                 S = S + ki * comm ** 2
+#                 Q = Q + ki * mui @ comm
+#
+#                 gamma[which] = Gamma
+#
+#             else:
+#                 # Adding
+#                 Gamma = s[idx] ** 2 / theta[idx]
+#                 phii = Phi[:, idx]
+#                 Sigii = 1 / (Gamma + S[idx])
+#                 mui = Sigii @ Q[idx]
+#                 comm1 = Sig @ (phi.T @ phii) / gamma_0
+#
+#                 ei = phii - np.matmul(phi * comm1)
+#                 off = - Sigii * comm1
+#
+#                 Sigii_comm1 = np.hstack([Sig + Sigii @ (comm1 @ comm1.T), off])
+#                 off_Sigii = np.hstack([off.T, Sigii])
+#
+#                 Sig = np.vstack([Sigii_comm1, off_Sigii])
+#
+#                 mu = np.vstack([mu - mu * comm1, mui])
 #
 #
+# def intersect_mimic(a: np.ndarray, b: np.ndarray, assume_unique: Optional[bool] = False) -> Tuple[
+#     np.ndarray, np.ndarray, np.ndarray]:
+#     """
+#     MATLAB 风格 intersect(A,B) 的 Python 复现。
+#     返回 (c, ia, ib)，其中
+#         c  : 公共元素（升序、去重）
+#         ia : 这些元素在 a 中的下标
+#         ib : 这些元素在 b 中的下标
+#     与 [C,ia,ib] = intersect(A,B) 在 MATLAB 中的行为一致。
+#     """
+#     a = np.asarray(a).ravel()
+#     b = np.asarray(b).ravel()
+#
+#     if not assume_unique:
+#         # 先拿到去重+排序后的数组，并记录“反向索引”
+#         a_u, a_ind = np.unique(a, return_index=True)
+#         b_u, b_ind = np.unique(b, return_index=True)
+#     else:
+#         a_u, a_ind = a, np.arange(a.size)
+#         b_u, b_ind = b, np.arange(b.size)
+#
+#     # 求交集
+#     mask = np.in1d(a_u, b_u, assume_unique=True)
+#     c = a_u[mask]  # 公共元素，已升序
+#     ia_orig = a_ind[mask]  # 在原始 a 中的下标
+#
+#     # 同样的操作对 b
+#     mask_b = np.in1d(b_u, a_u, assume_unique=True)
+#     ib_orig = b_ind[mask_b]
+#
+#     return c, ia_orig, ib_orig
 #
 #
+# if __name__ == "__main__":
+#     T = 1
+#     fs = 2001
+#     t = np.arange(0, fs) / fs
 #
+#     a1 = np.exp(-0.03 * t)
+#     a2 = np.exp(-0.06 * t)
 #
+#     f_1t = 25 + 8 * t - 3 * t ** 2 + 0.4 * t ** 3
+#     f_2t = 40 + 16 * t - 6 * t ** 2 + 0.4 * t ** 3
 #
+#     g_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t ** 2 - 1 * t ** 3 + 0.1 * t ** 4))
+#     g_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t ** 2 - 2 * t ** 3 + 0.1 * t ** 4))
+#     g = g_1t + g_2t
+#
+#     print(g.shape)
+#
+#     beta = 1e-6
+#     tol = 1e-5
+#
+#     iniIF = np.vstack([28 * np.ones(len(t)), 48 * np.ones(len(t))])
+#
+#     avncmd = AVNCMD(max_imfs=2, beta=beta,
+#                     tol=tol)
+#     avncmd.fit_transform(g, fs)

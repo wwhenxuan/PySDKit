@@ -173,7 +173,7 @@ class CEEMDAN(object):
 
         # Normalize the decomposed noise sequences
         if self.beta_progress:
-            all_stds = [np.std(imfs[0]) for imfs in all_noise_EMD]
+            all_stds = [np.var(imfs[0]) for imfs in all_noise_EMD]
             all_noise_EMD = [
                 imfs / imfs_std for (imfs, imfs_std) in zip(all_noise_EMD, all_stds)
             ]
