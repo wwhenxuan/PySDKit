@@ -23,9 +23,6 @@ from ._generator import test_emd
 # Generate the test function for HHT
 from ._generator import test_hht
 
-# Generator for 1D univariate
-from ._generator import test_univariate_signal
-
 # Generator for 1D multivariate
 from ._generator import test_multivariate_signal
 
@@ -49,3 +46,8 @@ from ._cube import test_univariate_cube
 
 # Test case for multivariate 3D cube
 from ._cube import test_multivariate_cube
+
+# Generator for 1D univariate
+from ._test_univariate import test_univariate_signal
+
+#
