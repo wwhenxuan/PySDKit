@@ -10,9 +10,9 @@ from typing import Tuple
 
 
 def test_univariate_signal(
-        case: int = 1,
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
+    case: int = 1,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a one-dimensional univariate signal based on the input `case`
@@ -37,7 +37,7 @@ def test_univariate_signal(
 
 
 def test_univariate_1(
-        duration: float = 1.0, sampling_rate: int = 1000
+    duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
     4 / np.pi * (np.sin(2 * np.pi * 10 * t) + np.sin(2 * np.pi * 30 * t) / 3 + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2)
@@ -49,19 +49,19 @@ def test_univariate_1(
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
     signal = (
-            4
-            / np.pi
-            * (
-                    np.sin(2 * np.pi * 10 * t)
-                    + np.sin(2 * np.pi * 30 * t) / 3
-                    + np.sin(2 * np.pi * (50 * t + 20 * t ** 2)) / 2
-            )
+        4
+        / np.pi
+        * (
+            np.sin(2 * np.pi * 10 * t)
+            + np.sin(2 * np.pi * 30 * t) / 3
+            + np.sin(2 * np.pi * (50 * t + 20 * t**2)) / 2
+        )
     )
     return t, signal
 
 
 def test_univariate_2(
-        duration: float = 10.0, sampling_rate: int = 128
+    duration: float = 10.0, sampling_rate: int = 128
 ) -> Tuple[np.array, np.array]:
     """
     Generate 3 * 2 ^ (-t) * sin(sin(2 * pi * t))
@@ -73,19 +73,19 @@ def test_univariate_2(
     """
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
     signal = (
-            3 * 2 ** (-t) * np.sin(np.sin(2 * np.pi * t))
-            + np.cos(2 * np.pi * t * 5)
-            + np.sin(2 * np.pi * (t + 2 * t ** 2))
-            + np.sin(2 * np.pi * t * 30)
+        3 * 2 ** (-t) * np.sin(np.sin(2 * np.pi * t))
+        + np.cos(2 * np.pi * t * 5)
+        + np.sin(2 * np.pi * (t + 2 * t**2))
+        + np.sin(2 * np.pi * t * 30)
     )
     return t, signal
 
 
 def test_univariate_3(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate 5 * sin(2 * pi * t) + 3 * sin(2 * pi * t)
@@ -100,11 +100,11 @@ def test_univariate_3(
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
     signal = (
-            5 * np.sin(2 * np.pi * t)
-            + 3 * np.cos(2 * np.pi * t)
-            + 2 * np.cos(2 * np.pi * t ** 2)
-            + np.sin(2 * np.pi * t ** 3)
-            + np.sin(2 * np.pi * (t * 30 + t ** 2 * 2))
+        5 * np.sin(2 * np.pi * t)
+        + 3 * np.cos(2 * np.pi * t)
+        + 2 * np.cos(2 * np.pi * t**2)
+        + np.sin(2 * np.pi * t**3)
+        + np.sin(2 * np.pi * (t * 30 + t**2 * 2))
     )
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
@@ -112,10 +112,10 @@ def test_univariate_3(
 
 
 def test_emd(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        random_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for _emd test.
@@ -129,33 +129,47 @@ def test_emd(
     """
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = np.cos(22 * np.pi * t ** 2) + 2 * t ** 2
+    signal = np.cos(22 * np.pi * t**2) + 2 * t**2
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
     return t, noise_signal
 
 
-def test_nonlinear_chip(case: int = 0,
-                        duration: float = 1.0,
-                        sampling_rate: int = 1000,
-                        noise_level: float = 0.1,
-                        random_state: int = 42,) -> Tuple[np.array, np.array]:
+def test_univariate_nonlinear_chip(
+    case: int = 0,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
+) -> Tuple[np.array, np.array]:
     """
+    Select a test case for a one-dimensional nonlinear chip univariate signal based on the input `case`
 
-    :param case: the test number in [1, 2, 3]
-    :param duration:
-    :param sampling_rate:
-    :param noise_level:
-    :param random_state:
-    :return:
+    :param case: the test number in [0, 1]
+    :param duration: Length of the signal in seconds.
+    :param sampling_rate: Number of samples per second.
+    :param noise_level: Standard deviation of the Gaussian noise.
+    :param random_state: Random seed for the noise generation.
+    :return: the generated non-linear chip signal.
     """
+    case = int(case)
+    if case == 0:
+        t, signal = test_nonlinear_chip_1(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
+    elif case == 1:
+        t, signal = test_nonlinear_chip_2(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
+    else:
+        print(f"There is no test number {case}, return case=0!")
+        t, signal = test_nonlinear_chip_1(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
+
+    return t, signal
 
 
-def test_nonlinear_chip_1(duration: float = 1.0,
-                        sampling_rate: int = 1000,
-                        noise_level: float = 0.1,
-                        random_state: int = 42,
-                        ) -> Tuple[np.array, np.array]:
+def test_nonlinear_chip_1(
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
+) -> Tuple[np.array, np.array]:
     """
     Generate the test example for non-linear chip test.
     a1 = exp(-0.03 * t)
@@ -178,8 +192,8 @@ def test_nonlinear_chip_1(duration: float = 1.0,
     a2 = np.exp(-0.06 * t)
 
     # A two-component simulated nonlinear chirp signal (NCS)
-    s_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t ** 2 - 1 * t ** 3 + 0.1 * t ** 4))
-    s_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t ** 2 - 2 * t ** 3 + 0.1 * t ** 4))
+    s_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t**2 - 1 * t**3 + 0.1 * t**4))
+    s_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t**2 - 2 * t**3 + 0.1 * t**4))
     signal = s_1t + s_2t
 
     # Add normal noise to the generated signal
@@ -189,17 +203,18 @@ def test_nonlinear_chip_1(duration: float = 1.0,
     return t, noise_signal
 
 
-def test_nonlinear_chip_2(duration: float = 1.0,
-                        sampling_rate: int = 1000,
-                        noise_level: float = 0.1,
-                        random_state: int = 42,
-                        ) -> Tuple[np.array, np.array]:
+def test_nonlinear_chip_2(
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
+) -> Tuple[np.array, np.array]:
     """
     Generate the test example for non-linear chip test.
-    a1 = np.exp(-0.03 * t)
-    a2 = np.exp(-0.06 * t)
-    s_1t = a1 * cos(2 * pi * (0.8 + 25 * t + 4 * t ** 2 - 1 * t ** 3 + 0.1 * t ** 4))
-    s_2t = a2 * cos(2 * pi * (1 + 40 * t + 8 * t ** 2 - 2 * t ** 3 + 0.1 * t ** 4))
+    a1 = 1 + 0.5 * cos(2 * pi * t)
+    a2 = 1 - 0.5 * cos(2 * pi * t)
+    s_1t = a1 * cos(2 * pi * (100 * t + 150 * t ** 2 + sin(9 * pi * t)))
+    s_2t = a2 * cos(2 * pi * (400 * t - 150 * t ** 2 + sin(9 * pi * t)))
     signal = s_1t + s_2t
 
     :param duration: Length of the signal in seconds.
@@ -212,12 +227,12 @@ def test_nonlinear_chip_2(duration: float = 1.0,
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
 
     # Instantaneous amplitudes (IAs) and instantaneous frequencies (IFs)
-    a1 = np.exp(-0.03 * t)
-    a2 = np.exp(-0.06 * t)
+    a1 = 1 + 0.5 * np.cos(2 * np.pi * t)
+    a2 = 1 - 0.5 * np.cos(2 * np.pi * t)
 
     # A two-component simulated nonlinear chirp signal (NCS)
-    s_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t ** 2 - 1 * t ** 3 + 0.1 * t ** 4))
-    s_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t ** 2 - 2 * t ** 3 + 0.1 * t ** 4))
+    s_1t = a1 * np.cos(2 * np.pi * (100 * t + 150 * t ** 2 + np.sin(9 * np.pi * t)))
+    s_2t = a2 * np.cos(2 * np.pi * (400 * t - 150 * t ** 2 + np.sin(9 * np.pi * t)))
     signal = s_1t + s_2t
 
     # Add normal noise to the generated signal
@@ -227,12 +242,11 @@ def test_nonlinear_chip_2(duration: float = 1.0,
     return t, noise_signal
 
 
-
 def test_univariate_gaussamp_quadfm(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a Gaussian–modulated quadratic chirp:
@@ -247,17 +261,17 @@ def test_univariate_gaussamp_quadfm(
     """
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    envelope = 4 * np.exp(-((t - 3) / 1.5) ** 2)
-    signal = envelope * np.sin(2 * np.pi * (10 * t + 3 * t ** 2))
+    envelope = 4 * np.exp(-(((t - 3) / 1.5) ** 2))
+    signal = envelope * np.sin(2 * np.pi * (10 * t + 3 * t**2))
     noise = np.random.normal(0, noise_level, signal.shape)
     return t, signal + noise
 
 
 def test_univariate_duffing(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a signal governed by a softening Duffing-type ODE:
@@ -280,20 +294,29 @@ def test_univariate_duffing(
 
     omega = 2 * np.pi * 1.1
     for k in range(1, n):
-        a = -0.3 * v[k - 1] - 4 * x[k - 1] + 0.6 * x[k - 1] ** 3 + 2 * np.cos(omega * t[k - 1])
+        a = (
+            -0.3 * v[k - 1]
+            - 4 * x[k - 1]
+            + 0.6 * x[k - 1] ** 3
+            + 2 * np.cos(omega * t[k - 1])
+        )
         v1 = v[k - 1]
         x1 = x[k - 1]
         v2 = v[k - 1] + 0.5 * dt * a
         x2 = x[k - 1] + 0.5 * dt * v1
-        a2 = -0.3 * v2 - 4 * x2 + 0.6 * x2 ** 3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+        a2 = (
+            -0.3 * v2 - 4 * x2 + 0.6 * x2**3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+        )
 
         v3 = v[k - 1] + 0.5 * dt * a2
         x3 = x[k - 1] + 0.5 * dt * v2
-        a3 = -0.3 * v3 - 4 * x3 + 0.6 * x3 ** 3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+        a3 = (
+            -0.3 * v3 - 4 * x3 + 0.6 * x3**3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+        )
 
         v4 = v[k - 1] + dt * a3
         x4 = x[k - 1] + dt * v3
-        a4 = -0.3 * v4 - 4 * x4 + 0.6 * x4 ** 3 + 2 * np.cos(omega * t[k])
+        a4 = -0.3 * v4 - 4 * x4 + 0.6 * x4**3 + 2 * np.cos(omega * t[k])
 
         x[k] = x[k - 1] + dt / 6 * (v1 + 2 * v2 + 2 * v3 + v4)
         v[k] = v[k - 1] + dt / 6 * (a + 2 * a2 + 2 * a3 + a4)
@@ -304,10 +327,10 @@ def test_univariate_duffing(
 
 
 def test_univariate_logistic_am(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a carrier modulated by the chaotic logistic map:
@@ -334,10 +357,10 @@ def test_univariate_logistic_am(
 
 
 def test_univariate_cubic_quad(
-        duration: float = 6.0,
-        sampling_rate: int = 128,
-        noise_level: float = 0.0,
-        random_state: int = 42,
+    duration: float = 6.0,
+    sampling_rate: int = 128,
+    noise_level: float = 0.0,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a signal with quadratic & cubic coupling:
@@ -353,21 +376,9 @@ def test_univariate_cubic_quad(
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
     signal = (
-            2 * np.sin(2 * np.pi * 3 * t)
-            + 0.8 * np.sin(2 * np.pi * 5 * t) ** 2
-            + 0.5 * np.sin(2 * np.pi * 7 * t) ** 3
+        2 * np.sin(2 * np.pi * 3 * t)
+        + 0.8 * np.sin(2 * np.pi * 5 * t) ** 2
+        + 0.5 * np.sin(2 * np.pi * 7 * t) ** 3
     )
     noise = np.random.normal(0, noise_level, signal.shape)
     return t, signal + noise
-
-
-if __name__ == '__main__':
-    from pysdkit.plot import plot_signal
-    from matplotlib import pyplot as plt
-
-    for fun in [test_univariate_gaussamp_quadfm, test_univariate_duffing, test_univariate_logistic_am, test_univariate_cubic_quad]:
-
-        time, signal = fun()
-
-        plot_signal(time, signal)
-        plt.show()

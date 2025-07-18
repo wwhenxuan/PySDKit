@@ -7,6 +7,7 @@ Created on 2024/7/22 22:56
 
 # A series of functions for generating 1D NumPy signals
 from ._generator import generate_sin_signal, generate_cos_signal
+
 from ._generator import (
     generate_square_wave,
     generate_triangle_wave,
@@ -50,4 +51,13 @@ from ._cube import test_multivariate_cube
 # Generator for 1D univariate
 from ._test_univariate import test_univariate_signal
 
-#
+# Generator for 1D univariate nonlinear chip signal
+from ._test_univariate import test_univariate_nonlinear_chip
+
+# Generator for other univariate with different characterization
+from ._test_univariate import (
+    test_univariate_gaussamp_quadfm,
+    test_univariate_duffing,
+    test_univariate_logistic_am,
+    test_univariate_cubic_quad,
+)

@@ -12,11 +12,11 @@ from typing import Tuple, Optional
 
 
 def generate_sin_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
@@ -38,11 +38,11 @@ def generate_sin_signal(
 
 
 def generate_cos_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a Cosine signal with Gaussian noise and a sinusoidal component.
@@ -64,11 +64,11 @@ def generate_cos_signal(
 
 
 def generate_square_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a square wave signal with Gaussian noise.
@@ -92,11 +92,11 @@ def generate_square_wave(
 
 
 def generate_triangle_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a triangular wave signal with Gaussian noise.
@@ -121,11 +121,11 @@ def generate_triangle_wave(
 
 
 def generate_sawtooth_wave(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.2,
-        frequency: float = 10.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.2,
+    frequency: float = 10.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate a sawtooth wave signal with Gaussian noise.
@@ -147,13 +147,13 @@ def generate_sawtooth_wave(
 
 
 def generate_am_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        carrier_freq: float = 100.0,
-        modulating_freq: float = 5.0,
-        mod_index: float = 1.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    carrier_freq: float = 100.0,
+    modulating_freq: float = 5.0,
+    mod_index: float = 1.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate an Amplitude Modulated (AM) signal with Gaussian noise.
@@ -183,12 +183,12 @@ def generate_am_signal(
 
 
 def generate_exponential_signal(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        decay_rate: float = 1.0,
-        initial_amplitude: float = 1.0,
-        rand_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    decay_rate: float = 1.0,
+    initial_amplitude: float = 1.0,
+    rand_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate an exponentially decaying signal with Gaussian noise.
@@ -213,10 +213,10 @@ def generate_exponential_signal(
 
 
 def test_emd(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        random_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
 ) -> Tuple[np.array, np.array]:
     """
     Generate cos(22 * pi * t ^ 2) + 6 * t ^ 2 for _emd test.
@@ -230,7 +230,7 @@ def test_emd(
     """
     np.random.seed(seed=random_state)
     t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False)
-    signal = np.cos(22 * np.pi * t ** 2) + 2 * t ** 2
+    signal = np.cos(22 * np.pi * t**2) + 2 * t**2
     noise = np.random.normal(0, noise_level, signal.shape)
     noise_signal = signal + noise
     return t, noise_signal
@@ -255,9 +255,9 @@ def test_hht(duration: float = 2.0, sampling_rate: int = 1000):
 
 
 def test_multivariate_signal(
-        case: int = 1,
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
+    case: int = 1,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
 ) -> Tuple[np.array, np.array]:
     """
     Select a test case for a 1D multivariate signal based on the input `case`
@@ -282,7 +282,7 @@ def test_multivariate_signal(
 
 
 def test_multivariate_1D_1(
-        duration: float = 1.0, sampling_rate: int = 1000
+    duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
     Generate some simple cosine and sine function for multivariate signal decomposition test
@@ -307,7 +307,7 @@ def test_multivariate_1D_1(
 
 
 def test_multivariate_1D_2(
-        duration: float = 1.0, sampling_rate: int = 1000
+    duration: float = 1.0, sampling_rate: int = 1000
 ) -> Tuple[np.array, np.array]:
     """
     Generate four channels simple cosine and sine function for multivariate signal decomposition
@@ -322,24 +322,24 @@ def test_multivariate_1D_2(
 
     # Generate the multi-channels signals
     signal_1 = (
-            2 * np.cos(2 * np.pi * 3 * t ** 2)
-            + 1.7 * np.cos(2 * np.pi * 20 * t)
-            + np.cos(2 * np.pi * 40 * t)
-            + np.random.uniform(0, 0.2, t.shape)
+        2 * np.cos(2 * np.pi * 3 * t**2)
+        + 1.7 * np.cos(2 * np.pi * 20 * t)
+        + np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
     )
 
-    signal_2 = 1.5 * np.cos(2 * np.pi * 3 * t ** 2) + np.random.uniform(0, 0.2, t.shape)
+    signal_2 = 1.5 * np.cos(2 * np.pi * 3 * t**2) + np.random.uniform(0, 0.2, t.shape)
 
     signal_3 = (
-            2 * np.cos(2 * np.pi * 20 * t + np.pi / 3)
-            + 1.8 * np.cos(2 * np.pi * 40 * t)
-            + np.random.uniform(0, 0.2, t.shape)
+        2 * np.cos(2 * np.pi * 20 * t + np.pi / 3)
+        + 1.8 * np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
     )
 
     signal_4 = (
-            1.8 * np.cos(2 * np.pi * 3 * t ** 2)
-            + 2 * np.cos(2 * np.pi * 40 * t)
-            + np.random.uniform(0, 0.2, t.shape)
+        1.8 * np.cos(2 * np.pi * 3 * t**2)
+        + 2 * np.cos(2 * np.pi * 40 * t)
+        + np.random.uniform(0, 0.2, t.shape)
     )
 
     # Concat all the input channels
@@ -349,10 +349,10 @@ def test_multivariate_1D_2(
 
 
 def test_multivariate_1D_3(
-        duration: float = 1.0,
-        sampling_rate: int = 1000,
-        noise_level: float = 0.1,
-        random_state: int = 42,
+    duration: float = 1.0,
+    sampling_rate: int = 1000,
+    noise_level: float = 0.1,
+    random_state: int = 42,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate some simple cosine function for multivariate signal decomposition test
@@ -369,33 +369,33 @@ def test_multivariate_1D_3(
 
     # Generate the multi-channels signals
     f_channel1 = (
-            (10 * np.cos(2 * np.pi * 2 * t))
-            + (9 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (10 * np.cos(2 * np.pi * 2 * t))
+        + (9 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel2 = (
-            (9 * (np.cos(2 * np.pi * 24 * t)))
-            + (8 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (9 * (np.cos(2 * np.pi * 24 * t)))
+        + (8 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel3 = (
-            (8 * (np.cos(2 * np.pi * 28 * t)))
-            + (7 * (np.cos(2 * np.pi * 48 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (8 * (np.cos(2 * np.pi * 28 * t)))
+        + (7 * (np.cos(2 * np.pi * 48 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel4 = (
-            (7 * (np.cos(2 * np.pi * 32 * t)))
-            + (6 * (np.cos(2 * np.pi * 36 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (7 * (np.cos(2 * np.pi * 32 * t)))
+        + (6 * (np.cos(2 * np.pi * 36 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     f_channel5 = (
-            (6 * (np.cos(2 * np.pi * 19 * t)))
-            + (5 * (np.cos(2 * np.pi * 64 * t)))
-            + np.random.normal(0, noise_level, t.shape)
+        (6 * (np.cos(2 * np.pi * 19 * t)))
+        + (5 * (np.cos(2 * np.pi * 64 * t)))
+        + np.random.normal(0, noise_level, t.shape)
     )
 
     # concat all channels
