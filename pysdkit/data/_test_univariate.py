@@ -136,7 +136,7 @@ def test_emd(
 
 
 def test_univariate_nonlinear_chip(
-    case: int = 0,
+    case: int = 1,
     duration: float = 1.0,
     sampling_rate: int = 1000,
     noise_level: float = 0.1,
@@ -145,7 +145,7 @@ def test_univariate_nonlinear_chip(
     """
     Select a test case for a one-dimensional nonlinear chip univariate signal based on the input `case`
 
-    :param case: the test number in [0, 1]
+    :param case: the test number in [1, 2]
     :param duration: Length of the signal in seconds.
     :param sampling_rate: Number of samples per second.
     :param noise_level: Standard deviation of the Gaussian noise.
@@ -153,13 +153,28 @@ def test_univariate_nonlinear_chip(
     :return: the generated non-linear chip signal.
     """
     case = int(case)
-    if case == 0:
-        t, signal = test_nonlinear_chip_1(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
-    elif case == 1:
-        t, signal = test_nonlinear_chip_2(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
+    if case == 1:
+        t, signal = test_nonlinear_chip_1(
+            duration=duration,
+            sampling_rate=sampling_rate,
+            noise_level=noise_level,
+            random_state=random_state,
+        )
+    elif case == 2:
+        t, signal = test_nonlinear_chip_2(
+            duration=duration,
+            sampling_rate=sampling_rate,
+            noise_level=noise_level,
+            random_state=random_state,
+        )
     else:
-        print(f"There is no test number {case}, return case=0!")
-        t, signal = test_nonlinear_chip_1(duration=duration, sampling_rate=sampling_rate, noise_level=noise_level, random_state=random_state)
+        print(f"There is no test number {case}, return case=1!")
+        t, signal = test_nonlinear_chip_1(
+            duration=duration,
+            sampling_rate=sampling_rate,
+            noise_level=noise_level,
+            random_state=random_state,
+        )
 
     return t, signal
 
@@ -231,8 +246,8 @@ def test_nonlinear_chip_2(
     a2 = 1 - 0.5 * np.cos(2 * np.pi * t)
 
     # A two-component simulated nonlinear chirp signal (NCS)
-    s_1t = a1 * np.cos(2 * np.pi * (100 * t + 150 * t ** 2 + np.sin(9 * np.pi * t)))
-    s_2t = a2 * np.cos(2 * np.pi * (400 * t - 150 * t ** 2 + np.sin(9 * np.pi * t)))
+    s_1t = a1 * np.cos(2 * np.pi * (100 * t + 150 * t**2 + np.sin(9 * np.pi * t)))
+    s_2t = a2 * np.cos(2 * np.pi * (400 * t - 150 * t**2 + np.sin(9 * np.pi * t)))
     signal = s_1t + s_2t
 
     # Add normal noise to the generated signal

@@ -20,8 +20,8 @@ from pysdkit.data import (
 )
 
 
-class Signal_Generator_Test(unittest.TestCase):
-    """验证各种生成一维信号的算法"""
+class Base_Signal_Generator_Test(unittest.TestCase):
+    """验证各种生成基础形式信号生成算法的测试模块"""
 
     duration = 1.0
     sample_rate = 1000
