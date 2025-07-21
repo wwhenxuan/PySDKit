@@ -36,7 +36,9 @@ def normalize(X: np.ndarray) -> np.ndarray:
     return X_normalized
 
 
-def pca(X: np.ndarray, n_components: Optional[int] = 2, norm: Optional[str] = "centralize") -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def pca(
+    X: np.ndarray, n_components: Optional[int] = 2, norm: Optional[str] = "centralize"
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     PCA主成分分析降维的函数接口
 
@@ -83,15 +85,21 @@ def pca(X: np.ndarray, n_components: Optional[int] = 2, norm: Optional[str] = "c
 
     return X_reduced, components, explained_variance_ratio
 
+
+class PCA(object):
+    """PCA主成分分析面向对象接口"""
+
+    def __init__(self, ):
+        pass
+
+    def fit_transform(self):
+        """执行PCA主成分分析算法"""
+
+
 # 示例用法
 if __name__ == "__main__":
     # 创建示例数据（4个样本，3个特征）
-    X = np.array([
-        [2.5, 2.4, 3.1],
-        [0.5, 0.7, 1.2],
-        [2.2, 2.9, 2.5],
-        [1.9, 2.2, 1.8]
-    ])
+    X = np.array([[2.5, 2.4, 3.1], [0.5, 0.7, 1.2], [2.2, 2.9, 2.5], [1.9, 2.2, 1.8]])
 
     # 执行PCA降维到2维
     X_reduced, components, variance_ratio = pca(X, n_components=2)
