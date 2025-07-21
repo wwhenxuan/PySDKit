@@ -40,11 +40,17 @@ class Base_Signal_Generator_Test(unittest.TestCase):
 
                     # Validate the numerical difference in noise means
                     diff_mean = np.allclose(np.mean(y), mean, atol=1e-6)
-                    self.assertTrue(expr=diff_mean, msg="The mean value of the output noise does not meet the requirements")
+                    self.assertTrue(
+                        expr=diff_mean,
+                        msg="The mean value of the output noise does not meet the requirements",
+                    )
 
                     # Verify the numerical difference in noise standard deviation
                     diff_std = np.allclose(np.std(y), std, atol=1e-6)
-                    self.assertTrue(expr=diff_std, msg="The standard deviation of the output noise does not meet the requirements")
+                    self.assertTrue(
+                        expr=diff_std,
+                        msg="The standard deviation of the output noise does not meet the requirements",
+                    )
 
     def test_generate(self) -> None:
         """Test all functions that generate signals"""
@@ -65,7 +71,8 @@ class Base_Signal_Generator_Test(unittest.TestCase):
             )
             # Determine whether the signal length and timestamp array length meet the requirements
             self.assertTrue(
-                expr=len(signal) == self.sample_rate, msg="The length of the signal is wrong"
+                expr=len(signal) == self.sample_rate,
+                msg="The length of the signal is wrong",
             )
             self.assertTrue(
                 expr=len(time) == self.sample_rate, msg="Time error length error"
@@ -73,7 +80,8 @@ class Base_Signal_Generator_Test(unittest.TestCase):
 
             # Determine whether the timestamp array and signal length match
             self.assertTrue(
-                expr=len(signal) == len(time), msg="The length of the signal and the length of the timestamp do not match"
+                expr=len(signal) == len(time),
+                msg="The length of the signal and the length of the timestamp do not match",
             )
 
     def test_sine_generator(self) -> None:
@@ -93,7 +101,9 @@ class Base_Signal_Generator_Test(unittest.TestCase):
             # Determine the difference between the generated signal and the real signal
             diff = np.allclose(sine, signal, atol=1e-6)
 
-            self.assertTrue(expr=diff, msg="The generated sinusoidal signal has numerical errors")
+            self.assertTrue(
+                expr=diff, msg="The generated sinusoidal signal has numerical errors"
+            )
 
     def test_cosine_generator(self) -> None:
         """Test cosine signal generation"""
@@ -109,7 +119,9 @@ class Base_Signal_Generator_Test(unittest.TestCase):
             cosine = np.cos(2 * np.pi * frequency * time)
             # Determine the difference between the generated signal and the real signal
             diff = np.allclose(cosine, signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="The generated cosine signal has numerical errors")
+            self.assertTrue(
+                expr=diff, msg="The generated cosine signal has numerical errors"
+            )
 
     def test_square_wave(self) -> None:
         """Verify square wave signal generation"""
@@ -127,7 +139,9 @@ class Base_Signal_Generator_Test(unittest.TestCase):
 
             # Determine the difference between the generated signal and the real signal
             diff = np.allclose(square, signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="The generated square wave signal has numerical errors")
+            self.assertTrue(
+                expr=diff, msg="The generated square wave signal has numerical errors"
+            )
 
     def test_triangle_wave(self) -> None:
         """Verify the generation of triangle wave signal"""
@@ -146,7 +160,9 @@ class Base_Signal_Generator_Test(unittest.TestCase):
             # Determine the difference between the generated signal and the real signal
             diff = np.allclose(triangle, signal, atol=1e-6)
 
-            self.assertTrue(expr=diff, msg="The generated triangle wave signal has numerical errors")
+            self.assertTrue(
+                expr=diff, msg="The generated triangle wave signal has numerical errors"
+            )
 
     def test_sawtooth_wave(self) -> None:
         """Verify sawtooth signal generation"""
@@ -164,7 +180,9 @@ class Base_Signal_Generator_Test(unittest.TestCase):
 
             # Determine the difference between the generated signal and the real signal
             diff = np.allclose(sawtooth_wave, signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="The generated sawtooth signal has numerical errors")
+            self.assertTrue(
+                expr=diff, msg="The generated sawtooth signal has numerical errors"
+            )
 
     def test_exponential_signal(self) -> None:
         """Generation of validation index signals"""
@@ -185,7 +203,10 @@ class Base_Signal_Generator_Test(unittest.TestCase):
 
                 # Determine the difference between the generated signal and the real signal
                 diff = np.allclose(exp, signal, atol=1e-6)
-                self.assertTrue(expr=diff, msg="The generated exponential signal has a numerical error")
+                self.assertTrue(
+                    expr=diff,
+                    msg="The generated exponential signal has a numerical error",
+                )
 
     def test_am_signal(self) -> None:
         """Verify Amplitude Modulated (AM) signal generation"""
@@ -214,7 +235,8 @@ class Base_Signal_Generator_Test(unittest.TestCase):
                     # Determine the difference between the generated signal and the real signal
                     diff = np.allclose(am_signal, signal, atol=1e-6)
                     self.assertTrue(
-                        expr=diff, msg="The generated Amplitude Modulated (AM) signal has numerical errors"
+                        expr=diff,
+                        msg="The generated Amplitude Modulated (AM) signal has numerical errors",
                     )
 
 
