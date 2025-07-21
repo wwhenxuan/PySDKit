@@ -89,7 +89,9 @@ def pca(
 class PCA(object):
     """PCA主成分分析面向对象接口"""
 
-    def __init__(self, ):
+    def __init__(
+        self,
+    ) -> None:
         pass
 
     def fit_transform(self):
