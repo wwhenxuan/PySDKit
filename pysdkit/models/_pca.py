@@ -6,7 +6,7 @@ Created on 2025/07/21 11:53:35
 """
 import numpy as np
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from pysdkit.models._base import normalize, centralize, UnsupervisedModel
 
 
@@ -74,9 +74,12 @@ class PCA(UnsupervisedModel):
         self.norm = norm
 
         # Stores the results of the current model fit
-        self.X_reduced = None
-        self.components = None
-        self.explained_variance_ratio = None
+        self._X_reduced = None
+        self._components = None
+        self._explained_variance_ratio = None
+
+        # Stores the stats information of inputs data
+        self._mean, self._variance = None, None
 
     def __call__(self, X: np.ndarray) -> np.ndarray:
         """Allow instances to be called like functions"""
@@ -94,7 +97,7 @@ class PCA(UnsupervisedModel):
         :param X: the ndarray with shape (n_samples, n_features).
         :return: None
         """
-        if isinstance(X, np.ndarray):
+        if not isinstance(X, np.ndarray):
             raise TypeError("Input data must be an ndarray.")
         if len(X.shape) != 2:
             raise ValueError(
@@ -103,9 +106,11 @@ class PCA(UnsupervisedModel):
 
     def reset(self) -> None:
         """Clear all stored results from the PCA algorithm."""
-        self.X_reduced = None
-        self.components = None
-        self.explained_variance_ratio = None
+        self._X_reduced = None
+        self._components = None
+        self._explained_variance_ratio = None
+        self._mean = None
+        self._variance = None
 
     def data_processing(self, X: np.ndarray) -> np.ndarray:
         """
@@ -136,6 +141,10 @@ class PCA(UnsupervisedModel):
         # Check if the inputs data is valid
         self._check_inputs(X=X)
 
+        # Save the stats information
+        self._mean = np.mean(X, axis=0)
+        self._variance = np.var(X, axis=0)
+
         # Preprocess the data
         X_norm = self.data_processing(X)
 
@@ -151,34 +160,53 @@ class PCA(UnsupervisedModel):
         sorted_eigenvectors = eigenvectors[:, sorted_idx]
 
         # Select the top n components
-        self.components = sorted_eigenvectors[:, : self.n_components].T
+        self._components = sorted_eigenvectors[:, : self.n_components].T
         explained_variance = sorted_eigenvalues[: self.n_components]
 
         # Compute explained variance ratio
         total_variance = np.sum(sorted_eigenvalues)
-        self.explained_variance_ratio = explained_variance / total_variance
+        self._explained_variance_ratio = explained_variance / total_variance
 
         # Project data onto principal components
-        self.X_reduced = np.dot(X_norm, self.components.T)
+        self._X_reduced = np.dot(X_norm, self._components.T)
 
-        return self.X_reduced
+        return self._X_reduced
 
-    def get_components(self) -> np.ndarray:
+    @property
+    def components_(self) -> np.ndarray | List[float]:
         """Returns the top N principal components."""
-        if self.components is not None:
+        if self._components is not None:
             # Return recorded results after PCA has been executed
-            return self.components
+            return self._components.tolist()
         else:
             raise ValueError("Please run the PCA algorithm first!")
 
-    def get_explained_variance_ratio(self) -> float:
+    @property
+    def explained_variance_ratio_(self) -> np.ndarray | List[float]:
         """Calculates the explained variance ratio."""
-        if self.explained_variance_ratio is not None:
+        if self._explained_variance_ratio is not None:
             # Return the explained variance ratio
-            return self.explained_variance_ratio
+            return self._explained_variance_ratio.tolist()
         else:
             raise ValueError("Please run the PCA algorithm first!")
 
+    @property
+    def mean_(self) -> np.ndarray | List[float]:
+        """Returns the mean vector of the inputs data"""
+        if self._mean is not None:
+            # Return the mean vector
+            return self._mean
+        else:
+            raise ValueError("Please run the PCA algorithm first!")
+
+    @property
+    def variance_(self) -> np.ndarray | List[float]:
+        """Returns the variance vector of the inputs data"""
+        if self._variance is not None:
+            # Return the variance vector
+            return self._variance
+        else:
+            raise ValueError("Please run the PCA algorithm first!")
 
 # if __name__ == "__main__":
 #     # 创建示例数据（4个样本，3个特征）

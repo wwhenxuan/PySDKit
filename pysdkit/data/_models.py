@@ -30,4 +30,4 @@ def test_pca(number: int = 200, dim: int = 2, random_state: Optional[int] = 42) 
     # Generate a random rotation matrix
     rot = rng.rand(dim, dim)
 
-    return np.dot(rot, rng.randn(dim, number))
+    return np.dot(rot, rng.randn(dim, number)).T

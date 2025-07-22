@@ -33,8 +33,8 @@ class PCATest(unittest.TestCase):
         pca = PCA(n_components=2)
         # 检验初始的拟合数据是否为None
         self.assertIsNone(pca.X_reduced, msg="创建的PCA对象在未拟合数据时数据对象为非None")
-        self.assertIsNone(pca.components, msg="创建的PCA对象在未拟合数据时数据对象为非None")
-        self.assertIsNone(pca.explained_variance_ratio, msg="创建的PCA对象在未拟合数据时数据对象为非None")
+        self.assertIsNone(pca._components, msg="创建的PCA对象在未拟合数据时数据对象为非None")
+        self.assertIsNone(pca._explained_variance_ratio, msg="创建的PCA对象在未拟合数据时数据对象为非None")
 
     def test_wrong_shape_inputs(self) -> None:
         """测试PCA算法的非法的形状输入"""
