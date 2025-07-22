@@ -65,6 +65,8 @@ class KnnDtw(SupervisedModel):
             raise TypeError("`labels` must be a numpy array")
         if len(self.samples.shape) != 2:
             raise ValueError("The input `samples` should be a 2D ndarray with shape [n_samples, n_timepoints]")
+        if len(self.labels.shape) != 1:
+            raise ValueError("The input `labels` should be a 1D ndarray with shape [n_samples]")
         if self.samples.shape[0] != len(self.labels):
             raise ValueError("The number of samples and labels should be the same")
 
