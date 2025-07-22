@@ -59,7 +59,7 @@ def pca(
 
 
 class PCA(UnsupervisedModel):
-    """Object-oriented interface for Principal Component Analysis (PCA)."""
+    """Object-oriented interface for Principal Component Analysis (PCA)"""
 
     def __init__(
         self, n_components: Optional[int] = 2, norm: Optional[str] = "centralize"
@@ -85,6 +85,21 @@ class PCA(UnsupervisedModel):
     def __str__(self) -> str:
         """Get the full name and abbreviation of the algorithm"""
         return "Principal Component Analysis"
+
+    @staticmethod
+    def _check_inputs(X: np.ndarray) -> None:
+        """
+        Check if input data is valid
+
+        :param X: the ndarray with shape (n_samples, n_features).
+        :return: None
+        """
+        if isinstance(X, np.ndarray):
+            raise ValueError("Input data must be an ndarray.")
+        if len(X.shape) != 2:
+            raise ValueError(
+                "Input data must be an ndarray with shape (n_samples, n_features)."
+            )
 
     def reset(self) -> None:
         """Clear all stored results from the PCA algorithm."""
@@ -117,6 +132,9 @@ class PCA(UnsupervisedModel):
         """
         # Clear previously stored results
         self.reset()
+
+        # Check if the inputs data is valid
+        self._check_inputs(X=X)
 
         # Preprocess the data
         X_norm = self.data_processing(X)
