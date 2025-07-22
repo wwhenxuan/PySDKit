@@ -21,7 +21,7 @@ class Univariate_Signal_Generator_Test(unittest.TestCase):
     """Verify various test modules that generate one-dimensional signals"""
 
     def test_emd(self) -> None:
-        """Verify the data generator that generates EMD test samples"""
+        """Verify the data generator that generates EMD test X"""
         for duration in range(1, 6):
             # Traversal cycle time point information
             for sampling_rate in [100, 200, 500]:

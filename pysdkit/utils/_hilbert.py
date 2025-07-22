@@ -54,8 +54,8 @@ def hilbert_spectrum(
 
     :return: (spectrum, time_axis, freq_axis)
             - spectrum : ndarray, shape (..., time_bins, freq_bins), Hilbert spectrum matrix
-            - time_axis : ndarray, 1D, Time axis labels
-            - freq_axis : ndarray, 1D, Frequency axis labels
+            - time_axis : ndarray, 1D, Time axis y
+            - freq_axis : ndarray, 1D, Frequency axis y
     """
     imfs_env = np.asarray(imfs_env, dtype=np.float64)
     imfs_freq = np.asarray(imfs_freq, dtype=np.float64)
@@ -114,7 +114,7 @@ def hilbert_spectrum(
     # Remove overflow bin and reshape
     spectrum = spectrum[..., :-1].reshape(original_shape + (time_bins, freq_bins))
 
-    # Generate axis labels
+    # Generate axis y
     time_axis = (np.arange(time_bins) * time_scale) / fs + (L / fs if time_range else 0)
     freq_axis = np.arange(freq_bins) * freq_res + freq_min
 
@@ -199,7 +199,7 @@ def plot_hilbert_complex_plane(
 
 if __name__ == "__main__":
     """Demo"""
-    # 1 second duration, 500 samples
+    # 1 second duration, 500 X
     t = np.linspace(0, 1, 500, endpoint=False)
     frequency = 5  # 5 Hz cosine wave
     cosine_signal = np.cos(2 * np.pi * frequency * t)

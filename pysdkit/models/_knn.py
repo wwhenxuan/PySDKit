@@ -4,7 +4,6 @@ Created on 2025/03/17 17:53:21
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
-import sys
 import numpy as np
 from scipy.stats import mode
 from scipy.spatial.distance import squareform
@@ -12,9 +11,10 @@ from scipy.spatial.distance import squareform
 from typing import Optional, Callable, Tuple
 
 from pysdkit.tsa import dtw_distance
+from pysdkit.models._base import SupervisedModel
 
 
-class KnnDtw(object):
+class KNN(SupervisedModel):
     """
     K-nearest neighbor classifier using dynamic time warping
     as the distance measure between pairs of time series arrays
@@ -39,20 +39,50 @@ class KnnDtw(object):
         self.subsample_step = subsample_step
 
         # Define the sample and label variables of the fitting data in advance
-        self.samples, self.labels = None, None
+        self.X, self.y = None, None
 
-    def fit(self, samples: np.ndarray, labels: np.ndarray) -> None:
+    def __call__(
+        self, X: np.ndarray, y: np.ndarray, X_pred: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Allow instances to be called like functions"""
+        return self.fit_transform(X=X, y=y, X_pred=X_pred)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "K-nearest Neighbor Classifier"
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         """
-        Fit the model using x as training data and l as class labels
+        Fit the model using x as training data and l as class y
 
-        :param samples: array of shape [n_samples, n_timepoints],
+        :param X: array of shape [n_samples, n_timepoints],
                   Training data set for input into KNN classifer
-        :param labels: array of shape [n_samples],
-                  Training labels for input into KNN classifier
+        :param y: array of shape [n_samples],
+                  Training y for input into KNN classifier
         :return: None
         """
-        self.samples = samples
-        self.labels = labels
+        # Record the fitted data
+        self.X = X
+        self.y = y
+        # Check data format
+        self._check_data()
+
+    def _check_data(self) -> None:
+        """Check whether the data format input in the `fit` method meets the requirements"""
+        if not isinstance(self.X, np.ndarray):
+            raise TypeError("`X` must be a numpy array")
+        if not isinstance(self.y, np.ndarray):
+            raise TypeError("`y` must be a numpy array")
+        if len(self.X.shape) != 2:
+            raise ValueError(
+                "The input `X` should be a 2D ndarray with shape [n_samples, n_timepoints]"
+            )
+        if len(self.y.shape) != 1:
+            raise ValueError(
+                "The input `y` should be a 1D ndarray with shape [n_samples]"
+            )
+        if self.X.shape[0] != len(self.y):
+            raise ValueError("The number of X and y should be the same")
 
     def _dtw_distance(
         self, ts_a: np.ndarray, ts_b: np.ndarray, d: Callable = lambda x, y: abs(x - y)
@@ -120,28 +150,28 @@ class KnnDtw(object):
 
             return dm
 
-    def predict(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, X_pred: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
-        Predict the class labels or probability estimates for the provided data
+        Predict the class y or probability estimates for the provided data
 
-        :param x: array of shape [n_samples, n_timepoints]
+        :param X_pred: array of shape [n_samples, n_timepoints]
                   Array containing the testing data set to be classified
-        :return: (1) the predicted class labels
+        :return: (1) the predicted class y
                  (2) the knn label count probability
         """
         # If no training data is input, prediction is made
-        if self.samples is None:
+        if self.X is None:
             # No training data has been entered yet
             raise ValueError("Must fit the training data before predicting")
 
-        # Calculate the distance matrix between the input data and the training set samples
-        dm = self._dist_matrix(x, self.samples)
+        # Calculate the distance matrix between the input data and the training set X
+        dm = self._dist_matrix(X_pred, self.X)
 
         # Identify the k nearest neighbors
         knn_idx = dm.argsort()[:, : self.n_neighbors]
 
-        # Identify k nearest labels
-        knn_labels = self.labels[knn_idx]
+        # Identify k nearest y
+        knn_labels = self.y[knn_idx]
 
         # Model Label
         mode_data = mode(knn_labels, axis=1)
@@ -150,3 +180,21 @@ class KnnDtw(object):
 
         # Returns the classification results and the probability of classification
         return mode_label.ravel(), mode_proba.ravel()
+
+    def fit_transform(
+        self, X: np.ndarray, y: np.ndarray, X_pred: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Fit the inputs data and predict the classification y
+
+        :param X: array of shape [n_samples, n_timepoints]
+        :param y: array of shape [n_samples, n_timepoints]
+        :param X_pred: array of shape [n_samples, n_timepoints] to be predicted
+        :return: (1) the predicted class y
+                 (2) the knn label count probability
+        """
+        # Fit the model params
+        self.fit(X=X, y=y)
+
+        # return the predicted results
+        return self.predict(X_pred=X_pred)

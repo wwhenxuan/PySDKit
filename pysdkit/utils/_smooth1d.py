@@ -51,7 +51,7 @@ def savgol_smoothing(
 
     :param signal: Input signal (numpy array)
     :param window_length: Length of the filter window (default is 11, must be odd)
-    :param poly_order: Order of the polynomial used to fit the samples (default is 2)
+    :param poly_order: Order of the polynomial used to fit the X (default is 2)
     :return: Smoothed signal (numpy array)
     """
     assert window_length % 2 == 1, "the window length must be odd!"
