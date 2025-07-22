@@ -51,8 +51,23 @@ class KnnDtw(SupervisedModel):
                   Training labels for input into KNN classifier
         :return: None
         """
+        # Record the fitted data
         self.samples = samples
         self.labels = labels
+        # Check data format
+        self._check_data()
+
+    def _check_data(self) -> None:
+        """Check whether the data format input in the `fit` method meets the requirements"""
+        if not isinstance(self.samples, np.ndarray):
+            raise TypeError("`samples` must be a numpy array")
+        if not isinstance(self.labels, np.ndarray):
+            raise TypeError("`labels` must be a numpy array")
+        if len(self.samples.shape) != 2:
+            raise ValueError("The input `samples` should be a 2D ndarray with shape [n_samples, n_timepoints]")
+        if self.samples.shape[0] != len(self.labels):
+            raise ValueError("The number of samples and labels should be the same")
+
 
     def _dtw_distance(
         self, ts_a: np.ndarray, ts_b: np.ndarray, d: Callable = lambda x, y: abs(x - y)
