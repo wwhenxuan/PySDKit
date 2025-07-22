@@ -78,6 +78,14 @@ class PCA(UnsupervisedModel):
         self.components = None
         self.explained_variance_ratio = None
 
+    def __call__(self, X: np.ndarray) -> np.ndarray:
+        """Allow instances to be called like functions"""
+        return self.fit_transform(X=X)
+
+    def __str__(self) -> str:
+        """Get the full name and abbreviation of the algorithm"""
+        return "Principal Component Analysis"
+
     def reset(self) -> None:
         """Clear all stored results from the PCA algorithm."""
         self.X_reduced = None

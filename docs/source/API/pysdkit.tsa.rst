@@ -32,7 +32,7 @@ tsa.knn
 ---------------------------
 
 .. automodule:: pysdkit.tsa._knn
-.. autoclass:: pysdkit.tsa._knn.KnnDtw
+.. autoclass:: pysdkit.tsa._knn.KNN
     :members:
     :undoc-members:
     :private-members:

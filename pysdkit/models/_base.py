@@ -51,11 +51,11 @@ class SupervisedModel(ABC):
         pass
 
     @abstractmethod
-    def predict(self, X: np.ndarray):
+    def predict(self, X_pred: np.ndarray):
         """
         根据`fit`方法中拟合获得的参数去执行对应的算法做出模型的预测
 
-        :param X: 形状为[n_samples, num_features]的待预测样本
+        :param X_pred: 形状为[n_samples, num_features]的待预测样本
         :return: The predicted values of `X`
         """
         pass
