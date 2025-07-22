@@ -66,7 +66,7 @@ class KNNTest(unittest.TestCase):
 
         # 测试非法的样本输入
         with self.assertRaises(TypeError):
-            knn.fit(1, np.ones(100))
+            knn.fit(42, np.ones(100))
 
         # 测试非法的标签输入
         with self.assertRaises(TypeError):
@@ -112,6 +112,52 @@ class KNNTest(unittest.TestCase):
         # 判断标签和概率的长度
         self.assertEqual(first=len(y), second=len(y_pred), msg="输出标签长度错误")
         self.assertEqual(first=len(y), second=len(y_prob), msg="输出概率标签长度错误")
+
+    def test_fit_transform(self) -> None:
+        """测试KNN的`fit_transform`方法能否正确执行"""
+        # 生成用于测试的随机数据
+        X = self.rng.random(size=(10, 2))
+        y = np.hstack((np.zeros(5), np.ones(5)))
+
+        # 创建K近邻分类器实例对象
+        knn = KNN(n_neighbors=1)
+
+        # 拟合数据并预测结果
+        (y_pred, y_prob) = knn.fit_transform(X, y, X)
+
+        # 判断前后标签是否一致
+        self.assertEqual(first=y.all(), second=y_pred.all(), msg="最近邻算法分类错误")
+
+        # 判断标签和概率的长度
+        self.assertEqual(first=len(y), second=len(y_pred), msg="输出标签长度错误")
+        self.assertEqual(first=len(y), second=len(y_prob), msg="输出概率标签长度错误")
+
+    def test_call(self) -> None:
+        """测试call方法能否正确执行"""
+        # 生成用于测试的随机数据
+        X = self.rng.random(size=(10, 2))
+        y = np.hstack((np.zeros(5), np.ones(5)))
+
+        # 创建K近邻分类器实例对象
+        knn = KNN(n_neighbors=1)
+
+        # 拟合数据并预测结果
+        (y_pred, y_prob) = knn(X, y, X)
+
+        # 判断前后标签是否一致
+        self.assertEqual(first=y.all(), second=y_pred.all(), msg="最近邻算法分类错误")
+
+        # 判断标签和概率的长度
+        self.assertEqual(first=len(y), second=len(y_pred), msg="输出标签长度错误")
+        self.assertEqual(first=len(y), second=len(y_prob), msg="输出概率标签长度错误")
+
+    def test_str(self) -> None:
+        """验证`__str__`方法能否正确返回字符串"""
+        # 创建KNN的算法实例
+        knn = KNN(n_neighbors=1)
+
+        # 判断是否返回字符串对象
+        self.assertIsInstance(str(knn), str, "`__str__`方法返回内容为非字符串")
 
 
 if __name__ == "__main__":

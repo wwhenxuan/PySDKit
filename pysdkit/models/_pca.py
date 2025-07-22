@@ -95,7 +95,7 @@ class PCA(UnsupervisedModel):
         :return: None
         """
         if isinstance(X, np.ndarray):
-            raise ValueError("Input data must be an ndarray.")
+            raise TypeError("Input data must be an ndarray.")
         if len(X.shape) != 2:
             raise ValueError(
                 "Input data must be an ndarray with shape (n_samples, n_features)."

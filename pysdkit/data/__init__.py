@@ -29,6 +29,7 @@ __all__ = [
     "test_multivariate_image",
     "test_univariate_cube",
     "test_multivariate_cube",
+    "test_pca",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -87,3 +88,6 @@ from ._cube import test_univariate_cube
 
 # Test case for multivariate 3D cube
 from ._cube import test_multivariate_cube
+
+# Test case for Principal Component Analysis
+from ._models import test_pca
