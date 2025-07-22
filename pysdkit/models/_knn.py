@@ -11,9 +11,10 @@ from scipy.spatial.distance import squareform
 from typing import Optional, Callable, Tuple
 
 from pysdkit.tsa import dtw_distance
+from pysdkit.models._base import SupervisedModel
 
 
-class KnnDtw(object):
+class KnnDtw(SupervisedModel):
     """
     K-nearest neighbor classifier using dynamic time warping
     as the distance measure between pairs of time series arrays
