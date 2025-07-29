@@ -1,7 +1,6 @@
 # PySDKit: signal decomposition in Python
 
 <div align="center">
-
 [![PyPI version](https://badge.fury.io/py/PySDKit.svg)](https://pypi.org/project/PySDKit/) 
 ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit)
 [![Python](https://img.shields.io/badge/python-3.8+-blue?logo=python)](https://www.python.org/)

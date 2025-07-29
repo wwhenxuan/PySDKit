@@ -289,8 +289,6 @@ class MEMD(object):
                     "Parameter `stop_crit` is set incorrectly! Please choose from 'stop' or 'fix_h'."
                 )
 
-            print(stop_flag)
-
             # In case the current mode is so small that machine precision can cause
             # spurious extrema to appear
             if np.max(np.abs(m)) < 1e-10 * (np.max(np.abs(signal))):
