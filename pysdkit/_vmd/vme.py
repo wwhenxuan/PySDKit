@@ -178,7 +178,7 @@ class VME(object):
         u_hat[0] = np.conj(u_hat[-1])
 
         u_d = np.zeros(T)
-        u_d[:] = np.real(ifftshift(ts=ifft(ts=u_hat[:])))
+        u_d[:] = np.real(ifft(ts=ifftshift(ts=u_hat[:])))
 
         # Remove mirror part
         u_d = u_d[T // 4 : 3 * T // 4]
