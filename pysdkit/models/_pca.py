@@ -208,6 +208,7 @@ class PCA(UnsupervisedModel):
         else:
             raise ValueError("Please run the PCA algorithm first!")
 
+
 # if __name__ == "__main__":
 #     # 创建示例数据（4个样本，3个特征）
 #     X = np.array([[2.5, 2.4, 3.1], [0.5, 0.7, 1.2], [2.2, 2.9, 2.5], [1.9, 2.2, 1.8]])

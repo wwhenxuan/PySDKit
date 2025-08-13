@@ -27,14 +27,22 @@ class PCATest(unittest.TestCase):
                 n_components,
                 msg="创建的PCA对象中的属性参数与传入的超参数不一致",
             )
+
     def test_none(self) -> None:
         """测试在未执行`fit_transform`方法前PCA中的初始化数据属性是否为None"""
         # 创建K近邻分类器实例对象
         pca = PCA(n_components=2)
         # 检验初始的拟合数据是否为None
-        self.assertIsNone(pca.X_reduced, msg="创建的PCA对象在未拟合数据时数据对象为非None")
-        self.assertIsNone(pca._components, msg="创建的PCA对象在未拟合数据时数据对象为非None")
-        self.assertIsNone(pca._explained_variance_ratio, msg="创建的PCA对象在未拟合数据时数据对象为非None")
+        self.assertIsNone(
+            pca.X_reduced, msg="创建的PCA对象在未拟合数据时数据对象为非None"
+        )
+        self.assertIsNone(
+            pca._components, msg="创建的PCA对象在未拟合数据时数据对象为非None"
+        )
+        self.assertIsNone(
+            pca._explained_variance_ratio,
+            msg="创建的PCA对象在未拟合数据时数据对象为非None",
+        )
 
     def test_wrong_shape_inputs(self) -> None:
         """测试PCA算法的非法的形状输入"""
