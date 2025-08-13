@@ -33,7 +33,7 @@ def correlation(
     Notes
     -------------
     * Basicly the correlation is calculated above two derections (in the straight and backward direction),
-      consequencely it is taken for double size of samples (full mode).
+      consequencely it is taken for double size of X (full mode).
     * Here correlation function is calculated using fast Fourier transform, thus more correctly to say:
         R = ifft( fft(x, 2N)* conj( fft(y, 2N) ) ) [N+1:],[:N], where first part is backward part, and the second part is straightforward.
     """
@@ -253,7 +253,7 @@ def convolution(x, y, mode="straight"):
     -----------------
     * Basicly convolution in formule above two derections (in the straight
         and backward direction) function, consequencely it is taken for double
-        size of samples (full mode), if  mode = straight, only
+        size of X (full mode), if  mode = straight, only
         the first half part of correlation is taken.
     * Correlation function allow also same mode but it does
                                 not reccomended for this function.

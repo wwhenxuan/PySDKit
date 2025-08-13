@@ -510,7 +510,8 @@ class EMD(object):
                         if f1 and f2:
                             break
 
-                else:  # Less than 2 ext, i.e. trend
+                else:
+                    # Less than 2 ext, i.e. trend
                     finished = True
                     break
 
@@ -535,3 +536,17 @@ class EMD(object):
             IMF = np.vstack((IMF, self.residue))
 
         return IMF
+
+
+if __name__ == "__main__":
+    from pysdkit.data import test_hht, test_univariate_signal
+    from matplotlib import pyplot as plt
+    from pysdkit.plot import plot_IMFs
+
+    time, signal = test_univariate_signal(case=1)
+    emd = EMD(max_imfs=5)
+    imfs = emd.fit_transform(signal, max_imfs=6)
+    print(imfs.shape)
+
+    plot_IMFs(signal, imfs)
+    plt.show()

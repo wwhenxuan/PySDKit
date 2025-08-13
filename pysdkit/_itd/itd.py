@@ -106,6 +106,8 @@ class ITD(object):
         LK1 = np.append(idx_min.reshape(-1, 1), LK1.reshape(-1, 1))
         LK2 = np.append(idx_max.reshape(-1, 1), LK2.reshape(-1, 1))
 
+        print(LK1.shape, LK2.shape)
+
         LK = np.vstack((LK1, LK2)).T
 
         LK_col_2 = np.argsort(LK[:, 0])
@@ -151,24 +153,14 @@ class ITD(object):
 
 
 if __name__ == "__main__":
-    from matplotlib import pyplot as plt
+    from pysdkit.data import test_univariate_signal
+    from pysdkit.plot import plot_IMFs
 
-    fs = 1000
-    N = 3000
-    t = np.arange(0, N) / fs
-    x1 = (2 + np.cos(2 * np.pi * 0.5 * t)) * np.cos(2 * np.pi * 5 * t + 15 * t**2)
-    x2 = np.cos(2 * np.pi * 2 * t)
+    time, signal = test_univariate_signal()
 
-    signal = x1 + x2
+    print(signal.shape)
 
-    itd = ITD(N_max=100)
-    IMFs = itd.fit_transform(signal)
-    row, length = IMFs.shape
-    print(IMFs.shape)
+    itd = ITD()
+    imfs = itd.fit_transform(signal=signal)
 
-    fig, ax = plt.subplots(row + 1, 1, figsize=(10, 8))
-    ax[0].plot(t, signal)
-    for index, i in enumerate(range(row), 1):
-        ax[index].plot(t[:300], IMFs[i, :300])
-
-    fig.show()
+    plot_IMFs(signal, IMFs=imfs)

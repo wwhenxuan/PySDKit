@@ -2,7 +2,7 @@
 A Python library for signal decomposition algorithms.
 """
 
-__version__ = "0.4.18"
+__version__ = "0.4.21"
 
 # Empirical Mode Decomposition
 from ._emd import EMD
@@ -79,6 +79,9 @@ from ._jmd import JMD
 # Moving Average Decomposition
 from .tsa import Moving_Decomp
 
+# Seasonal-Trend decomposition using LOESS (STL)
+from .tsa import STL
+
 # Hilbert-Huang Transform
 from ._emd import HHT
 
@@ -130,6 +133,7 @@ Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Moving Average Decomposition                    |    Moving
+Seasonal-Trend decomposition using LOESS        |    STL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
 """
@@ -156,6 +160,7 @@ __all__ = [
     "ACMD",
     "MVMD",
     "VME",
+    "VMD2D",
     "CVMD2D",
     "VNCMD",
     "INCMD",
@@ -163,6 +168,8 @@ __all__ = [
     "EWT",
     "JMD",
     "Moving_Decomp",
+    "STL",
+    "models",
     "data",
     "entropy",
     "HHT",

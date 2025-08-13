@@ -89,7 +89,7 @@ class EFD(object):
         imfs = np.zeros(shape=(number, len(signal)))
 
         # The results are stored in the frequency domain
-        ft = np.zeros([number, len(ff)])
+        ft = np.zeros([number, len(ff)], dtype=complex)
 
         # We define an ideal functions and extract components
         for k in range(0, number):
