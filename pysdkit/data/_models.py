@@ -9,7 +9,9 @@ import numpy as np
 from typing import Optional, Tuple
 
 
-def test_pca(number: int = 200, dim: int = 2, random_state: Optional[int] = 42) -> np.ndarray:
+def test_pca(
+    number: int = 200, dim: int = 2, random_state: Optional[int] = 42
+) -> np.ndarray:
     """
     Generate synthetic data for testing Principal Component Analysis (PCA).
     The dataset is created by multiplying a set of coordinate points (default 2-D)
