@@ -30,6 +30,7 @@ __all__ = [
     "test_univariate_cube",
     "test_multivariate_cube",
     "test_pca",
+    "test_fmd",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -47,6 +48,9 @@ from ._time_series import generate_time_series
 
 # Generate the main test sample signal
 from ._generator import test_emd
+
+# Generate the test function for FMD
+from ._generator import test_fmd
 
 # Generate the test function for HHT
 from ._generator import test_hht

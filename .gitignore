@@ -39,3 +39,6 @@ MANIFEST
 *.out
 env.sh
 *-env.sh
+# pixi environments
+.pixi/*
+!.pixi/config.toml

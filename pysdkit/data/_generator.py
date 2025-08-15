@@ -236,6 +236,88 @@ def test_emd(
     return t, noise_signal
 
 
+def test_fmd(sample_rate:int=20000, duration:float=1.0, n_channels:int=1,
+             Ta:float=1/22, Tb:float=1/30,
+             freq_imp=2000, damp=200, pulse_periodic=1.0, pulse_rand=0.5, interf_harmonic=0.3,
+             cycle_periodic=20, cycle_rand=5, cycle_harmonic=2, snr_db=-10, seed=42)->Tuple[np.array, np.array]:
+    """
+    Generate bearing fault simulation signals (single channel / multi-channel)
+    :param fs: Sampling frequency
+    :param duration: Signal duration (seconds)
+    :param n_channels: Number of channels (1 for single channel)
+    :param Ta: Periodic impulse
+    :param Tb: Random impulse
+    :param freq_imp: Resonant frequency of the impulse
+    :param damp: Damping coefficient
+    :param pulse_periodic: Amplitudes of Periodic Shocks
+    :param pulse_rand: Amplitudes of Random Shock
+    :param interf_harmonic: Amplitudes of Harmonic Interference
+    :param cycle_periodic: Number of impulses/harmonics of Periodic Shocks
+    :param cycle_rand: Number of impulses/harmonics of Random Shock
+    :param cycle_harmonic: Number of impulses/harmonics of Harmonic Interference
+    :param snr_db: Signal-to-noise ratio (dB)
+    :return: Tuple containing time array and the bearing fault signals.
+    """
+
+    np.random.seed(seed=seed)
+    t_full = np.arange(0, duration, 1 / sample_rate)
+    n_samples = len(t_full)
+
+    def s(t_local, fn, eta):
+        return np.exp(-eta * t_local) * np.cos(2*np.pi*fn*t_local)
+
+    X = np.zeros((n_channels, n_samples))
+
+    for ch in range(n_channels):
+        sig = np.zeros(n_samples)
+
+        # Periodic shocks
+        for i in range(cycle_periodic):
+            delay = i * Ta + np.random.uniform(-0.02*Ta, 0.02*Ta)
+            idx = int(round(delay * sample_rate))
+
+            if idx >= 0:
+                if idx < n_samples:
+                    t_local = t_full[:n_samples - idx]
+                    sig[idx:] += float(pulse_periodic) * s(t_local, freq_imp, damp)
+            else:
+                tail_len = n_samples + idx
+                if tail_len > 0:
+                    t_local = t_full[:tail_len]
+                    sig[:tail_len] += float(pulse_periodic) * s(t_local, freq_imp, damp)
+
+        # Random shocks
+        for j in range(cycle_rand):
+            delay = j * Tb + np.random.uniform(0, Tb)
+            idx = int(round(delay * sample_rate))
+            if idx >= 0:
+                if idx < n_samples:
+                    t_local = t_full[:n_samples - idx]
+                    sig[idx:] += float(pulse_rand) * s(t_local, freq_imp, damp)
+            else:
+                tail_len = n_samples + idx
+                if tail_len > 0:
+                    t_local = t_full[:tail_len]
+                    sig[:tail_len] += float(pulse_rand) * s(t_local, freq_imp, damp)
+
+        # Harmonic interference
+        for k in range(cycle_harmonic):
+            fk = np.random.uniform(500, 3000)
+            phase = np.random.uniform(0, 2*np.pi)
+            sig += float(interf_harmonic) * np.sin(2 * np.pi * fk * t_full + phase)
+
+        # Add noise
+        sig_power = np.mean(sig**2)
+        noise_power = sig_power / (10**(snr_db/10))
+        noise = np.random.normal(scale=np.sqrt(noise_power), size=n_samples)
+        sig += noise
+
+        X[ch] = sig
+
+    X = X if n_channels > 1 else X[0]
+    return t_full, X
+
+
 def test_hht(duration: float = 2.0, sampling_rate: int = 1000):
     """
     Generate data generation function to verify Hilbert-Huang transform.

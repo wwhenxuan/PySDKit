@@ -81,7 +81,7 @@ from .tsa import Moving_Decomp
 
 # Hilbert-Huang Transform
 from ._emd import HHT
-
+from ._fmd import FMD
 
 def greet():
     print(
@@ -174,4 +174,6 @@ __all__ = [
     "greet",
     "print_functions",
     "__version__",
+    "FMD",
+    "FMD2D",
 ]
