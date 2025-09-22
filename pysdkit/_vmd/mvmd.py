@@ -5,7 +5,7 @@ Created on 2024/6/1 18:44
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 from .base import Base
 
 
@@ -101,7 +101,7 @@ class MVMD(Base):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: bool = False
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Multivariate signal decomposition using MVMD algorithm
 
@@ -179,7 +179,6 @@ class MVMD(Base):
                 ) / np.sum(np.square(np.abs(u_hat_plus[n, T // 2 : T, k - 1, :])))
 
             for k in range(2, self.K + 1):
-
                 # update mode accumulator
                 sum_uk = (
                     u_hat_plus[n, :, k - 2, :] + sum_uk - u_hat_plus[n - 1, :, k - 1, :]

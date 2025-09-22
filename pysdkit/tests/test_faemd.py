@@ -31,9 +31,7 @@ class FAEMDTest(unittest.TestCase):
             self.assertEqual(first=num_vars, second=num_imfs, msg=f"分解模态的数目错误")
 
             # 检查信号的长度
-            self.assertEqual(
-                first=seq_len, second=len(signal), msg="分解信号的长度错误"
-            )
+            self.assertEqual(first=seq_len, second=len(signal), msg="分解信号的长度错误")
 
             # 检验信号分解效果
             diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
@@ -48,9 +46,7 @@ class FAEMDTest(unittest.TestCase):
         IMFs = faemd.fit_transform(signal, max_imfs=num_vars)
 
         # 检验分解子模态的数目
-        self.assertEqual(
-            first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误"
-        )
+        self.assertEqual(first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误")
 
         # 检验分解信号的长度
         self.assertEqual(first=IMFs.shape[1], second=seq_len, msg="分解信号的长度错误")
@@ -80,9 +76,7 @@ class FAEMDTest(unittest.TestCase):
             self.assertEqual(first=num_vars, second=num_imfs, msg=f"分解模态的数目错误")
 
             # 检查信号的长度
-            self.assertEqual(
-                first=seq_len, second=len(signal), msg="分解信号的长度错误"
-            )
+            self.assertEqual(first=seq_len, second=len(signal), msg="分解信号的长度错误")
 
             # 检验信号分解效果
             diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
@@ -97,9 +91,7 @@ class FAEMDTest(unittest.TestCase):
         IMFs = faemd(signal, max_imfs=num_vars)
 
         # 检验分解子模态的数目
-        self.assertEqual(
-            first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误"
-        )
+        self.assertEqual(first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误")
 
         # 检验分解信号的长度
         self.assertEqual(first=IMFs.shape[1], second=seq_len, msg="分解信号的长度错误")

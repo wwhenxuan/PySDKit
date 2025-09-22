@@ -6,7 +6,7 @@ Created on 2025/04/16 22:51:55
 """
 import numpy as np
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pysdkit.utils import fft, ifft, fmirror
 
@@ -33,7 +33,7 @@ class EFD(object):
 
     def __call__(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> np.ndarray | Tuple[np.ndarray, float]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, float]]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -43,7 +43,7 @@ class EFD(object):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> np.ndarray | Tuple[np.ndarray, float]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, float]]:
         """
         Signal decomposition using EFD algorithm
 

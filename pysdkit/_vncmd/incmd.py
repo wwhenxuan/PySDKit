@@ -16,7 +16,7 @@ from scipy.signal import welch
 from scipy.sparse.linalg import inv as sparseinv
 from scipy.sparse.linalg import spsolve
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pysdkit.utils import get_timeline
 
@@ -72,7 +72,7 @@ class INCMD(object):
         time: Optional[np.ndarray] = None,
         K: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, time=time, K=K, return_all=return_all)
 
@@ -242,7 +242,7 @@ class INCMD(object):
         time: Optional[np.ndarray] = None,
         K: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Start executing the INCMD algorithm for signal decomposition.
 

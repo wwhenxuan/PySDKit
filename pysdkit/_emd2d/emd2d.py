@@ -300,7 +300,6 @@ class EMD2D(object):
 
                 # Make sure there are enough extreme points
                 if len(min_peaks[0]) > 4 and len(max_peaks[0]) > 4:
-
                     # Record the last input data
                     imf_old = imf.copy()
 

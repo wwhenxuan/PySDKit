@@ -6,7 +6,7 @@ Created on 2025/01/31 23:33:43
 """
 import numpy as np
 
-from typing import Optional, Tuple
+from typing import Optional, Union, Tuple
 
 
 class RLMD(object):
@@ -86,7 +86,12 @@ class RLMD(object):
     def _initial_inputs(
         self, signal: np.ndarray
     ) -> Tuple[
-        np.ndarray | float, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray
+        Union[np.ndarray, float],
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
     ]:
         """"""
         # get the length of inputs signal
@@ -108,7 +113,7 @@ class RLMD(object):
 
         return signal_energy, ams, fms, pfs, iterNum, fvs
 
-    def _stop_lmd(self, signal: np.ndarray, signal_energy: np.ndarray | float) -> bool:
+    def _stop_lmd(self, signal: np.ndarray, signal_energy: Union[np.ndarray, float]) -> bool:
         """
         Stopping criterion of LMD algorithm.
         Check if there are enough (3) extrema to continue the decomposition
@@ -135,7 +140,7 @@ class RLMD(object):
 
     def _lmd_mean_amp(
         self, x: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray | int]:
+    ) -> Tuple[np.ndarray, np.ndarray, Union[np.ndarray, int]]:
         """
         Compute mean function and amplitude function of x in LMD
 
@@ -232,7 +237,7 @@ class RLMD(object):
 
     def _get_best_span(
         self, ind_extr: np.ndarray, x: np.ndarray
-    ) -> Tuple[np.ndarray | int, int]:
+    ) -> Tuple[Union[np.ndarray, int], int]:
         """
         Moving average span selection.
         Return the best span of moving average
@@ -315,7 +320,7 @@ class RLMD(object):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
         This funcion perform the local mean decompose (LMD) on the input signal, and return the product function (pfs),
         and their corresponding instantaneous amplititde(ams) and frequency modulation signal(fms).
@@ -338,7 +343,6 @@ class RLMD(object):
         while i < self.max_imfs and not self._stop_lmd(
             signal=xs, signal_energy=signal_energy
         ):
-
             # initialize variables used in PF sifting loop
             a_i = np.ones(nx)
             s_j = np.zeros(shape=(self.max_iter, nx))
@@ -492,7 +496,7 @@ def extr(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def extend(
-    x: np.ndarray, indmin: np.ndarray, indmax: np.ndarray, extd_r: np.ndarray | float
+    x: np.ndarray, indmin: np.ndarray, indmax: np.ndarray, extd_r: Union[np.ndarray, float]
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Python implementation of the MATLAB `extend` routine from the EMD toolbox.
@@ -664,7 +668,7 @@ def rms(
     *,
     keepdims: bool = False,
     omitnan: bool = False,
-) -> np.ndarray | float:
+) -> Union[np.ndarray, float]:
     """
     The Python version of rms function in Matlab.
 
@@ -690,7 +694,7 @@ def kurtosis(
     axis: Optional[int] = 0,
     bias: Optional[bool] = False,
     nan_policy: Optional[str] = "propagate",
-) -> np.ndarray | float:
+) -> Union[np.ndarray, float]:
     """
     Reproduce MATLAB kurtosis(x) behavior (global formula, flag=0)
 

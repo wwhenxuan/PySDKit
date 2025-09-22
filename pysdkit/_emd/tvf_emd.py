@@ -14,7 +14,7 @@ from scipy.sparse.linalg import spsolve
 from pysdkit.utils import inst_freq_local
 from pysdkit.utils import divide2exp
 
-from typing import Optional, Tuple, Dict, Any, Iterable
+from typing import Optional, Tuple, Dict, Any, Iterable, Union
 
 warnings.filterwarnings("ignore")
 
@@ -145,7 +145,7 @@ class TVF_EMD(object):
         bis_freq: np.ndarray,
         ind_remove_pad: np.ndarray,
         num_padding: int,
-    ) -> None | int | float | complex | ndarray | Iterable:
+    ) -> Union[None, int, float, complex, ndarray, Iterable]:
         """Remove unstable parts or 'noise' from the signal based on the extrema points of the input signal and certain rules, and smooth the signal through interpolation"""
         org_bis_freq = bis_freq.copy()
         flag_intermitt = 0
@@ -528,7 +528,7 @@ def check_knots(
     return x, y, knots
 
 
-def spline_base(breaks: np.ndarray, n: int) -> Dict[str, int | Any | Any]:
+def spline_base(breaks: np.ndarray, n: int) -> Dict[str, Union[int, Any, Any]]:
     """
     Generates B-spline base of order `n` for knots `breaks`
     This function comes from https://github.com/stfbnc/pytvfemd/tree/master

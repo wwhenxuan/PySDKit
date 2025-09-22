@@ -9,7 +9,7 @@ Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 import numpy as np
 from numpy import ndarray
 from scipy.interpolate import interp1d
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pysdkit._emd import akima, cubic, pchip, cubic_hermite, cubic_spline_3pts
 from pysdkit._emd import find_extrema_parabol, find_extrema_simple
@@ -231,7 +231,7 @@ class EMD(object):
 
     def extract_max_min_spline(
         self, time: np.ndarray, signal: np.ndarray
-    ) -> list[int] | tuple[ndarray, ndarray, ndarray, ndarray]:
+    ) -> Union[list[int], tuple[ndarray, ndarray, ndarray, ndarray]]:
         """
         Extracts top and bottom envelopes based on the signal,
         which are constructed based on maxima and minima, respectively.

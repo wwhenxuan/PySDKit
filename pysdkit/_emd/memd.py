@@ -12,7 +12,7 @@ from sys import exit
 
 from numpy import ndarray, dtype
 from scipy.interpolate import CubicSpline
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, Union
 
 
 class MEMD(object):
@@ -121,7 +121,6 @@ class MEMD(object):
         dir_vec = np.zeros(shape=(N_dim, 1))
 
         for it in range(0, self.n_dir):
-
             if N_dim != 3:
                 # Multivariate signal (for N_dim ~=3) with hammersley sequence
                 # Linear normalisation of hammersley sequence in the range of -1.00 - 1.00
@@ -495,7 +494,6 @@ def nth_prime(n: int) -> list:
 
     # Iterate through natural numbers starting from 3
     for i in range(3, 104745):  # 104745 is an arbitrary upper limit for demonstration
-
         # Check if the current number is prime
         if is_prime(i):
             # Append the prime number to the list
@@ -670,16 +668,16 @@ def boundary_conditions(
     x: np.ndarray,
     z: np.ndarray,
     nbsym: int,
-) -> (
-    Tuple[None, None, None, None, int]
-    | Tuple[
+) -> Union[
+    Tuple[None, None, None, None, int],
+    Tuple[
         ndarray[Any, dtype[Any]],
         ndarray[Any, dtype[Any]],
         ndarray[Any, dtype[Any]],
         ndarray[Any, dtype[Any]],
         int,
-    ]
-):
+    ],
+]:
     """
     Handle boundary conditions for signal processing by extending the signal symmetrically.
 

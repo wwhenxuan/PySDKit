@@ -7,7 +7,7 @@ Created on 2024/6/2 21:12
 import numpy as np
 from numpy import fft as f
 from matplotlib import pyplot as plt
-from typing import Optional, List, Tuple, Any
+from typing import Optional, List, Tuple, Any, Union
 from ._functions import set_themes
 from ._functions import generate_random_hex_color
 from pysdkit.utils import simple_moving_average, weighted_moving_average
@@ -154,7 +154,7 @@ def plot_HilbertSpectrum(
     energy_scale: Optional[str] = "log",
     plot_marginal: Optional[bool] = False,
     dpi: Optional[int] = 500,
-) -> tuple[list[Any] | Any, list[Any]] | list[Any] | Any:
+) -> Union[tuple[Union[list[Any], Any], list[Any]], list[Any], Any]:
     """
     Visualize the Hilbert spectrum using numpy and matplotlib.
 

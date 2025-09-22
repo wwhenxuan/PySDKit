@@ -9,7 +9,7 @@ This py includes a series of functional modules
 import numpy as np
 from scipy import linalg
 
-from typing import Optional
+from typing import Optional, Union
 
 __all__ = [
     "max_min_normalization",
@@ -231,7 +231,6 @@ def lags_matrix(
         "same",
         "valid",
     ]:
-
         matrix = np.zeros(shape=(seq_len + lags - 1, lags), dtype=dtype)
 
         # full mode
@@ -266,7 +265,7 @@ def covariance_matrix(
     lags: Optional[int] = None,
     ret_base: Optional[bool] = False,
     dtype: Optional[np.dtype] = None,
-) -> tuple[np.ndarray, np.ndarray] | np.ndarray:
+) -> Union[tuple[np.ndarray, np.ndarray], np.ndarray]:
     """
     This function calculates the covariance matrix of the input signal's lag matrix
     It generates a specific lag matrix based on the input signal x and the specified mode,

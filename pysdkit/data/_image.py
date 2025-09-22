@@ -9,10 +9,10 @@ import numpy as np
 from os import path
 import requests
 
-from typing import Optional, Tuple
+from typing import Optional, Union, Tuple
 
 
-def test_grayscale() -> np.ndarray | None:
+def test_grayscale() -> Union[np.ndarray, None]:
     """
     Load a sample 2D grayscale image for testing, the size is [256, 256]
 

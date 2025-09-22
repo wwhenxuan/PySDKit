@@ -96,9 +96,7 @@ class EWTTest(unittest.TestCase):
             IMFs = ewt_c(signal)
             # 检验是否能够正常分解
             num_imfs, length = IMFs.shape
-            self.assertEqual(
-                first=length, second=len(signal), msg="分解信号的长度与原信号不相等"
-            )
+            self.assertEqual(first=length, second=len(signal), msg="分解信号的长度与原信号不相等")
 
     def test_wrong_detect(self) -> None:
         """测试错误的边界检测方法"""
@@ -126,12 +124,8 @@ class EWTTest(unittest.TestCase):
             IMFs = ewt_c(signal)
             # 检验是否能够正常分解
             num_imfs, length = IMFs.shape
-            self.assertEqual(
-                first=num_imfs, second=3, msg="分解信号的本征模态函数数目错误"
-            )
-            self.assertEqual(
-                first=length, second=len(signal), msg="分解信号的长度与原信号不相等"
-            )
+            self.assertEqual(first=num_imfs, second=3, msg="分解信号的本征模态函数数目错误")
+            self.assertEqual(first=length, second=len(signal), msg="分解信号的长度与原信号不相等")
 
 
 if __name__ == "__main__":

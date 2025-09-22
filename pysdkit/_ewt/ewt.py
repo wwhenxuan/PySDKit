@@ -13,7 +13,7 @@ Original Code from: https://github.com/vrcarva/ewtpy
 """
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 
 class EWT(object):
@@ -60,7 +60,7 @@ class EWT(object):
         signal: np.ndarray,
         N: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, N=N, return_all=return_all)
 
@@ -80,7 +80,7 @@ class EWT(object):
         signal: np.ndarray,
         N: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Perform Empirical Wavelet Transform on the input signal.
 
@@ -251,9 +251,9 @@ def EWT_Boundaries_Detect(
 
     elif reg == "gaussian":
         regFilter = np.zeros(lengthFilter)
-        regFilter[regFilter.size // 2] = (
-            1  # Ensure center is set for Gaussian filtering
-        )
+        regFilter[
+            regFilter.size // 2
+        ] = 1  # Ensure center is set for Gaussian filtering
         presig = np.convolve(
             ff, gaussian_filter(regFilter, sigmaFilter), mode="same"
         )  # Gaussian filter
