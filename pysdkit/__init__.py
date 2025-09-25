@@ -76,6 +76,9 @@ from ._ewt import ewt, EWT
 # Jump Plus AM-FM Mode Decomposition
 from ._jmd import JMD
 
+# Feature Mode Decomposition
+from ._fmd import FMD
+
 # Moving Average Decomposition
 from .tsa import Moving_Decomp
 
@@ -132,6 +135,7 @@ Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
 Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
+Feature Mode Decomposition                      |    FMD
 Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
 Hilbert-Huang Transform                         |    HHT
@@ -167,6 +171,7 @@ __all__ = [
     "ewt",
     "EWT",
     "JMD",
+    "FMD",
     "Moving_Decomp",
     "STL",
     "models",
