@@ -211,8 +211,7 @@ class SVMD(Base):
                     # update u_L
                     u_hat_L[n + 1, :] = (
                         f_hat_onesided
-                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4)
-                        * u_hat_L[n, :]
+                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4) * u_hat_L[n, :]
                         + lambda_vector[n, :] / 2
                     ) / (
                         1

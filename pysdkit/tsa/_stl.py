@@ -31,6 +31,8 @@ class STL(object):
     """
     Seasonal-Trend decomposition using LOESS (STL)
 
+    RB C. STL: A seasonal-trend decomposition procedure based on loess[J]. J Off Stat, 1990, 6: 3-73.
+
     STL uses LOESS (locally estimated scatterplot smoothing) to extract smooths estimates of the three components.
     The key inputs into STL are:
     (1) season - The length of the seasonal smoother. Must be odd.

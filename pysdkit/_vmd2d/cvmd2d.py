@@ -120,7 +120,9 @@ class CVMD2D(object):
 
     def __call__(
         self, image: np.ndarray, return_all: Optional[str] = False
-    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
+    ) -> Union[
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray
+    ]:
         """allow instances to be called like functions"""
         return self.fit_transform(image=image, return_all=return_all)
 
@@ -177,7 +179,9 @@ class CVMD2D(object):
 
     def fit_transform(
         self, image: np.ndarray, return_all: Optional[str] = False
-    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
+    ) -> Union[
+        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray
+    ]:
         """
         Execute the signal decomposition algorithm for 2D images
 
@@ -354,12 +358,7 @@ class CVMD2D(object):
                     # Propagate by heat equation
                     A[:, :, k] = ifft2d(
                         fft2d(A[:, :, k])
-                        / (
-                            1
-                            + self.t
-                            * self.gamma
-                            * ifftshift(freqs_1**2 + freqs_2**2)
-                        )
+                        / (1 + self.t * self.gamma * ifftshift(freqs_1**2 + freqs_2**2))
                     )
 
                     # individual MBO thresholding [0,1] (no segmentation constraint)
@@ -386,12 +385,7 @@ class CVMD2D(object):
                     )
                     A[:, :, k] = ifft2d(
                         fft2d(A[:, :, k])
-                        / (
-                            1
-                            + self.t
-                            * self.gamma
-                            * ifftshift(freqs_1**2 + freqs_2**2)
-                        )
+                        / (1 + self.t * self.gamma * ifftshift(freqs_1**2 + freqs_2**2))
                     )
 
                 # Reshape A to a 2D array of shape [Hx*Hy, K]

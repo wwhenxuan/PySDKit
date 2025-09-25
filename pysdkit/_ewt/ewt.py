@@ -251,9 +251,9 @@ def EWT_Boundaries_Detect(
 
     elif reg == "gaussian":
         regFilter = np.zeros(lengthFilter)
-        regFilter[
-            regFilter.size // 2
-        ] = 1  # Ensure center is set for Gaussian filtering
+        regFilter[regFilter.size // 2] = (
+            1  # Ensure center is set for Gaussian filtering
+        )
         presig = np.convolve(
             ff, gaussian_filter(regFilter, sigmaFilter), mode="same"
         )  # Gaussian filter

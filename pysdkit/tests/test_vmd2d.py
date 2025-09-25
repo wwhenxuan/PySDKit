@@ -32,8 +32,12 @@ class VMD2DTest(unittest.TestCase):
 
         # 判断生成图像的长宽是否与输入图像相匹配
         H, W, C = IMFs.shape
-        self.assertEqual(first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误")
-        self.assertEqual(first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误")
+        self.assertEqual(
+            first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误"
+        )
+        self.assertEqual(
+            first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误"
+        )
         self.assertEqual(first=C, second=K, msg="算法分解的模态数目错误")
 
     def test_default_call(self) -> None:
@@ -51,8 +55,12 @@ class VMD2DTest(unittest.TestCase):
 
         # 判断生成图像的长宽是否与输入图像相匹配
         H, W, C = IMFs.shape
-        self.assertEqual(first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误")
-        self.assertEqual(first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误")
+        self.assertEqual(
+            first=H, second=self.grayscale.shape[0], msg="分解图像的高度尺寸错误"
+        )
+        self.assertEqual(
+            first=W, second=self.grayscale.shape[1], msg="分解图像的宽度尺寸错误"
+        )
         self.assertEqual(first=C, second=K, msg="算法分解的模态数目错误")
 
     def test_VMD2D_DC(self) -> None:
