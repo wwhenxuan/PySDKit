@@ -2,7 +2,7 @@ import numpy as np
 from pysdkit.utils import lags_matrix
 from pysdkit.utils import to_2d
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 __all__ = ["kernel_matrix", "euclidian_matrix"]
 
@@ -15,7 +15,7 @@ def kernel_matrix(
     lags: Optional[int] = None,
     return_base: Optional[bool] = False,
     normalization: Optional[bool] = True,
-) -> np.ndarray | Tuple[np.ndarray, np.ndarray]:
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
     """
     This function is used to generate the kernel matrix of the input signal
 
@@ -116,7 +116,7 @@ def kernel_matrix(
     return out
 
 
-def euclidian_matrix(X, Y, inner=False, square=True, normalize=False):
+def euclidian_matrix(X, Y, inner=False, square=True, normalize=False) -> np.ndarray:
     """
     Matrix of euclidian distance I.E. Pairwise distance matrix
 
@@ -138,7 +138,7 @@ def euclidian_matrix(X, Y, inner=False, square=True, normalize=False):
     return out
 
 
-def _kernel(a, b=None, ktype="rbf", kpar=1 / 2):
+def _kernel(a, b=None, ktype="rbf", kpar=1 / 2) -> Union[float, np.ndarray]:
     """
     Compute the kernel matrix (Gram matrix) between matrices a and b.
 
@@ -199,7 +199,6 @@ def _kernel(a, b=None, ktype="rbf", kpar=1 / 2):
     return k
 
 
-# ------------------------------------------------------------
 def _check_dim(
     X: np.ndarray, Y: Optional[np.ndarray] = None
 ) -> Tuple[np.ndarray, np.ndarray]:

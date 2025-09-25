@@ -124,13 +124,21 @@ class REMD(object):
         """
         # Get the position of the extreme point by calling the function to find the extreme point
         if self.extrema_detection == "parabol":
-            local_max_pos, local_max_val, local_min_pos, local_min_val, indzer = (
-                find_extrema_parabol(time=time, signal=signal)
-            )
+            (
+                local_max_pos,
+                local_max_val,
+                local_min_pos,
+                local_min_val,
+                indzer,
+            ) = find_extrema_parabol(time=time, signal=signal)
         elif self.extrema_detection == "simple":
-            local_max_pos, local_max_val, local_min_pos, local_min_val, indzer = (
-                find_extrema_simple(time=time, signal=signal)
-            )
+            (
+                local_max_pos,
+                local_max_val,
+                local_min_pos,
+                local_min_val,
+                indzer,
+            ) = find_extrema_simple(time=time, signal=signal)
         else:
             raise ValueError("`find_extrema` must be 'parabol' or 'simple'")
 
@@ -241,7 +249,6 @@ class REMD(object):
 
         # in case symmetrized parts do not extend enough
         if tl_min[0] > time[0] or tl_max[0] > time[0]:
-
             if lsym == indmax[0]:
                 lmax = np.fliplr(indmax[: min(end_max, nbsym)])
 
@@ -254,7 +261,6 @@ class REMD(object):
             lsym = 0
 
         if tr_min[-1] < time[xlen] or tr_max[-1] < time[xlen]:
-
             if rsym == indmax[-1]:
                 rmax = np.fliplr(indmax[max(end_max - nbsym + 1, 0) :])
 

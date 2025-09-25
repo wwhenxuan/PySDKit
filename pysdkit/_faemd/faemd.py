@@ -60,7 +60,7 @@ class FAEMD(object):
         signal: np.ndarray,
         return_all: bool = False,
         max_imfs: Optional[int] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(
             signal=signal, return_all=return_all, max_imfs=max_imfs
@@ -195,7 +195,7 @@ class FAEMD(object):
         signal: np.ndarray,
         return_all: bool = False,
         max_imfs: Optional[int] = None,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Execute the signal decomposition algorithm
 
@@ -234,7 +234,6 @@ class FAEMD(object):
 
         # 开始进行信号的迭代分解
         while imf < max_imfs - 1:
-
             # Initialising intermediary IMFs
             H = Residue.copy()
 

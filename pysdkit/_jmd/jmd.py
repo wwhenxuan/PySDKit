@@ -8,7 +8,7 @@ import numpy as np
 from numpy import linalg
 import scipy.sparse as sp
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pysdkit.utils import fft, fftshift, ifft, ifftshift
 
@@ -69,7 +69,7 @@ class JMD(object):
 
     def __call__(
         self, signal: np.ndarray, return_all: bool = True
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal=signal, return_all=return_all)
 
@@ -77,7 +77,9 @@ class JMD(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Jump Plus AM-FM Mode Decomposition (JMD)"
 
-    def jump_step(self, freqs: np.ndarray, T: int) -> Tuple[
+    def jump_step(
+        self, freqs: np.ndarray, T: int
+    ) -> Tuple[
         float,
         np.ndarray,
         np.ndarray,
@@ -194,7 +196,7 @@ class JMD(object):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Signal decomposition using Jump Plus AM-FM Mode Decomposition algorithm
 

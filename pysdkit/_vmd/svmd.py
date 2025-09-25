@@ -211,7 +211,8 @@ class SVMD(Base):
                     # update u_L
                     u_hat_L[n + 1, :] = (
                         f_hat_onesided
-                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4) * u_hat_L[n, :]
+                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4)
+                        * u_hat_L[n, :]
                         + lambda_vector[n, :] / 2
                     ) / (
                         1
@@ -304,7 +305,6 @@ class SVMD(Base):
             if self.init_omega > 0:
                 ii = 0
                 while ii < 1 and n2 < 300:
-
                     omega_L = np.sort(
                         np.exp(
                             np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()

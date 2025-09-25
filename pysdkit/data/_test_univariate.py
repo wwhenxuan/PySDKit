@@ -207,8 +207,12 @@ def test_nonlinear_chip_1(
     a2 = np.exp(-0.06 * t)
 
     # A two-component simulated nonlinear chirp signal (NCS)
-    s_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t**2 - 1 * t**3 + 0.1 * t**4))
-    s_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t**2 - 2 * t**3 + 0.1 * t**4))
+    s_1t = a1 * np.cos(
+        2 * np.pi * (0.8 + 25 * t + 4 * t**2 - 1 * t**3 + 0.1 * t**4)
+    )
+    s_2t = a2 * np.cos(
+        2 * np.pi * (1 + 40 * t + 8 * t**2 - 2 * t**3 + 0.1 * t**4)
+    )
     signal = s_1t + s_2t
 
     # Add normal noise to the generated signal
@@ -320,13 +324,19 @@ def test_univariate_duffing(
         v2 = v[k - 1] + 0.5 * dt * a
         x2 = x[k - 1] + 0.5 * dt * v1
         a2 = (
-            -0.3 * v2 - 4 * x2 + 0.6 * x2**3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+            -0.3 * v2
+            - 4 * x2
+            + 0.6 * x2**3
+            + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
         )
 
         v3 = v[k - 1] + 0.5 * dt * a2
         x3 = x[k - 1] + 0.5 * dt * v2
         a3 = (
-            -0.3 * v3 - 4 * x3 + 0.6 * x3**3 + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
+            -0.3 * v3
+            - 4 * x3
+            + 0.6 * x3**3
+            + 2 * np.cos(omega * (t[k - 1] + 0.5 * dt))
         )
 
         v4 = v[k - 1] + dt * a3

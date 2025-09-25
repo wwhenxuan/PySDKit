@@ -26,9 +26,7 @@ class MDTest(unittest.TestCase):
         trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
         # 验证一元时间序列的输出
-        self.assertEqual(
-            first=len(time_series), second=len(trends), msg="输入输出信号的长度不一致"
-        )
+        self.assertEqual(first=len(time_series), second=len(trends), msg="输入输出信号的长度不一致")
         self.assertEqual(
             first=len(time_series),
             second=len(seasonalities),
@@ -81,9 +79,7 @@ class MDTest(unittest.TestCase):
         trends, seasonalities = moving_decomp.fit_transform(signal=time_series)
 
         # 验证一元时间序列的输出
-        self.assertEqual(
-            first=len(time_series), second=len(trends), msg="输入输出信号的长度不一致"
-        )
+        self.assertEqual(first=len(time_series), second=len(trends), msg="输入输出信号的长度不一致")
         self.assertEqual(
             first=len(time_series),
             second=len(seasonalities),

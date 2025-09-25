@@ -7,7 +7,7 @@ Created on 2025/02/02 17:00:47
 import numpy as np
 from pysdkit.utils import fft2d, ifft2d, fftshift, ifftshift
 
-from typing import Optional, Tuple
+from typing import Optional, Union, Tuple
 
 
 class VMD2D(object):
@@ -54,7 +54,7 @@ class VMD2D(object):
         img: np.ndarray,
         K: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """allow instances to be called like functions"""
         return self.fit_transform(img=img, K=K, return_all=return_all)
 
@@ -93,7 +93,7 @@ class VMD2D(object):
         img: np.ndarray,
         K: Optional[int] = None,
         return_all: Optional[bool] = False,
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
         Image decomposition using VMD algorithm
 

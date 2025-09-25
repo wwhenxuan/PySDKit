@@ -5,7 +5,7 @@ Created on Sat Mar 4 11:59:21 2024
 @email: wwhenxuan@gmail.com
 """
 import numpy as np
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union
 
 from .base import Base
 from pysdkit.plot import plot_IMFs
@@ -149,7 +149,7 @@ class VMD(Base):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: bool = False
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray, np.ndarray], np.ndarray]:
         """
         Signal decomposition using VMD algorithm
 

@@ -7,15 +7,14 @@ Created on 2025/02/24 13:20:36
 """
 import numpy as np
 
-from typing import Tuple
+from typing import Tuple, Union
 
 
 def extrema(
     x: np.ndarray,
-) -> (
-    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
-    | Tuple[None, None, None, None]
-):
+) -> Union[
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], Tuple[None, None, None, None]
+]:
     """
     Gets the global extrema points from a time series
 

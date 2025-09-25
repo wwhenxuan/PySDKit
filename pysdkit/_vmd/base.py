@@ -73,9 +73,9 @@ class Base(object):
         fMirr[:, 0 : T // 2] = np.flip(
             ts[:, 0 : T // 2], axis=1
         )  # Mirror the first T//2 elements at the beginning
-        fMirr[:, T // 2 : 3 * T // 2] = (
-            ts  # Include the original time series in the middle
-        )
+        fMirr[
+            :, T // 2 : 3 * T // 2
+        ] = ts  # Include the original time series in the middle
         fMirr[:, 3 * T // 2 : 2 * T] = np.flip(
             ts[:, T // 2 :], axis=1
         )  # Mirror the last T//2 elements at the end

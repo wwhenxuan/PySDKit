@@ -85,12 +85,8 @@ class KNNTest(unittest.TestCase):
         knn.fit(X, y)
 
         # 判断拟合的数据
-        self.assertEqual(
-            first=X.all(), second=knn.X.all(), msg="输入的样本与拟合样本不一致"
-        )
-        self.assertEqual(
-            first=y.all(), second=knn.y.all(), msg="输入的标签与拟合的标签不一致"
-        )
+        self.assertEqual(first=X.all(), second=knn.X.all(), msg="输入的样本与拟合样本不一致")
+        self.assertEqual(first=y.all(), second=knn.y.all(), msg="输入的标签与拟合的标签不一致")
 
     def test_predict(self) -> None:
         """测试K近邻分类器中用于预测的方法"""

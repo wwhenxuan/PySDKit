@@ -7,7 +7,7 @@ Created on 2025/02/06 10:29:05
 import numpy as np
 from matplotlib import pyplot as plt
 
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, Union
 
 from pysdkit.plot import plot_IMFs, plot_HilbertSpectrum
 from pysdkit.utils import (
@@ -47,7 +47,7 @@ class HHT(object):
         signal: np.ndarray,
         fs: Optional[float] = None,
         return_all: Optional[bool] = False,
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
         Perform Hilbert-Huang transform on the signal `x`, and return the amplitude and
         instantaneous frequency function of each intrinsic mode.
@@ -64,7 +64,7 @@ class HHT(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Hilbert-Huang Transform (HHT)"
 
-    def _get_emd(self) -> EMD | REMD | EEMD | CEEMDAN:
+    def _get_emd(self) -> Union[EMD, REMD, EEMD, CEEMDAN]:
         """选择对应的经验模态分解算法"""
         if self.algorithm == "EMD":
             return EMD(max_imfs=self.max_imfs)
@@ -107,7 +107,7 @@ class HHT(object):
         signal: np.ndarray,
         fs: Optional[float] = None,
         return_all: Optional[bool] = False,
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
         Perform Hilbert-Huang transform on the signal `x`, and return the amplitude and
         instantaneous frequency function of each intrinsic mode.
@@ -207,7 +207,7 @@ class HHT(object):
         freq_lim: Optional[tuple[float, float]] = None,
         freq_res: Optional[float] = None,
         time_scale: int = 1,
-    ) -> tuple[list[Any] | Any, list[Any]] | list[Any] | Any:
+    ) -> Union[tuple[Union[list[Any], Any], list[Any]], list[Any], Any]:
         """
         Obtaining and visualizing the Hilbert spectrum.
 

@@ -129,7 +129,6 @@ def multiscale_permutation_entropy(
 
 
 if __name__ == "__main__":
-
     ########## Permutation Entropy Test Examples ##########
     y = np.array([1, 3, 2, 5, 4])
     m = 3

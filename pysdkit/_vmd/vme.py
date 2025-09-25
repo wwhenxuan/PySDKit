@@ -6,7 +6,7 @@ Created on 2025/04/02 22:44:18
 """
 import numpy as np
 
-from typing import Optional, Tuple
+from typing import Optional, Union, Tuple
 
 from pysdkit.utils import fft, fftshift, ifft, ifftshift
 
@@ -63,7 +63,7 @@ class VME(object):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> np.ndarray | Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
         """
         Signal decomposition using VME algorithm
 

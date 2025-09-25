@@ -6,7 +6,7 @@ Created on 2025/02/06 00:19:23
 """
 import numpy as np
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from pysdkit.utils import differ
 from pysdkit.utils import fft, ifft
@@ -57,7 +57,7 @@ class HVD(object):
 
     def __call__(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> Tuple[np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
         """allow instances to be called like functions"""
         return self.fit_transform(signal, return_all)
 
@@ -112,7 +112,7 @@ class HVD(object):
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
-    ) -> Tuple[np.ndarray, np.ndarray] | np.ndarray:
+    ) -> Union[Tuple[np.ndarray, np.ndarray], np.ndarray]:
         """Start executing the Hilbert Vibration Decomposition algorithm."""
 
         # Mirror the input signal to improve decomposition at the endpoints
