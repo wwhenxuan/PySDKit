@@ -83,9 +83,7 @@ class RLMD(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Robust Local Mean Decomposition (RLMD)"
 
-    def _initial_inputs(
-        self, signal: np.ndarray
-    ) -> Tuple[
+    def _initial_inputs(self, signal: np.ndarray) -> Tuple[
         Union[np.ndarray, float],
         np.ndarray,
         np.ndarray,
@@ -113,7 +111,9 @@ class RLMD(object):
 
         return signal_energy, ams, fms, pfs, iterNum, fvs
 
-    def _stop_lmd(self, signal: np.ndarray, signal_energy: Union[np.ndarray, float]) -> bool:
+    def _stop_lmd(
+        self, signal: np.ndarray, signal_energy: Union[np.ndarray, float]
+    ) -> bool:
         """
         Stopping criterion of LMD algorithm.
         Check if there are enough (3) extrema to continue the decomposition
@@ -496,7 +496,10 @@ def extr(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def extend(
-    x: np.ndarray, indmin: np.ndarray, indmax: np.ndarray, extd_r: Union[np.ndarray, float]
+    x: np.ndarray,
+    indmin: np.ndarray,
+    indmax: np.ndarray,
+    extd_r: Union[np.ndarray, float],
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Python implementation of the MATLAB `extend` routine from the EMD toolbox.

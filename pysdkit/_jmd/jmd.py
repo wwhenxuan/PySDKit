@@ -77,9 +77,7 @@ class JMD(object):
         """Get the full name and abbreviation of the algorithm"""
         return "Jump Plus AM-FM Mode Decomposition (JMD)"
 
-    def jump_step(
-        self, freqs: np.ndarray, T: int
-    ) -> Tuple[
+    def jump_step(self, freqs: np.ndarray, T: int) -> Tuple[
         float,
         np.ndarray,
         np.ndarray,
