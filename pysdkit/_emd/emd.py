@@ -519,8 +519,7 @@ class EMD(object):
             IMF = np.vstack((IMF, imf.copy()))
             imfNo += 1
 
-            if self.end_condition(signal, IMF) or imfNo == max_imfs - 1:
-                # Determine whether to stop iterative decomposition based on the original input signal and the intrinsic mode function
+            if self.end_condition(signal, IMF) or (max_imfs > 0 and imfNo >= max_imfs):
                 break
 
         # If the last sifting had 2 or less extrema then that's a trend (residue)
