@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="PySDKit",
     packages=setuptools.find_packages(),
-    version="0.4.24",
+    version="0.4.25",
     description="A Python library for signal decomposition algorithms with a unified interface.",
     url="https://github.com/wwhenxuan/PySDKit",
     author="whenxuan, changewam, josefinez, Yuan Feng, Wentong Zhao, JacktheFowler, Deeksha Manjunath",
