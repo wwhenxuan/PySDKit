@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PySDKit"
+dynamic = ["version"]
+description = "A Python library for signal decomposition algorithms with a unified interface."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+authors = [
+    { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
+    { name = "RuiZhe Wang", email = "3133986068@qq.com" },
+    { name = "josefinez" },
+    { name = "Deeksha Manjunath" },
+    { name = "Yuan Feng" },
+    { name = "WenTong Zhao", email = "23049200290@stu.xidian.edu.cn" },
+    { name = "JacktheFowler" },
+]
+maintainers = [
+    { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
+]
+keywords = [
+    "signal decomposition",
+    "signal processing",
+    "machine learning",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy>=1.24.3",
+    "scipy>=1.11.1",
+    "matplotlib>=3.7.2",
+    "tqdm>=4.66.5",
+    "requests>=2.32.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/wwhenxuan/PySDKit"
+Repository = "https://github.com/wwhenxuan/PySDKit"
+Issues = "https://github.com/wwhenxuan/PySDKit/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "pysdkit.__version__" }
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pysdkit*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.txt"]
