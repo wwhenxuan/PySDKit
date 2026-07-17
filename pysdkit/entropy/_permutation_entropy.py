@@ -7,12 +7,12 @@ Created on 2025/02/12 11:38:53
 import numpy as np
 import itertools
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 
 def permutation_entropy(
     y: np.ndarray, m: Optional[int] = 2, t: Optional[int] = 1
-) -> Tuple[np.ndarray, np.ndarray] | Tuple[float, float]:
+) -> Union[Tuple[np.ndarray, np.ndarray], Tuple[float, float]]:
     """
     Calculate the permutation entropy of the input time series of signal.
 

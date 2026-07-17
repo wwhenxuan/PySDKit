@@ -6,7 +6,7 @@ Created on 2025/07/21 11:53:35
 """
 import numpy as np
 
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union
 from pysdkit.models._base import normalize, centralize, UnsupervisedModel
 
 
@@ -173,7 +173,7 @@ class PCA(UnsupervisedModel):
         return self._X_reduced
 
     @property
-    def components_(self) -> np.ndarray | List[float]:
+    def components_(self) -> Union[np.ndarray, List[float]]:
         """Returns the top N principal components."""
         if self._components is not None:
             # Return recorded results after PCA has been executed
@@ -182,7 +182,7 @@ class PCA(UnsupervisedModel):
             raise ValueError("Please run the PCA algorithm first!")
 
     @property
-    def explained_variance_ratio_(self) -> np.ndarray | List[float]:
+    def explained_variance_ratio_(self) -> Union[np.ndarray, List[float]]:
         """Calculates the explained variance ratio."""
         if self._explained_variance_ratio is not None:
             # Return the explained variance ratio
@@ -191,7 +191,7 @@ class PCA(UnsupervisedModel):
             raise ValueError("Please run the PCA algorithm first!")
 
     @property
-    def mean_(self) -> np.ndarray | List[float]:
+    def mean_(self) -> Union[np.ndarray, List[float]]:
         """Returns the mean vector of the inputs data"""
         if self._mean is not None:
             # Return the mean vector
@@ -200,7 +200,7 @@ class PCA(UnsupervisedModel):
             raise ValueError("Please run the PCA algorithm first!")
 
     @property
-    def variance_(self) -> np.ndarray | List[float]:
+    def variance_(self) -> Union[np.ndarray, List[float]]:
         """Returns the variance vector of the inputs data"""
         if self._variance is not None:
             # Return the variance vector

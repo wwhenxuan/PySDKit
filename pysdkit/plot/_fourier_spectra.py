@@ -154,7 +154,7 @@ def plot_HilbertSpectrum(
     energy_scale: Optional[str] = "log",
     plot_marginal: Optional[bool] = False,
     dpi: Optional[int] = 500,
-) -> Union[tuple[Union[list[Any], Any], list[Any]], list[Any], Any]:
+) -> Union[Tuple[Union[List[Any], Any], List[Any]], List[Any], Any]:
     """
     Visualize the Hilbert spectrum using numpy and matplotlib.
 

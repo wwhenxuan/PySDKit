@@ -7,7 +7,7 @@ Created on 2025/02/06 10:29:05
 import numpy as np
 from matplotlib import pyplot as plt
 
-from typing import Optional, Tuple, Any, Union
+from typing import Optional, Tuple, Any, Union, List
 
 from pysdkit.plot import plot_IMFs, plot_HilbertSpectrum
 from pysdkit.utils import (
@@ -164,7 +164,7 @@ class HHT(object):
         imfs_env: Optional[np.ndarray] = None,
         imfs_freq: Optional[np.ndarray] = None,
         fs: Optional[float] = None,
-        freq_lim: Optional[tuple[float, float]] = None,
+        freq_lim: Optional[Tuple[float, float]] = None,
         freq_res: Optional[float] = None,
         time_scale: int = 1,
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -204,10 +204,10 @@ class HHT(object):
         imfs_env: Optional[np.ndarray] = None,
         imfs_freq: Optional[np.ndarray] = None,
         fs: Optional[float] = None,
-        freq_lim: Optional[tuple[float, float]] = None,
+        freq_lim: Optional[Tuple[float, float]] = None,
         freq_res: Optional[float] = None,
         time_scale: int = 1,
-    ) -> Union[tuple[Union[list[Any], Any], list[Any]], list[Any], Any]:
+    ) -> Union[Tuple[Union[List[Any], Any], List[Any]], List[Any], Any]:
         """
         Obtaining and visualizing the Hilbert spectrum.
 

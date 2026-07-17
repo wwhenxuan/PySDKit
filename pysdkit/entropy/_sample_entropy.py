@@ -8,12 +8,12 @@ import numpy as np
 from numpy import bool_
 from scipy.spatial.distance import pdist
 
-from typing import Optional, Tuple, Any
+from typing import Optional, Tuple, Any, Union
 
 
 def sample_entropy(
     y: np.ndarray, m: Optional[int], r: Optional[float], dist_type="chebychev"
-) -> np.ndarray | float:
+) -> Union[np.ndarray, float]:
     """
     Computing the Sample Entropy of a given signal or time series of 1D numpy ndarray.
 
@@ -107,7 +107,7 @@ def multiscale_sample_entropy(
     m: Optional[int] = 2,
     r: Optional[float] = 0.15,
     tau: Optional[int] = 1,
-) -> Tuple[float | Any, bool_, bool_]:
+) -> Tuple[Union[float, Any], bool_, bool_]:
     """
     Multiscale Sample Entropy (MSE) computation.
 

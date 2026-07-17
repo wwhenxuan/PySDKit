@@ -78,14 +78,14 @@ def correlation(
         R[:N] /= N
         R[N + 1 :] /= N - 1
 
-    if mode is "full":
+    if mode == "full":
         # ifftshift
         R = np.append(R[N + 1 :], R[:N])
 
-    elif mode is "straight":
+    elif mode == "straight":
         R = R[:N]
 
-    elif mode is "same":
+    elif mode == "same":
         R = np.append(R[N + N // 2 :], R[: N // 2])
     else:
         raise NotImplementedError("use one of the aviliable modes")
@@ -154,7 +154,7 @@ def autocorrelation(
 
 
 def xycor(s1, s2, mode="R12", modecor="same"):
-    """
+    r"""
     Function for special cross-correlation modes.
 
     Parameters

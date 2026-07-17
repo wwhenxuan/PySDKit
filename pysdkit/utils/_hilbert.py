@@ -36,9 +36,9 @@ def hilbert_spectrum(
     imfs_env: np.ndarray,
     imfs_freq: np.ndarray,
     fs: int,
-    freq_lim: Optional[tuple[float, float]] = None,
+    freq_lim: Optional[Tuple[float, float]] = None,
     freq_res: Optional[float] = None,
-    time_range: Optional[tuple[float, float]] = None,
+    time_range: Optional[Tuple[float, float]] = None,
     time_scale: Optional[int] = 1,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
