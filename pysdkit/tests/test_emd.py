@@ -12,39 +12,53 @@ from pysdkit.data import test_emd, test_univariate_signal
 
 
 class EMDTest(unittest.TestCase):
-    """测试经验模态分解算法(EMD)能否正常运行"""
+    """Test whether Empirical Mode Decomposition (EMD) runs normally"""
 
     def test_fit_transform(self) -> None:
-        """验证能否正常进行信号分解"""
-        # 创建算法实例对象
+        """Verify that signal decomposition can be performed normally"""
+        # Create an algorithm instance object
         emd = EMD()
         for index in range(1, 4):
-            # 获取测试信号
+            # Get the test signal
             time, signal = test_univariate_signal(case=index)
             IMFs = emd.fit_transform(signal)
-            # 判断输出的维数
+            # Determine the output dimension
             dim = len(IMFs.shape)
-            self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
-            # 判断输出信号的长度
+            self.assertEqual(
+                first=dim,
+                second=2,
+                msg="The output shape of the decomposed signal is wrong",
+            )
+            # Determine the length of the output signal
             _, length = IMFs.shape
-            self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+            self.assertEqual(
+                first=len(signal),
+                second=length,
+                msg="Wrong length of decomposed signal",
+            )
 
     def test_default_call(self) -> None:
-        """验证call方法能否正常运行"""
+        """Verify that the call method can run normally"""
         time, signal = test_emd()
-        # 创建算法实例对象
+        # Create an algorithm instance object
         emd = EMD()
         IMFs = emd(signal)
 
-        # 判断输出的维数
+        # Determine the output dimension
         dim = len(IMFs.shape)
-        self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
-        # 判断输出信号的长度
+        self.assertEqual(
+            first=dim,
+            second=2,
+            msg="The output shape of the decomposed signal is wrong",
+        )
+        # Determine the length of the output signal
         _, length = IMFs.shape
-        self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+        self.assertEqual(
+            first=len(signal), second=length, msg="Wrong length of decomposed signal"
+        )
 
     def test_different_length_inputs(self) -> None:
-        """验证当时间戳数组和输入信号长度不一致时的异常"""
+        """Verify the exception when the timestamp array and input signal length differ"""
         time = np.arange(100)
         signal = np.random.randn(125)
 
@@ -53,54 +67,54 @@ class EMDTest(unittest.TestCase):
             emd.fit_transform(signal=signal, time=time)
 
     def test_trend(self) -> None:
-        """判断对于单一的趋势信号输入"""
+        """Verify input consisting of a single trend signal"""
         emd = EMD()
 
-        # 创建仅有趋势分量的时间戳和信号
+        # Create timestamps and a signal with only a trend component
         time = np.arange(0, 1, 0.01)
         signal = 2 * time
 
-        # 执行信号分解算法获得本征模态函数
+        # Run signal decomposition to obtain IMFs
         IMFs = emd.fit_transform(signal=signal, time=time)
         self.assertEqual(first=IMFs.shape[0], second=1, msg="Expecting single IMF")
         self.assertTrue(np.allclose(signal, IMFs[0]))
 
     def test_single_imf(self) -> None:
-        """判断单一本征模态函数的输入"""
+        """Verify input consisting of a single IMF"""
         emd = EMD()
 
-        # 创建时间戳数组
+        # Create a timestamp array
         time = np.arange(0, 1, 0.001)
 
-        # 创建余弦信号
+        # Create a cosine signal
         cosine = np.cos(2 * np.pi * 4 * time)
 
-        # 判断单一余弦函数的输入
+        # Test input consisting of a single cosine
         IMFs = emd.fit_transform(signal=cosine.copy(), time=time)
         self.assertEqual(first=IMFs.shape[0], second=1, msg="Expecting single IMF!")
 
-        # 判断输入输出之间的数值差异
+        # Verify numerical difference between input and output
         diff = np.allclose(IMFs[0], cosine)
         self.assertTrue(diff, "Expecting 1st IMF to be cos(8 * pi * t)")
 
-        # 创建输入的趋势分量
+        # Create an input trend component
         trend = 3 * (time - 0.5)
 
-        # 判断余弦与趋势分量输入
+        # Test input consisting of cosine plus trend
         IMFs = emd.fit_transform(signal=trend.copy() + cosine.copy(), time=time)
         self.assertEqual(
             first=IMFs.shape[0], second=2, msg="Expecting two IMF of cosine and trend!"
         )
 
-        # 进一步判断两个模态输出的数值差异
+        # Further verify numerical differences between the two modal outputs
         diff_cosine = np.allclose(IMFs[0], cosine, atol=0.2)
         self.assertTrue(diff_cosine, "Expecting 1st IMF to be cosine")
         diff_trend = np.allclose(IMFs[1], trend, atol=0.2)
         self.assertTrue(diff_trend, "Expecting 2nd IMF to be trend")
 
     def test_spline_kind(self) -> None:
-        """验证EMD算法中所有的插值算法能够正常运行"""
-        # 创建两个不同分量的测试信号
+        """Verify that all interpolation algorithms in EMD run normally"""
+        # Create a test signal with two different components
         time = np.arange(0, 1, 0.01)
         cosine = np.cos(2 * np.pi * 4 * time)
         trend = 3 * (time - 0.1)
@@ -115,20 +129,20 @@ class EMDTest(unittest.TestCase):
             "quadratic",
             "linear",
         ]:
-            # 遍历所有的插值算法并创建实例
+            # Iterate over all interpolation algorithms and create instances
             emd = EMD(spline_kind=spline_kind)
 
-            # 执行信号分解算法并判断输出结果
+            # Run signal decomposition and verify the output
             IMFs = emd.fit_transform(signal=signal, time=time)
 
-            # 判断IMF的数目是否符合要求
+            # Verify that the number of IMFs meets the requirement
             self.assertEqual(
                 first=IMFs.shape[0],
                 second=2,
                 msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {spline_kind}",
             )
 
-            # 进一步判断两个模态输出的数值差异
+            # Further verify numerical differences between the two modal outputs
             diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
             self.assertTrue(
                 diff_cosine,
@@ -141,41 +155,41 @@ class EMDTest(unittest.TestCase):
             )
 
     def test_wrong_spline_kind(self) -> None:
-        """验证错误的插值类型输入是否会引发异常"""
+        """Verify that invalid interpolation type input raises an exception"""
         spline_kind = "wrong"
 
-        # 创建随机输入
+        # Create random input
         time = np.arange(10)
         signal = np.random.randn(10)
 
-        # 开始验证错误的插值类型
+        # Validate the invalid interpolation type
         with self.assertRaises(ValueError):
             emd = EMD(spline_kind=spline_kind)
             emd.fit_transform(signal=signal, time=time)
 
     def test_extrema_detection(self) -> None:
-        """验证EMD算法中所有的极值点探测算法能否正常的运行"""
-        # 创建两个不同分量的测试信号
+        """Verify that all extrema detection algorithms in EMD run normally"""
+        # Create a test signal with two different components
         time = np.arange(0, 1, 0.01)
         cosine = np.cos(2 * np.pi * 4 * time)
         trend = 3 * (time - 0.1)
         signal = cosine.copy() + trend.copy()
 
         for extrema_detection in ["parabol", "simple"]:
-            # 遍历所有的插值算法并创建实例
+            # Iterate over extrema detection methods and create instances
             emd = EMD(extrema_detection=extrema_detection)
 
-            # 执行信号分解算法并判断输出结果
+            # Run signal decomposition and verify the output
             IMFs = emd.fit_transform(signal=signal, time=time)
 
-            # 判断IMF的数目是否符合要求
+            # Verify that the number of IMFs meets the requirement
             self.assertEqual(
                 first=IMFs.shape[0],
                 second=2,
                 msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {extrema_detection}",
             )
 
-            # 进一步判断两个模态输出的数值差异
+            # Further verify numerical differences between the two modal outputs
             diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
             self.assertTrue(
                 diff_cosine,
@@ -188,21 +202,21 @@ class EMDTest(unittest.TestCase):
             )
 
     def test_wrong_extrema_detection(self) -> None:
-        """验证错误的极值点探测类型输入是否会引发异常"""
+        """Verify that invalid extrema detection type input raises an exception"""
         extrema_detection = "wrong"
 
-        # 创建随机输入
+        # Create random input
         time = np.arange(10)
         signal = np.random.randn(10)
 
-        # 开始验证错误的极值点探测类型
+        # Validate the invalid extrema detection type
         with self.assertRaises(ValueError):
             emd = EMD(extrema_detection=extrema_detection)
             emd.fit_transform(signal=signal, time=time)
 
     def test_max_iteration_flag(self) -> None:
-        """验证模型的最大迭代次数"""
-        # 创建随机信号进行验证
+        """Verify the model maximum iteration count"""
+        # Create a random signal for validation
         signal = np.random.random(200)
         emd = EMD()
         emd.MAX_ITERATION = 10
@@ -215,7 +229,7 @@ class EMDTest(unittest.TestCase):
         self.assertTrue(IMFs.shape[0] > 1)
 
     def test_get_imfs_and_residue(self) -> None:
-        """验证经过分解后能否正常获得本征模态函数和趋势分量"""
+        """Verify that IMFs and residue can be obtained normally after decomposition"""
         signal = np.random.random(200)
         emd = EMD(**{"MAX_ITERATION": 10, "FIXE": 20})
         all_imfs = emd(signal, max_imfs=3)
@@ -234,15 +248,15 @@ class EMDTest(unittest.TestCase):
         )
 
     def test_get_imfs_and_residue_without_running(self) -> None:
-        """验证当不执行算法时能不能获得输出的结果"""
+        """Verify that output cannot be obtained when the algorithm has not been run"""
         emd = EMD()
         with self.assertRaises(ValueError):
-            # 由于没有执行分解过程因此按理说无法获得IMFs和残差结果
+            # Since decomposition was not performed, IMFs and residue should be unavailable
             _, _ = emd.get_imfs_and_residue()
 
     def test_get_imfs_and_trend(self) -> None:
-        """验证经过分解后能否正常获得本征模态函数和趋势分量"""
-        # 创建算法实例和测试信号
+        """Verify that IMFs and trend can be obtained normally after decomposition"""
+        # Create an algorithm instance and test signal
         emd = EMD()
         time = np.linspace(0, 2 * np.pi, 100)
         expected_trend = 5 * time
@@ -252,12 +266,12 @@ class EMDTest(unittest.TestCase):
             + expected_trend
         )
 
-        # 执行信号分解算法
+        # Run signal decomposition
         IMFs = emd(signal)
-        # 尝试获得趋势分量
+        # Obtain the trend component
         imfs, trend = emd.get_imfs_and_trend()
 
-        # 对趋势分量进行进一步的数值验证
+        # Further numerical validation of the trend component
         onset_trend = trend - trend.mean()
         onset_expected_trend = expected_trend - expected_trend.mean()
         self.assertEqual(

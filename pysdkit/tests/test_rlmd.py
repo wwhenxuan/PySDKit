@@ -11,54 +11,68 @@ from pysdkit.data import test_emd, test_univariate_signal
 
 
 class RLMDTest(unittest.TestCase):
-    """测试鲁棒的局部均值分解(RLMD)算法能否正常运行"""
+    """Test whether Robust Local Mean Decomposition (RLMD) runs normally"""
 
     def test_fit_transform(self) -> None:
-        """验证能否正常进行信号分解"""
-        # 创建算法实例对象
+        """Verify that signal decomposition can be performed normally"""
+        # Create an algorithm instance object
         rlmd = RLMD()
         for index in range(1, 4):
-            # 获取测试信号
+            # Get the test signal
             time, signal = test_univariate_signal(case=index)
             IMFs = rlmd.fit_transform(signal)
-            # 判断输出的维数
+            # Determine the output dimension
             dim = len(IMFs.shape)
-            self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
-            # 判断输出信号的长度
+            self.assertEqual(
+                first=dim,
+                second=2,
+                msg="The output shape of the decomposed signal is wrong",
+            )
+            # Determine the length of the output signal
             _, length = IMFs.shape
-            self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+            self.assertEqual(
+                first=len(signal),
+                second=length,
+                msg="Wrong length of decomposed signal",
+            )
 
     def test_default_call(self) -> None:
-        """验证call方法能否正常运行"""
+        """Verify that the call method can run normally"""
         time, signal = test_emd()
-        # 创建算法实例对象
+        # Create an algorithm instance object
         rlmd = RLMD()
         IMFs = rlmd(signal)
 
-        # 判断输出的维数
+        # Determine the output dimension
         dim = len(IMFs.shape)
-        self.assertEqual(first=dim, second=2, msg="分解信号的输出形状错误")
-        # 判断输出信号的长度
+        self.assertEqual(
+            first=dim,
+            second=2,
+            msg="The output shape of the decomposed signal is wrong",
+        )
+        # Determine the length of the output signal
         _, length = IMFs.shape
-        self.assertEqual(first=len(signal), second=length, msg="分解信号的长度错误")
+        self.assertEqual(
+            first=len(signal), second=length, msg="Wrong length of decomposed signal"
+        )
 
     def test_imfs_number(self) -> None:
-        """验证算法分解得到的本征模态函数的数目和指定的超参数是否一致"""
+        """Verify that the number of IMFs matches the specified hyperparameter"""
         time, signal = test_emd()
 
-        # 遍历多个超参数
+        # Iterate over multiple hyperparameter values
         for k in [2, 3, 5]:
-            # 创建算法实例并执行算法
+            # Create an algorithm instance and run the algorithm
             rlmd = RLMD(max_imfs=k)
             IMFs = rlmd.fit_transform(signal)
 
-            # 判断分解得到的模态数目和指定的超参数数目是否一致
+            # Verify that the number of decomposed modes matches the hyperparameter
             number = IMFs.shape[0]
-            # 考虑到有残差的存在因此应该要+1
+            # Account for the residue component, so expect k + 1
             self.assertEqual(
                 first=number,
                 second=k + 1,
-                msg="分解得到的本征模态函数的数目和指定的超参数不一致",
+                msg="The number of IMFs does not match the specified hyperparameter",
             )
 
 

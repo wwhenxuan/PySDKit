@@ -9,160 +9,196 @@ from pysdkit import FAEMD
 
 
 class FAEMDTest(unittest.TestCase):
-    """测试快速自适应经验模态分解算法能否正常运行"""
+    """Test whether Fast Adaptive EMD (FAEMD) runs normally"""
 
     def test_fit_transform(self) -> None:
-        """验证能否正常进行信号分解"""
-        # 创建算法验证的实例
+        """Verify that signal decomposition can be performed normally"""
+        # Create an algorithm validation instance
         faemd = FAEMD(max_imfs=3)
 
-        # 获取一元测试信号
+        # Get a univariate test signal
         _, signal = test_emd()
 
-        # 测试一元信号
+        # Test univariate signals
         for num_imfs in range(2, 5):
-            # 执行信号分解算法
+            # Run the signal decomposition algorithm
             IMFs = faemd.fit_transform(signal, max_imfs=num_imfs)
 
-            # 获取分解得到的本征模态函数
+            # Get the decomposed IMFs
             num_vars, seq_len = IMFs.shape
 
-            # 检查信号的分解模态数目
-            self.assertEqual(first=num_vars, second=num_imfs, msg=f"分解模态的数目错误")
-
-            # 检查信号的长度
+            # Check the number of decomposition modes
             self.assertEqual(
-                first=seq_len, second=len(signal), msg="分解信号的长度错误"
+                first=num_vars,
+                second=num_imfs,
+                msg="Wrong number of decomposition modes",
             )
 
-            # 检验信号分解效果
-            diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="分解子模态无法重构原信号")
+            # Check the signal length
+            self.assertEqual(
+                first=seq_len,
+                second=len(signal),
+                msg="Wrong length of decomposed signal",
+            )
 
-        # 获取二元测试信号
+            # Verify reconstruction quality
+            diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
+            self.assertTrue(
+                expr=diff,
+                msg="Decomposed sub-modes cannot reconstruct the original signal",
+            )
+
+        # Get a bivariate test signal
         _, signal = test_multivariate_signal()
-        # 获取信号的形状信息
+        # Get signal shape information
         num_vars, seq_len = signal.shape
 
-        # 执行多元信号分解算法
+        # Run multivariate signal decomposition
         IMFs = faemd.fit_transform(signal, max_imfs=num_vars)
 
-        # 检验分解子模态的数目
+        # Verify the number of decomposed modes
         self.assertEqual(
-            first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误"
+            first=IMFs.shape[0],
+            second=num_vars,
+            msg="Wrong number of modes in the decomposed signal",
         )
 
-        # 检验分解信号的长度
-        self.assertEqual(first=IMFs.shape[1], second=seq_len, msg="分解信号的长度错误")
+        # Verify the length of the decomposed signal
+        self.assertEqual(
+            first=IMFs.shape[1], second=seq_len, msg="Wrong length of decomposed signal"
+        )
 
-        # 检验信号的重构效果
+        # Verify reconstruction quality
         for num in range(num_vars):
             diff = np.allclose(np.sum(IMFs[:, :, num], axis=0), signal[num], atol=1e-6)
-            self.assertTrue(expr=diff, msg="分解子模态无法重构原信号")
-
-    def test_default_call(self) -> None:
-        """验证能否正常进行信号分解"""
-        # 创建算法验证的实例
-        faemd = FAEMD(max_imfs=3)
-
-        # 获取一元测试信号
-        _, signal = test_emd()
-
-        # 测试一元信号
-        for num_imfs in range(2, 5):
-            # 执行信号分解算法
-            IMFs = faemd(signal, max_imfs=num_imfs)
-
-            # 获取分解得到的本征模态函数
-            num_vars, seq_len = IMFs.shape
-
-            # 检查信号的分解模态数目
-            self.assertEqual(first=num_vars, second=num_imfs, msg=f"分解模态的数目错误")
-
-            # 检查信号的长度
-            self.assertEqual(
-                first=seq_len, second=len(signal), msg="分解信号的长度错误"
+            self.assertTrue(
+                expr=diff,
+                msg="Decomposed sub-modes cannot reconstruct the original signal",
             )
 
-            # 检验信号分解效果
-            diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="分解子模态无法重构原信号")
-
-        # 获取二元测试信号
-        _, signal = test_multivariate_signal()
-        # 获取信号的形状信息
-        num_vars, seq_len = signal.shape
-
-        # 执行多元信号分解算法
-        IMFs = faemd(signal, max_imfs=num_vars)
-
-        # 检验分解子模态的数目
-        self.assertEqual(
-            first=IMFs.shape[0], second=num_vars, msg="分解信号的模态数目错误"
-        )
-
-        # 检验分解信号的长度
-        self.assertEqual(first=IMFs.shape[1], second=seq_len, msg="分解信号的长度错误")
-
-        # 检验信号的重构效果
-        for num in range(num_vars):
-            diff = np.allclose(np.sum(IMFs[:, :, num], axis=0), signal[num], atol=1e-6)
-            self.assertTrue(expr=diff, msg="分解子模态无法重构原信号")
-
-    def test_trend(self) -> None:
-        """判断对于单一的趋势信号输入"""
+    def test_default_call(self) -> None:
+        """Verify that signal decomposition can be performed normally"""
+        # Create an algorithm validation instance
         faemd = FAEMD(max_imfs=3)
 
-        # 创建仅有趋势分量的时间戳和信号
+        # Get a univariate test signal
+        _, signal = test_emd()
+
+        # Test univariate signals
+        for num_imfs in range(2, 5):
+            # Run the signal decomposition algorithm
+            IMFs = faemd(signal, max_imfs=num_imfs)
+
+            # Get the decomposed IMFs
+            num_vars, seq_len = IMFs.shape
+
+            # Check the number of decomposition modes
+            self.assertEqual(
+                first=num_vars,
+                second=num_imfs,
+                msg="Wrong number of decomposition modes",
+            )
+
+            # Check the signal length
+            self.assertEqual(
+                first=seq_len,
+                second=len(signal),
+                msg="Wrong length of decomposed signal",
+            )
+
+            # Verify reconstruction quality
+            diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
+            self.assertTrue(
+                expr=diff,
+                msg="Decomposed sub-modes cannot reconstruct the original signal",
+            )
+
+        # Get a bivariate test signal
+        _, signal = test_multivariate_signal()
+        # Get signal shape information
+        num_vars, seq_len = signal.shape
+
+        # Run multivariate signal decomposition
+        IMFs = faemd(signal, max_imfs=num_vars)
+
+        # Verify the number of decomposed modes
+        self.assertEqual(
+            first=IMFs.shape[0],
+            second=num_vars,
+            msg="Wrong number of modes in the decomposed signal",
+        )
+
+        # Verify the length of the decomposed signal
+        self.assertEqual(
+            first=IMFs.shape[1], second=seq_len, msg="Wrong length of decomposed signal"
+        )
+
+        # Verify reconstruction quality
+        for num in range(num_vars):
+            diff = np.allclose(np.sum(IMFs[:, :, num], axis=0), signal[num], atol=1e-6)
+            self.assertTrue(
+                expr=diff,
+                msg="Decomposed sub-modes cannot reconstruct the original signal",
+            )
+
+    def test_trend(self) -> None:
+        """Verify input consisting of a single trend signal"""
+        faemd = FAEMD(max_imfs=3)
+
+        # Create timestamps and a signal with only a trend component
         time = np.arange(0, 1, 0.01)
         signal = 2 * time
 
-        # 执行信号分解算法获得本征模态函数
+        # Run signal decomposition to obtain IMFs
         IMFs = faemd.fit_transform(signal=signal)
 
-        # 检验信号的最后一个本征模态函数
+        # Verify the last IMF captures the trend
         diff = np.allclose(IMFs[-1], signal, atol=1e-6)
-        self.assertTrue(expr=diff, msg="没能正确提取趋势信息")
+        self.assertTrue(expr=diff, msg="Failed to extract trend information correctly")
 
     def test_signal_imf(self) -> None:
-        """验证算法对单一模态信号的提取能力"""
-        # 创建信号分解算法实例
+        """Verify extraction of a single-mode signal"""
+        # Create a signal decomposition instance
         faemd = FAEMD(max_imfs=2, tol=1e-10)
 
-        # 创建时间戳数组
+        # Create a timestamp array
         time = np.arange(0, 1, 0.001)
 
-        # 创建余弦信号
+        # Create a cosine signal
         cosine = np.cos(2 * np.pi * 4 * time)
 
-        # 判断单一余弦函数的输入
+        # Test input consisting of a single cosine
         IMFs = faemd.fit_transform(signal=cosine.copy())
 
-        # 检验信号的最后一个本征模态函数
+        # Verify the first IMF captures the cosine component
         diff = np.allclose(IMFs[0], cosine, atol=1)
-        self.assertTrue(expr=diff, msg="没能正确提取单一模态信息")
+        self.assertTrue(
+            expr=diff, msg="Failed to extract single-mode information correctly"
+        )
 
     def test_window_type(self) -> None:
-        """验证使用的平滑算法类型"""
-        # 创建测试信号
+        """Verify supported smoothing window types"""
+        # Create a test signal
         time, signal = test_emd()
 
-        # 遍历指定的索引类型
+        # Iterate over supported window type indices
         for index in range(7):
-            # 创建测试信号实例
+            # Create a test instance
             faemd = FAEMD(max_imfs=2, window_type=index)
 
-            # 执行信号分解算法
+            # Run the signal decomposition algorithm
             IMFs = faemd.fit_transform(signal=signal)
 
-            # 判断差异
+            # Verify reconstruction quality
             diff = np.allclose(np.sum(IMFs, axis=0), signal, atol=1e-6)
-            self.assertTrue(expr=diff, msg="分解得到的本征模态函数无法重构原信号")
+            self.assertTrue(
+                expr=diff, msg="Decomposed IMFs cannot reconstruct the original signal"
+            )
 
     def test_wrong_window_type(self) -> None:
-        """验证错误的`window_type`参数"""
+        """Verify invalid `window_type` parameters"""
         with self.assertRaises(ValueError):
-            # 以错误的参数创建信号分解算法实例
+            # Create a signal decomposition instance with invalid parameters
             FAEMD(max_imfs=2, window_type=-1)
 
 

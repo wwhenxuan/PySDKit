@@ -321,7 +321,8 @@ def bayesian_strategy(Phi: np.ndarray, y: np.ndarray) -> np.ndarray:
     index = np.array([index0], dtype=int)
 
     phi = Phi[:, index]  # (n_samples, 1)
-    Hessian = gamma[0] + float(phi.T @ phi) / gamma_0
+    phi_energy = float(np.asarray(phi.T @ phi).reshape(-1)[0])
+    Hessian = gamma[0] + phi_energy / gamma_0
     Sig = np.array([[1.0 / Hessian]], dtype=float)
     mu = np.array([Sig[0, 0] * PHIt[index0] / gamma_0], dtype=float)
 
