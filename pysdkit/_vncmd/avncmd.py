@@ -203,17 +203,20 @@ class AVNCMD(Base):
                 # (ukdif is d(vk)/dt, vkdif is d(uk)/dt — matches MATLAB)
                 ukdif = self.differ(vk[i, :], 1.0 / fs)
                 vkdif = self.differ(uk[i, :], 1.0 / fs)
+                # Guard against near-zero demodulated amplitudes (division blow-up).
                 denom = uk[i, :] ** 2 + vk[i, :] ** 2
+                denom = np.maximum(denom, np.finfo(self.DTYPE).eps)
                 deltaIF = (uk[i, :] * ukdif - vk[i, :] * vkdif) / denom / (2.0 * np.pi)
+                deltaIF = np.nan_to_num(deltaIF, nan=0.0, posinf=0.0, neginf=0.0)
 
                 # Low-pass correction of the IF increment
                 deltaIF = spsolve(
                     (2.0 / beta_thin) * HtH + speye(N, dtype=self.DTYPE, format="csc"),
-                    deltaIF,
+                    np.asarray(deltaIF, dtype=self.DTYPE),
                 )
-                iniIF[i, :] = np.abs(
-                    iniIF[i, :] - np.asarray(deltaIF, dtype=self.DTYPE)
-                )
+                deltaIF = np.asarray(deltaIF, dtype=self.DTYPE).real
+                deltaIF = np.nan_to_num(deltaIF, nan=0.0, posinf=0.0, neginf=0.0)
+                iniIF[i, :] = np.abs(iniIF[i, :] - deltaIF)
 
                 # Update demodulation bases
                 phase = 2.0 * np.pi * cumulative_trapezoid(iniIF[i, :], t, initial=0)
@@ -307,15 +310,21 @@ def bayesian_strategy(Phi: np.ndarray, y: np.ndarray) -> np.ndarray:
     n_samples, m = Phi.shape
 
     gamma_0 = (np.std(y) ** 2) / 1e2
+    if not np.isfinite(gamma_0) or gamma_0 <= 0.0:
+        gamma_0 = 1e-12
     eta = 1e-8
     max_iter = 1000
 
     PHIt = Phi.T @ y
     PHI2 = np.sum(Phi**2, axis=0)
+    PHI2 = np.maximum(PHI2, np.finfo(float).eps)
     ratio = (PHIt**2) / PHI2
     index0 = int(np.argmax(ratio))
     maxr = ratio[index0]
-    gamma = np.array([PHI2[index0] / (maxr - gamma_0)], dtype=float)
+    denom_g = maxr - gamma_0
+    if abs(denom_g) < np.finfo(float).eps:
+        denom_g = np.finfo(float).eps
+    gamma = np.array([PHI2[index0] / denom_g], dtype=float)
 
     # Active set (0-based column indices into Phi)
     index = np.array([index0], dtype=int)

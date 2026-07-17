@@ -154,7 +154,7 @@ class FAEMD(object):
         L = len(signal)
 
         # Ensure that the processed signal is always a column vector
-        signal = np.reshape(signal, newshape=[L, 1])
+        signal = np.reshape(signal, [L, 1])
 
         r = int((window_size - 1) / 2)
 
@@ -186,7 +186,7 @@ class FAEMD(object):
         f_signal = y[r:-r]
 
         # Restoring Signal size
-        f_signal = np.reshape(f_signal, newshape=shape)
+        f_signal = np.reshape(f_signal, shape)
 
         return f_signal
 
