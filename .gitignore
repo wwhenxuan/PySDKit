@@ -24,3 +24,7 @@ venv/
 
 # save the test data
 /data/
+
+# The checkpoint and repo of the model
+checkpoints/
+repo/
