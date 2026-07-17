@@ -7,3 +7,5 @@ Created on Sat Mar 8 21:45:02 2024
 from .vncmd import VNCMD
 
 from .incmd import INCMD
+
+from .avncmd import AVNCMD

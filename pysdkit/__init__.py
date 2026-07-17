@@ -70,6 +70,9 @@ from ._vncmd import VNCMD
 # Iterative Nonlinear Chirp Mode Decomposition
 from ._vncmd import INCMD
 
+# Adaptive Variational Nonlinear Chirp Mode Decomposition
+from ._vncmd import AVNCMD
+
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
@@ -168,6 +171,7 @@ __all__ = [
     "CVMD2D",
     "VNCMD",
     "INCMD",
+    "AVNCMD",
     "ewt",
     "EWT",
     "JMD",

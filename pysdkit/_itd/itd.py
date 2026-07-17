@@ -131,11 +131,13 @@ class ITD(object):
             LK = LK[1:-1]
 
         # Clamp to signal boundaries
-        LK = np.vstack((
-            [0, LK[0, 1]],
-            LK,
-            [length - 1, LK[-1, 1]],
-        ))
+        LK = np.vstack(
+            (
+                [0, LK[0, 1]],
+                LK,
+                [length - 1, LK[-1, 1]],
+            )
+        )
 
         # Compute baseline by piecewise-linear interpolation between extrema
         idx_Xk = np.concatenate(([0], idx_cb, [length - 1])).astype(int)
