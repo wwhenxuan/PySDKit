@@ -73,6 +73,9 @@ from ._vncmd import INCMD
 # Adaptive Variational Nonlinear Chirp Mode Decomposition
 from ._vncmd import AVNCMD
 
+# Adaptive Local Iterative Filtering
+from ._alif import ALIF
+
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
@@ -136,6 +139,8 @@ Variational Mode Decomposition for 2D Image     |    VMD2D
 Compact VMD for 2D Image                        |    CVMD2D
 Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
 Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
+Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
+Adaptive Local Iterative Filtering              |    ALIF
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Feature Mode Decomposition                      |    FMD
@@ -172,6 +177,7 @@ __all__ = [
     "VNCMD",
     "INCMD",
     "AVNCMD",
+    "ALIF",
     "ewt",
     "EWT",
     "JMD",
