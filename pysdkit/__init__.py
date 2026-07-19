@@ -88,6 +88,9 @@ from ._ewt import ewt, EWT
 # Jump Plus AM-FM Mode Decomposition
 from ._jmd import JMD
 
+# Multivariate Jump Plus AM-FM Mode Decomposition
+from ._jmd import MJMD
+
 # Feature Mode Decomposition
 from ._fmd import FMD
 
@@ -151,6 +154,7 @@ Adaptive Local Iterative Filtering              |    ALIF
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
+Multivariate Jump Plus AM-FM Mode Decomposition |    MJMD
 Feature Mode Decomposition                      |    FMD
 Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
@@ -191,6 +195,7 @@ __all__ = [
     "ewt",
     "EWT",
     "JMD",
+    "MJMD",
     "FMD",
     "Moving_Decomp",
     "STL",

@@ -5,3 +5,6 @@ Created on 2025/02/05 13:32:00
 @email: wwhenxuan@gmail.com
 """
 from .jmd import JMD
+from .mjmd import MJMD
+
+__all__ = ["JMD", "MJMD"]
