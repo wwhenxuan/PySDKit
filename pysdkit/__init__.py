@@ -2,7 +2,7 @@
 A Python library for signal decomposition algorithms.
 """
 
-__version__ = "0.4.27"
+__version__ = "0.4.28"
 
 # Empirical Mode Decomposition
 from ._emd import EMD

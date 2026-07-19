@@ -75,9 +75,7 @@ class OVMD(Base):
         signal = np.asarray(signal, dtype=float).ravel()
         t = signal.size
         t2 = t // 2
-        return np.concatenate(
-            [signal[t2 - 1 :: -1], signal, signal[: t2 - 1 : -1]]
-        )
+        return np.concatenate([signal[t2 - 1 :: -1], signal, signal[: t2 - 1 : -1]])
 
     def fit_transform(
         self, signal: np.ndarray, return_all: bool = False
@@ -168,11 +166,7 @@ class OVMD(Base):
                 k_minus = self.K - 1 if k == 0 else k - 1
                 sum_uk = u_hat_plus[1, :, k_minus] + sum_uk - u_hat_plus[0, :, k]
 
-                denom = (
-                    1.0
-                    + alpha_vec[k] * (freqs - omega_hist[m, k]) ** 2
-                    + send_cont
-                )
+                denom = 1.0 + alpha_vec[k] * (freqs - omega_hist[m, k]) ** 2 + send_cont
                 u_hat_plus[1, :, k] = (
                     f_hat_plus - sum_uk - lambda_hat / 2.0 + receive_cont
                 ) / denom
@@ -189,19 +183,17 @@ class OVMD(Base):
                 den = np.sum(np.abs(u_hat_plus[1, pos, k]) ** 2 + o_subs[pos])
                 omega_hist[m + 1, k] = num / (den + np.finfo(float).eps)
                 omega_filter[k, :] = 1.0 / (
-                    1.0
-                    + alpha_vec[k]
-                    * (np.abs(freqs) - omega_hist[m + 1, k]) ** 2
+                    1.0 + alpha_vec[k] * (np.abs(freqs) - omega_hist[m + 1, k]) ** 2
                 )
 
             # proportional bandwidth + convergence measure
             u_diff = np.finfo(float).eps
             for i in range(self.K):
-                alpha_vec[i] = self.alpha / max(omega_hist[m + 1, i], np.finfo(float).eps)
+                alpha_vec[i] = self.alpha / max(
+                    omega_hist[m + 1, i], np.finfo(float).eps
+                )
                 omega_filter[i, :] = 1.0 / (
-                    1.0
-                    + alpha_vec[i]
-                    * (np.abs(freqs) - omega_hist[m + 1, i]) ** 2
+                    1.0 + alpha_vec[i] * (np.abs(freqs) - omega_hist[m + 1, i]) ** 2
                 )
                 cur = u_hat_plus[1, :, i]
                 prev = u_hat_plus[0, :, i]
