@@ -7,7 +7,11 @@ import numpy as np
 
 from pysdkit import ALIF
 from pysdkit._alif import IterativeFiltering
-from pysdkit._alif._helpers import get_mask_v1, load_prefixed_filter, maxmins
+from pysdkit._alif.iterative_filtering import (
+    get_mask_v1,
+    load_prefixed_filter,
+    maxmins,
+)
 
 
 def _make_chirp_mixture(n: int = 512):

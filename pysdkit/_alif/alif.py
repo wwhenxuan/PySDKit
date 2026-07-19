@@ -14,12 +14,12 @@ from typing import Optional
 import numpy as np
 from scipy.interpolate import interp1d
 
-from pysdkit._alif._helpers import (
+from pysdkit._alif.iterative_filtering import (
+    IterativeFiltering,
     adaptive_average,
     load_prefixed_filter,
     maxmins,
 )
-from pysdkit._alif.iterative_filtering import IterativeFiltering
 
 
 class ALIF(object):
