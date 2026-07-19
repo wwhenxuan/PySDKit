@@ -58,6 +58,9 @@ from ._vmd import MVMD
 # Variational Mode Extraction, to extract a specific mode from the signal
 from ._vmd import VME
 
+# Orthogonalized Variational Mode Decomposition
+from ._vmd import OVMD
+
 # Variational Mode Decomposition for 2D Image
 from ._vmd2d import VMD2D
 
@@ -138,6 +141,7 @@ Singular Spectral Analysis                      |    SSA
 Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
+Orthogonalized Variational Mode Decomposition   |    OVMD
 Variational Mode Decomposition for 2D Image     |    VMD2D
 Compact VMD for 2D Image                        |    CVMD2D
 Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
@@ -176,6 +180,7 @@ __all__ = [
     "ACMD",
     "MVMD",
     "VME",
+    "OVMD",
     "VMD2D",
     "CVMD2D",
     "VNCMD",
