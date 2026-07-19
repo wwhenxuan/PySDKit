@@ -76,6 +76,9 @@ from ._vncmd import AVNCMD
 # Adaptive Local Iterative Filtering
 from ._alif import ALIF
 
+# Adaptive Polymorphic Mode Decomposition
+from ._apmd import APMD
+
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
@@ -141,6 +144,7 @@ Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
 Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
 Adaptive Local Iterative Filtering              |    ALIF
+Adaptive Polymorphic Mode Decomposition         |    APMD
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Feature Mode Decomposition                      |    FMD
@@ -178,6 +182,7 @@ __all__ = [
     "INCMD",
     "AVNCMD",
     "ALIF",
+    "APMD",
     "ewt",
     "EWT",
     "JMD",
