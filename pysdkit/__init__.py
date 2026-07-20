@@ -91,6 +91,9 @@ from ._jmd import JMD
 # Multivariate Jump Plus AM-FM Mode Decomposition
 from ._jmd import MJMD
 
+# Successive Jump and Mode Decomposition (univariate / multivariate)
+from ._jmd import SJMD, SMJMD
+
 # Feature Mode Decomposition
 from ._fmd import FMD
 
@@ -155,6 +158,7 @@ Adaptive Polymorphic Mode Decomposition         |    APMD
 Empirical Wavelet Transform                     |    EWT
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Multivariate Jump Plus AM-FM Mode Decomposition |    MJMD
+Successive Jump and Mode Decomposition          |    SJMD / SMJMD
 Feature Mode Decomposition                      |    FMD
 Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
@@ -196,6 +200,8 @@ __all__ = [
     "EWT",
     "JMD",
     "MJMD",
+    "SJMD",
+    "SMJMD",
     "FMD",
     "Moving_Decomp",
     "STL",
