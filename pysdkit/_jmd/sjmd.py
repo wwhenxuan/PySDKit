@@ -166,7 +166,10 @@ class SJMD(object):
                 err = np.linalg.norm(f_hat_temp - u_hat_i[:, :, 0].T) ** 2
             else:
                 err = np.linalg.norm(f_hat_temp - np.sum(u_hat_i, axis=2).T) ** 2
-            bic.append(2 * t_len * np.log(err + np.finfo(float).eps) + (3 * k) * np.log(2 * t_len))
+            bic.append(
+                2 * t_len * np.log(err + np.finfo(float).eps)
+                + (3 * k) * np.log(2 * t_len)
+            )
             if k > 1 and bic[-1] > bic[-2]:
                 stop = True
         elif stopc == 3:
@@ -288,9 +291,9 @@ class SJMD(object):
                                 - u_hat_l[:, c, n + 1]
                             )
                         )
-                        den_g = 1.0 + 2.0 * (alpha_val**2) * (
-                            omega_freqs - omega_l[n]
-                        ) ** 4
+                        den_g = (
+                            1.0 + 2.0 * (alpha_val**2) * (omega_freqs - omega_l[n]) ** 4
+                        )
                         g_hat_plus[:, c, n + 1] = num_g / den_g
 
                     # shared / single center frequency
@@ -311,9 +314,7 @@ class SJMD(object):
                     u_td = np.zeros((n_ch, t_len), dtype=float)
                     fr_td = np.zeros((n_ch, t_len), dtype=float)
                     for c in range(n_ch):
-                        u_td[c, :] = np.real(
-                            np.fft.ifft(np.fft.ifftshift(u_hat[:, c]))
-                        )
+                        u_td[c, :] = np.real(np.fft.ifft(np.fft.ifftshift(u_hat[:, c])))
                         fr_td[c, :] = np.real(
                             np.fft.ifft(np.fft.ifftshift(g_hat[:, c]))
                         )
