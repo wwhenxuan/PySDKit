@@ -173,7 +173,7 @@ class HVD(object):
             return imfs
 
 
-def make_window_real_valued(H, N):
+def make_window_real_valued(H: np.ndarray, N: int) -> np.ndarray:
     """
     Make window real valued
 

@@ -41,7 +41,7 @@ class RLMD(object):
         sifting_stopping_mode: Optional[str] = "liu",
         min_peak: Optional[int] = 3,
         min_ratio: Optional[float] = 0.001,
-    ):
+    ) -> None:
         """
         The above parameters are the default parameters of the algorithm.
         Please modify and adjust them according to the specific data when using them.
@@ -92,7 +92,7 @@ class RLMD(object):
         np.ndarray,
         np.ndarray,
     ]:
-        """"""
+        """Initialize the input signal."""
         # get the length of inputs signal
         nx = signal.shape[0]
 
