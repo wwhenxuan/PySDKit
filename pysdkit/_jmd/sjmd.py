@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on 2025/07/20
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+@author: Rongkun Zhu
+@email: 25481568@life.hkbu.edu.hk
 
 Successive Jump and Mode Decomposition (SJMD / SMJMD).
 
