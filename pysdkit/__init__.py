@@ -85,6 +85,9 @@ from ._apmd import APMD
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
+# Empirical Wavelet Transform for 2D Images
+from ._ewt import ewt2d, EWT2D
+
 # Jump Plus AM-FM Mode Decomposition
 from ._jmd import JMD
 
@@ -156,6 +159,7 @@ Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
 Adaptive Local Iterative Filtering              |    ALIF
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Empirical Wavelet Transform                     |    EWT
+Empirical Wavelet Transform for 2D Image        |    EWT2D
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Multivariate Jump Plus AM-FM Mode Decomposition |    MJMD
 Successive Jump and Mode Decomposition          |    SJMD / SMJMD
@@ -198,6 +202,8 @@ __all__ = [
     "APMD",
     "ewt",
     "EWT",
+    "ewt2d",
+    "EWT2D",
     "JMD",
     "MJMD",
     "SJMD",
