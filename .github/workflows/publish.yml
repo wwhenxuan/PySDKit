@@ -1,4 +1,5 @@
-# Publish PySDKit to PyPI when a version tag is pushed, e.g. v0.4.31
+# Publish PySDKit to PyPI when a version tag is pushed, e.g. 0.4.31
+# (matches this repo's existing tag style: 0.4.30, 0.4.29, ... without a "v" prefix)
 #
 # One-time setup on PyPI (Trusted Publishing):
 #   1. https://pypi.org/manage/project/PySDKit/settings/publishing/
@@ -12,16 +13,18 @@
 # Release steps:
 #   1. Bump pysdkit/__init__.py -> __version__ = "x.y.z"
 #   2. Commit and push to main
-#   3. Create and push a matching tag:
-#        git tag v0.4.31
-#        git push origin v0.4.31
+#   3. Create and push a matching tag (same style as before):
+#        git tag 0.4.31
+#        git push origin 0.4.31
 
 name: Publish to PyPI
 
 on:
   push:
     tags:
-      - "v*"
+      # Match tags like 0.4.31 (this repo's convention). Also accept v0.4.31.
+      - "[0-9]+.[0-9]+.[0-9]+*"
+      - "v[0-9]+.[0-9]+.[0-9]+*"
   workflow_dispatch:
 
 permissions:
