@@ -16,3 +16,5 @@ from .acmd import ACMD
 from .vme import VME
 
 from .ovmd import OVMD
+
+from .svmd import svmd, SVMD

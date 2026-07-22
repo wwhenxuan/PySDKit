@@ -61,6 +61,9 @@ from ._vmd import VME
 # Orthogonalized Variational Mode Decomposition
 from ._vmd import OVMD
 
+# Successive Variational Mode Decomposition
+from ._vmd import svmd, SVMD
+
 # Variational Mode Decomposition for 2D Image
 from ._vmd2d import VMD2D
 
@@ -151,6 +154,7 @@ Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
 Orthogonalized Variational Mode Decomposition   |    OVMD
+Successive Variational Mode Decomposition       |    SVMD
 Variational Mode Decomposition for 2D Image     |    VMD2D
 Compact VMD for 2D Image                        |    CVMD2D
 Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
@@ -193,6 +197,8 @@ __all__ = [
     "MVMD",
     "VME",
     "OVMD",
+    "svmd",
+    "SVMD",
     "VMD2D",
     "CVMD2D",
     "VNCMD",

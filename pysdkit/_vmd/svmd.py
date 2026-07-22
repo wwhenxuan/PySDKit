@@ -3,399 +3,484 @@
 Created on 2024/6/2 17:54
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
+Successive Variational Mode Decomposition (SVMD).
+
+Unlike classical VMD, which extracts K modes concurrently and therefore
+requires a known mode count, SVMD extracts compact-spectrum modes
+**one by one**.  At each stage the residual / previously extracted modes
+are discouraged from overlapping the mode of interest, and a stopping
+criterion decides when to halt.
+
+Mojtaba Nazari, Sayed Mahmoud Sakhaei.
+Successive Variational Mode Decomposition,
+Signal Processing 174 (2020) 107610.
+https://doi.org/10.1016/j.sigpro.2020.107610
 """
+from __future__ import annotations
+
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
 from numpy.linalg import norm
 from scipy.signal import savgol_filter
 
-from pysdkit._vmd.base import Base
-
-from typing import Optional, Tuple
+from .base import Base
 
 
 class SVMD(Base):
     """
-    Successive variational mode decomposition.
-    Mojtaba Nazari, Sayed Mahmoud Sakhaei.
-    Signal Processing 174 (2020) 107610.
+    Successive Variational Mode Decomposition.
+
+    SVMD extends the variational framework of VMD by extracting modes
+    successively.  Each new mode ``u_L`` is obtained by solving a constrained
+    optimization problem that enforces:
+
+    1. a compact spectrum around a center frequency ``ω_L`` (as in VMD);
+    2. little spectral overlap with previously extracted modes;
+    3. little spectral overlap with the residual signal.
+
+    Because modes are obtained one after another, the algorithm does **not**
+    require the number of modes ``K`` a priori.  Several stopping criteria
+    (noise power, exact reconstruction, BIC, power of the last mode) are
+    available.
+
+    Nazari & Sakhaei, Signal Processing, 174:107610, 2020.
     """
 
     def __init__(
         self,
-        max_alpha: int = 20000,
+        max_alpha: float = 20000,
         tau: float = 0.0,
         tol: float = 1e-6,
-        stopc: Optional[int] = 4,
+        stopc: int = 4,
         init_omega: int = 0,
         max_iter: int = 300,
-        poly_order: Optional[int] = 8,
-        window_length: Optional[int] = 25,
-        random_seed: Optional[int] = 42,
+        max_modes: int = 30,
+        poly_order: int = 8,
+        window_length: int = 25,
+        random_seed: int = 42,
     ) -> None:
         """
-        Input and Parameters:
-        :param max_alpha: the balancing parameter of the data-fidelity constraint (compactness of mode)
-        :param tau: time-step of the dual ascent. Set it to 0 in presence of high-level noise.
-        :param tol: tolerance of convergence criterion; typically around 1e-6.
-        :param stopc: the type of stoping criteria:
-               1 - In the Presence of Noise (or recommended for the signals with compact spectrums such as EEG);
-               2 - For Clean Signal (Exact Reconstruction);
-               3 - Bayesian Estimation Method;
-               4 - Power of the Last Mode (default).
-        :param init_omega: initialization type of center frequency (not necessary to set):
-               0- the center frequencies initiate from 0 (for each mode)
-               1- the center frequencies initiate randomly with this condition: each new initial value must not be equal to the center frequency of previously extracted modes.
-        :param max_iter: number of iterations to obtain each mode.
-        :param poly_order: Savitzky-Golay滤波器中多项式的阶数。
-        :param window_length: Savitzky-Golay滤波器中的滑动窗口长度（必须是奇数）。
-        :param random_seed: the random seed.
+        :param max_alpha: balancing parameter of the data-fidelity constraint
+            (compactness of each mode).  Typical values: 1e3–2e4.
+        :param tau: dual-ascent time step.  Set to 0 under high-level noise.
+        :param tol: relative convergence tolerance for each mode (≈ 1e-6).
+        :param stopc: stopping-criterion type
+            1 – residual power vs. estimated noise (compact spectra / EEG);
+            2 – exact reconstruction (clean signals);
+            3 – Bayesian information criterion (BIC);
+            4 – power of the last mode (default, as in the MATLAB toolbox).
+        :param init_omega: center-frequency initialisation
+            0 – start each mode at DC (default, usually sufficient);
+            1 – random initialisation avoiding previously found frequencies.
+        :param max_iter: maximum ADMM iterations used to refine each mode.
+        :param max_modes: hard upper bound on the number of extracted modes
+            (safety guard against non-termination).
+        :param poly_order: Savitzky–Golay polynomial order used for noise
+            estimation (stopc = 1).
+        :param window_length: Savitzky–Golay window length (must be odd).
+        :param random_seed: RNG seed for ``init_omega = 1``.
         """
         super().__init__()
-        # 对于SVMD算法的基本参数
-        self.max_alpha = max_alpha
-        self.tau = tau
-        self.tol = tol
-        self.stopc = stopc
-        self.init_omega = init_omega
-        # 配置Savitzky-Golay滤波器的参数
-        self.poly_order = poly_order
-        self.window_length = window_length
-        # 获取双精度浮点数的相对精度
+        self.max_alpha = float(max_alpha)
+        self.tau = float(tau)
+        self.tol = float(tol)
+        self.stopc = int(stopc)
+        self.init_omega = int(init_omega)
+        self.max_iter = int(max_iter)
+        self.max_modes = int(max_modes)
+        self.poly_order = int(poly_order)
+        self.window_length = int(window_length)
         self.eps = np.finfo(np.float64).eps
-        # 最大迭代次数
-        self.max_iter = max_iter
-        # 使用的随机数生成器
         self.rng = np.random.RandomState(seed=random_seed)
 
-    # def fmirror
-    def sgolayfilt(
+        if self.stopc not in (1, 2, 3, 4):
+            raise ValueError("stopc must be one of {1, 2, 3, 4}")
+        if self.init_omega not in (0, 1):
+            raise ValueError("init_omega must be 0 or 1")
+
+        self.signal: Optional[np.ndarray] = None
+        self.u: Optional[np.ndarray] = None
+        self.u_hat: Optional[np.ndarray] = None
+        self.omega: Optional[np.ndarray] = None
+
+    def __call__(
+        self, signal: np.ndarray, return_all: bool = False
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """Allow instances to be called like functions."""
+        return self.fit_transform(signal=signal, return_all=return_all)
+
+    def __str__(self) -> str:
+        return "Successive Variational Mode Decomposition (SVMD)"
+
+    # ------------------------------------------------------------------ #
+    # Helpers
+    # ------------------------------------------------------------------ #
+    def _sgolay(
         self,
         signal: np.ndarray,
         poly_order: Optional[int] = None,
         window_length: Optional[int] = None,
     ) -> np.ndarray:
-        """Filtering the input to estimate the noise"""
-        poly_order = self.poly_order if poly_order is None else poly_order
-        window_length = self.window_length if window_length is None else window_length
-        return savgol_filter(
-            x=signal, polyorder=poly_order, window_length=window_length
+        """Savitzky–Golay smoother used to estimate the noise floor."""
+        poly_order = self.poly_order if poly_order is None else int(poly_order)
+        window_length = (
+            self.window_length if window_length is None else int(window_length)
         )
+        if window_length % 2 == 0:
+            window_length += 1
+        if window_length > signal.size:
+            window_length = signal.size if signal.size % 2 == 1 else signal.size - 1
+        if window_length < poly_order + 2:
+            poly_order = max(1, window_length - 2)
+        return savgol_filter(signal, window_length=window_length, polyorder=poly_order)
 
-    @staticmethod
-    def fmirror_signal_noise(
-        signal: np.ndarray, signal_noise: np.ndarray, seq_len: int
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Mirroring the signal and noise part to extend"""
-        f_mir = np.zeros(seq_len // 2)
-        f_mir_noise = np.zeros(seq_len // 2)
-        f_mir[0 : seq_len // 2] = signal[seq_len // 2 - 1 :: -1]
-        f_mir_noise[0:, seq_len / 2] = signal_noise[seq_len / 2 - 1 :: -1]
-
-        f_mir = np.concatenate((f_mir, signal))
-        f_mir_noise = np.concatenate((f_mir_noise, signal_noise))
-
-        f_mir = np.concatenate((f_mir, signal[: seq_len // 2]))
-        f_mir_noise = np.concatenate((f_mir_noise, signal_noise[: seq_len // 2]))
-
-        return f_mir, f_mir_noise
-
-    def init_omega_L(self, fs: float) -> np.ndarray:
-        """Initialize the center frequencies"""
-
-        # Initializing the omega_d
-        omega_L = np.zeros(self.max_iter)
-
-        # Choose the initialization methods
+    def _init_omega_scalar(self, fs: float) -> float:
+        """Return the initial center frequency for a new mode."""
         if self.init_omega == 0:
-            omega_L[0] = 0
-        elif self.init_omega == 1:
-            omega_L[0] = np.exp(
-                np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()
+            return 0.0
+        return float(np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()))
+
+    def _reinit_omega(self, fs: float, omega_d: List[float]) -> Tuple[float, int]:
+        """
+        Draw a random ω that is at least ≈ 0.02 (normalised Hz) away from
+        previously extracted center frequencies.  Returns ``(omega, n2)``.
+        """
+        n2 = 0
+        omega = 0.0
+        while n2 < 300:
+            omega = float(
+                np.exp(np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand())
             )
-        else:
-            raise ValueError("the input param 'init_omega' must be 0 or 1!")
+            if len(omega_d) == 0 or np.min(np.abs(np.asarray(omega_d) - omega)) >= 0.02:
+                return omega, n2 + 1
+            n2 += 1
+        return omega, n2
 
-        return omega_L
-
+    # ------------------------------------------------------------------ #
+    # Main API
+    # ------------------------------------------------------------------ #
     def fit_transform(
         self,
         signal: np.ndarray,
+        return_all: bool = False,
         poly_order: Optional[int] = None,
         window_length: Optional[int] = None,
-    ):
-        """开始进行信号分解"""
-        # TODO: Part1---Start initializing the input signal of size [num_channels, seq_len]
-        seq_len = len(signal)
-        if seq_len % 2 > 0:
-            # Check the length of the signal
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+        """
+        Decompose a 1-D signal with SVMD.
+
+        :param signal: real-valued 1-D array (even length preferred; odd
+            length is truncated by one sample, matching the MATLAB code).
+        :param return_all: if True, also return spectra and center frequencies.
+        :param poly_order: optional override of the Savitzky–Golay order.
+        :param window_length: optional override of the Savitzky–Golay window.
+        :return: modes ``(L, N)``, optionally ``(u, u_hat, omega)``.
+        """
+        signal = np.asarray(signal, dtype=float).ravel()
+        if signal.size < 4:
+            raise ValueError("signal length must be at least 4 samples")
+
+        # MATLAB: discard the last sample if the length is odd
+        if signal.size % 2 == 1:
             signal = signal[:-1]
-            seq_len = seq_len - 1
+        save_T = signal.size
+        self.signal = signal
 
-        # Estimating the noise
-        y = self.sgolayfilt(
-            signal=signal, poly_order=poly_order, window_length=window_length
-        )
-        signal_noise = signal - y
+        # ---- Part 1: initialisation -----------------------------------
+        y = self._sgolay(signal, poly_order=poly_order, window_length=window_length)
+        signoise = signal - y
+        fs = 1.0 / save_T
 
-        fs = 1 / seq_len
+        # Mirror extension of the signal and of the estimated noise
+        f = self.fmirror(signal, save_T // 2)
+        fnoise = self.fmirror(signoise, save_T // 2)
 
-        # Mirroring the signal and noise part to expend
-        f, fnoise = self.fmirror_signal_noise(signal, signal_noise, seq_len=seq_len)
+        T = f.size
+        t = np.arange(1, T + 1, dtype=float) / T
+        omega_freqs = t - 0.5 - 1.0 / T
+        half = T // 2
 
-        # time domain (t -- >> 0: T)
-        T = len(f)
-        t = np.arange(1, T + 1) / T
-
-        # Set the update step
-        udiff = self.tol + self.eps
-        # Discretization of spectral domain
-        omega_freqs = t - 0.5 - 1 / T
-
-        # FFT of signal(and Hilbert transform concept=making it one-sided)
-        f_hat = self.fftshift(ts=self.fft(ts=f))
+        # One-sided FFT (Hilbert concept used by VMD / SVMD)
+        f_hat = self.fftshift(self.fft(f))
         f_hat_onesided = f_hat.copy()
-        f_hat_onesided[0 : T // 2] = 0
-        f_hat_n = self.fftshift(ts=self.fft(fnoise))
+        f_hat_onesided[:half] = 0.0
+
+        f_hat_n = self.fftshift(self.fft(fnoise))
         f_hat_n_onesided = f_hat_n.copy()
-        f_hat_n_onesided[0 : T // 2] = 0
+        f_hat_n_onesided[:half] = 0.0
+        noisepe = float(norm(f_hat_n_onesided, ord=2) ** 2)
 
-        # Noise power estimation
-        noisepe = norm(f_hat_n_onesided, ord=2) ** 2
+        N = self.max_iter
+        min_alpha = 10.0
 
-        # Initializing omega_d
-        omega_L = self.init_omega_L(fs=fs)
+        # Accumulated modes / filters / frequencies
+        modes_hat: List[np.ndarray] = []  # each: (T,) complex
+        omega_d: List[float] = []
+        alpha_hist: List[float] = []
+        h_rows: List[np.ndarray] = []  # filter rows for previously extracted modes
 
-        # The initial value of alpha
-        min_alpha = 10
-        # The initial value of alpha
-        Alpha = min_alpha
-        alpha = np.zeros(1)
+        # Stopping-criterion auxiliaries
+        polm_list: List[float] = []
+        polm_temp = 1.0
+        bic_list: List[float] = []
+        sigerror_list: List[float] = []
+        normind_list: List[float] = []
 
-        # Dual variables vector
-        lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
+        SC2 = 0
+        mode_idx = 0  # 0-based mode counter (= MATLAB l-1)
 
-        # Keeping changes of mode spectrum
-        u_hat_L = np.zeros([self.max_iter, len(omega_freqs)])
+        # ---- Part 2–6: successive extraction --------------------------
+        while SC2 != 1 and mode_idx < self.max_modes:
+            # Fresh ADMM state for the new mode
+            Alpha = min_alpha
+            omega_L = np.zeros(N, dtype=float)
+            n2 = 0
+            if self.init_omega == 0 or mode_idx == 0:
+                omega_L[0] = self._init_omega_scalar(fs)
+            else:
+                omega_L[0], n2 = self._reinit_omega(fs, omega_d)
 
-        # Main loop counter
-        n = 0  # TODO: 注意这里是从0还是从1开始
+            lambda_hat = np.zeros((N, T), dtype=complex)
+            u_hat_L = np.zeros((N, T), dtype=complex)
 
-        m = 0  # iteration counter for increasing alpha
-        SC2 = 0  # main stopping criteria index
-        l = 0  # the initial number of modes  TODO: 注意这里应该是0还是1
-        bf = 0  # bit flag to increase alpha
-        BIC = np.zeros(1)
+            udiff = self.tol + self.eps
+            n = 0  # 0-based iteration index (MATLAB n starts at 1)
+            m = 0.0
+            bf = 0
 
-        # Initialization of filter matrix
-        h_hat_Temp = np.zeros([2, len(omega_freqs)])
-        u_hat_Temp = np.zeros(
-            shape=(1, len(omega_freqs), 1)
-        )  # matrix 1 of modes  TODO:这里要注意
-        u_hat_i = np.zeros([1, len(omega_freqs)])  # matrix 2 of modes
+            h_sum = (
+                np.sum(np.vstack(h_rows), axis=0)
+                if len(h_rows) > 0
+                else np.zeros(T, dtype=float)
+            )
+            u_sum = (
+                np.sum(np.vstack(modes_hat), axis=0)
+                if len(modes_hat) > 0
+                else np.zeros(T, dtype=complex)
+            )
 
-        # Counter for initializing omega_L
-        n2 = 0
-
-        # Initializing Power of Last Mode index
-        polm = np.zeros(2)
-
-        omega_d_Temp = np.zeros(1)  # initialization of center frequencies vector1
-        sigerror = np.zeros(1)  # initializing signal error index for stopping
-        gamma = np.zeros(1)  # initializing gamma
-        normind = np.zeros(1)
-
-        # TODO: Part2---Main loop for iterative updates
-        while SC2 != 1:
+            # Outer α-growth loop --------------------------------------
             while Alpha < self.max_alpha + 1:
-                while udiff > self.tol and n < self.max_iter:
-                    # update u_L
-                    u_hat_L[n + 1, :] = (
-                        f_hat_onesided
-                        + ((Alpha**2) * (omega_freqs - omega_L[n]) ** 4) * u_hat_L[n, :]
-                        + lambda_vector[n, :] / 2
-                    ) / (
-                        1
-                        + (Alpha**2)
-                        * (omega_freqs - omega_L[n]) ** 4
-                        * ((1 + (2 * Alpha) * (omega_freqs - omega_L[n]) ** 2))
-                        + np.sum(h_hat_Temp)
+                # Inner ADMM loop --------------------------------------
+                while udiff > self.tol and n < N - 1:
+                    dw = omega_freqs - omega_L[n]
+                    dw2 = dw**2
+                    dw4 = dw2**2
+                    A2 = Alpha**2
+
+                    # Update mode spectrum û_L  (Eq. derived via ADMM)
+                    numer = (
+                        f_hat_onesided + (A2 * dw4) * u_hat_L[n] + lambda_hat[n] / 2.0
                     )
+                    denom = 1.0 + (A2 * dw4) * (1.0 + 2.0 * Alpha * dw2) + h_sum
+                    u_hat_L[n + 1] = numer / denom
 
-                    # update omega_L
-                    omega_L[n + 1] = (
-                        omega_freqs[T // 2 : T]
-                        * (np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2).T
-                    ) / np.sum(np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2)
-
-                    # update lambda dual ascent
-                    lambda_vector[n + 1, :] = lambda_vector[n, :] + self.tau * (
-                        f_hat_onesided
-                        - (
-                            u_hat_L[n + 1, :]
-                            + (
-                                (Alpha**2)
-                                * (omega_freqs - omega_L[n]) ** 4
-                                * (
-                                    f_hat_onesided
-                                    - u_hat_L[n + 1, :]
-                                    - np.sum(u_hat_i)
-                                    + lambda_vector[n, :] / 2
-                                )
-                                - np.sum(u_hat_i)
-                            )
-                            / np.sum(np.abs(u_hat_L[n + 1, T // 2 : T]) ** 2)
+                    # Update center frequency ω_L (positive frequencies only)
+                    power = np.abs(u_hat_L[n + 1, half:]) ** 2
+                    power_sum = np.sum(power)
+                    if power_sum > 0:
+                        omega_L[n + 1] = float(
+                            np.dot(omega_freqs[half:], power) / power_sum
                         )
-                    )
+                    else:
+                        omega_L[n + 1] = omega_L[n]
 
-                    udiff = self.eps
+                    # Dual ascent for λ
+                    if self.tau != 0.0:
+                        filter_num = (
+                            A2
+                            * dw4
+                            * (
+                                f_hat_onesided
+                                - u_hat_L[n + 1]
+                                - u_sum
+                                + lambda_hat[n] / 2.0
+                            )
+                            - u_sum
+                        )
+                        filter_den = 1.0 + A2 * dw4
+                        residual = f_hat_onesided - (
+                            u_hat_L[n + 1] + filter_num / filter_den + u_sum
+                        )
+                        lambda_hat[n + 1] = lambda_hat[n] + self.tau * residual
+                    else:
+                        lambda_hat[n + 1] = lambda_hat[n]
 
-                    # 1st loop criterion
-                    udiff = udiff + (
-                        1
-                        / T
-                        * (u_hat_L[n + 1, :] - u_hat_L[n, :])
-                        * np.conj((u_hat_L[n + 1, :] - u_hat_L[n, :]))
-                    ).T / (1 / T * (u_hat_L[n, :]) * np.conj((u_hat_L[n, :])).T)
-
-                    udiff = np.abs(udiff)
+                    # Relative spectral update
+                    diff = u_hat_L[n + 1] - u_hat_L[n]
+                    num = np.vdot(diff, diff).real / T
+                    den = np.vdot(u_hat_L[n], u_hat_L[n]).real / T + self.eps
+                    udiff = abs(num / den)
                     n += 1
 
-                # TODO: Part 3---Increasing Alpha to achieve a pure mode
-                if np.abs(m - np.log(self.max_alpha)) > 1:
-                    m = m + 1
+                # ---- Part 3: increase α toward max_alpha -------------
+                if abs(m - np.log(self.max_alpha)) > 1.0:
+                    m = m + 1.0
                 else:
                     m = m + 0.05
                     bf = bf + 1
 
-                if bf > 2:
-                    Alpha = Alpha + 1
+                if bf >= 2:
+                    Alpha = Alpha + 1.0
 
-                if Alpha <= (self.max_alpha - 1):
-                    # exp(SC1) <= (max_alpha)
+                if Alpha <= (self.max_alpha - 1.0):
                     if bf == 1:
-                        Alpha[0] = self.max_alpha - 1
+                        Alpha = self.max_alpha - 1.0
                     else:
-                        Alpha[0] = np.exp(m)
+                        Alpha = float(np.exp(m))
 
-                    omega_L = omega_L[n]
+                    # Keep the current ω / spectrum and restart ADMM
+                    omega_keep = float(omega_L[n])
+                    temp_ud = u_hat_L[n].copy()
 
-                    # Initializing
-                    udiff = self.tol + self.eps  # update step
-                    temp_ud = u_hat_L[
-                        n, :
-                    ]  # keeping the last update of the obtained mode
+                    udiff = self.tol + self.eps
+                    n = 0
+                    lambda_hat = np.zeros((N, T), dtype=complex)
+                    u_hat_L = np.zeros((N, T), dtype=complex)
+                    u_hat_L[0] = temp_ud
+                    omega_L = np.zeros(N, dtype=float)
+                    omega_L[0] = omega_keep
 
-                    n = 0  # loop counter  TODO: 注意这里是1还是0
+            # ---- Part 4: store the converged mode --------------------
+            # Last written iterate is index n (MATLAB uses u_hat_L(n,:)
+            # after the while, with ω from the previous step).
+            mode_spectrum = u_hat_L[n].copy()
+            omega_val = float(omega_L[max(n - 1, 0)])
+            if omega_val <= 0.0 and n > 0:
+                # Fall back to the last strictly positive ω, matching
+                # MATLAB ``omega_L = omega_L(omega_L > 0)``.
+                pos = omega_L[omega_L > 0]
+                omega_val = float(pos[-1]) if pos.size > 0 else float(omega_L[n])
 
-                    lambda_vector = np.zeros([self.max_iter, len(omega_freqs)])
-                    u_hat_L = np.zeros([self.max_iter, len(omega_freqs)])
-                    u_hat_L[n, :] = temp_ud
+            modes_hat.append(mode_spectrum)
+            omega_d.append(omega_val)
+            alpha_hist.append(float(Alpha))
 
-            # TODO: Part 4---Saving the Modes and Center Frequencies
-            omega_L = omega_L[omega_L > 0]
-            u_hat_Temp[0, :, l] = u_hat_L[n, :]
-            omega_d_Temp[l] = omega_L[n - 1, 0]
-
-            alpha[l] = Alpha
-            Alpha[0] = min_alpha
-            bf = 0
-
-            # Initializing omega_L
-            if self.init_omega > 0:
-                ii = 0
-                while ii < 1 and n2 < 300:
-                    omega_L = np.sort(
-                        np.exp(
-                            np.log(fs) + (np.log(0.5) - np.log(fs)) * self.rng.rand()
-                        )
-                    )
-
-                    checkp = np.abs(omega_d_Temp - omega_L)
-
-                    if len(np.where(checkp < 0.02)[1]) <= 0:
-                        # It will continue if difference between previous vector of omega_d and the current random omega_plus is about 2Hz
-                        ii = 1
-                    n2 += 1
-            else:
-                omega_L = 0
-
-            # Update step
-            udiff = self.tol + self.eps
-
-            lambda_vector = np.zeros(shape=[self.max_iter, len(omega_freqs)])
-
-            gamma[l] = 1
-
-            h_hat_Temp[l, :] = gamma[l] / (
-                (alpha[l] ** 2) * (omega_freqs - omega_d_Temp[l]) ** 4
+            # Filter that suppresses this mode in subsequent extractions
+            gamma = 1.0
+            h_row = gamma / (
+                (alpha_hist[-1] ** 2) * (omega_freqs - omega_d[-1]) ** 4 + self.eps
             )
+            h_rows.append(h_row)
 
-            # Keeping the last desired mode as one of the extracted modes
-            u_hat_i[l, :] = u_hat_Temp[0, :, l]
+            # ---- Part 5: stopping criteria ---------------------------
+            u_stack = np.vstack(modes_hat)
+            residual = f_hat_onesided - np.sum(u_stack, axis=0)
 
-            # TODO: Part 5---Stopping Criteria
-            if self.stopc is not None:
-                # Checking the stopping criteria
+            if self.stopc == 1:
+                # Residual power vs. estimated noise power
+                sigerror = float(norm(residual, ord=2) ** 2)
+                sigerror_list.append(sigerror)
+                if n2 >= 300 or sigerror <= round(noisepe):
+                    SC2 = 1
 
-                if self.stopc == 1:
-                    # In the presence of noise
-                    if u_hat_i.shape[0] == 1:
-                        sigerror[l] = norm((f_hat_onesided - u_hat_L), ord=2) ** 2
-                    else:
-                        sigerror[l] = (
-                            norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
-                        )
+            elif self.stopc == 2:
+                # Exact reconstruction (relative residual energy)
+                sum_u = np.sum(u_stack, axis=0)
+                ni = (norm(sum_u - f_hat_onesided) ** 2 / T) / (
+                    norm(f_hat_onesided) ** 2 / T + self.eps
+                )
+                normind_list.append(float(ni))
+                if n2 >= 300 or ni < 0.005:
+                    SC2 = 1
 
-                    if n2 >= 300 or sigerror[l] <= np.round(noisepe):
+            elif self.stopc == 3:
+                # Bayesian information criterion
+                sigerror = float(norm(residual, ord=2) ** 2)
+                sigerror_list.append(sigerror)
+                # MATLAB: BIC(l) = 2*T*log(sigerror) + (3*l)*log(2*T)
+                # with 1-based l = mode_idx + 1
+                bic = 2 * T * np.log(max(sigerror, self.eps)) + (
+                    3 * (mode_idx + 1)
+                ) * np.log(2 * T)
+                bic_list.append(float(bic))
+                if mode_idx >= 1 and bic_list[-1] > bic_list[-2]:
+                    SC2 = 1
+
+            else:
+                # stopc == 4: power of the last mode (default)
+                mode_l = modes_hat[-1]
+                omega_l = omega_d[-1]
+                # After α-growth, Alpha sits near / above max_alpha
+                A = float(Alpha)
+                filt = (4.0 * A * mode_l) / (
+                    1.0 + 2.0 * A * (omega_freqs - omega_l) ** 2
+                )
+                polm_val = float(norm(filt * np.conj(mode_l), ord=2))
+                if mode_idx < 1:
+                    polm_temp = polm_val if polm_val != 0 else 1.0
+                    polm_list.append(1.0)
+                else:
+                    polm_list.append(polm_val / (polm_temp + self.eps))
+                    if abs(polm_list[-1] - polm_list[-2]) < 0.001:
                         SC2 = 1
 
-                elif self.stopc == 2:
-                    # Exact Reconstruction
-                    sum_u = np.sum(u_hat_Temp[0, :])  # sum of current obtained modes
-                    normind[l] = (
-                        (1 / T)
-                        * (norm(sum_u - f_hat_onesided, ord=2) ** 2)
-                        / ((1 / T) * norm(f_hat_n_onesided, ord=2) ** 2)
-                    )
-                    if n2 >= 300 or normind[l] < 0.005:
-                        SC2 = 1
+            # ---- Part 6: prepare the next mode -----------------------
+            mode_idx += 1
 
-                elif self.stopc == 3:
-                    # Bayesian Method
-                    if u_hat_i.shape[0] == 1:
-                        sigerror[l] = norm((f_hat_onesided - u_hat_i), ord=2) ** 2
-                    else:
-                        sigerror[l] = (
-                            norm((f_hat_onesided - np.sum(u_hat_i)), ord=2) ** 2
-                        )
+        if len(modes_hat) == 0:
+            raise RuntimeError("SVMD failed to extract any mode")
 
-                    BIC[l] = 2 * T * np.log(sigerror[l]) + (3 * (l + 1)) * np.log(2 * T)
+        # ---- Part 7: signal reconstruction ---------------------------
+        L = len(modes_hat)
+        omega = np.asarray(omega_d, dtype=float)
 
-                    if l > 0:
-                        if BIC[l] > BIC[l - 1]:
-                            SC2 = 1
+        u_hat_full = np.zeros((T, L), dtype=complex)
+        stacked = np.vstack(modes_hat).T  # (T, L)
+        # Hermitian completion identical to VMD / MATLAB SVMD
+        idxs = np.flip(np.arange(1, half + 1), axis=0)
+        u_hat_full[half:T, :] = stacked[half:T, :]
+        u_hat_full[idxs, :] = np.conj(stacked[half:T, :])
+        u_hat_full[0, :] = np.conj(u_hat_full[-1, :])
 
-                elif self.stopc == 4:
-                    # Power of the last mode
-                    if l < 1:
-                        polm[l] = norm(
-                            (
-                                4
-                                * Alpha
-                                * u_hat_i[l, :]
-                                / (
-                                    1
-                                    + 2
-                                    * Alpha
-                                    * (omega_freqs - omega_d_Temp[l, :]) ** 2
-                                )
-                            )
-                            * u_hat_i[l, :].T,
-                            ord=2,
-                        )
-                        polm_temp = polm[l]
-                        polm[l] = polm[l] / np.max(polm_temp)
-                    else:
-                        polm[l] = norm(
-                            (4 * Alpha * u_hat_i[l, :] / (1 + 2 * Alpha * ()))
-                        )
+        u = np.zeros((L, T), dtype=float)
+        for ell in range(L):
+            u[ell, :] = np.real(self.ifft(self.ifftshift(u_hat_full[:, ell])))
+
+        # Sort by ascending center frequency
+        order = np.argsort(omega)
+        omega = omega[order]
+        u = u[order, :]
+
+        # Remove the mirrored borders
+        u = u[:, T // 4 : 3 * T // 4]
+
+        # Recompute spectra on the cropped modes
+        u_hat = np.zeros((save_T, L), dtype=complex)
+        for ell in range(L):
+            u_hat[:, ell] = self.fftshift(self.fft(u[ell, :]))
+
+        self.u = u
+        self.u_hat = u_hat
+        self.omega = omega
+
+        if return_all:
+            return u, u_hat, omega
+        return u
+
+
+def svmd(
+    signal: np.ndarray,
+    max_alpha: float = 20000,
+    tau: float = 0.0,
+    tol: float = 1e-6,
+    stopc: int = 4,
+    init_omega: int = 0,
+    max_iter: int = 300,
+    return_all: bool = False,
+) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    """
+    Functional interface to Successive Variational Mode Decomposition.
+
+    See :class:`SVMD` for parameter descriptions.
+    """
+    return SVMD(
+        max_alpha=max_alpha,
+        tau=tau,
+        tol=tol,
+        stopc=stopc,
+        init_omega=init_omega,
+        max_iter=max_iter,
+    ).fit_transform(signal=signal, return_all=return_all)
