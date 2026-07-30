@@ -4,6 +4,7 @@ Created on 2025/02/01 22:06:04
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import warnings
 import numpy as np
 from numpy import ndarray

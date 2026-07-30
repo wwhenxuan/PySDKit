@@ -2,6 +2,7 @@
 """
 Unit tests for JMD and MJMD.
 """
+
 import unittest
 import numpy as np
 

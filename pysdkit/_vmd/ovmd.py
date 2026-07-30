@@ -11,6 +11,7 @@ Orthogonalized Variational Mode Decomposition,
 Signal Processing, 239:110251, 2026.
 https://doi.org/10.1016/j.sigpro.2025.110251
 """
+
 from __future__ import annotations
 
 from typing import Optional, Tuple, Union

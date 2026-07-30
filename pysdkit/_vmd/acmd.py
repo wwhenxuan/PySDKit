@@ -4,6 +4,7 @@ Created on 2025/01/11 10:33:21
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from numpy.linalg import norm
 from scipy.integrate import cumulative_trapezoid

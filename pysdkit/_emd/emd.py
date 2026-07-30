@@ -6,6 +6,7 @@ Created on Sat Mar 4 21:58:54 2024
 
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
+
 import numpy as np
 from numpy import ndarray
 from scipy.interpolate import interp1d

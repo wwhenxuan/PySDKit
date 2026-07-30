@@ -5,6 +5,7 @@ Created on Sat Mar 5 22:09:45 2024
 @email: wwhenxuan@gmail.com
 The following code is mainly used to find extreme points in the EMD algorithm
 """
+
 import numpy as np
 from scipy.interpolate import (
     Akima1DInterpolator,

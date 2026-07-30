@@ -4,6 +4,7 @@ Created on 2025/02/12 11:36:44
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 # 排列熵
 # The Permutation Entropy
 from ._permutation_entropy import permutation_entropy

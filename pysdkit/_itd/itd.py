@@ -4,6 +4,7 @@ Created on 2025/01/12 12:24:54
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 
 from scipy.signal import find_peaks

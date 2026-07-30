@@ -8,6 +8,7 @@ Multivariate Jump Plus AM-FM Mode Decomposition (MJMD).
 
 Faithful port of the authors' MATLAB ``MJMD.m``.
 """
+
 from __future__ import annotations
 
 from typing import Optional, Tuple, Union

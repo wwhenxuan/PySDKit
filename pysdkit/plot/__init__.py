@@ -5,6 +5,7 @@ Created on Sat Mar 4 21:31:05 2024
 @email: wwhenxuan@gmail.com
 Some auxiliary function modules for data visualization in the PySDKit library
 """
+
 # Visualize the original input signal and the decomposed IMFs on a 2D plane
 from ._plot_imfs import plot_IMFs
 

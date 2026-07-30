@@ -7,6 +7,7 @@ The following code is mainly used to Performs extrapolation on edges by adding e
 
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
+
 import numpy as np
 from typing import Tuple, Optional
 

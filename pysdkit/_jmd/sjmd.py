@@ -9,6 +9,7 @@ Successive Jump and Mode Decomposition (SJMD / SMJMD).
 Faithful port of the authors' MATLAB ``SJMD.m``.
 One implementation covers both univariate (SJMD) and multivariate (SMJMD).
 """
+
 from __future__ import annotations
 
 from typing import List, Optional, Tuple, Union

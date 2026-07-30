@@ -4,6 +4,7 @@ Created on 2025/02/02 16:47:10
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from numpy import fft
 from matplotlib import pyplot as plt

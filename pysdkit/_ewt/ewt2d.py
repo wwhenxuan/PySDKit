@@ -27,6 +27,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/42141-empirical-wavelet-tra
 Original Python reference:
 https://github.com/basile-h/EWT-Python  (repo/EWT-Python in this project)
 """
+
 from __future__ import annotations
 
 import numpy as np

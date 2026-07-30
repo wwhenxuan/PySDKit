@@ -4,6 +4,7 @@ Created on 2025/07/22 10:08:57
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import unittest
 import numpy as np
 
@@ -112,7 +113,7 @@ class KNNTest(unittest.TestCase):
         # Fit the data
         knn.fit(X, y)
         # Predict labels
-        (y_pred, y_prob) = knn.predict(X)
+        y_pred, y_prob = knn.predict(X)
 
         # Verify that labels match before and after prediction
         self.assertEqual(
@@ -137,7 +138,7 @@ class KNNTest(unittest.TestCase):
         knn = KNN(n_neighbors=1)
 
         # Fit the data and predict results
-        (y_pred, y_prob) = knn.fit_transform(X, y, X)
+        y_pred, y_prob = knn.fit_transform(X, y, X)
 
         # Verify that labels match before and after prediction
         self.assertEqual(
@@ -162,7 +163,7 @@ class KNNTest(unittest.TestCase):
         knn = KNN(n_neighbors=1)
 
         # Fit the data and predict results
-        (y_pred, y_prob) = knn(X, y, X)
+        y_pred, y_prob = knn(X, y, X)
 
         # Verify that labels match before and after prediction
         self.assertEqual(

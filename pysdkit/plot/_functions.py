@@ -5,6 +5,7 @@ Created on Sat Mar 4 21:31:05 2024
 @email: wwhenxuan@gmail.com
 Some auxiliary function modules for data visualization in the PySDKit library
 """
+
 import random
 from matplotlib import pyplot as plt
 from matplotlib.colors import rgb2hex

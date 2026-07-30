@@ -5,6 +5,7 @@ Created on 2025/02/04 13:10:33
 @email: wwhenxuan@gmail.com
 We refactored from https://github.com/mariogrune/MEMD-Python-
 """
+
 import numpy as np
 import warnings
 

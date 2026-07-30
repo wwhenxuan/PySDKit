@@ -35,7 +35,7 @@ def diagonal_average(
     """
 
     # Get the number of rows and columns in the matrix
-    (rows, columns) = matrix.shape
+    rows, columns = matrix.shape
 
     # Calculate the total number of diagonals in the matrix
     n_diags = rows + columns - 1
@@ -123,7 +123,7 @@ def get_diagonal(
     >>> print(get_diagonal(b,1,reverse=True))  # 1 left backward diagonal
     """
     # Get the number of rows and columns in the matrix
-    (rows, columns) = matrix.shape
+    rows, columns = matrix.shape
 
     # Calculate the total number of diagonals in the matrix
     n_diags = rows + columns - 1
@@ -195,7 +195,7 @@ def _length_of_diag_(matrix: np.ndarray, idx):
     matrix = np.asarray(matrix)
 
     # Get the number of rows and columns in the matrix
-    (rows, columns) = matrix.shape
+    rows, columns = matrix.shape
 
     # Calculate the total number of diagonals in the matrix
     n_diags = rows + columns - 1

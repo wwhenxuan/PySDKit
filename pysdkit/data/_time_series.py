@@ -5,6 +5,7 @@ Created on 2025/02/10 18:35:29
 @email: wwhenxuan@gmail.com
 Generate time series test examples
 """
+
 import numpy as np
 from typing import Optional, Union
 

@@ -8,6 +8,7 @@ Adaptive Polymorphic Mode Decomposition (APMD).
 
 Huang Z. and Liu J., Digital Signal Processing, 161:104913, 2025.
 """
+
 from __future__ import annotations
 
 import time

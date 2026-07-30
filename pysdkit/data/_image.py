@@ -5,6 +5,7 @@ Created on 2025/02/02 13:01:46
 @email: wwhenxuan@gmail.com
 Generate samples for testing 2D image data
 """
+
 import numpy as np
 from os import path
 import requests

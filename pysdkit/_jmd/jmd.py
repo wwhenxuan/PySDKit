@@ -8,6 +8,7 @@ Jump Plus AM-FM Mode Decomposition (JMD).
 
 Faithful port of the authors' MATLAB ``JMD.m``.
 """
+
 from __future__ import annotations
 
 from typing import Optional, Tuple, Union

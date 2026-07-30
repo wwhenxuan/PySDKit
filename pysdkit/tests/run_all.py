@@ -16,6 +16,7 @@ Usage (from repository root):
 or:
     python pysdkit/tests/run_all.py
 """
+
 from __future__ import annotations
 
 import os

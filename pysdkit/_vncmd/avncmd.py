@@ -8,6 +8,7 @@ Adaptive Variational Nonlinear Chirp Mode Decomposition (AVNCMD).
 
 MATLAB reference: https://github.com/HauLiang/AVNCMD
 """
+
 from __future__ import annotations
 
 import numpy as np

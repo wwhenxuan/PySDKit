@@ -5,6 +5,7 @@ Created on 2025/02/11 00:19:03
 @email: wwhenxuan@gmail.com
 Generate 3D cube test sample
 """
+
 import numpy as np
 
 from typing import Optional, Union, Tuple, List

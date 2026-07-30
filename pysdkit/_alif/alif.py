@@ -6,6 +6,7 @@ MATLAB reference: https://github.com/Cicone/ALIF
 Paper: Cicone, A., Liu, J., Zhou, H. Adaptive Local Iterative Filtering for Signal
 Decomposition and Instantaneous Frequency analysis. ACHA, 41(2):384-411, 2016.
 """
+
 from __future__ import annotations
 
 import time

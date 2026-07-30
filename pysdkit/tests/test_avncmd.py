@@ -2,6 +2,7 @@
 """
 Unit tests for Adaptive Variational Nonlinear Chirp Mode Decomposition (AVNCMD).
 """
+
 import unittest
 import numpy as np
 

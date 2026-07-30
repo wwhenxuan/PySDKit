@@ -6,6 +6,7 @@ Created on Sat Mar 18 12:11:34 2024
 
 MATLAB code source https://www.mathworks.com/matlabcentral/fileexchange/64292-variational-nonlinear-chirp-mode-decomposition
 """
+
 import numpy as np
 from numpy.linalg import solve, norm
 from scipy.sparse import diags, eye

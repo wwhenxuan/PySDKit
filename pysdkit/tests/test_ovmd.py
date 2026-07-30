@@ -2,6 +2,7 @@
 """
 Unit tests for Orthogonalized Variational Mode Decomposition (OVMD).
 """
+
 import unittest
 import numpy as np
 

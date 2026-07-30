@@ -4,6 +4,7 @@ Iterative Filtering (IF) — subroutine used by Adaptive Local Iterative Filteri
 
 MATLAB reference: IF_v8_3.m from https://github.com/Cicone/ALIF
 """
+
 from __future__ import annotations
 
 import os

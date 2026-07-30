@@ -2,6 +2,7 @@
 """
 Unit tests for SJMD / SMJMD.
 """
+
 import unittest
 import numpy as np
 

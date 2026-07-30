@@ -4,6 +4,7 @@ Created on 2024/7/22 22:56
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 __all__ = [
     "generate_sin_signal",
     "generate_cos_signal",

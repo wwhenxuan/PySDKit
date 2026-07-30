@@ -4,6 +4,7 @@ Created on 2024/6/1 18:44
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from typing import Optional, Tuple, Union
 from .base import Base

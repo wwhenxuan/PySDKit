@@ -7,6 +7,7 @@ The following code is mainly used to find extreme points in the EMD algorithm
 
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
+
 import numpy as np
 from pysdkit.utils._process import not_duplicate, find_zero_crossings
 from typing import Tuple

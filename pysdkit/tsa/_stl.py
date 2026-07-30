@@ -4,6 +4,7 @@ Created on 2025/02/12 00:14:21
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from typing import Optional, Literal
 from scipy.linalg import lstsq

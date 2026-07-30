@@ -2,6 +2,7 @@
 """
 Unit tests for Adaptive Polymorphic Mode Decomposition (APMD).
 """
+
 import unittest
 import numpy as np
 

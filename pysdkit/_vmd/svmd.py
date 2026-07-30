@@ -17,6 +17,7 @@ Successive Variational Mode Decomposition,
 Signal Processing 174 (2020) 107610.
 https://doi.org/10.1016/j.sigpro.2020.107610
 """
+
 from __future__ import annotations
 
 from typing import List, Optional, Tuple, Union

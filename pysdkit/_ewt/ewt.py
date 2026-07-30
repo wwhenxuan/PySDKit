@@ -11,6 +11,7 @@ Available at: https://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=652
 Original Matlab toolbox: https://www.mathworks.com/matlabcentral/fileexchange/42141-empirical-wavelet-transforms
 Original Code from: https://github.com/vrcarva/ewtpy
 """
+
 import numpy as np
 from scipy.ndimage.filters import gaussian_filter
 from typing import Optional, Tuple, Union

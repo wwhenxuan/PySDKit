@@ -4,6 +4,7 @@ Created on 2025/02/01 22:30:40
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from numpy import floating
 from scipy.stats import mode

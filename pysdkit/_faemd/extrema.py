@@ -5,6 +5,7 @@ Created on 2025/02/24 13:20:36
 @email: wwhenxuan@gmail.com
 要不要考虑将这个函数移动到utils中
 """
+
 import numpy as np
 
 from typing import Tuple, Union

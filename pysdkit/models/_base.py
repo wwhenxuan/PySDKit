@@ -4,6 +4,7 @@ Created on 2025/07/21 15:34:55
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 
 from abc import ABC, abstractmethod

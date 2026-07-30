@@ -2,6 +2,7 @@
 """
 Tests for the Intrinsic Time-Scale Decomposition (ITD) algorithm.
 """
+
 import unittest
 import numpy as np
 

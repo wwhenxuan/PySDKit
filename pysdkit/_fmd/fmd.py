@@ -4,6 +4,7 @@ Created on 2025/01/12 00:05:39
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 
 import scipy.signal as signal

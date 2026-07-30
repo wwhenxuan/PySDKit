@@ -4,6 +4,7 @@ Created on 2025/02/03 18:36:18
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 from ._splines import akima, cubic, pchip, cubic_hermite, cubic_spline_3pts
 
 from ._find_extrema import find_extrema_parabol, find_extrema_simple

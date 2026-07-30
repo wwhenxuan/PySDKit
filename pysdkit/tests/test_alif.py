@@ -2,6 +2,7 @@
 """
 Unit tests for Adaptive Local Iterative Filtering (ALIF).
 """
+
 import unittest
 import numpy as np
 

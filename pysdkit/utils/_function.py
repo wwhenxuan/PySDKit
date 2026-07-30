@@ -6,11 +6,11 @@ Created on 2024/6/3 15:31
 
 This py includes a series of functional modules
 """
+
 import numpy as np
 from scipy import linalg
 
 from typing import Optional, Union, Tuple
-
 
 __all__ = [
     "max_min_normalization",

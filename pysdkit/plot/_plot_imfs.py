@@ -9,6 +9,7 @@ Created on Sat Mar 4 11:59:21 2024
 
 对分解后的频谱进行可视化
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 

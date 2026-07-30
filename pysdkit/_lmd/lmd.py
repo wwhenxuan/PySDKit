@@ -4,6 +4,7 @@ Created on 2025/01/31 21:35:18
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 """
+
 import numpy as np
 from scipy.signal import argrelextrema
 
