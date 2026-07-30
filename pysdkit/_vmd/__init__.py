@@ -18,3 +18,5 @@ from .vme import VME
 from .ovmd import OVMD
 
 from .svmd import svmd, SVMD
+
+from .stvmd import stvmd, STVMD

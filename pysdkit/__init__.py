@@ -64,6 +64,9 @@ from ._vmd import OVMD
 # Successive Variational Mode Decomposition
 from ._vmd import svmd, SVMD
 
+# Short-Time Variational Mode Decomposition
+from ._vmd import stvmd, STVMD
+
 # Variational Mode Decomposition for 2D Image
 from ._vmd2d import VMD2D
 
@@ -114,8 +117,7 @@ from ._emd import HHT
 
 
 def greet():
-    print(
-        r"""
+    print(r"""
  ____          ____   ____   _  __ _  _   
 |  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
 | |_) || | | |\___ \ | | | || ' / | || __|
@@ -125,14 +127,12 @@ def greet():
     
 A Python library for signal decomposition algorithms.
 https://github.com/wwhenxuan/PySDKit
-"""
-    )
+""")
 
 
 def print_functions():
     """"""
-    print(
-        """
+    print("""
 _______________________________________________________________
 Algorithm Name                                  | Abbreviation
 _______________________________________________________________
@@ -155,6 +155,7 @@ Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
 Orthogonalized Variational Mode Decomposition   |    OVMD
 Successive Variational Mode Decomposition       |    SVMD
+Short-Time Variational Mode Decomposition       |    STVMD
 Variational Mode Decomposition for 2D Image     |    VMD2D
 Compact VMD for 2D Image                        |    CVMD2D
 Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
@@ -172,8 +173,7 @@ Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
-"""
-    )
+""")
 
 
 __all__ = [
@@ -199,6 +199,8 @@ __all__ = [
     "OVMD",
     "svmd",
     "SVMD",
+    "stvmd",
+    "STVMD",
     "VMD2D",
     "CVMD2D",
     "VNCMD",
