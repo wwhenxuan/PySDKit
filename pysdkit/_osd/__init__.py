@@ -19,3 +19,5 @@ to replicating the given signal with the components. Our software provides a rob
 decomposition, which is guaranteed to find the globally optimal descomposition when the loss functions are all convex,
 and is a good heuristic when they are not.
 """
+
+from .swd import SWD, swd

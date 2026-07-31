@@ -46,6 +46,9 @@ from ._lmd import RLMD
 # Singular Spectral Analysis
 from ._ssa import SSA
 
+# Swarm Decomposition
+from ._osd import SWD, swd
+
 # Variational Mode Decomposition
 from ._vmd import vmd, VMD
 
@@ -117,7 +120,8 @@ from ._emd import HHT
 
 
 def greet():
-    print(r"""
+    print(
+        r"""
  ____          ____   ____   _  __ _  _   
 |  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
 | |_) || | | |\___ \ | | | || ' / | || __|
@@ -127,12 +131,14 @@ def greet():
     
 A Python library for signal decomposition algorithms.
 https://github.com/wwhenxuan/PySDKit
-""")
+"""
+    )
 
 
 def print_functions():
     """"""
-    print("""
+    print(
+        """
 _______________________________________________________________
 Algorithm Name                                  | Abbreviation
 _______________________________________________________________
@@ -150,6 +156,7 @@ Intrinsic Time-Scale Decomposition              |    ITD
 Local Mean Decomposition                        |    LMD
 Robust Local Mean Decomposition                 |    RLMD
 Singular Spectral Analysis                      |    SSA
+Swarm Decomposition                             |    SWD
 Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
@@ -173,7 +180,8 @@ Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
-""")
+"""
+    )
 
 
 __all__ = [
@@ -191,6 +199,8 @@ __all__ = [
     "LMD",
     "RLMD",
     "SSA",
+    "SWD",
+    "swd",
     "vmd",
     "VMD",
     "ACMD",

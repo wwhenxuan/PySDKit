@@ -272,9 +272,7 @@ class SWD(object):
             nperseg = self.welch_window or max(16, n // 8)
             nperseg = min(nperseg, n)
             noverlap = (
-                self.welch_noverlap
-                if self.welch_noverlap is not None
-                else nperseg // 2
+                self.welch_noverlap if self.welch_noverlap is not None else nperseg // 2
             )
             nfft = self.welch_nfft or int(2 ** np.ceil(np.log2(max(n, nperseg))))
             return welch(
