@@ -4,18 +4,24 @@ Created on Sat Mar 18 12:11:34 2024
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 
-MATLAB code source https://www.mathworks.com/matlabcentral/fileexchange/64292-variational-nonlinear-chirp-mode-decomposition
+MATLAB code source:
+https://www.mathworks.com/matlabcentral/fileexchange/64292-variational-nonlinear-chirp-mode-decomposition
 """
 
+from __future__ import annotations
+
 import numpy as np
-from numpy.linalg import solve, norm
-from scipy.sparse import diags, eye
+from numpy.linalg import norm
+from scipy.sparse import diags, eye as speye, csr_matrix
+from scipy.sparse.linalg import spsolve
 
 try:
     from scipy.integrate import cumulative_trapezoid
-except ImportError:
+except ImportError:  # pragma: no cover
     from scipy.integrate import cumtrapz as cumulative_trapezoid
-from typing import Tuple, Optional
+
+from typing import Optional, Tuple, Union
+
 from pysdkit._vmd.base import Base
 
 
@@ -23,7 +29,7 @@ class VNCMD(Base):
     """
     Variational Nonlinear Chirp Mode Decomposition
 
-    Chen S, Dong X, Peng Z, et al. Nonlinear chirp mode decomposition: A variational method[J].
+    Chen S, Dong X, Peng Z, et al. Nonlinear chirp mode decomposition: A variational method.
     IEEE Transactions on Signal Processing, 2017, 65(22): 6024-6037.
     """
 
@@ -37,315 +43,248 @@ class VNCMD(Base):
         max_iter: int = 300,
         tol: float = 1e-5,
         dtype: np.dtype = np.float64,
-    ):
+    ) -> None:
         """
-        :param eIF: initial instantaneous frequency (IF) time series for all the signal modes; each row of eIF corresponds to the IF of each mode
-        :param fs: sampling frequency
-        :param alpha: penalty parameter controling the filtering bandwidth of VNCMD;the smaller the alpha is, the narrower the bandwidth would be
-        :param beta: penalty parameter controling the smooth degree of the IF increment during iterations;the smaller the beta is, the more smooth the IF increment would be
-        :param var: the variance of the Gaussian white noise; if we set var to zero, the noise variable u (see the following code) will be dropped.
-        :param max_iter: the maximum number of iterations
-        :param tol: tolerance of convergence criterion; typically 1e-7, 1e-8, 1e-9...
-        :param dtype: data types used by all operations
+        :param eIF: initial instantaneous frequency (IF) time series for all modes;
+                    shape (K, N), each row is the IF of one mode
+        :param fs: sampling frequency (Hz)
+        :param alpha: penalty controlling the filtering bandwidth of VNCMD;
+                      smaller alpha -> narrower bandwidth
+        :param beta: penalty controlling smoothness of the IF increment;
+                     smaller beta -> smoother IF updates
+        :param var: variance of the Gaussian white noise; set to 0 to drop the
+                    noise slack variable ``u``
+        :param max_iter: maximum number of iterations
+        :param tol: tolerance of the convergence criterion
+        :param dtype: floating dtype used by internal arrays
         """
-
         self.fs = fs
-
-        self.eIF = eIF
+        self.eIF = None if eIF is None else np.asarray(eIF, dtype=dtype)
         if self.eIF is None:
             self.K, self.N = None, None
         else:
-            self.K, self.N = self.eIF.shape[0], self.eIF.shape[1]
+            self.K, self.N = self.eIF.shape
 
-        self.alpha = alpha
-        self.beta = beta
-        self.var = var
-
-        self.max_iter = max_iter
-        self.tol = tol
-
-        # 保存本次运算结果
-        self.IFmset = None
-        self.smset = None
-        self.IA = None
-
+        self.alpha = float(alpha)
+        self.beta = float(beta)
+        self.var = float(var)
+        self.max_iter = int(max_iter)
+        self.tol = float(tol)
         self.DTYPE = dtype
 
-    def __call__(self, signal: np.ndarray, eIF: Optional[np.ndarray] = None):
-        """allow instances to be called like functions"""
-        return self.fit_transform(signal=signal, eIF=eIF)
+        self.IFmset: Optional[np.ndarray] = None
+        self.smset: Optional[np.ndarray] = None
+        self.IA: Optional[np.ndarray] = None
+
+    def __call__(
+        self,
+        signal: np.ndarray,
+        eIF: Optional[np.ndarray] = None,
+        return_all: bool = False,
+    ):
+        return self.fit_transform(signal=signal, eIF=eIF, return_all=return_all)
 
     def __str__(self) -> str:
-        """Get the full name and abbreviation of the algorithm"""
         return "Variational Nonlinear Chirp Mode Decomposition (VNCMD)"
 
     @staticmethod
     def projec(vec: np.ndarray, var: float) -> np.ndarray:
+        """Projection onto the ball of radius ``sqrt(M * var)`` (MATLAB ``projec``)."""
+        vec = np.asarray(vec, dtype=float).ravel()
+        e = np.sqrt(vec.size * var)
+        nrm = norm(vec)
+        if nrm > e and nrm > 0:
+            return (e / nrm) * vec
+        return vec.copy()
+
+    def difference_matrix(self, n: int) -> csr_matrix:
         """
-        Projection operation.
+        Modified second-order difference matrix.
 
-        :param vec: The vector for projection.
-        :param var: The variance of the noise.
-        :return: numpy.ndarray: The projected vector.
+        MATLAB: ``oper = spdiags([e e2 e], -1:1, N, N)``
         """
-        M = len(vec)
-        e = np.sqrt(M * var)  # Upper bound determined by the noise level
-        u = vec.copy()  # Copy the input vector to avoid modifying the original
-
-        if np.linalg.norm(vec) > e:
-            u = (e / np.linalg.norm(vec)) * vec
-
-        return u
-
-    def difference_matrix(self, N: int) -> np.ndarray:
-        """
-        Constructs an NxN second-order difference matrix.
-
-        :param N: The size of the matrix.
-        :return: The second-order difference matrix.
-        """
-        # Create an K-element column vector filled with ones
-        e = np.ones(N, dtype=self.DTYPE)
-        # Create an K-element column vector filled with -2
-        e2 = -2 * np.ones(N, dtype=self.DTYPE)
-        # Set the first element of e2 to -1
+        e = np.ones(n, dtype=self.DTYPE)
+        e2 = -2 * np.ones(n, dtype=self.DTYPE)
         e2[0] = -1
-        # Set the last element of e2 to -1
         e2[-1] = -1
-
-        # Create an NxN matrix filled with zeros
-        oper = np.zeros((N, N), dtype=self.DTYPE)
-
-        # Fill the main diagonal with e2
-        np.fill_diagonal(oper, e2)
-        # Fill the first upper diagonal with 1s, leaving the last element
-        np.fill_diagonal(oper[1:], e[:-1])
-        # Fill the first lower diagonal with 1s, leaving the last element
-        np.fill_diagonal(oper[:, 1:], e[:-1])
-
-        return oper
+        return diags([e, e2, e], offsets=[-1, 0, 1], shape=(n, n), format="csr")
 
     def differ(self, y: np.ndarray, delta: float) -> np.ndarray:
         """
-        Compute the derivative of a discrete time series y.
+        Discrete derivative (MATLAB ``Differ.m``).
 
-        :param y: The input time series.
-        :param delta: The sampling time interval of y.
-        :return: numpy.ndarray: The derivative of the time series.
+        :param y: input series
+        :param delta: sampling interval (``1/fs``)
         """
-        L = len(y)
-        ybar = np.zeros(L - 2, dtype=self.DTYPE)
+        y = np.asarray(y, dtype=self.DTYPE).ravel()
+        l = y.size
+        if l < 2:
+            return np.zeros_like(y)
 
-        for i in range(1, L - 1):
-            ybar[i - 1] = (y[i + 1] - y[i - 1]) / (2 * delta)
-
-        # Prepend and append the boundary differences
-        ybar = np.concatenate(
-            (
-                np.array([(y[1] - y[0]) / delta], dtype=self.DTYPE),
-                ybar,
-                np.array([(y[-1] - y[-2]) / delta], dtype=self.DTYPE),
-            )
-        )
-
+        ybar = np.empty(l, dtype=self.DTYPE)
+        ybar[0] = (y[1] - y[0]) / delta
+        if l > 2:
+            ybar[1:-1] = (y[2:] - y[:-2]) / (2 * delta)
+        ybar[-1] = (y[-1] - y[-2]) / delta
         return ybar
 
-    def init_K_N(self, eIF: Optional[np.ndarray]) -> Tuple[int, int, np.ndarray]:
-        """Initialize the frequency and get its size"""
+    def init_K_N(
+        self, eIF: Optional[np.ndarray], signal: np.ndarray
+    ) -> Tuple[int, int, np.ndarray]:
         if eIF is not None:
-            K, N = eIF.shape[0], eIF.shape[1]
-        elif self.eIF is None:
-            raise ValueError()
+            eIF_arr = np.array(eIF, dtype=self.DTYPE, copy=True)
+        elif self.eIF is not None:
+            eIF_arr = np.array(self.eIF, dtype=self.DTYPE, copy=True)
         else:
-            K, N = self.K, self.N
-            eIF = self.eIF
-        return K, N, eIF
-
-    def fit_transform(self, signal: np.ndarray, eIF: Optional[np.ndarray] = None):
-        """
-        Execute VNCMD algorithm for signal decomposition
-
-        :param signal: the time domain signal (1D numpy array)  to be decomposed
-        :param eIF: initial instantaneous frequency (IF) time series for all the signal modes; each row of eIF corresponds to the IF of each mode
-        :return: - IFmset: the collection of the obtained IF time series of all the signal modes at each iteration
-                 - smset: the collection of the obtained signal modes at each iteration
-                 - IA: the finally estimated instantaneous amplitudes of the obtained signal modes
-        """
-        signal = signal.astype(self.DTYPE)
-        K, N, eIF = self.init_K_N(eIF=eIF)
-        t = np.arange(0, N, dtype=self.DTYPE) / self.fs
-
-        # Get the improved second-order difference matrix
-        oper = self.difference_matrix(N)
-        opedoub = np.dot(oper.T, oper)
-
-        # Used to store the demodulated orthogonal signal components
-        sinm, cosm = np.zeros((K, N), dtype=self.DTYPE), np.zeros(
-            (K, N), dtype=self.DTYPE
-        )
-
-        # Used to store the demodulated orthogonal signal components
-        xm, ym = np.zeros((K, N), dtype=self.DTYPE), np.zeros((K, N), dtype=self.DTYPE)
-
-        # Stores a collection of instantaneous frequency sequences of all signal modes obtained at each iteration
-        IFsetiter = np.zeros((K, N, self.max_iter + 1), dtype=self.DTYPE)
-        # Initialize the instantaneous frequency of the first iteration
-        IFsetiter[:, :, 0] = eIF
-
-        # Stores the collection of signal patterns obtained at each iteration
-        ssetiter = np.zeros((K, N, self.max_iter + 1), dtype=self.DTYPE)
-
-        # Lagrange multiplier, used to adjust constraints
-        lamuda = np.zeros(N, dtype=self.DTYPE)
-
-        # Initialize the variables defined above through loops
-        for i in range(K):
-            sinm[i, :] = np.sin(
-                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0),
-                dtype=self.DTYPE,
-            )
-            cosm[i, :] = np.cos(
-                2 * np.pi * cumulative_trapezoid(eIF[i, :], t, initial=0),
-                dtype=self.DTYPE,
+            raise ValueError(
+                "Initial instantaneous frequencies `eIF` of shape (K, N) are required."
             )
 
-            Bm = diags(
-                sinm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE
-            ).toarray()
-            Bdoubm = diags(
-                (sinm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE
-            ).toarray()
+        if eIF_arr.ndim != 2:
+            raise ValueError("`eIF` must be a 2-D array of shape (K, N).")
 
-            Am = diags(
-                cosm[i, :].T, offsets=0, shape=(N, N), dtype=self.DTYPE
-            ).toarray()
-            Adoubm = diags(
-                (cosm[i, :] ** 2).T, offsets=0, shape=(N, N), dtype=self.DTYPE
-            ).toarray()
+        k, n = eIF_arr.shape
+        if signal.size != n:
+            raise ValueError(
+                f"Signal length ({signal.size}) must match eIF length N={n}."
+            )
+        return k, n, eIF_arr
 
-            xm[i, :] = solve(2 / self.alpha * opedoub + Adoubm, np.dot(Am.T, signal))
-            ym[i, :] = solve(2 / self.alpha * opedoub + Bdoubm, np.dot(Bm.T, signal))
+    @staticmethod
+    def _diag(v: np.ndarray) -> csr_matrix:
+        return diags(v, offsets=0, shape=(v.size, v.size), format="csr")
 
-            ssetiter[i, :, 0] = xm[i, :] * cosm[i, :] + ym[i, :] * sinm[i, :]
+    def fit_transform(
+        self,
+        signal: np.ndarray,
+        eIF: Optional[np.ndarray] = None,
+        return_all: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Execute the VNCMD algorithm (faithful to MATLAB ``VNCMD.m``).
 
-        # iteration counter
-        iter = 0
+        :param signal: 1-D time-domain signal
+        :param eIF: optional initial IF array of shape (K, N)
+        :param return_all: if True, return full histories ``(IFmset, smset, IA)``;
+                           else return final ``(modes, IF, IA)`` with shape ``(K, N)``
+        """
+        signal = np.asarray(signal, dtype=self.DTYPE).ravel()
+        if self.fs is None:
+            raise ValueError("Sampling frequency `fs` must be provided.")
+        fs = float(self.fs)
 
-        # Indicates the change difference between the current iteration and the previous iteration
-        sDif = self.tol + 1
+        k, n, eIF_arr = self.init_K_N(eIF=eIF, signal=signal)
+        t = np.arange(n, dtype=self.DTYPE) / fs
+        dt = 1.0 / fs
 
-        # The cumulative sum
-        sum_x, sum_y = np.sum(xm * cosm, axis=0), np.sum(ym * sinm, axis=0)
-        sum_x, sum_y = np.squeeze(sum_x), np.squeeze(sum_y)
+        oper = self.difference_matrix(n)
+        opedoub = (oper.T @ oper).tocsr()
+        eye_n = speye(n, dtype=self.DTYPE, format="csr")
 
-        # Start main loop
-        while sDif > self.tol and iter <= self.max_iter:
-            # Gradually increase betathr during the cycle but not exceed beta.
-            betathr = 10 ** (iter / 36 - 10)
+        sinm = np.zeros((k, n), dtype=self.DTYPE)
+        cosm = np.zeros((k, n), dtype=self.DTYPE)
+        xm = np.zeros((k, n), dtype=self.DTYPE)
+        ym = np.zeros((k, n), dtype=self.DTYPE)
+
+        if_hist = np.zeros((k, n, self.max_iter + 1), dtype=self.DTYPE)
+        mode_hist = np.zeros((k, n, self.max_iter + 1), dtype=self.DTYPE)
+        if_hist[:, :, 0] = eIF_arr
+
+        lamuda = np.zeros(n, dtype=self.DTYPE)
+
+        for i in range(k):
+            phase = 2 * np.pi * cumulative_trapezoid(eIF_arr[i], t, initial=0)
+            sinm[i] = np.sin(phase)
+            cosm[i] = np.cos(phase)
+
+            am = self._diag(cosm[i])
+            bm = self._diag(sinm[i])
+            adoubm = self._diag(cosm[i] ** 2)
+            bdoubm = self._diag(sinm[i] ** 2)
+
+            xm[i] = spsolve(2 / self.alpha * opedoub + adoubm, am.T @ signal)
+            ym[i] = spsolve(2 / self.alpha * opedoub + bdoubm, bm.T @ signal)
+            mode_hist[i, :, 0] = xm[i] * cosm[i] + ym[i] * sinm[i]
+
+        # MATLAB uses 1-based iter starting at 1
+        it = 1
+        s_dif = self.tol + 1.0
+        sum_x = np.sum(xm * cosm, axis=0)
+        sum_y = np.sum(ym * sinm, axis=0)
+
+        while s_dif > self.tol and it <= self.max_iter:
+            betathr = 10 ** (it / 36.0 - 10.0)
             if betathr > self.beta:
                 betathr = self.beta
 
-            u = self.projec(
-                vec=signal - sum_x - sum_y - lamuda / self.alpha, var=self.var
-            )
+            u = self.projec(signal - sum_x - sum_y - lamuda / self.alpha, self.var)
 
-            for i in range(K):
-                Bm = diags(sinm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                Bdoubm = diags((sinm[i, :] ** 2).T, offsets=0, shape=(N, N)).toarray()
+            for i in range(k):
+                am = self._diag(cosm[i])
+                bm = self._diag(sinm[i])
+                adoubm = self._diag(cosm[i] ** 2)
+                bdoubm = self._diag(sinm[i] ** 2)
 
-                Am = diags(cosm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                Adoubm = diags((cosm[i, :] ** 2).T, offsets=0, shape=(N, N)).toarray()
-
-                # remove the relevant component from the sum
-                sum_x = sum_x - xm[i, :] * cosm[i, :]
-
-                xm[i, :] = np.linalg.solve(
-                    2 / self.alpha * opedoub + Adoubm,
-                    np.dot(Am.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T),
-                )
-                interx = xm[i, :] * cosm[i, :]
+                # x-update
+                sum_x = sum_x - xm[i] * cosm[i]
+                rhs = signal - sum_x - sum_y - u - lamuda / self.alpha
+                xm[i] = spsolve(2 / self.alpha * opedoub + adoubm, am.T @ rhs)
+                interx = xm[i] * cosm[i]
                 sum_x = sum_x + interx
 
-                sum_y = sum_y - ym[i, :] * sinm[i, :]
-                ym[i, :] = np.linalg.solve(
-                    2 / self.alpha * opedoub + Bdoubm,
-                    np.dot(Bm.T, (signal - sum_x - sum_y - u - lamuda / self.alpha).T),
-                )
-                sum_y = sum_y + ym[i, :] * sinm[i, :]
+                # y-update — do not restore ym*sinm until after IF / phase update
+                sum_y = sum_y - ym[i] * sinm[i]
+                rhs = signal - sum_x - sum_y - u - lamuda / self.alpha
+                ym[i] = spsolve(2 / self.alpha * opedoub + bdoubm, bm.T @ rhs)
 
-                # compute the derivative of the functions
-                xbar = self.differ(xm[i, :], self.fs)
-                ybar = self.differ(ym[i, :], self.fs)
+                # IF update (Differ uses sampling interval 1/fs)
+                xbar = self.differ(xm[i], dt)
+                ybar = self.differ(ym[i], dt)
+                denom = xm[i] ** 2 + ym[i] ** 2
+                denom = np.where(denom < 1e-30, 1e-30, denom)
+                delta_if = (xm[i] * ybar - ym[i] * xbar) / denom / (2 * np.pi)
+                delta_if = spsolve(2 / betathr * opedoub + eye_n, delta_if)
+                eIF_arr[i] = eIF_arr[i] - 0.5 * delta_if
 
-                # obtain the frequency increment by arctangent demodulation
-                deltaIF = (
-                    (xm[i, :] * ybar - ym[i, :] * xbar)
-                    / (xm[i, :] ** 2 + ym[i, :] ** 2)
-                    / 2
-                    / np.pi
-                )
-                # smooth the frequency increment by low pass filtering
-                deltaIF = solve(2 / betathr * opedoub + eye(N), deltaIF.T)
-                # update the IF
-                eIF[i, :] = eIF[i, :] - 0.5 * deltaIF.T
+                phase = 2 * np.pi * cumulative_trapezoid(eIF_arr[i], t, initial=0)
+                sinm[i] = np.sin(phase)
+                cosm[i] = np.cos(phase)
 
-                # update cos and sin functions
-                sinm[i, :] = np.sin(2 * np.pi * cumtrapz(eIF[i, :], t, initial=0))
-                cosm[i, :] = np.cos(2 * np.pi * cumtrapz(eIF[i, :], t, initial=0))
+                sum_x = sum_x - interx + xm[i] * cosm[i]
+                sum_y = sum_y + ym[i] * sinm[i]
+                mode_hist[i, :, it] = xm[i] * cosm[i] + ym[i] * sinm[i]
 
-                # update sums
-                sum_x = sum_x - interx + xm[i, :] * cosm[i, :]
-                sum_y = sum_y + ym[i, :] * sinm[i, :]
-                ssetiter[i, :, iter + 1] = xm[i, :] * cosm[i, :] + ym[i, :] * sinm[i, :]
-
-            IFsetiter[:, :, iter + 1] = eIF
-
-            # update the Lagrangian multiplier
+            if_hist[:, :, it] = eIF_arr
             lamuda = lamuda + self.alpha * (u + sum_x + sum_y - signal)
 
-            # restart scheme
+            # Restart scheme
             if norm(u + sum_x + sum_y - signal) > norm(signal):
-                lamuda = np.zeros(shape=(1, len(t)))
-                for i in range(K):
-                    Bm = diags(sinm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                    Bdoubm = diags(
-                        (sinm[i, :] ** 2).T, offsets=0, shape=(N, N)
-                    ).toarray()
+                lamuda = np.zeros(n, dtype=self.DTYPE)
+                for i in range(k):
+                    am = self._diag(cosm[i])
+                    bm = self._diag(sinm[i])
+                    adoubm = self._diag(cosm[i] ** 2)
+                    bdoubm = self._diag(sinm[i] ** 2)
+                    xm[i] = spsolve(2 / self.alpha * opedoub + adoubm, am.T @ signal)
+                    ym[i] = spsolve(2 / self.alpha * opedoub + bdoubm, bm.T @ signal)
+                    mode_hist[i, :, it] = xm[i] * cosm[i] + ym[i] * sinm[i]
+                sum_x = np.sum(xm * cosm, axis=0)
+                sum_y = np.sum(ym * sinm, axis=0)
 
-                    Am = diags(cosm[i, :].T, offsets=0, shape=(N, N)).toarray()
-                    Adoubm = diags(
-                        (cosm[i, :] ** 2).T, offsets=0, shape=(N, N)
-                    ).toarray()
+            s_dif = 0.0
+            for i in range(k):
+                prev = mode_hist[i, :, it - 1]
+                curr = mode_hist[i, :, it]
+                prev_n = norm(prev)
+                if prev_n > 0:
+                    s_dif += (norm(curr - prev) / prev_n) ** 2
 
-                    xm[i, :] = solve(
-                        2 / self.alpha * opedoub + Adoubm, np.dot(Am.T, signal)
-                    )
-                    ym[i, :] = solve(
-                        2 / self.alpha * opedoub + Bdoubm, np.dot(Bm.T, signal)
-                    )
+            it += 1
 
-                    ssetiter[i, :, iter + 1] = (
-                        xm[i, :] * cosm[i, :] + ym[i, :] * sinm[i, :]
-                    )
-
-                sum_x, sum_y = np.sum(xm * cosm, axis=1), np.sum(ym * sinm, axis=1)
-
-            # compute the convergence index
-            sDif = 0
-            for i in range(K):
-                sDif += (
-                    norm(ssetiter[i, :, iter + 1] - ssetiter[i, :, iter])
-                    / norm(ssetiter[i, :, iter])
-                ) ** 2
-
-            # Increase the number of push iterations
-            iter += 1
-
-            print(sDif)
-
-        self.IFmset = IFsetiter[:, :, 0:iter]
-        self.smset = ssetiter[:, :, 0:iter]
+        self.IFmset = if_hist[:, :, :it]
+        self.smset = mode_hist[:, :, :it]
         self.IA = np.sqrt(xm**2 + ym**2)
 
-        # print(self.IFmset.shape, self.smset.shape)
-        return self.IFmset[:, :, -1], self.smset[:, :, -1], self.IA
+        if return_all:
+            return self.IFmset, self.smset, self.IA
+        return self.smset[:, :, -1], self.IFmset[:, :, -1], self.IA
