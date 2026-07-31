@@ -49,6 +49,9 @@ from ._ssa import SSA
 # Swarm Decomposition
 from ._osd import SWD, swd
 
+# Generalized Dispersion Mode Decomposition
+from ._gdmd import GDMD, gdmd
+
 # Variational Mode Decomposition
 from ._vmd import vmd, VMD
 
@@ -157,6 +160,7 @@ Local Mean Decomposition                        |    LMD
 Robust Local Mean Decomposition                 |    RLMD
 Singular Spectral Analysis                      |    SSA
 Swarm Decomposition                             |    SWD
+Generalized Dispersion Mode Decomposition       |    GDMD
 Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
@@ -201,6 +205,8 @@ __all__ = [
     "SSA",
     "SWD",
     "swd",
+    "GDMD",
+    "gdmd",
     "vmd",
     "VMD",
     "ACMD",
