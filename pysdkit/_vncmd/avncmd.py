@@ -464,29 +464,3 @@ def _intersect_indices(a: np.ndarray, b: np.ndarray) -> Tuple[np.ndarray, np.nda
     common = np.intersect1d(a, b, assume_unique=False)
     which = np.array([np.where(b == c)[0][0] for c in common], dtype=int)
     return common.astype(int), which
-
-
-if __name__ == "__main__":
-    # Demo aligned with repo/AVNCMD/Demo_AVNCMD.m (shortened for a quick check)
-    T = 1.0
-    fs = 2000.0
-    t = np.arange(0.0, T + 1.0 / fs, 1.0 / fs)
-
-    a1 = np.exp(-0.03 * t)
-    a2 = np.exp(-0.06 * t)
-    f_1t = 25 + 8 * t - 3 * t**2 + 0.4 * t**3
-    f_2t = 40 + 16 * t - 6 * t**2 + 0.4 * t**3
-
-    g_1t = a1 * np.cos(2 * np.pi * (0.8 + 25 * t + 4 * t**2 - 1 * t**3 + 0.1 * t**4))
-    g_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t**2 - 2 * t**3 + 0.1 * t**4))
-    g = g_1t + g_2t
-
-    iniIF = np.vstack([28.0 * np.ones_like(t), 48.0 * np.ones_like(t)])
-    avncmd = AVNCMD(beta=1e-6, tol=1e-5, max_iter=50)
-    estIF, estMode, estIA = avncmd.fit_transform(g, iniIF=iniIF, fs=fs)
-
-    print("estIF", estIF.shape, "estMode", estMode.shape, "estIA", estIA.shape)
-    print("IF1 RE", norm(estIF[0] - f_1t) / norm(f_1t))
-    print("IF2 RE", norm(estIF[1] - f_2t) / norm(f_2t))
-    print("Mode1 RE", norm(estMode[0] - g_1t) / norm(g_1t))
-    print("Mode2 RE", norm(estMode[1] - g_2t) / norm(g_2t))
