@@ -36,7 +36,7 @@ class SSA(object):
     def __init__(
         self,
         K: int = 3,
-        mode="covar",
+        mode: str = "traj",
         lags: Optional[int] = None,
         averaging: Optional[bool] = True,
         extra_size: Optional[bool] = False,
@@ -50,6 +50,9 @@ class SSA(object):
         :param averaging: if True, then mean of each diagonal will be taken for diagonal averaging instead of just summarizing (True, by default)
         :param extra_size: if True, than near doubled size of output will be returned
         """
+        if K < 1:
+            raise ValueError("K must be a positive integer")
+
         self.K = K
         self.mode = mode
         self.lags = lags
@@ -76,41 +79,56 @@ class SSA(object):
 
         # Make sure the data type is correct
         signal = np.asarray(signal)
+        if signal.ndim != 1 or signal.size < 2:
+            raise ValueError("signal must be a 1D array with at least 2 samples")
 
         # Get the length of the signal
         seq_len = signal.shape[0]
 
         # for toeplitz and hankel N_lags always = N
         if self.lags is None:
-            lags = seq_len // 2
+            lags = max(seq_len // 2, 2)
         else:
-            lags = self.lags
+            lags = int(self.lags)
+
+        if lags < 2 or lags >= seq_len:
+            raise ValueError(
+                f"lags must satisfy 2 <= lags < len(signal); got lags={lags}, len={seq_len}"
+            )
 
         # Whether to set the inversion
         reverse = False
         if self.mode in ["traj", "hankel", "trajectory", "caterpillar"]:
             reverse = True
 
-        # Generate lag matrix
+        # Generate lag / trajectory matrix
         base = lags_matrix(signal, lags=lags, mode=self.mode)
 
+        # R = X^H X; its eigenvectors are the right singular vectors of X
         R = np.dot(base.T, np.conj(base))
 
-        # create the eigen value
-        es, ev = linalg.eig(R)
-        es = np.sqrt(es) + self.EPSILON
+        # Hermitian eigendecomposition, sorted by eigenvalue magnitude (descending)
+        es, ev = linalg.eigh(R)
+        order = np.argsort(es)[::-1]
+        es = es[order]
+        ev = ev[:, order]
 
+        # Singular values σ = sqrt(λ); floor tiny / negative numerical values
+        singular = np.sqrt(np.maximum(es.real, 0.0)) + self.EPSILON
+
+        n_components = min(self.K, ev.shape[1])
         # Array used to store decomposition results
         imfs = np.zeros(
-            shape=(self.K, base.shape[0] + base.shape[1] - 1), dtype=signal.dtype
+            shape=(n_components, base.shape[0] + base.shape[1] - 1),
+            dtype=np.result_type(signal.dtype, np.float64),
         )
 
-        # Start the iteration loop
-        for i in range(self.K):
-            Ys = np.matrix(ev[:, i]) * es[i]
-            Vs = np.dot(base, Ys.H) / es[i]
-
-            hankel = np.outer(Ys, Vs)
+        # Reconstruct each elementary component via X_i = (X v_i) v_i^H
+        for i in range(n_components):
+            v = ev[:, i]
+            # Left singular vector direction (scaled): u σ = X v
+            xv = np.dot(base, v)
+            hankel = np.outer(xv, np.conj(v))
 
             diag = diagonal_average(
                 hankel,
@@ -124,11 +142,20 @@ class SSA(object):
         # Adjust the scale of the result after the iteration
         imfs = imfs[:, : diag.size]
 
+        # For trajectory embedding, match the original series length by default
+        if not self.extra_size and imfs.shape[1] >= seq_len:
+            if self.mode in ["traj", "trajectory", "caterpillar", "covar", "valid"]:
+                imfs = imfs[:, :seq_len]
+
         # Handling complex mappings
         if self.mode in ["traj", "trajectory", "caterpillar"]:
             imfs = np.conj(imfs)
 
-        return np.asarray(imfs) / seq_len
+        # Return real components when the input is real-valued
+        if np.isrealobj(signal):
+            imfs = np.real(imfs)
+
+        return np.asarray(imfs)
 
 
 if __name__ == "__main__":
@@ -138,7 +165,7 @@ if __name__ == "__main__":
 
     time, signal = test_emd()
 
-    ssa = SSA(K=2, mode="covar")
+    ssa = SSA(K=2, mode="traj")
     IMFs = ssa.fit_transform(signal)
 
     print(IMFs.shape)
