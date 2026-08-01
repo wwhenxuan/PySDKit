@@ -118,6 +118,9 @@ from .tsa import Moving_Decomp
 # Seasonal-Trend decomposition using LOESS (STL)
 from .tsa import STL
 
+# Multiple Seasonal-Trend decomposition using LOESS (MSTL)
+from .tsa import MSTL
+
 # Hilbert-Huang Transform
 from ._emd import HHT
 
@@ -182,6 +185,7 @@ Successive Jump and Mode Decomposition          |    SJMD / SMJMD
 Feature Mode Decomposition                      |    FMD
 Moving Average Decomposition                    |    Moving
 Seasonal-Trend decomposition using LOESS        |    STL
+Multiple Seasonal-Trend decomposition (LOESS)   |    MSTL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
 """
@@ -235,6 +239,7 @@ __all__ = [
     "FMD",
     "Moving_Decomp",
     "STL",
+    "MSTL",
     "models",
     "data",
     "entropy",
