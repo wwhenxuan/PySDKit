@@ -135,7 +135,7 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 |   [`STNBMD`]() (Short-Time Narrow-Band Mode Decomposition)   | [[paper]](https://www.sciencedirect.com/science/article/pii/S0022460X16002443?via%3Dihub) | [[code]](https://ww2.mathworks.cn/matlabcentral/fileexchange/56226-short-time-narrow-band-mode-decomposition-stnbmd-toolbox) |   ✖️   |
 | [`SWD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_osd/swd.py) (Swarm Decomposition) |   [[paper]](https://doi.org/10.1016/j.sigpro.2016.09.004)    |  [[code]](https://github.com/gkaposto/Swarm-Decomposition)   |   ✔️   |
 | [`STL`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/tsa/_stl.py) (Seasonal-Trend decomposition using LOESS) | [[paper]](https://www.nniiem.ru/file/news/2016/stl-statistical-model.pdf) | [[code]](https://www.statsmodels.org/stable/examples/notebooks/generated/stl_decomposition.html) |   ✔️   |
-| [`MSTL`]() (Multivariate Seasonal-Trend decomposition using LOESS) | [[paper]](https://www.nniiem.ru/file/news/2016/stl-statistical-model.pdf) | [[code]](https://www.statsmodels.org/stable/examples/notebooks/generated/mstl_decomposition.html) |   ✖️   |
+| [`MSTL`]() (Multivariate Seasonal-Trend decomposition using LOESS) | [[paper]](https://arxiv.org/abs/2107.13462) | [[code]](https://github.com/KishManani/MSTL) |   ✔️   |
 
 ## Acknowledgements 🎖️ <a id="Acknowledgements"></a>
 
