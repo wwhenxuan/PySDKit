@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on 2025/02/12 00:14:21
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+@author: Ruizhe Wang
+@email: changewam@stu.xidian.edu.cn
 """
 
 import numpy as np
