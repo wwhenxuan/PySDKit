@@ -5,8 +5,10 @@ Created on 2025/02/12 00:14:21
 @email: changewam@stu.xidian.edu.cn
 """
 
-import numpy as np
+import operator
 from typing import Optional, Literal
+
+import numpy as np
 from scipy.linalg import lstsq
 
 
@@ -32,13 +34,16 @@ class STL(object):
     """
     Seasonal-Trend decomposition using LOESS (STL)
 
-    RB C. STL: A seasonal-trend decomposition procedure based on loess[J]. J Off Stat, 1990, 6: 3-73.
+    R. B. Cleveland, W. S. Cleveland, J. E. McRae, and I. Terpenning.
+    STL: A Seasonal-Trend Decomposition Procedure Based on Loess.
+    Journal of Official Statistics, 6:3-73, 1990.
 
-    STL uses LOESS (locally estimated scatterplot smoothing) to extract smooths estimates of the three components.
+    STL uses LOESS (locally estimated scatterplot smoothing) to extract
+    smooth estimates of the seasonal, trend and remainder components.
     The key inputs into STL are:
-    (1) season - The length of the seasonal smoother. Must be odd.
-    (2) trend - The length of the trend smoother, usually around 150% of season. Must be odd and larger than season.
-    (3) low_pass - The length of the low-pass estimation window, usually the smallest odd number larger than the periodicity of the data.
+    (1) seasonal - The length of the seasonal smoother. Must be odd (>= 3; >= 7 recommended).
+    (2) trend - The length of the trend smoother, usually around 150% of season. Must be odd and >= period.
+    (3) low_pass - The length of the low-pass estimation window, usually the smallest odd number >= period.
     """
 
     def __init__(
@@ -59,7 +64,7 @@ class STL(object):
         Initialize STL decomposer configuration
 
         :param period: Seasonal period length (must be >= 2)
-        :param seasonal: Seasonal smoothing window size (odd, >=7)
+        :param seasonal: Seasonal smoothing window size (odd, >= 3; >= 7 recommended)
         :param trend: Trend smoothing window size (odd, >= period)
         :param low_pass: Low-pass filter window size (odd, >= period)
         :param seasonal_deg: Seasonal LOESS degree (0 or 1)
@@ -72,47 +77,62 @@ class STL(object):
         """
 
         # Validate and set period
-        if not isinstance(period, int) or period < 2:
+        try:
+            period = operator.index(period)
+        except TypeError as exc:
+            raise ValueError("period must be an integer >= 2") from exc
+        if period < 2:
             raise ValueError("period must be an integer >= 2")
         self.period = period
 
         # Validate and set seasonal parameters
-        if not self._is_odd_int(seasonal) or seasonal < 3:
+        if not self._is_odd_int(seasonal) or int(seasonal) < 3:
             raise ValueError("seasonal must be an odd integer >= 3")
-        self.seasonal = seasonal
+        self.seasonal = int(seasonal)
 
-        # Calculate trend window size
+        # Calculate trend window size (Cleveland et al. default)
         if trend is None:
             # Ensure denominator is positive
-            denom = max(1 - 1.5 / seasonal, 0.01)
+            denom = max(1 - 1.5 / self.seasonal, 0.01)
             trend = int(np.ceil(1.5 * period / denom))
             # Ensure it's odd
             trend = trend + 1 if trend % 2 == 0 else trend
-        if not self._is_odd_int(trend) or trend < period:
-            raise ValueError("trend must be an odd integer >= period length")
-        self.trend = trend
+        if not self._is_odd_int(trend) or int(trend) <= period:
+            # NETLIB / statsmodels: trend > period (strict), odd
+            raise ValueError("trend must be an odd integer > period length")
+        self.trend = int(trend)
 
         # Calculate low-pass filter window size
         if low_pass is None:
-            low_pass = period + (1 if period % 2 == 0 else 0)
-            low_pass = low_pass + 1 if low_pass % 2 == 0 else low_pass
-        if not self._is_odd_int(low_pass) or low_pass < period:
+            low_pass = period + 1 if period % 2 == 0 else period
+            if low_pass % 2 == 0:
+                low_pass += 1
+        if not self._is_odd_int(low_pass) or int(low_pass) < period:
             raise ValueError("low_pass must be an odd integer >= period length")
-        self.low_pass = low_pass
+        self.low_pass = int(low_pass)
 
         # Set other parameters
+        if seasonal_deg not in (0, 1) or trend_deg not in (0, 1) or low_pass_deg not in (
+            0,
+            1,
+        ):
+            raise ValueError("LOESS degrees must be 0 or 1")
         self.seasonal_deg = seasonal_deg
         self.trend_deg = trend_deg
         self.low_pass_deg = low_pass_deg
-        self.robust = robust
-        self.seasonal_jump = max(1, seasonal_jump)
-        self.trend_jump = max(1, trend_jump)
-        self.low_pass_jump = max(1, low_pass_jump)
+        self.robust = bool(robust)
+        self.seasonal_jump = max(1, int(seasonal_jump))
+        self.trend_jump = max(1, int(trend_jump))
+        self.low_pass_jump = max(1, int(low_pass_jump))
 
     @staticmethod
     def _is_odd_int(x: int) -> bool:
-        """Check if value is an odd integer"""
-        return isinstance(x, int) and x > 0 and x % 2 == 1
+        """Check if value is an odd positive integer (accepts numpy integers)."""
+        try:
+            x = operator.index(x)
+        except TypeError:
+            return False
+        return x > 0 and x % 2 == 1
 
     def __str__(self) -> str:
         return "Seasonal-Trend decomposition using LOESS (STL)"
@@ -161,18 +181,19 @@ class STL(object):
         # Initialize output array (with boundary extension)
         seasonal_temp = np.zeros(self.nobs + 2 * self.period)
 
-        # Process each seasonal position
+        # Process each seasonal position (cycle-subseries)
         for j in range(self.period):
             # Get subseries for current seasonal position
             subseries = detrended[j :: self.period]
             n_sub = len(subseries)
+            x = np.arange(n_sub, dtype=float)
 
             # Get corresponding robust weights
             weights = self.rw[j :: self.period] if self.robust else np.ones(n_sub)
 
-            # Apply LOESS smoothing
+            # Apply LOESS smoothing on the observed cycle indices
             smoothed = self._loess(
-                x=np.arange(n_sub),
+                x=x,
                 y=subseries,
                 weights=weights,
                 window_size=self.seasonal,
@@ -180,18 +201,34 @@ class STL(object):
                 jump=self.seasonal_jump,
             )
 
-            # Store results (including boundary points)
-            start_idx = j
-            for i in range(
-                -1, n_sub + 1
-            ):  # Include left boundary(-1) and right boundary(n_sub)
-                idx = start_idx + i * self.period
+            # LOESS extrapolation at the cycle boundaries (Cleveland et al.)
+            left = self._loess_at(
+                x,
+                subseries,
+                x0=-1.0,
+                window_size=self.seasonal,
+                degree=self.seasonal_deg,
+                weights=weights,
+            )
+            right = self._loess_at(
+                x,
+                subseries,
+                x0=float(n_sub),
+                window_size=self.seasonal,
+                degree=self.seasonal_deg,
+                weights=weights,
+            )
+
+            # Store into the extended workspace.  Time t maps to index
+            # ``period + t``, so the central slice
+            # ``seasonal_temp[period:period+nobs]`` aligns with the series.
+            for i in range(-1, n_sub + 1):
+                idx = self.period + j + i * self.period
                 if 0 <= idx < len(seasonal_temp):
-                    # Boundary points use extrapolated values
                     if i == -1:
-                        seasonal_temp[idx] = smoothed[0]  # Left boundary
+                        seasonal_temp[idx] = left
                     elif i == n_sub:
-                        seasonal_temp[idx] = smoothed[-1]  # Right boundary
+                        seasonal_temp[idx] = right
                     else:
                         seasonal_temp[idx] = smoothed[i]
 
@@ -199,33 +236,40 @@ class STL(object):
 
     def _low_pass_filter(self, seasonal_temp: np.ndarray) -> np.ndarray:
         """
-        Low-pass filtering
+        Low-pass filtering of the extended seasonal series.
+
+        Classic STL applies three moving averages of lengths
+        (period, period, 3), which shortens the series from
+        ``nobs + 2*period`` down to ``nobs``, then LOESS-smooths the result.
 
         :param seasonal_temp: Temporary seasonal component
         :return: Low-frequency component (length = nobs)
         """
-        n = self.nobs + 2 * self.period
-
         # First moving average (length=period)
-        ma1 = self._moving_average(seasonal_temp, self.period)
+        ma1 = self._moving_average_reduce(seasonal_temp, self.period)
 
         # Second moving average (length=period)
-        ma2 = self._moving_average(ma1, self.period)
+        ma2 = self._moving_average_reduce(ma1, self.period)
 
-        # Third moving average (length=3)
-        ma3 = self._moving_average(ma2, 3)
+        # Third moving average (length=3) -> length == nobs
+        ma3 = self._moving_average_reduce(ma2, 3)
 
         # Apply LOESS smoothing
         low_pass = self._loess(
-            x=np.arange(len(ma3)),
+            x=np.arange(len(ma3), dtype=float),
             y=ma3,
             window_size=self.low_pass,
             degree=self.low_pass_deg,
             jump=self.low_pass_jump,
         )
 
-        # Trim to original data length (remove boundary effects)
-        return low_pass[: self.nobs]
+        if len(low_pass) != self.nobs:
+            # Defensive trim / pad (should not trigger with classic MA lengths)
+            out = np.zeros(self.nobs, dtype=float)
+            n = min(self.nobs, len(low_pass))
+            out[:n] = low_pass[:n]
+            return out
+        return low_pass
 
     def _trend_smoothing(self, deseasonalized: np.ndarray) -> np.ndarray:
         """
@@ -312,7 +356,9 @@ class STL(object):
 
         # Perform LOESS smoothing for each calculation point
         for i in indices:
-            result[i] = self._loess_point(x, y, i, window_size, degree, weights)
+            result[i] = self._loess_at(
+                x, y, float(x[i]), window_size, degree, weights, fallback=float(y[i])
+            )
 
         # Linear interpolation for jump points
         if jump > 1 and len(indices) > 1:
@@ -328,85 +374,86 @@ class STL(object):
         return result
 
     @staticmethod
-    def _loess_point(
+    def _loess_at(
         x: np.ndarray,
         y: np.ndarray,
-        idx: int,
+        x0: float,
         window_size: int,
         degree: int,
         weights: np.ndarray,
+        fallback: Optional[float] = None,
     ) -> float:
         """
-        Single-point LOESS calculation
+        Evaluate LOESS at an arbitrary abscissa ``x0``.
 
         :param x: Independent variable
         :param y: Dependent variable
-        :param idx: Target point index
-        :param window_size: Window size
-        :param degree: Polynomial degree
+        :param x0: Target abscissa (may lie outside ``x`` for extrapolation)
+        :param window_size: Neighborhood size
+        :param degree: Polynomial degree (0 or 1)
         :param weights: Observation weights
-        :return: Fitted value
+        :param fallback: Value used if the local fit is singular
+        :return: Fitted value at ``x0``
         """
-        # 1. Calculate distances and determine window
-        distances = np.abs(x - x[idx])
-        max_distance = np.partition(distances, window_size - 1)[window_size - 1]
+        if fallback is None:
+            # Nearest observation as a safe fallback
+            fallback = float(y[int(np.argmin(np.abs(x - x0)))])
 
-        # Handle case where window is larger than data length
-        if window_size > len(x):
-            max_distance = np.max(distances) * window_size / len(x)
+        n = len(x)
+        distances = np.abs(x - x0)
 
-        # 2. Calculate tricube weights
-        d_scaled = distances / (max_distance + 1e-12)
-        weights_tricube = np.where(d_scaled < 1, (1 - d_scaled**3) ** 3, 0)
+        if window_size >= n:
+            max_distance = float(np.max(distances)) * window_size / max(n, 1)
+        else:
+            max_distance = float(np.partition(distances, window_size - 1)[window_size - 1])
 
-        # Combine observation weights
+        if max_distance <= 0:
+            return fallback
+
+        # Tricube neighborhood weights
+        d_scaled = distances / max_distance
+        weights_tricube = np.where(d_scaled < 1.0, (1.0 - d_scaled**3) ** 3, 0.0)
         weights_total = weights * weights_tricube
 
-        # 3. Weighted least squares fitting
         if degree == 0:  # Constant fit
             weight_sum = np.sum(weights_total)
             if weight_sum < 1e-12:
-                return y[idx]  # Fallback to original value
-            return np.sum(weights_total * y) / weight_sum
+                return fallback
+            return float(np.sum(weights_total * y) / weight_sum)
 
-        elif degree == 1:  # Linear fit
-            # Construct design matrix [1, x]
-            X = np.column_stack((np.ones_like(x), x - x[idx]))
-
-            # Weighted least squares
-            X_weighted = X * np.sqrt(weights_total)[:, np.newaxis]
-            y_weighted = y * np.sqrt(weights_total)
-
-            # Solve
+        if degree == 1:  # Linear fit centered at x0
+            X = np.column_stack((np.ones(n, dtype=float), x - x0))
+            sqrt_w = np.sqrt(np.maximum(weights_total, 0.0))
+            X_weighted = X * sqrt_w[:, np.newaxis]
+            y_weighted = y * sqrt_w
             try:
                 beta, _, _, _ = lstsq(X_weighted, y_weighted, lapack_driver="gelsy")
-                return beta[0]  # Constant term is the fitted value
-            except:
-                return y[idx]  # Fallback if solution fails
+                return float(beta[0])
+            except np.linalg.LinAlgError:
+                return fallback
 
-        else:
-            raise ValueError("Only degrees 0 or 1 are supported")
+        raise ValueError("Only degrees 0 or 1 are supported")
 
     @staticmethod
-    def _moving_average(data: np.ndarray, window: int) -> np.ndarray:
+    def _moving_average_reduce(data: np.ndarray, window: int) -> np.ndarray:
         """
-        Moving average
+        Non-centered moving average that shortens the series by ``window - 1``.
+
+        This matches the NETLIB / Cleveland STL low-pass filter stage.
 
         :param data: Input data
         :param window: Window size
-        :return: Moving average result
+        :return: Moving average of length ``len(data) - window + 1``
         """
+        data = np.asarray(data, dtype=float)
         n = len(data)
+        if window <= 1:
+            return data.copy()
         if window > n:
-            return np.full(n, np.mean(data))
+            return np.array([float(np.mean(data))])
 
-        # Calculate cumulative sum
-        cumsum = np.cumsum(np.insert(data, 0, 0))
-        result = (cumsum[window:] - cumsum[:-window]) / window
-
-        # Boundary handling (padding ends)
-        pad = window - 1
-        return np.pad(result, (pad // 2, pad - pad // 2), "edge")
+        cumsum = np.cumsum(np.insert(data, 0, 0.0))
+        return (cumsum[window:] - cumsum[:-window]) / window
 
     def fit_transform(
         self,
