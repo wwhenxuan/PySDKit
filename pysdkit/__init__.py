@@ -29,7 +29,7 @@ from ._emd import TVF_EMD
 from ._emd import EFD
 
 # Fast and Adaptive Empirical Mode Decomposition
-from ._faemd import FAEMD
+from ._faemd import FAEMD, FAEMD2D, FAEMD3D
 
 # Empirical Mode Decomposition 2D for images
 from ._emd2d import EMD2D
@@ -160,6 +160,8 @@ Serial Empirical Mode Decomposition             |    SEMD
 Time Varying Filter based EMD                   |    TVF_EMD
 Empirical Fourier Decomposition                 |    EFD
 Fast and Adaptive Empirical Mode Decomposition  |    FAEMD
+Bidimensional FAEMD                             |    FAEMD2D
+Tridimensional FAEMD                            |    FAEMD3D
 Empirical Mode Decomposition 2D for images      |    EMD2D
 Hilbert Vibration Decomposition                 |    HVD
 Intrinsic Time-Scale Decomposition              |    ITD
@@ -206,6 +208,8 @@ __all__ = [
     "TVF_EMD",
     "EFD",
     "FAEMD",
+    "FAEMD2D",
+    "FAEMD3D",
     "EMD2D",
     "HVD",
     "ITD",

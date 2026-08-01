@@ -201,6 +201,21 @@ class FAEMDTest(unittest.TestCase):
             # Create a signal decomposition instance with invalid parameters
             FAEMD(max_imfs=2, window_type=-1)
 
+    def test_str(self) -> None:
+        self.assertIn("FAEMD", str(FAEMD(max_imfs=2)))
+
+    def test_return_all(self) -> None:
+        """return_all should expose windows and sift counts."""
+        _, signal = test_emd()
+        imfs, residue, windows, sift_count = FAEMD(max_imfs=3).fit_transform(
+            signal, return_all=True
+        )
+        self.assertEqual(imfs.shape[0], 3)
+        self.assertEqual(windows.shape[0], 7)
+        self.assertEqual(sift_count.shape[0], 3)
+        self.assertTrue(np.allclose(imfs.sum(0), signal, atol=1e-6))
+
 
 if __name__ == "__main__":
     unittest.main()
+
