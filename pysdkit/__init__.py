@@ -34,6 +34,9 @@ from ._faemd import FAEMD, FAEMD2D, FAEMD3D
 # Empirical Mode Decomposition 2D for images
 from ._emd2d import EMD2D
 
+# Bidimensional Multivariate Empirical Mode Decomposition
+from ._emd2d import BMEMD
+
 # Hilbert Vibration Decomposition
 from ._hvd import HVD
 
@@ -163,6 +166,7 @@ Fast and Adaptive Empirical Mode Decomposition  |    FAEMD
 Bidimensional FAEMD                             |    FAEMD2D
 Tridimensional FAEMD                            |    FAEMD3D
 Empirical Mode Decomposition 2D for images      |    EMD2D
+Bidimensional Multivariate EMD                  |    BMEMD
 Hilbert Vibration Decomposition                 |    HVD
 Intrinsic Time-Scale Decomposition              |    ITD
 Local Mean Decomposition                        |    LMD
@@ -211,6 +215,7 @@ __all__ = [
     "FAEMD2D",
     "FAEMD3D",
     "EMD2D",
+    "BMEMD",
     "HVD",
     "ITD",
     "LMD",
