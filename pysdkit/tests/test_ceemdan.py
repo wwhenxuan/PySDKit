@@ -1,285 +1,203 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/04/16 23:54:01
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Complete Ensemble EMD with Adaptive Noise (CEEMDAN).
+
+Torres, M. E., Colominas, M. A., Schlotthauer, G. and Flandrin, P. (2011).
+A complete ensemble empirical mode decomposition with adaptive noise.
+IEEE ICASSP.
 """
 
 import unittest
+from typing import Tuple
+
 import numpy as np
 
-from pysdkit import CEEMDAN
+from pysdkit import CEEMDAN, EMD
 from pysdkit.data import test_emd, test_univariate_signal
 
 
-class CEEMDANTest(unittest.TestCase):
-    """
-    Test whether CEEMDAN can run normally
-    This algorithm is relatively slow
-    """
+def _two_tone(n: int = 320) -> Tuple[np.ndarray, np.ndarray]:
+    t = np.linspace(0.0, 1.0, n, endpoint=False)
+    signal = np.sin(2.0 * np.pi * 6.0 * t) + 0.5 * np.sin(2.0 * np.pi * 28.0 * t)
+    return t, signal
 
-    def test_fit_transform(self) -> None:
-        """Verify that signal decomposition can be performed normally"""
-        # Create an algorithm instance object
-        ceemdan = CEEMDAN()
-        for index in range(1, 4):
-            # Get the test signal
-            time, signal = test_univariate_signal(case=index)
-            IMFs = ceemdan.fit_transform(signal)
-            # Determine the output dimension
-            dim = len(IMFs.shape)
-            self.assertEqual(
-                first=dim,
-                second=2,
-                msg="The output shape of the decomposed signal is wrong",
-            )
-            # Determine the length of the output signal
-            _, length = IMFs.shape
-            self.assertEqual(
-                first=len(signal),
-                second=length,
-                msg="Wrong length of decomposed signal",
-            )
+
+class CEEMDANTest(unittest.TestCase):
+    """Automated tests for CEEMDAN."""
+
+    def test_str(self) -> None:
+        self.assertIn("CEEMDAN", str(CEEMDAN()))
+
+    def test_fit_transform_shape(self) -> None:
+        ceemdan = CEEMDAN(trials=10, epsilon=0.05, max_imfs=3, random_seed=0)
+        for case in range(1, 4):
+            _, signal = test_univariate_signal(case=case)
+            imfs = ceemdan.fit_transform(signal)
+            self.assertEqual(imfs.ndim, 2)
+            self.assertEqual(imfs.shape[1], signal.size)
+            self.assertGreaterEqual(imfs.shape[0], 1)
 
     def test_default_call(self) -> None:
-        """Verify that the call method can run normally"""
-        time, signal = test_emd()
+        """``__call__`` must match ``fit_transform`` on a fresh instance."""
+        _, signal = test_emd()
+        a = CEEMDAN(trials=8, max_imfs=3, random_seed=1)(signal)
+        b = CEEMDAN(trials=8, max_imfs=3, random_seed=1).fit_transform(signal)
+        self.assertEqual(a.shape, b.shape)
+        self.assertTrue(np.allclose(a, b))
 
-        # Create an algorithm instance object
-        ceemdan = CEEMDAN()
-        IMFs = ceemdan(signal)
+    def test_complete_reconstruction(self) -> None:
+        """
+        Paper Eq. (5): x = sum_k IMF~_k + R  (exact / numerically complete).
 
-        # Determine the output dimension
-        dim = len(IMFs.shape)
-        self.assertEqual(
-            first=dim,
-            second=2,
-            msg="The output shape of the decomposed signal is wrong",
-        )
-        # Determine the length of the output signal
-        _, length = IMFs.shape
-        self.assertEqual(
-            first=len(signal), second=length, msg="Wrong length of decomposed signal"
-        )
+        In this implementation the residue is appended as the last row of
+        ``fit_transform``, so the modes alone must reconstruct ``x``.
+        """
+        _, signal = test_emd()
+        ceemdan = CEEMDAN(trials=12, epsilon=0.05, max_imfs=4, random_seed=2)
+        imfs = ceemdan.fit_transform(signal)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal, atol=1e-8))
 
-    def test_different_length_inputs(self) -> None:
-        """Verify the exception when the timestamp array and the input signal length are inconsistent"""
-        time = np.arange(100)
-        signal = np.random.randn(125)
-
-        ceemdan = CEEMDAN()
-        with self.assertRaises(ValueError):
-            ceemdan.fit_transform(signal=signal, time=time)
-
-    def test_trend(self) -> None:
-        """Determine the input of a single trend signal"""
-        ceemdan = CEEMDAN()
-
-        time = np.arange(0, 1, 0.01)
-        signal = 2 * time
-
-        IMFs = ceemdan.fit_transform(signal=signal, time=time)
-        self.assertTrue(IMFs.shape[0] >= 1, "Expecting at least one component")
-        reconstructed = np.sum(IMFs, axis=0)
-        self.assertTrue(
-            np.allclose(signal, reconstructed, atol=1e-6),
-            "IMFs should reconstruct the original signal",
-        )
-
-    def test_single_imf(self) -> None:
-        """Determine the input of a single eigenmode function"""
-        ceemdan = CEEMDAN()
-
-        time = np.arange(0, 1, 0.001)
-        cosine = np.cos(2 * np.pi * 4 * time)
-
-        IMFs = ceemdan.fit_transform(signal=cosine.copy(), time=time)
-        self.assertTrue(IMFs.shape[0] >= 1, "Expecting at least one component")
-        reconstructed = np.sum(IMFs, axis=0)
-        self.assertTrue(
-            np.allclose(cosine, reconstructed, atol=1e-6),
-            "IMFs should reconstruct the original cosine signal",
-        )
-
-        trend = 3 * (time - 0.5)
-        IMFs = ceemdan.fit_transform(signal=trend.copy() + cosine.copy(), time=time)
-        self.assertTrue(
-            IMFs.shape[0] >= 2,
-            "Expecting at least two components for cosine + trend",
-        )
-        reconstructed = np.sum(IMFs, axis=0)
-        self.assertTrue(
-            np.allclose(trend + cosine, reconstructed, atol=1e-6),
-            "IMFs should reconstruct the original signal",
-        )
-
-    # def test_spline_kind(self) -> None:
-    #     """Verify that all interpolation algorithms in the EMD algorithm can run normally"""
-    #
-    #     # Create two test signals with different components
-    #     time = np.arange(0, 1, 0.01)
-    #     cosine = np.cos(2 * np.pi * 4 * time)
-    #     trend = 3 * (time - 0.1)
-    #     signal = cosine.copy() + trend.copy()
-    #
-    #     for spline_kind in [
-    #         "akima",
-    #         "cubic",
-    #         "pchip",
-    #         "cubic_hermite",
-    #         "slinear",
-    #         "quadratic",
-    #         "linear",
-    #     ]:
-    #         # Traverse all interpolation algorithms and create instances
-    #         ceemdan = CEEMDAN(spline_kind=spline_kind)
-    #
-    #         # Execute the signal decomposition algorithm and determine the output results
-    #         IMFs = ceemdan.fit_transform(signal=signal, time=time)
-    #
-    #         # Determine whether the number of IMFs meets the requirements
-    #         self.assertEqual(
-    #             first=IMFs.shape[0],
-    #             second=2,
-    #             msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {spline_kind}",
-    #         )
-    #
-    #         # Further determine the numerical difference between the two modal outputs
-    #         diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
-    #         self.assertTrue(
-    #             diff_cosine,
-    #             msg=f"Expecting 1st IMF to be cosine when the `spline_kind` is {spline_kind}",
-    #         )
-    #         diff_trend = np.allclose(IMFs[1], trend, atol=0.3)
-    #         self.assertTrue(
-    #             diff_trend,
-    #             msg=f"Expecting 2nd IMF to be trend when the `spline_kind` is {spline_kind}",
-    #         )
-    #
-    # def test_wrong_spline_kind(self) -> None:
-    #     """Verify that incorrect interpolation type input will cause an exception"""
-    #     spline_kind = "wrong"
-    #
-    #     # Creating random input
-    #     time = np.arange(10)
-    #     signal = np.random.randn(10)
-    #
-    #     # Start validating the wrong interpolation type
-    #     with self.assertRaises(ValueError):
-    #         ceemdan = CEEMDAN(spline_kind=spline_kind)
-    #         ceemdan.fit_transform(signal=signal, time=time)
-
-    # def test_extrema_detection(self) -> None:
-    #     """Verify that all extreme point detection algorithms in the EMD algorithm can run normally"""
-    #     # Create two test signals with different components
-    #     time = np.arange(0, 1, 0.01)
-    #     cosine = np.cos(2 * np.pi * 4 * time)
-    #     trend = 3 * (time - 0.1)
-    #     signal = cosine.copy() + trend.copy()
-    #
-    #     for extrema_detection in ["parabol", "simple"]:
-    #         # Traverse all interpolation algorithms and create instances
-    #         ceemdan = CEEMDAN(extrema_detection=extrema_detection)
-    #
-    #         # Execute the signal decomposition algorithm and determine the output results
-    #         IMFs = ceemdan.fit_transform(signal=signal, time=time)
-    #
-    #         # Determine whether the number of IMFs meets the requirements
-    #         self.assertEqual(
-    #             first=IMFs.shape[0],
-    #             second=2,
-    #             msg=f"Expecting two IMF of cosine and trend when the `spline_kind` is {extrema_detection}",
-    #         )
-    #
-    #         # Further determine the numerical difference between the two modal outputs
-    #         diff_cosine = np.allclose(IMFs[0], cosine, atol=0.3)
-    #         self.assertTrue(
-    #             diff_cosine,
-    #             msg=f"Expecting 1st IMF to be cosine when the `extrema_detection` is {extrema_detection}",
-    #         )
-    #         diff_trend = np.allclose(IMFs[1], trend, atol=0.3)
-    #         self.assertTrue(
-    #             diff_trend,
-    #             msg=f"Expecting 2nd IMF to be trend when the `extrema_detection` is {extrema_detection}",
-    #         )
-    #
-    # def test_wrong_extrema_detection(self) -> None:
-    #     """Verify whether an incorrect extreme point detection type input will cause an exception"""
-    #     extrema_detection = "wrong"
-    #
-    #     # Creating random input
-    #     time = np.arange(10)
-    #     signal = np.random.randn(10)
-    #
-    #     # Start verification of wrong extreme point detection type
-    #     with self.assertRaises(ValueError):
-    #         ceemdan = CEEMDAN(extrema_detection=extrema_detection)
-    #         ceemdan.fit_transform(signal=signal, time=time)
-
-    def test_max_iteration_flag(self) -> None:
-        """The maximum number of iterations to validate the model"""
-        # Creating random signals for verification
-        signal = np.random.random(200)
-        ceemdan = CEEMDAN()
-        ceemdan.MAX_ITERATION = 10
-        ceemdan.FIXE = 20
-        IMFs = ceemdan.fit_transform(signal)
-
-        # There's not much to test, except that it doesn't fail.
-        # With low MAX_ITERATION value for random signal it's
-        # guaranteed to have at least 2 IMFs.
-        self.assertTrue(IMFs.shape[0] > 1)
-
-    # def test_get_imfs_and_residue(self) -> None:
-    #     """Verify whether the intrinsic mode function and trend component can be obtained normally after decomposition"""
-    #     signal = np.random.random(200)
-    #     ceemdan = CEEMDAN(**{"MAX_ITERATION": 10, "FIXE": 20})
-    #     all_imfs = ceemdan(signal, max_imfs=3)
-    #
-    #     imfs, residue = ceemdan.get_imfs_and_residue()
-    #     self.assertEqual(
-    #         all_imfs.shape[0], imfs.shape[0] + 1, msg="Compare number of components"
-    #     )
-    #     self.assertTrue(
-    #         np.array_equal(all_imfs[:-1], imfs),
-    #         msg="Shouldn't matter where imfs are from",
-    #     )
-    #     self.assertTrue(
-    #         np.array_equal(all_imfs[-1], residue),
-    #         msg="Residue, if any, is the last row",
-    #     )
+        stored, residue = ceemdan.get_imfs_and_residue()
+        self.assertTrue(np.allclose(stored, imfs))
+        # Residue stored after scaling is ~0 because R is already in ``imfs``
+        self.assertTrue(np.allclose(residue, 0.0, atol=1e-8))
 
     def test_get_imfs_and_residue_without_running(self) -> None:
-        """Verify that the output can be obtained when the algorithm is not executed"""
-        ceemdan = CEEMDAN()
         with self.assertRaises(ValueError):
-            # Since the decomposition process is not performed,
-            # it is reasonable to not be able to obtain IMFs and residual results.
-            _, _ = ceemdan.get_imfs_and_residue()
+            CEEMDAN().get_imfs_and_residue()
 
     def test_get_imfs_and_trend(self) -> None:
-        """Verify whether the intrinsic mode function and trend component can be obtained normally after decomposition"""
-        ceemdan = CEEMDAN()
-        time = np.linspace(0, 2 * np.pi, 100)
-        expected_trend = 5 * time
-        signal = (
-            2 * np.sin(4.1 * 6.28 * time)
-            + 1.2 * np.cos(7.4 * 6.28 * time)
-            + expected_trend
+        t, signal = _two_tone()
+        signal = signal + 3.0 * t
+        ceemdan = CEEMDAN(trials=10, max_imfs=3, random_seed=3)
+        imfs = ceemdan.fit_transform(signal, time=t)
+        modes, trend = ceemdan.get_imfs_and_trend()
+        self.assertEqual(modes.ndim, 2)
+        self.assertEqual(trend.shape, signal.shape)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal, atol=1e-8))
+
+    def test_different_length_inputs(self) -> None:
+        ceemdan = CEEMDAN(trials=4, random_seed=0)
+        with self.assertRaises(ValueError):
+            ceemdan.fit_transform(signal=np.random.randn(125), time=np.arange(100))
+
+    def test_trend_only(self) -> None:
+        time = np.arange(0.0, 1.0, 0.01)
+        signal = 2.0 * time
+        imfs = CEEMDAN(trials=8, max_imfs=2, random_seed=4).fit_transform(
+            signal, time=time
+        )
+        self.assertGreaterEqual(imfs.shape[0], 1)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal, atol=1e-6))
+
+    def test_single_tone_plus_trend(self) -> None:
+        time = np.arange(0.0, 1.0, 0.002)
+        cosine = np.cos(2.0 * np.pi * 4.0 * time)
+        trend = 3.0 * (time - 0.5)
+        imfs = CEEMDAN(trials=12, epsilon=0.05, max_imfs=3, random_seed=5).fit_transform(
+            cosine + trend, time=time
+        )
+        self.assertGreaterEqual(imfs.shape[0], 2)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), cosine + trend, atol=1e-6))
+
+    def test_end_condition_max_imf(self) -> None:
+        """Stopping when the requested IMF count is reached."""
+        t, signal = _two_tone(n=200)
+        ceemdan = CEEMDAN(
+            trials=6,
+            range_thr=1e-12,
+            total_power_thr=1e-12,
+            random_seed=0,
+        )
+        # Already extracted 2 modes while max_imf=2 → stop
+        dummy = np.vstack([0.3 * signal, 0.2 * signal])
+        self.assertTrue(ceemdan.end_condition(signal, dummy, max_imf=2))
+        # Only 1 mode so far, residue still rich → continue
+        self.assertFalse(
+            ceemdan.end_condition(signal, dummy[:1] * 0.05, max_imf=3)
         )
 
-        IMFs = ceemdan(signal)
-        imfs, trend = ceemdan.get_imfs_and_trend()
+    def test_end_condition_range_and_power(self) -> None:
+        ceemdan = CEEMDAN(range_thr=0.5, total_power_thr=1e6, trials=4, random_seed=0)
+        signal = np.ones(64)
+        cimfs = np.zeros((1, 64))
+        # Flat residue → range criterion
+        self.assertTrue(ceemdan.end_condition(signal, cimfs, max_imf=-1))
 
-        self.assertTrue(
-            imfs.shape[0] >= 1,
-            "Should have at least one IMF component",
+        ceemdan_pwr = CEEMDAN(
+            range_thr=1e-12, total_power_thr=1.0, trials=4, random_seed=0
         )
-        reconstructed = np.sum(IMFs, axis=0)
+        # Residue = signal (sum of empty-ish cIMFs), large absolute power
+        # total_power_thr=1.0 with sum(|R|) = 64 should stop
         self.assertTrue(
-            np.allclose(signal, reconstructed, atol=1e-6),
-            "Full IMFs should reconstruct the original signal",
+            ceemdan_pwr.end_condition(np.ones(64), np.zeros((1, 64)), max_imf=-1)
         )
+
+    def test_noise_kinds(self) -> None:
+        t, signal = _two_tone(n=180)
+        for kind in ("normal", "uniform"):
+            imfs = CEEMDAN(
+                trials=6,
+                noise_kind=kind,
+                max_imfs=2,
+                random_seed=6,
+            ).fit_transform(signal, time=t)
+            self.assertEqual(imfs.shape[1], signal.size)
+            self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal, atol=1e-7))
+
+        bad = CEEMDAN(noise_kind="laplace", trials=2, random_seed=0)
+        with self.assertRaises(ValueError):
+            bad._generate_noise(1.0, 10)
+
+    def test_update_random_seed_changes_noise(self) -> None:
+        ceemdan = CEEMDAN(random_seed=1)
+        a = ceemdan._generate_noise(1.0, 200)
+        ceemdan.update_random_seed(2)
+        b = ceemdan._generate_noise(1.0, 200)
+        self.assertFalse(np.allclose(a, b))
+
+    def test_reproducible_with_seed(self) -> None:
+        t, signal = _two_tone(n=220)
+        a = CEEMDAN(trials=8, max_imfs=3, random_seed=8).fit_transform(signal, time=t)
+        b = CEEMDAN(trials=8, max_imfs=3, random_seed=8).fit_transform(signal, time=t)
+        self.assertTrue(np.allclose(a, b))
+
+    def test_max_imfs_cap(self) -> None:
+        """``max_imfs`` limits oscillatory modes before the residue row."""
+        t, signal = _two_tone(n=240)
+        imfs = CEEMDAN(trials=8, max_imfs=2, random_seed=9).fit_transform(
+            signal, time=t
+        )
+        # at most 2 oscillatory cIMFs + 1 residue
+        self.assertLessEqual(imfs.shape[0], 3)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal, atol=1e-7))
+
+    def test_ext_emd_injection(self) -> None:
+        emd = EMD(max_imfs=2, max_iteration=200)
+        ceemdan = CEEMDAN(ext_EMD=emd, trials=6, max_imfs=2, random_seed=0)
+        _, signal = test_emd()
+        imfs = ceemdan.fit_transform(signal[:280])
+        self.assertEqual(imfs.ndim, 2)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), signal[:280], atol=1e-7))
+
+    def test_delta_like_impulse_decomposes(self) -> None:
+        """
+        Torres et al. use a discrete Dirac as a stress test for noise-assisted EMD.
+
+        We only require a finite multi-mode output that reconstructs the impulse.
+        """
+        n = 128
+        impulse = np.zeros(n)
+        impulse[n // 2] = 1.0
+        imfs = CEEMDAN(
+            trials=20,
+            epsilon=0.05,
+            noise_scale=0.02,
+            max_imfs=5,
+            random_seed=10,
+        ).fit_transform(impulse)
+        self.assertGreaterEqual(imfs.shape[0], 2)
+        self.assertTrue(np.allclose(np.sum(imfs, axis=0), impulse, atol=1e-7))
 
 
 if __name__ == "__main__":
