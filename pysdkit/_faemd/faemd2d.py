@@ -60,9 +60,7 @@ class FAEMD2D(object):
         self.residue: Optional[np.ndarray] = None
 
     def __str__(self) -> str:
-        return (
-            "Bidimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD2D)"
-        )
+        return "Bidimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD2D)"
 
     def __call__(
         self, signal: np.ndarray, max_imfs: Optional[int] = None
@@ -81,9 +79,7 @@ class FAEMD2D(object):
             return x[np.newaxis, ...], True
         if x.ndim == 3:
             return x, False
-        raise ValueError(
-            "FAEMD2D expects shape (H, W) or (n_channels, H, W)"
-        )
+        raise ValueError("FAEMD2D expects shape (H, W) or (n_channels, H, W)")
 
     def fit_transform(
         self,

@@ -18,9 +18,7 @@ def _texture_pair(n: int = 32, seed: int = 0) -> np.ndarray:
     xx = xx / float(n)
     yy = yy / float(n)
     ch0 = 0.6 * np.sin(2 * np.pi * 4 * xx) + 0.3 * np.sin(2 * np.pi * 2 * yy)
-    ch1 = 0.5 * np.cos(2 * np.pi * 3 * xx + 0.4) + 0.35 * np.sin(
-        2 * np.pi * 5 * yy
-    )
+    ch1 = 0.5 * np.cos(2 * np.pi * 3 * xx + 0.4) + 0.35 * np.sin(2 * np.pi * 5 * yy)
     ch0 = ch0 + 0.05 * rng.standard_normal((n, n))
     ch1 = ch1 + 0.05 * rng.standard_normal((n, n))
     return np.stack([ch0, ch1], axis=0)

@@ -58,9 +58,7 @@ class FAEMD3D(object):
         self.residue: Optional[np.ndarray] = None
 
     def __str__(self) -> str:
-        return (
-            "Tridimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD3D)"
-        )
+        return "Tridimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD3D)"
 
     def __call__(
         self, signal: np.ndarray, max_imfs: Optional[int] = None
@@ -79,9 +77,7 @@ class FAEMD3D(object):
             if min(x.shape[1:]) < 3:
                 raise ValueError("Each spatial dimension must be >= 3")
             return x, False
-        raise ValueError(
-            "FAEMD3D expects shape (X, Y, Z) or (n_channels, X, Y, Z)"
-        )
+        raise ValueError("FAEMD3D expects shape (X, Y, Z) or (n_channels, X, Y, Z)")
 
     def fit_transform(
         self,

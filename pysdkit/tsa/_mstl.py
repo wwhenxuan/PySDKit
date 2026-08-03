@@ -99,7 +99,9 @@ class MSTL(object):
             raise ValueError("periods must contain at least one seasonal period")
 
         self.windows = (
-            None if windows is None else self._as_window_tuple(windows, len(self.periods))
+            None
+            if windows is None
+            else self._as_window_tuple(windows, len(self.periods))
         )
         if self.windows is not None and len(self.windows) != len(self.periods):
             raise ValueError("periods and windows must have the same length")

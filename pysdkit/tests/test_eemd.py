@@ -165,9 +165,9 @@ class EEMDTest(unittest.TestCase):
     def test_mode_mixing_signal_produces_multiple_imfs(self) -> None:
         """Intermittent HF bursts should not collapse into a single IMF."""
         signal = _intermittent_signal()
-        imfs = EEMD(trials=20, noise_width=0.2, max_imfs=4, random_seed=9).fit_transform(
-            signal
-        )
+        imfs = EEMD(
+            trials=20, noise_width=0.2, max_imfs=4, random_seed=9
+        ).fit_transform(signal)
         self.assertGreaterEqual(imfs.shape[0], 2)
 
 

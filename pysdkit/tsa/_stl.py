@@ -112,9 +112,14 @@ class STL(object):
         self.low_pass = int(low_pass)
 
         # Set other parameters
-        if seasonal_deg not in (0, 1) or trend_deg not in (0, 1) or low_pass_deg not in (
-            0,
-            1,
+        if (
+            seasonal_deg not in (0, 1)
+            or trend_deg not in (0, 1)
+            or low_pass_deg
+            not in (
+                0,
+                1,
+            )
         ):
             raise ValueError("LOESS degrees must be 0 or 1")
         self.seasonal_deg = seasonal_deg
@@ -405,7 +410,9 @@ class STL(object):
         if window_size >= n:
             max_distance = float(np.max(distances)) * window_size / max(n, 1)
         else:
-            max_distance = float(np.partition(distances, window_size - 1)[window_size - 1])
+            max_distance = float(
+                np.partition(distances, window_size - 1)[window_size - 1]
+            )
 
         if max_distance <= 0:
             return fallback

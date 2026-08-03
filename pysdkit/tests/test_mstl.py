@@ -71,7 +71,11 @@ class TestMSTL(unittest.TestCase):
         y, _, _ = _multi_seasonal_series(n=240, periods=(period, 48), seed=1)
         # Keep only daily-like oscillation for a cleaner single-period case
         t = np.arange(y.size, dtype=float)
-        y = 0.01 * t + 3 * np.sin(2 * np.pi * t / period) + 0.1 * np.random.default_rng(0).standard_normal(y.size)
+        y = (
+            0.01 * t
+            + 3 * np.sin(2 * np.pi * t / period)
+            + 0.1 * np.random.default_rng(0).standard_normal(y.size)
+        )
 
         result = MSTL(periods=period, iterate=5).fit_transform(y)
         self.assertEqual(result.seasonal.ndim, 1)
@@ -97,9 +101,9 @@ class TestMSTL(unittest.TestCase):
 
     def test_recovers_seasonal_energy(self) -> None:
         """Extracted seasonals should correlate with the planted components."""
-        result = MSTL(periods=self.periods, iterate=2, stl_kwargs={"seasonal_deg": 0}).fit_transform(
-            self.y
-        )
+        result = MSTL(
+            periods=self.periods, iterate=2, stl_kwargs={"seasonal_deg": 0}
+        ).fit_transform(self.y)
         # periods are sorted ascending -> seasonal[0] ~ daily, seasonal[1] ~ weekly
         corr_daily = np.corrcoef(result.seasonal[0], self.true_seas[0])[0, 1]
         corr_weekly = np.corrcoef(result.seasonal[1], self.true_seas[1])[0, 1]

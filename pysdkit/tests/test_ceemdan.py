@@ -94,9 +94,9 @@ class CEEMDANTest(unittest.TestCase):
         time = np.arange(0.0, 1.0, 0.002)
         cosine = np.cos(2.0 * np.pi * 4.0 * time)
         trend = 3.0 * (time - 0.5)
-        imfs = CEEMDAN(trials=12, epsilon=0.05, max_imfs=3, random_seed=5).fit_transform(
-            cosine + trend, time=time
-        )
+        imfs = CEEMDAN(
+            trials=12, epsilon=0.05, max_imfs=3, random_seed=5
+        ).fit_transform(cosine + trend, time=time)
         self.assertGreaterEqual(imfs.shape[0], 2)
         self.assertTrue(np.allclose(np.sum(imfs, axis=0), cosine + trend, atol=1e-6))
 
@@ -113,9 +113,7 @@ class CEEMDANTest(unittest.TestCase):
         dummy = np.vstack([0.3 * signal, 0.2 * signal])
         self.assertTrue(ceemdan.end_condition(signal, dummy, max_imf=2))
         # Only 1 mode so far, residue still rich → continue
-        self.assertFalse(
-            ceemdan.end_condition(signal, dummy[:1] * 0.05, max_imf=3)
-        )
+        self.assertFalse(ceemdan.end_condition(signal, dummy[:1] * 0.05, max_imf=3))
 
     def test_end_condition_range_and_power(self) -> None:
         ceemdan = CEEMDAN(range_thr=0.5, total_power_thr=1e6, trials=4, random_seed=0)

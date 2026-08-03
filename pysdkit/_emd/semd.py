@@ -37,7 +37,9 @@ def concatenate_signals(matrix_x: np.ndarray, num_interval: int) -> np.ndarray:
     """
     matrix_x = np.asarray(matrix_x, dtype=float)
     if matrix_x.ndim != 2:
-        raise ValueError("matrix_x must be a 2-D array of shape (n_samples, n_channels)")
+        raise ValueError(
+            "matrix_x must be a 2-D array of shape (n_samples, n_channels)"
+        )
 
     n_length, n_signal = matrix_x.shape
     if n_signal < 1:
@@ -276,7 +278,11 @@ class SEMD(object):
         if max_imfs is None:
             max_imfs = self.max_imfs
         # Only forward a hard cap when it is positive; otherwise let the backend decide
-        emd_kwargs = {} if (max_imfs is None or int(max_imfs) < 0) else {"max_imfs": int(max_imfs)}
+        emd_kwargs = (
+            {}
+            if (max_imfs is None or int(max_imfs) < 0)
+            else {"max_imfs": int(max_imfs)}
+        )
 
         if x.ndim == 1:
             imfs = self.emd.fit_transform(x, **emd_kwargs)

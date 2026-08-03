@@ -81,9 +81,7 @@ def filter_size1D(
     return _seven_windows_from_spacings(edge_max, edge_min, window_type)
 
 
-def ord_filt1(
-    signal: np.ndarray, order: str, window_size: int
-) -> np.ndarray:
+def ord_filt1(signal: np.ndarray, order: str, window_size: int) -> np.ndarray:
     """1-D rank-order filter with symmetric (reflected) padding."""
     signal = np.asarray(signal, dtype=float)
     shape = signal.shape
@@ -139,12 +137,8 @@ def identify_max_min_2d(signal: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     signal = np.asarray(signal, dtype=float)
     mask = np.ones((3, 3), dtype=bool)
     mask[1, 1] = False
-    neigh_max = ndimage.maximum_filter(
-        signal, footprint=mask, mode="nearest"
-    )
-    neigh_min = ndimage.minimum_filter(
-        signal, footprint=mask, mode="nearest"
-    )
+    neigh_max = ndimage.maximum_filter(signal, footprint=mask, mode="nearest")
+    neigh_min = ndimage.minimum_filter(signal, footprint=mask, mode="nearest")
     maxima = signal >= neigh_max
     minima = signal <= neigh_min
     return maxima, minima
@@ -281,9 +275,7 @@ def filter_size_3d(
     return _seven_windows_from_spacings(max_nearest, min_nearest, window_type)
 
 
-def ord_filt3_separable(
-    signal: np.ndarray, order: str, window_size: int
-) -> np.ndarray:
+def ord_filt3_separable(signal: np.ndarray, order: str, window_size: int) -> np.ndarray:
     """Separable 3-D OSF: apply 1-D rank filter along each axis."""
     w = int(window_size)
     if w < 3:

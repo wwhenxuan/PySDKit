@@ -198,9 +198,7 @@ class BMEMD(object):
     def _check_input(images: np.ndarray) -> np.ndarray:
         x = np.asarray(images, dtype=float)
         if x.ndim != 3:
-            raise ValueError(
-                "BMEMD expects a 3-D array of shape (n_channels, H, W)"
-            )
+            raise ValueError("BMEMD expects a 3-D array of shape (n_channels, H, W)")
         n_ch, height, width = x.shape
         if n_ch < 2 or n_ch > 16:
             raise ValueError("n_channels must satisfy 2 <= n_channels <= 16")
@@ -321,9 +319,7 @@ class BMEMD(object):
         env_mean = env_mean / float(len(directions))
         return env_mean, nem, amp
 
-    def _stop_sifting(
-        self, env_mean: np.ndarray, amp: np.ndarray, nem: int
-    ) -> bool:
+    def _stop_sifting(self, env_mean: np.ndarray, amp: np.ndarray, nem: int) -> bool:
         """Return True if sifting should stop (MATLAB ``stop_sifting``)."""
         sx = np.sqrt(np.sum(env_mean**2, axis=0))
         if np.any(amp):

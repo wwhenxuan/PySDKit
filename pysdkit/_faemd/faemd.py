@@ -163,9 +163,7 @@ class FAEMD(object):
 
     def get_imfs_and_residue(self) -> Tuple[np.ndarray, np.ndarray]:
         if self.imfs is None or self.residue is None:
-            raise ValueError(
-                "No IMF found. Please run `fit_transform` method first."
-            )
+            raise ValueError("No IMF found. Please run `fit_transform` method first.")
         return self.imfs, self.residue
 
 
@@ -178,9 +176,7 @@ def check_inputs(signal: np.ndarray) -> Tuple[np.ndarray, Tuple]:
     elif signal.ndim == 2:
         pass
     else:
-        raise ValueError(
-            "signal must have shape [seq_len] or [n_channels, seq_len]"
-        )
+        raise ValueError("signal must have shape [seq_len] or [n_channels, seq_len]")
     return signal.T, inputs_shape
 
 
