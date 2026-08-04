@@ -3,302 +3,289 @@
 Created on 2025/02/12 11:06:23
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
+
+Compact / Two-Dimensional TV Variational Mode Decomposition (CVMD2D / 2D-TV-VMD).
+
+Zosso D., Dragomiretskiy K., Bertozzi A.L., Weiss P.S.
+Two-Dimensional Compact Variational Mode Decomposition.
+Journal of Mathematical Imaging and Vision, 58(2):294–320, 2017.
+https://doi.org/10.1007/s10851-017-0710-z
+
+MATLAB reference:
+https://www.mathworks.com/matlabcentral/fileexchange/67285-two-dimensional-compact-variational-mode-decomposition-2d-tv-vmd
 """
+from __future__ import annotations
+
+from typing import Optional, Tuple, Union
 
 import numpy as np
-from scipy.linalg import norm
-from scipy.sparse import coo_matrix, csr_matrix
-
-from typing import Optional, Union, Tuple, Any
+from numpy.linalg import norm
 
 from pysdkit.utils import fft2d, ifft2d, fftshift, ifftshift
 
 
 class CVMD2D(object):
     """
-    Compact Variational Mode Decomposition for 2D Images
+    Compact Variational Mode Decomposition for 2D Images (2D-TV-VMD).
 
-    Spatially Compact and Spectrally Sparse Image Decomposition and Segmentation.
-    Decomposing multidimensional signals, such as images, into spatially compact,
-    potentially overlapping modes of essentially wavelike nature makes these components accessible for further downstream analysis.
+    Decomposes an image into spatially compact, spectrally sparse modes with
+    optional support segmentation (MBO / winner-takes-all) and artifact maps.
 
-    This decomposition enables space-frequency analysis, demodulation, estimation of local orientation, edge and corner detection,
-    texture analysis, denoising, inpainting, or curvature estimation.
+    The optimisation proceeds in three scheduled phases (``A_phase = [a, b]``):
 
-    [1] D. Zosso, K. Dragomiretskiy, A.L. Bertozzi, P.S. Weiss, Two-Dimensional Compact Variational Mode Decomposition,
-    Journal of Mathematical Imaging and Vision, 58(2):294–320, 2017. DOI:10.1007/s10851-017-0710-z.
+    - iterations ``1 … a-1``: classical 2D VMD (no spatial support evolution)
+    - iterations ``a … b-1``: 2D-TV-VMD (individual MBO on supports ``A_k``)
+    - iterations ``b … end``: segmented 2D-TV-VMD (joint winner-takes-all)
 
-    [2] K. Dragomiretskiy, D. Zosso, Variational Mode Decomposition,
-    IEEE Trans. on Signal Processing, 62(3):531-544, 2014. DOI:10.1109/TSP.2013.2288675.
-
-    [3] K. Dragomiretskiy, D. Zosso, Two-Dimensional Variational Mode Decomposition,
-    EMMCVPR 2015, Hong Kong, LNCS 8932:197-208, 2015. DOI:10.1007/978-3-319-14612-6_15.
-
-    MATLAB code: https://ww2.mathworks.cn/matlabcentral/fileexchange/67285-two-dimensional-compact-variational-mode-decomposition-2d-tv-vmd?s_tid=FX_rc2_behav
+    MATLAB code: ``VMD_2D_TV.m`` (Zosso & Dragomiretskiy).
     """
 
     def __init__(
         self,
-        K: Optional[int] = 5,
-        alpha: Optional[int] = 1000,
-        beta: Optional[float] = 0.5,
-        gamma: Optional[int] = 500,
-        delta: Optional[np.ndarray] = np.inf,
-        rho: Optional[int] = 10,
-        rho_k: Optional[int] = 10,
-        tau: Optional[float] = 0.0,
-        tau_k: Optional[float] = 2.5,
-        t: Optional[float] = 1.5,
-        DC: Optional[bool] = False,
-        init: Union[str, int] = "uniform",
-        u_tol: Optional[float] = 1e-10,
-        A_tol: Optional[float] = 1e-4,
-        omega_tol: Optional[float] = 1e-10,
-        max_iter: Optional[int] = 130,
-        M: Optional[int] = 1,
-        A_phase: Optional[np.ndarray] = np.array([100, 150]),
-        random_seed: Optional[int] = 42,
+        K: int = 5,
+        alpha: float = 1000,
+        beta: float = 0.5,
+        gamma: float = 500,
+        delta: float = np.inf,
+        rho: float = 10,
+        rho_k: float = 10,
+        tau: float = 0.0,
+        tau_k: float = 2.5,
+        t: float = 1.5,
+        DC: bool = False,
+        init: Union[str, int, np.ndarray] = "radially",
+        u_tol: float = 1e-10,
+        A_tol: float = 1e-4,
+        omega_tol: float = 1e-10,
+        max_iter: int = 130,
+        M: int = 1,
+        A_phase: Optional[np.ndarray] = None,
+        random_seed: int = 42,
     ) -> None:
         """
-        Please note that this algorithm is very sensitive to hyperparameters.
-
-        When using it, please try multiple configurations based on the input image features.
-
-        You can try the VMD2D algorithm instead of the complex hyperparameter configuration of the algorithm.
-
-        :param K: the number of modes to be recovered
-        :param alpha: narrowbandedness of subsignals coefficient (scalar)
-        :param beta: L1 penalty coefficient of spatial mode support (scalar)
-        :param gamma: Spatial support TV-term: heat diffusion coefficient
-        :param delta: Artifact classification threshold (inf for no artifacts)
-        :param rho: data fidelity coefficient
-        :param rho_k: u-v splitting coefficient
-        :param tau: time-step of dual ascent for data ( pick 0 for noise-slack )
-        :param tau_k: time-step of dual ascent for u-v splitting
-        :param t: spatial support TV-term: time-step of ODE/PDE
-        :param DC: true, if the first mode is put and kept at DC (0-freq)
-        :param init: "radially" = all omegas start initialized radially uniformly
-                     "random" = all omegas start initialized randomly on half plane
-                     2*K*M = use given omega list for initialization; should be 2xKxM
-        :param u_tol: Tolerance for u convergence
-        :param A_tol: Tolerance for A convergence
-        :param omega_tol: Tolerance for omega convergence
-        :param max_iter: maximum number of iterations
-        :param M: number of submodes
-        :param A_phase: 2D VMD - 2D-TV-VMD - 2D-TV-VMD-Seg scheduling
-                        % iterations 1:a --> 2D VMD
-                        % iterations a:b --> 2D TV VMD
-                        % iterations b:end --> 2D TV VMD Segmentation
-        :param: random_seed: random seed for the omega initialization
+        :param K: number of modes
+        :param alpha: spectral narrow-band / bandwidth penalty
+        :param beta: L1 area penalty on spatial supports ``A_k``
+        :param gamma: heat-diffusion weight for TV (MBO) propagation of ``A_k``
+        :param delta: artifact threshold on residual energy (``inf`` → disabled)
+        :param rho: data-fidelity weight
+        :param rho_k: u–v splitting weight
+        :param tau: dual step for data fidelity (0 → noise-slack)
+        :param tau_k: dual step for u–v splitting
+        :param t: ODE / PDE step for support updates
+        :param DC: keep the first mode at the DC frequency ``(0, 0)``
+        :param init: ``"radially"`` / ``"uniform"`` / ``0``, ``"random"`` / ``1``,
+                     or an array of shape ``(2, K, M)`` with custom centre frequencies
+        :param u_tol: relative tolerance on modes ``u``
+        :param A_tol: absolute tolerance on supports ``A``
+        :param omega_tol: tolerance on centre frequencies
+        :param max_iter: maximum ADMM iterations ``N``
+        :param M: number of spectral sub-modes per spatial mode
+        :param A_phase: ``[a, b]`` phase schedule (default ``[100, 150]``)
+        :param random_seed: RNG seed for random omega initialisation
         """
-        self.K = K
-        self.alpha = alpha
-        self.beta = beta
-        self.gamma = gamma
-        self.delta = delta
-        self.rho = rho
-        self.rho_k = rho_k
-        self.tau = tau
-        self.tau_k = tau_k
-        self.t = t
-        self.DC = DC
+        self.K = int(K)
+        self.alpha = float(alpha)
+        self.beta = float(beta)
+        self.gamma = float(gamma)
+        self.delta = float(delta)
+        self.rho = float(rho)
+        self.rho_k = float(rho_k)
+        self.tau = float(tau)
+        self.tau_k = float(tau_k)
+        self.t = float(t)
+        self.DC = bool(DC)
         self.init = init
-        self.u_tol = u_tol
-        self.A_tol = A_tol
-        self.omega_tol = omega_tol
-        self.max_iter = max_iter
-        self.M = M
-        self.A_phase = A_phase
+        self.u_tol = float(u_tol)
+        self.A_tol = float(A_tol)
+        self.omega_tol = float(omega_tol)
+        self.max_iter = int(max_iter)
+        self.M = int(M)
+        if A_phase is None:
+            self.A_phase = np.array([100.0, 150.0], dtype=float)
+        else:
+            self.A_phase = np.asarray(A_phase, dtype=float).ravel()
+            if self.A_phase.size != 2:
+                raise ValueError("A_phase must be a length-2 array [a, b]")
 
-        # A list of initialization methods
-        self.init_omega_list = ["uniform", "random"]
-        # Parameter Test
-        if self.init not in self.init_omega_list:
-            raise ValueError("init should be one of {}".format(self.init_omega_list))
-
-        # Create a generator based on a random number seed
         self.rng = np.random.default_rng(seed=random_seed)
 
     def __call__(
-        self, image: np.ndarray, return_all: Optional[str] = False
+        self, image: np.ndarray, return_all: bool = False
     ) -> Union[
-        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray
+        np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]
     ]:
-        """allow instances to be called like functions"""
         return self.fit_transform(image=image, return_all=return_all)
 
     def __str__(self) -> str:
-        """Get the full name and abbreviation of the algorithm"""
         return "Compact Variational Mode Decomposition for 2D Images (CVMD2D)"
 
     def _init_omega(self) -> np.ndarray:
-        """Initialization of omega_k"""
-        # N iterations at most, 2 spatial coordinates, K modes, M submodes
-        omega = np.zeros(shape=(self.max_iter, 2, self.K, self.M))
+        """Initialise centre frequencies ``omega`` (MATLAB ``init`` cases 0/1 / custom)."""
+        # (N+1) × 2 × K × M — extra slot so omega[n+1] is always valid
+        omega = np.zeros((self.max_iter + 1, 2, self.K, self.M), dtype=float)
 
-        if isinstance(self.init, str):
-            # 如果输入是字符串则通过已有的三种方法进行初始化
-            if self.init == "radially":
-                # Radially Uniform
-                # if DC, Keep first mode at 0, 0
-                if self.DC is True:
-                    maxK = self.K - 1
-                else:
-                    maxK = self.K
-                radius = 0.3
-                for k in range(int(self.DC), int(self.DC) + maxK):
-                    for m in range(0, self.M):
-                        omega[0, 0, k, m] = radius * np.cos(
-                            np.pi * (k - 1 + (m - 1) * maxK) / maxK / self.M
-                        )
-                        omega[0, 1, k, m] = radius * np.sin(
-                            np.pi * (k - 1 + (m - 1) * maxK) / maxK / self.M
-                        )
-            elif self.init == "random":
-                # Random on Half-Plane
-                for k in range(0, self.K):
-                    for m in range(0, self.M):
-                        omega[0, 0, k, m] = self.rng.random() - 1 / 2
-                        omega[0, 1, k, m] = self.rng.random() / 2
-                # DC component (if expected)
-                if self.DC is True:
-                    omega[0, 0, 0, :] = 0.0
-                    omega[0, 1, 0, :] = 0.0
+        init = self.init
+        # Map friendly aliases / MATLAB numeric codes
+        if isinstance(init, str):
+            key = init.lower()
+            if key in ("radially", "uniform", "radial"):
+                init = 0
+            elif key == "random":
+                init = 1
             else:
                 raise ValueError(
-                    "init should be one of {}".format(self.init_omega_list)
+                    "init string must be one of "
+                    "['radially', 'uniform', 'random']; got {!r}".format(init)
                 )
-        elif np.size(self.init) == 2 * self.K * self.M:
-            # use given omega list for initialization; should be 2xKxM
-            if np.size(self.init, 0) != 2 or np.size(self.init, 1) != self.K:
-                raise ValueError("init parameter has inappropriate size")
-            omega[0, :, :, :] = self.init
+
+        if isinstance(init, (int, np.integer)):
+            if init == 0:
+                # Radially uniform on the half-plane
+                max_k = self.K - 1 if self.DC else self.K
+                radius = 0.3
+                # MATLAB: for k = DC+(1:maxK) with angle (k-1+(m-1)*maxK)
+                # 0-based equivalent: angle factor = (k + m*max_k)
+                for k in range(int(self.DC), int(self.DC) + max_k):
+                    for m in range(self.M):
+                        angle = np.pi * (k + m * max_k) / max_k / self.M
+                        omega[0, 0, k, m] = radius * np.cos(angle)
+                        omega[0, 1, k, m] = radius * np.sin(angle)
+            elif init == 1:
+                for k in range(self.K):
+                    for m in range(self.M):
+                        omega[0, 0, k, m] = self.rng.random() - 0.5
+                        omega[0, 1, k, m] = self.rng.random() / 2.0
+                if self.DC:
+                    omega[0, :, 0, :] = 0.0
+            else:
+                raise ValueError("numeric init must be 0 (radially) or 1 (random)")
         else:
-            raise ValueError("Wrong input for `init`")
+            arr = np.asarray(init, dtype=float)
+            if arr.size != 2 * self.K * self.M:
+                raise ValueError(
+                    "custom init must have size 2*K*M (shape (2, K, M)); "
+                    "got size {}".format(arr.size)
+                )
+            arr = arr.reshape(2, self.K, self.M)
+            omega[0, :, :, :] = arr
 
         return omega
 
     def fit_transform(
-        self, image: np.ndarray, return_all: Optional[str] = False
+        self, image: np.ndarray, return_all: bool = False
     ) -> Union[
-        Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray], np.ndarray
+        np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]
     ]:
         """
-        Execute the signal decomposition algorithm for 2D images
+        Decompose a 2D image with compact / TV variational mode decomposition.
 
-        Please note that this algorithm is very sensitive to hyperparameters.
-        Please try multiple configurations based on the input image features.
-
-        You can try the VMD2D algorithm instead of the complex hyperparameter configuration of the algorithm.
+        :param image: real 2D array ``(Hy, Hx)``
+        :param return_all: if True, also return ``v, omega, A, X``
+        :return: modes ``u`` with shape ``(Hy, Hx, K, M)``, or the full tuple
         """
+        signal = np.asarray(image, dtype=float)
+        if signal.ndim != 2:
+            raise ValueError("image must be a 2-D array")
+        hy, hx = signal.shape
+        if hy < 4 or hx < 4:
+            raise ValueError("image spatial size must be at least 4×4")
 
-        # Resolution of image
-        Hy, Hx = image.shape
-        X, Y = np.meshgrid(np.arange(1, Hx + 1) / Hx, np.arange(1, Hy + 1) / Hy)
+        # Normalised spatial grid (MATLAB meshgrid)
+        grid_x, grid_y = np.meshgrid(
+            np.arange(1, hx + 1) / hx, np.arange(1, hy + 1) / hy
+        )
 
-        # Spectral Domain discretization
-        fx = 1 / Hx
-        fy = 1 / Hx
-        freqs_1 = X - 0.5 - fx
-        freqs_2 = Y - 0.5 - fy
+        # Spectral domain discretisation — fy uses Hy (bugfix vs old Hx)
+        fx = 1.0 / hx
+        fy = 1.0 / hy
+        freqs_1 = grid_x - 0.5 - fx
+        freqs_2 = grid_y - 0.5 - fy
 
-        # Storage matrices for (Fourier) modes. Iterations are not recorded
-        u_hat = np.zeros(shape=(Hy, Hx, self.K, self.M))
-
-        # copy the u_hat
-        u = u_hat.copy()
+        # Storage (Fourier modes are complex)
+        u_hat = np.zeros((hy, hx, self.K, self.M), dtype=complex)
+        u = np.zeros((hy, hx, self.K, self.M), dtype=float)
         u_old = u.copy()
         v = u.copy()
 
-        print("origin v", v.shape)
+        # Augmented Lagrangian variables
+        lambda_k = np.zeros_like(u)  # u/v linking  ~ rho_k
+        lambda_d = np.zeros((hy, hx), dtype=float)  # data fidelity ~ rho
 
-        # Augmented Lagrangian Variables
-
-        # linking variable u/v   ~rho_k
-        lambda_k = u.copy()
-        # data fidelity          ~rho
-        lambda_d = np.zeros(shape=(Hy, Hx))
-
-        # Spatial support variables
-        A = np.ones(shape=(Hy, Hx, self.K))
+        # Spatial supports & artifact map
+        A = np.ones((hy, hx, self.K), dtype=float)
         A_old = A.copy()
+        artifact = np.zeros((hy, hx), dtype=bool)
 
-        # Artifact map
-        X = np.zeros(shape=(Hy, Hx))
-
-        # Initialization of omega_k
         omega = self._init_omega()
 
-        ##### Main Loop for iterative updates #####
+        u_diff = np.inf
+        a_diff = np.inf
+        omega_diff = np.inf
+        sum_avk = 0.0
 
-        # Stopping criteria tolerances
-        uDiff = np.inf
-        ADiff = np.inf
-        omegaDiff = np.inf
+        # Phase-schedule lower bound (handles Inf in A_phase like MATLAB)
+        finite_phases = self.A_phase[np.isfinite(self.A_phase)]
+        phase_bound = float(np.max(finite_phases)) if finite_phases.size else 0.0
 
-        # Stores the sum of A_j*v_j for all j not equal to k
-        sum_Avk = 0
-
-        # Init the interation counter
+        # MATLAB starts n = 1; we use 0-based n and compare with (n + 1)
         n = 0
-
-        # Main loop - run until convergence or max number of iterations
-        while (
-            (uDiff > self.u_tol or ADiff > self.A_tol or omegaDiff > self.omega_tol)
-            and n < self.max_iter - 1
-        ) or n <= np.max(np.isfinite(self.A_phase) * self.A_phase):
-            # Mode
-            for k in range(0, self.K):
-                # Submodes
-                for m in range(0, self.M):
-                    # Compute the halfplane spectral mask for the 2D "analytic signal"
-                    HilbertMask = (
+        while n < self.max_iter and (
+            (u_diff > self.u_tol or a_diff > self.A_tol or omega_diff > self.omega_tol)
+            or (n + 1) <= phase_bound
+        ):
+            # ---- modes / submodes ------------------------------------------------
+            for k in range(self.K):
+                for m in range(self.M):
+                    hilbert_mask = (
                         np.sign(
                             freqs_1 * omega[n, 0, k, m] + freqs_2 * omega[n, 1, k, m]
                         )
-                        + 1
+                        + 1.0
                     )
 
-                    # Update accumulator
+                    # Update accumulator of A_j v_j for j ≠ (k,m)
                     if m == 0:
                         if k == 0:
-                            sum_Avk = (
-                                sum_Avk
+                            sum_avk = (
+                                sum_avk
                                 + A[:, :, -1] * v[:, :, -1, -1]
                                 - A[:, :, 0] * v[:, :, 0, 0]
                             )
                         else:
-                            sum_Avk = (
-                                sum_Avk
+                            sum_avk = (
+                                sum_avk
                                 + A[:, :, k - 1] * v[:, :, k - 1, -1]
                                 - A[:, :, k] * v[:, :, k, 0]
                             )
                     else:
-                        sum_Avk = (
-                            sum_Avk
+                        sum_avk = (
+                            sum_avk
                             + A[:, :, k] * v[:, :, k, m - 1]
                             - A[:, :, k] * v[:, :, k, m]
                         )
 
-                    # Update v (time domain averaging)
+                    one_minus_x = 1.0 - artifact.astype(float)
+
+                    # Update v (spatial-domain averaging)
                     v[:, :, k, m] = (
                         self.rho_k * u[:, :, k, m]
                         + lambda_k[:, :, k, m]
                         + self.rho
                         * A[:, :, k]
-                        * (image - sum_Avk + lambda_d / self.rho)
-                        * (1 - X)
-                    ) / (self.rho_k + self.rho * (1 - X) * A[:, :, k] ** 2)
+                        * (signal - sum_avk + lambda_d / self.rho)
+                        * one_minus_x
+                    ) / (self.rho_k + self.rho * one_minus_x * A[:, :, k] ** 2)
 
-                    # Update u_hat (analytic signal spectrum via Wiener filter)
+                    # Update u_hat (analytic spectrum via Wiener filter)
                     u_hat[:, :, k, m] = (
                         fftshift(
                             fft2d(self.rho_k * v[:, :, k, m] - lambda_k[:, :, k, m])
                         )
-                        * HilbertMask
+                        * hilbert_mask
                     ) / (
                         self.rho_k
-                        + 2
+                        + 2.0
                         * self.alpha
                         * (
                             (freqs_1 - omega[n, 0, k, m]) ** 2
@@ -306,166 +293,118 @@ class CVMD2D(object):
                         )
                     )
 
-                    # Update center frequencies (first mode is kept at omega = 0 if DC = 1)
-                    if not self.DC or k > 0:
-                        # Update signal frequencies as center of mass of power spectrum
-                        omega[n + 1, 0, k, m] = np.sum(
-                            np.sum(freqs_1 * (np.abs(u_hat[:, :, k, m]) ** 2))
-                        ) / np.sum(np.sum(np.abs(u_hat[:, :, k, m]) ** 2))
-                        omega[n + 1, 1, k, m] = np.sum(
-                            np.sum(freqs_2 * (np.abs(u_hat[:, :, k, m]) ** 2))
-                        ) / np.sum(np.sum(np.abs(u_hat[:, :, k, m]) ** 2))
-
-                        # Keep omegas on same halfplane (top half)
+                    # Centre frequencies (keep first mode at 0 if DC)
+                    if (not self.DC) or k > 0:
+                        power = np.abs(u_hat[:, :, k, m]) ** 2
+                        denom = np.sum(power)
+                        if denom > 1e-30:
+                            omega[n + 1, 0, k, m] = np.sum(freqs_1 * power) / denom
+                            omega[n + 1, 1, k, m] = np.sum(freqs_2 * power) / denom
+                        # Keep omegas on the top half-plane
                         if omega[n + 1, 1, k, m] < 0:
                             omega[n + 1, :, k, m] = -omega[n + 1, :, k, m]
 
-                    # recover full spectrum (and signal) from analytic signal spectrum
-                    u[:, :, k, m] = np.real(
-                        ifft2d(ifftshift(np.squeeze(u_hat[:, :, k, m])))
-                    )
+                    # Recover real mode from analytic spectrum
+                    u[:, :, k, m] = np.real(ifft2d(ifftshift(u_hat[:, :, k, m])))
 
-                # No MBO/TV-term propagation in phase I (2D VMD, only)
-
-                # Individual MBO for TV-term Propagation in phase II (2D TV VMD)
-                if self.A_phase[0] <= n + 1 < self.A_phase[1]:
-                    # Reconstruction Fidelity + Area Penalty + Segmentation Penalty
+                # Phase II: individual MBO / TV support propagation
+                # MATLAB: n >= A_phase(1) && n < A_phase(2)  (1-based n)
+                if self.A_phase[0] <= (n + 1) < self.A_phase[1]:
+                    one_minus_x = 1.0 - artifact.astype(float)
+                    sum_v_k = np.sum(v[:, :, k, :], axis=2)
                     A[:, :, k] = A[:, :, k] + self.t * (
                         -self.beta
-                        + 2
+                        + 2.0
                         * self.rho
-                        * np.sum(v[:, :, k, :], axis=2)
+                        * sum_v_k
                         * (
-                            image
+                            signal
                             - np.sum(A * np.sum(v, axis=3), axis=2)
-                            + A[:, :, k] * np.sum(v[:, :, k, :], axis=2)
+                            + A[:, :, k] * sum_v_k
                             + lambda_d / self.rho
                         )
-                        * (1 - X)
+                        * one_minus_x
                     )
                     A[:, :, k] = A[:, :, k] / (
-                        1
-                        + self.t
-                        * 2
-                        * self.rho
-                        * (1 - X)
-                        * np.sum(v[:, :, k, :], axis=2) ** 2
+                        1.0 + self.t * 2.0 * self.rho * one_minus_x * sum_v_k**2
                     )
 
-                    # Project to characteristic range
-                    A[A > 1] = 1
-                    A[A < 0] = 0
+                    A[A > 1] = 1.0
+                    A[A < 0] = 0.0
 
-                    # Propagate by heat equation
-                    A[:, :, k] = ifft2d(
-                        fft2d(A[:, :, k])
-                        / (1 + self.t * self.gamma * ifftshift(freqs_1**2 + freqs_2**2))
+                    # Heat equation / spectral diffusion
+                    A[:, :, k] = np.real(
+                        ifft2d(
+                            fft2d(A[:, :, k])
+                            / (
+                                1.0
+                                + self.t
+                                * self.gamma
+                                * ifftshift(freqs_1**2 + freqs_2**2)
+                            )
+                        )
                     )
+                    A[:, :, k] = (A[:, :, k] >= 0.5).astype(float)
 
-                    # individual MBO thresholding [0,1] (no segmentation constraint)
-                    A[:, :, k] = A[:, :, k] >= 0.5
-
-            # Joint MBO prop. with segmentation, "Winner Takes All", phase III
-            if n + 1 >= self.A_phase[1]:
-                sum_Avk = np.sum(A * np.sum(v, axis=3), axis=2)
-                for k in range(0, self.K):
+            # Phase III: joint MBO + winner-takes-all segmentation
+            if (n + 1) >= self.A_phase[1]:
+                sum_av = np.sum(A * np.sum(v, axis=3), axis=2)
+                for k in range(self.K):
+                    sum_v_k = np.sum(v[:, :, k, :], axis=2)
                     A[:, :, k] = A[:, :, k] + self.t * (
                         -self.beta
-                        + 2
+                        + 2.0
                         * self.rho
-                        * np.sum(v[:, :, k, :], axis=2)
-                        * (
-                            image
-                            - sum_Avk
-                            + A[:, :, k] * np.sum(v[:, :, k, :], axis=2)
-                            + lambda_d / self.rho
-                        )
+                        * sum_v_k
+                        * (signal - sum_av + A[:, :, k] * sum_v_k + lambda_d / self.rho)
                     )
                     A[:, :, k] = A[:, :, k] / (
-                        1 + self.t * 2 * self.rho * np.sum(v[:, :, k, :], axis=2) ** 2
+                        1.0 + self.t * 2.0 * self.rho * sum_v_k**2
                     )
-                    A[:, :, k] = ifft2d(
-                        fft2d(A[:, :, k])
-                        / (1 + self.t * self.gamma * ifftshift(freqs_1**2 + freqs_2**2))
+                    A[:, :, k] = np.real(
+                        ifft2d(
+                            fft2d(A[:, :, k])
+                            / (
+                                1.0
+                                + self.t
+                                * self.gamma
+                                * ifftshift(freqs_1**2 + freqs_2**2)
+                            )
+                        )
                     )
 
-                # Reshape A to a 2D array of shape [Hx*Hy, K]
-                A_reshaped = A.reshape(Hx * Hy, self.K)
-
-                # Find the index of the maximum value along the second axis (axis=1)
-                I = np.argmax(A_reshaped, axis=1)
-
-                # Create a sparse matrix with 1s at the positions specified by I
-                # Use scipy.sparse.csr_matrix to create a sparse matrix
-                row_indices = np.arange(Hx * Hy)  # Row indices (1:Hx*Hy)
-                data = np.ones(Hx * Hy)  # All values are 1
-                sparse_matrix = csr_matrix(
-                    (data, (row_indices, I)), shape=(Hx * Hy, self.K)
-                )
-
-                # Convert the sparse matrix to a dense array and reshape back to 3D
-                A = sparse_matrix.toarray().reshape(Hx, Hy, self.K)
+                # Winner-takes-all (column-major / Fortran order like MATLAB)
+                a_flat = A.reshape(hy * hx, self.K, order="F")
+                winners = np.argmax(a_flat, axis=1)
+                a_new = np.zeros_like(a_flat)
+                a_new[np.arange(hy * hx), winners] = 1.0
+                A = a_new.reshape(hy, hx, self.K, order="F")
 
             # Artifact thresholding
-            DF = image - np.sum(A * np.sum(v, axis=3), axis=2)
+            residual = signal - np.sum(A * np.sum(v, axis=3), axis=2)
+            artifact = residual**2 >= self.delta
 
-            # Update the X array
-            X = DF**2 >= self.delta
+            # Dual ascent — data fidelity
+            lambda_d = lambda_d + self.tau * residual
+            # Dual ascent — u/v splitting (must use tau_k, not tau)
+            lambda_k = lambda_k + self.tau_k * (u - v)
 
-            # data fidelity dual ascent
-            lambda_d = lambda_d + self.tau * DF
-
-            # Update Lagrangian multiplier variables via gradient ascent
-            lambda_k = lambda_k + self.tau * (u - v)
-
-            # Update counter
             n += 1
 
-            # Tolerance calculation for stopping criteria
-            uDiff = norm(u - u_old) ** 2 / norm(u**2 / (Hx * Hy))
-            ADiff = norm(A.ravel() - A_old.ravel(), ord=1) / (Hx * Hy)
+            # Stopping criteria (match MATLAB formulas)
+            u_norm = norm(u.ravel())
+            if u_norm > 1e-30:
+                u_diff = (norm((u - u_old).ravel()) ** 2) / (u_norm**2) / (hx * hy)
+            else:
+                u_diff = 0.0
+            a_diff = norm(A.ravel() - A_old.ravel(), ord=1) / (hx * hy)
+            omega_diff = float(norm(omega[n, :, :, :] - omega[n - 1, :, :, :]) ** 2)
 
-            # Storage of n-th iteration
             u_old = u.copy()
             A_old = A.copy()
 
-        omega = omega[n, :, :, :]
+        omega_final = omega[n, :, :, :]
 
-        # Whether to return all the information of decomposition
-        if return_all is True:
-            return u, v, omega, A, X
+        if return_all:
+            return u, v, omega_final, A, artifact.astype(float)
         return u
-
-
-if __name__ == "__main__":
-    from pysdkit.data import test_grayscale
-
-    img = test_grayscale()
-
-    vmd2d = CVMD2D(
-        K=5,
-        alpha=1000,
-        tau=2.5,
-        DC=True,
-        init="uniform",
-        max_iter=130,
-        M=1,
-        A_phase=np.array([100, np.inf]),
-        beta=0.5,
-        gamma=500,
-        rho=10,
-        rho_k=10,
-        tau_k=2.5,
-        t=1.5,
-    )
-    u = vmd2d.fit_transform(img)
-    print(u.shape)
-
-    from matplotlib import pyplot as plt
-
-    plt.imshow(img, cmap="gray")
-    plt.show()
-
-    for i in range(u.shape[2]):
-        plt.imshow(u[:, :, i], cmap="gray")
-        plt.show()
