@@ -4,8 +4,9 @@ Created on 2025/07/31
 @author: Whenxuan Wang
 @email: wwhenxuan@gmail.com
 
-Generalized Dispersion Mode Decomposition (GDMD) and
-Variational Generalized Nonlinear Mode Decomposition (VGNMD).
+Generalized Dispersion Mode Decomposition (GDMD),
+Variational Generalized Nonlinear Mode Decomposition (VGNMD),
+and Improved VGNMD (IVGNMD).
 """
 
 from .gdmd import (
@@ -31,6 +32,19 @@ from .vgnmd import (
     acmd_single,
 )
 
+from .ivgnmd import (
+    IVGNMD,
+    ivgnmd,
+    atffc_ivgnmd,
+    se,
+    tfsc,
+    tfst,
+    tfptd,
+    mtdc_ridge,
+    voa_ivgnmd,
+    make_ivgnmd_demo_signal,
+)
+
 __all__ = [
     "GDMD",
     "gdmd",
@@ -49,4 +63,14 @@ __all__ = [
     "stft_vgnmd",
     "make_vgnmd_demo_signal",
     "acmd_single",
+    "IVGNMD",
+    "ivgnmd",
+    "atffc_ivgnmd",
+    "se",
+    "tfsc",
+    "tfst",
+    "tfptd",
+    "mtdc_ridge",
+    "voa_ivgnmd",
+    "make_ivgnmd_demo_signal",
 ]
