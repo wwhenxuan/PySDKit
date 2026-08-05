@@ -5,79 +5,80 @@ Created on 2025/01/31 21:35:18
 @email: wwhenxuan@gmail.com
 """
 
+from __future__ import annotations
+
+from typing import Optional, Tuple
+
 import numpy as np
 from scipy.signal import argrelextrema
-
-from typing import Optional
 
 
 class LMD(object):
     """
-    Local Mean Decomposition
+    Local Mean Decomposition (classical Smith LMD).
 
-    Jia, Linshan, et al. “The Empirical Optimal Envelope and Its Application to Local Mean Decomposition.”
-    Digital Signal Processing, vol. 87, Elsevier BV, Apr. 2019, pp. 166–77, doi:10.1016/j.dsp.2019.01.024.
+    Decomposes a signal into Product Functions (PFs), each being a slowly
+    varying envelope multiplied by a pure FM carrier.
 
-    Python code: https://github.com/shownlin/PyLMD
+    Smith J.S. The local mean decomposition and its application to EEG
+    perception data. Journal of the Royal Society Interface, 2(5):443–454, 2005.
+    https://doi.org/10.1098/rsif.2005.0058
 
-    MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/107829-local-mean-decomposition?s_tid=srchtitle
+    Python reference (moving-average LMD):
+    https://github.com/shownlin/PyLMD
+
+    Note: the companion MATLAB ``eoe_lmd.m`` / Jia et al. DSP 2019 paper
+    implement **EOE-LMD** (empirical optimal envelopes), which is a different
+    envelope construction; this class follows classical Smith / PyLMD LMD.
     """
 
     def __init__(
         self,
         K: int = 5,
         endpoints: bool = True,
-        max_smooth_iter: int = 15,
+        max_smooth_iter: int = 12,
         max_envelope_iter: int = 200,
         envelope_epsilon: float = 0.01,
         convergence_epsilon: float = 0.01,
         min_extrema: int = 5,
     ) -> None:
         """
-        :param K: the maximum number of IFMs to be decomposed
-        :param endpoints: whether to treat the endpoint of the signal as a pseudo-extreme point
-        :param max_smooth_iter: maximum number of iterations of moving average algorithm
-        :param max_envelope_iter: maximum number of iterations when separating local envelope signals
-        :param envelope_epsilon: terminate processing when obtaining pure FM signal
-        :param convergence_epsilon: terminate processing when modulation signal converges
-        :param min_extrema: minimum number of local extrema
+        :param K: maximum number of PFs (excluding residue)
+        :param endpoints: treat signal endpoints as pseudo-extrema
+        :param max_smooth_iter: max moving-average smoothing iterations
+        :param max_envelope_iter: max inner sifting iterations per PF
+        :param envelope_epsilon: stop when mean |1 - a(t)| is below this
+        :param convergence_epsilon: stop when mean |s - t| is below this
+        :param min_extrema: minimum extrema count to continue outer loop
         """
-        self.K = K
-        self.endpoints = endpoints
-        self.max_smooth_iter = max_smooth_iter
-        self.max_envelope_iter = max_envelope_iter
-        self.envelope_epsilon = envelope_epsilon
-        self.convergence_epsilon = convergence_epsilon
-        self.min_extrema = min_extrema
+        self.K = int(K)
+        self.endpoints = bool(endpoints)
+        self.max_smooth_iter = int(max_smooth_iter)
+        self.max_envelope_iter = int(max_envelope_iter)
+        self.envelope_epsilon = float(envelope_epsilon)
+        self.convergence_epsilon = float(convergence_epsilon)
+        self.min_extrema = int(min_extrema)
 
     def __call__(self, signal: np.ndarray, K: Optional[int] = None) -> np.ndarray:
-        """allow instances to be called like functions"""
+        """Allow instances to be called like functions."""
         return self.fit_transform(signal=signal, K=K)
 
     def __str__(self) -> str:
-        """Get the full name and abbreviation of the algorithm"""
         return "Local Mean Decomposition (LMD)"
 
     def is_monotonous(self, signal: np.ndarray) -> bool:
-        """Determine whether the signal is a (non-strict) monotone sequence"""
-        # This method is used to determine the termination condition of the iterative loop
+        """Whether the signal is a (non-strict) monotone sequence."""
         if len(signal) <= 0:
-            # Sequence length less than 0 cannot be judged
-            return True  # Debugging Errors
-        else:
-            # Returns a test for whether it is monotonic
-            return self.is_monotonous_increase(signal) or self.is_monotonous_decrease(
-                signal
-            )
+            return True
+        return self.is_monotonous_increase(signal) or self.is_monotonous_decrease(
+            signal
+        )
 
     @staticmethod
     def is_monotonous_increase(signal: np.ndarray) -> bool:
-        """Determine whether the input signal is monotonically increasing"""
-        # Take the first sample
+        """Whether the input signal is monotonically non-decreasing."""
         y0 = signal[0]
-
         for y1 in signal:
-            # Traverse the entire signal
             if y1 < y0:
                 return False
             y0 = y1
@@ -85,70 +86,57 @@ class LMD(object):
 
     @staticmethod
     def is_monotonous_decrease(signal: np.ndarray) -> bool:
-        """Determine whether the input signal is monotonically decreasing"""
-        # Take the first sample
+        """Whether the input signal is monotonically non-increasing."""
         y0 = signal[0]
-
         for y1 in signal:
-            # Traverse the entire signal
             if y1 > y0:
                 return False
             y0 = y1
         return True
 
     def find_extrema(self, signal: np.ndarray) -> np.ndarray:
-        """Find all local extreme points of the signal"""
-
-        # The number of points can be used to determine whether further decomposition can be performed
+        """Find all local extreme points of the signal (optionally + endpoints)."""
         n = len(signal)
-
-        # Determine the extreme points in the input sequence using scipy's argrelextrema method
         extrema = np.append(
             argrelextrema(signal, np.greater)[0], argrelextrema(signal, np.less)[0]
         )
-
-        # Sort extreme points
         extrema.sort()
 
         if self.endpoints:
-            # Whether to consider the two endpoints of the input signal as extreme points
-            if extrema[0] != 0:
-                extrema = np.insert(extrema, 0, 0)
-            if extrema[-1] != n - 1:
-                extrema = np.append(extrema, n - 1)
+            # Guard empty extrema (e.g. constant / strictly monotone segments)
+            if extrema.size == 0:
+                extrema = np.array([0, n - 1], dtype=int)
+            else:
+                if extrema[0] != 0:
+                    extrema = np.insert(extrema, 0, 0)
+                if extrema[-1] != n - 1:
+                    extrema = np.append(extrema, n - 1)
 
-        return extrema
+        return extrema.astype(int)
 
     def moving_average_smooth(self, signal: np.ndarray, window: int) -> np.ndarray:
-        """Smooth the input signal by sliding average"""
-
-        n = len(signal)  # The length of the input signal
+        """Smooth a square local-mean / envelope sequence by weighted MA."""
+        n = len(signal)
 
         # at least one nearby sample is needed for average
         if window < 3:
             window = 3
 
-        # adjust length of sliding window to an odd number for symmetry
+        # odd window for symmetry
         if (window % 2) == 0:
             window += 1
 
         half = window // 2
-
-        # Initialize the parameters of the sliding average decomposition
         weight = np.array(list(range(1, half + 2)) + list(range(half, 0, -1)))
-        assert (
-            len(weight) == window
-        )  # Make sure the parameter length is the size of the window
+        assert len(weight) == window
 
-        smoothed = signal
+        smoothed = np.asarray(signal, dtype=float).copy()
 
-        # Start Iteration
         for _ in range(self.max_smooth_iter):
             head = list()
             tail = list()
             w_num = half
             for i in range(half):
-                # Process the head and tail separately
                 head.append(
                     np.array(
                         [smoothed[j] for j in range(i - (half - w_num), i + half + 1)]
@@ -164,7 +152,6 @@ class LMD(object):
                 )
                 w_num -= 1
 
-            # Smoothing through convolution
             smoothed = np.convolve(smoothed, weight, mode="same")
             smoothed[half:-half] = smoothed[half:-half] / sum(weight)
 
@@ -175,33 +162,41 @@ class LMD(object):
                     weight[:-w_num]
                 )
                 w_num -= 1
+            # stop when no consecutive identical samples remain (PyLMD / Smith)
             if self.is_smooth(smoothed, n):
-                # When the signal has been processed to a smooth state, the iteration stops
                 break
-        return smoothed  # Returns the smoothed signal
+        return smoothed
 
     @staticmethod
     def is_smooth(signal: np.ndarray, n: int) -> bool:
-        """Determine whether a signal is smooth"""
+        """True iff no two consecutive samples are identical (smoothed enough)."""
         for x in range(1, n):
-            # If there are two consecutive unequal points, it means it is not smooth
             if signal[x] == signal[x - 1]:
                 return False
         return True
 
-    def local_mean_and_envelope(self, signal: np.ndarray, extrema):
-        """Calculate the local mean function and local envelope function according to the location of the extreme points"""
+    def local_mean_and_envelope(
+        self, signal: np.ndarray, extrema: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Build local mean / envelope square signals and smooth them.
+
+        Between successive extrema ``n_k``, ``n_{k+1}``:
+
+        .. math::
+
+            m_k = (x(n_k)+x(n_{k+1}))/2,\\quad
+            a_k = |x(n_k)-x(n_{k+1})|/2
+        """
         n = len(signal)
         k = len(extrema)
         assert 1 < k <= n
-        # construct square signal
+
         mean = []
         enve = []
         prev_mean = (signal[extrema[0]] + signal[extrema[1]]) / 2
         prev_enve = abs(signal[extrema[0]] - signal[extrema[1]]) / 2
         e = 1
-        # Start calculating the local mean and envelope spectrum
-        # This process is the core of the algorithm
         for x in range(n):
             if (x == extrema[e]) and (e + 1 < k):
                 next_mean = (signal[extrema[e]] + signal[extrema[e + 1]]) / 2
@@ -215,7 +210,6 @@ class LMD(object):
                 mean.append(prev_mean)
                 enve.append(prev_enve)
 
-        # smooth square signal
         window = max(np.diff(extrema)) // 3
         return (
             np.array(mean),
@@ -225,46 +219,37 @@ class LMD(object):
         )
 
     def extract_product_function(self, signal: np.ndarray) -> np.ndarray:
-        """Perform one time local mean decomposition algorithm"""
-        s = signal
+        """Extract one Product Function (inner sifting loop)."""
+        s = np.asarray(signal, dtype=float).copy()
         n = len(signal)
-
-        # Used to store the results of this envelope spectrum analysis
         envelopes = []
 
-        def component():
-            # Calculate PF，using PF_i(t) = a_i(t)* s_in()，其中a_i = a_i0 * a_i1 * ... * a_in
+        def component() -> np.ndarray:
+            # PF = (prod_j a_j) * s_n
             c = s
-            for e in envelopes:
-                c = c * e
+            for env in envelopes:
+                c = c * env
             return c
 
-        # Start to separate the envelope signal through an iterative method
         for _ in range(self.max_envelope_iter):
-            # First, we can determine whether early stopping is possible by observing the extreme points of the signal
             extrema = self.find_extrema(s)
             if len(extrema) <= 3:
                 break
 
-            # Get the local envelope function of the input signal
             _m0, m, _a0, a = self.local_mean_and_envelope(s, extrema)
+            # avoid non-positive envelope (division)
+            a = np.asarray(a, dtype=float)
+            a[a <= 0] = 1.0 - 1e-4
 
-            for i in range(len(a)):
-                if a[i] <= 0:
-                    a[i] = 1 - 1e-4
-
-            # subtracted from the original data
             h = s - m
-
-            # amplitude demodulated by dividing a
             t = h / a
 
-            # Terminate processing when obtaining pure FM signal.
-            err = sum(abs(1 - a)) / n
+            # pure FM: envelope close to 1
+            err = float(np.sum(np.abs(1.0 - a)) / n)
             if err <= self.envelope_epsilon:
                 break
-            # Terminate processing when modulation signal converges.
-            err = sum(abs(s - t)) / n
+            # modulation convergence
+            err = float(np.sum(np.abs(s - t)) / n)
             if err <= self.convergence_epsilon:
                 break
             envelopes.append(a)
@@ -274,51 +259,33 @@ class LMD(object):
 
     def fit_transform(self, signal: np.ndarray, K: Optional[int] = None) -> np.ndarray:
         """
-        Signal decomposition using Local Mean Decomposition (LMD) algorithm
+        Decompose a 1-D signal with Local Mean Decomposition.
 
-        :param signal: the time domain signal (1D numpy array)  to be decomposed
-        :param K: the maximum number of IFMs to be decomposed
-        :return: IMFs
+        :param signal: time-domain signal ``(N,)``
+        :param K: optional override of maximum PF count (does not mutate ``self.K``)
+        :return: array ``(n_pf + 1, N)`` — PFs from high to low frequency, last row = residue
         """
-        if K is not None:
-            # Tuning Hyperparameters
-            self.K = K
+        x = np.asarray(signal, dtype=float).ravel()
+        if x.ndim != 1:
+            raise ValueError("signal must be a 1-D array")
+        if x.size < 4:
+            raise ValueError("signal length must be >= 4")
+
+        max_pf = int(self.K if K is None else K)
         pf = []
+        residue = x.copy()
 
-        # until the residual function is close to a monotone function
-        residue = signal[:]
-
-        # Decomposition by loop iteration
-        while (len(pf) < self.K) and (not self.is_monotonous(residue)):
-            # Ensure that the number of decompositions has the required sign and the remaining residuals are non-monotonic
-            if len(self.find_extrema(residue)) < self.min_extrema:
-                # The number of extreme points of the remaining signal must be greater than the minimum specified number
-                break
-
-            # Get the result of this local mean decomposition
+        while (
+            (len(pf) < max_pf)
+            and (not self.is_monotonous(residue))
+            and (len(self.find_extrema(residue)) >= self.min_extrema)
+        ):
             component = self.extract_product_function(residue)
-
-            # Each iteration subtracts the decomposed part from the original signal
+            # avoid zero / NaN components stalling the loop
+            if not np.all(np.isfinite(component)):
+                break
             residue = residue - component
-
-            # Record the results of this decomposition
             pf.append(component)
 
-        # Incorporate the residuals left over from the decomposition
         pf.append(residue)
-
-        return np.array(pf)
-
-
-if __name__ == "__main__":
-    from pysdkit.data import test_univariate_signal
-    from pysdkit.plot import plot_IMFs
-    from matplotlib import pyplot as plt
-
-    time, signal = test_univariate_signal()
-
-    rlmd = LMD()
-    imfs = rlmd.fit_transform(signal)
-
-    plot_IMFs(signal, imfs)
-    plt.show()
+        return np.asarray(pf, dtype=float)
