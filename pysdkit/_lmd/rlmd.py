@@ -37,7 +37,7 @@ class RLMD(object):
         smooth_mode: Optional[str] = "ma",
         ma_span: Optional[str] = "liu",
         ma_iter_mode: Optional[str] = "fixed",
-        stop_threshold: Optional[Tuple[float, float, float]] = (0.005, 0.7, 0.005),
+        stop_threshold: Optional[Tuple[float, float, float]] = (0.005, 0.7, 0.05),
         extd_r: Optional[float] = 0.2,
         sifting_stopping_mode: Optional[str] = "liu",
         min_peak: Optional[int] = 3,
@@ -156,34 +156,30 @@ class RLMD(object):
         # Total amount of extrema
         n_extr = len(indmin) + len(indmax)
 
-        if n_extr < self.min_peak:
+        # MATLAB stops mean/amp when n_extr < 3
+        if n_extr < 3:
             m = np.array([])
             a = np.array([])
             return m, a, n_extr
 
         # extend original data to refrain end effect
-        # ext_indmin(max) contains the end point's index
         ext_indmin, ext_indmax, ext_x, cut_index = extend(
             x=x, indmin=indmin, indmax=indmax, extd_r=self.extd_r
         )
 
-        # preparation
+        # preparation (0-based indices from extend)
         m0 = np.zeros(len(ext_x))
         a0 = np.zeros(len(ext_x))
+        ind_extextr = np.sort(np.hstack([ext_indmin, ext_indmax])).astype(int)
 
-        # TODO: Here the index array is processed by -1
-        ind_extextr = np.sort(np.hstack([ext_indmin, ext_indmax])) - 1
-
-        # Compute local mean and amplititude sequence
+        # Compute local mean and amplitude sequence (Smith square signals)
         if self.smooth_mode == "ma":
-            for k in range(
-                0, len(ind_extextr) - 1
-            ):  # TODO: Note that you don't need to subtract 1 here.
-                subm1 = ind_extextr[k]
-                subm2 = ind_extextr[k + 1]
-                # print(subm1, subm2, len(m0), len(a0), len(ext_x))
-                m0[subm1:subm2] = (ext_x[subm1] + ext_x[subm2]) / 2
-                a0[subm1:subm2] = np.abs(ext_x[subm1] + ext_x[subm2]) / 2
+            for k in range(0, len(ind_extextr) - 1):
+                subm1 = int(ind_extextr[k])
+                subm2 = int(ind_extextr[k + 1])
+                # MATLAB m0(subm1:subm2) is inclusive → Python slice end+1
+                m0[subm1 : subm2 + 1] = 0.5 * (ext_x[subm1] + ext_x[subm2])
+                a0[subm1 : subm2 + 1] = 0.5 * np.abs(ext_x[subm1] - ext_x[subm2])
 
             span, smax = self._get_best_span(ind_extextr, x=ext_x)
 
@@ -191,10 +187,13 @@ class RLMD(object):
             m = self._itrma(x=m0, span=span, smax=smax)
             a = self._itrma(x=a0, span=span, smax=smax)
 
-            # cut extension
-            # TODO: Here the index array is processed by -1
-            m = m[cut_index[0] : cut_index[1] + 1]
-            a = a[cut_index[0] : cut_index[1] + 1]
+            # cut extension (MATLAB cut_index inclusive)
+            c0, c1 = int(cut_index[0]), int(cut_index[1])
+            if c1 >= m.size or c0 < 0 or (c1 - c0 + 1) != x.size:
+                # extension/cut inconsistent — abort this sifting step
+                return np.array([]), np.array([]), n_extr
+            m = m[c0 : c1 + 1]
+            a = a[c0 : c1 + 1]
 
         else:
             raise ValueError(f"No specifications {self.smooth_mode} for smooth_mode!")
@@ -305,10 +304,12 @@ class RLMD(object):
         stop_sifting = False
 
         if self.sifting_stopping_mode.lower() == "liu":
-            # local optimal iteration.
-            fv_i[j] = rms(df) + np.abs(kurtosis(x=df) - 3)
+            # MATLAB: fv = rms(df) + abs(kurtosis(df) - 3)
+            # our kurtosis() returns excess kurtosis (already −3), so use abs(excess)
+            fv_i[j] = float(rms(df) + np.abs(kurtosis(x=df)))
 
-            if j >= 3:
+            # MATLAB uses 1-based j >= 3 → 0-based j >= 2
+            if j >= 2:
                 if (fv_i[j] >= fv_i[j - 1]) and (fv_i[j - 1] >= fv_i[j - 2]):
                     stop_sifting = True
                     return stop_sifting, fv_i
@@ -350,77 +351,60 @@ class RLMD(object):
             s_j = np.zeros(shape=(self.max_iter, nx))
             a_ij = np.zeros(shape=(self.max_iter, nx))
 
-            # PF sifting iteration loop
+            # PF sifting iteration loop (MATLAB: while j < max_iter)
             j = 0
             stop_sifting = False
             s = xs.copy()
 
-            while j < self.max_imfs and not stop_sifting:
-                # inner loop for sifting process
-
+            while j < self.max_iter and not stop_sifting:
                 # Compute mean function and amplitude function
                 m_j, a_j, n_extr = self._lmd_mean_amp(x=s)
 
-                # force to stop iter if number of extrema of s is smaller than 3.
-                if n_extr < self.min_peak:
-                    # The number of extreme points is too small to stop the algorithm iteration
+                # force to stop iter if number of extrema of s is smaller than 3
+                if n_extr < 3 or m_j.size == 0 or a_j.size == 0:
                     break
 
-                # remove mean
+                # remove mean / demodulate amplitude
                 h_j = s - m_j
-
-                # demodulate amplitude
                 s = h_j / a_j
 
-                # mulitiply every a_i
+                # multiply every a_i
                 a_i = a_i * a_j
-
                 a_ij[j, :] = a_i
                 s_j[j, :] = s
 
-                # Stopping criteria for judging the algorithm
                 stop_sifting, fvs_array = self._is_sifting_stopping(
                     a_j=a_j, j=j, fv_i=fvs[i, :]
                 )
                 fvs[i, :] = fvs_array
-
                 j = j + 1
 
+            if j == 0:
+                # no successful sifting step — keep residual and stop
+                break
+
             if self.sifting_stopping_mode.lower() == "liu":
-                # Get the index of the minimum value
-                opt0 = np.argmin(fvs[i, :j])
-
-                # in case iteration stop for n_extr<3
-                opt_IterNum = min(j, opt0)
-
+                # MATLAB: [~, opt0] = min(fvs(i,1:j)); opt_IterNum = min(j, opt0)
+                opt0 = int(np.argmin(fvs[i, :j]))
+                opt_IterNum = opt0
             else:
                 raise ValueError("No specifications for sifting_stopping_mode.")
 
-            # save each amplitude modulation function in ams.
+            # save AM / FM / PF (MATLAB: pf = am .* fm)
             ams[i, :] = a_ij[opt_IterNum, :]
-
-            # save each pure frequency modulation function in fms.
             fms[i, :] = s_j[opt_IterNum, :]
+            pfs[i, :] = ams[i, :] * fms[i, :]
 
-            # gain Product Funcion.
-            pfs[i, :] = a_ij[opt_IterNum, :]
-
-            # remove PF just obtained from the input signal
             xs = xs - pfs[i, :]
-            # print(pfs[i, :])
-
-            # record the iteration times taken by of each PF sifing
             iterNum[i] = opt_IterNum
-
             i = i + 1
 
-        # save residual in the last row of PFs matrix
-        # pfs[i + 1, :] = xs  # FIX: IndexError
+        # trim unused rows and append residual (MATLAB pfs(i+1,:)=xs)
         residual = xs
-        # Append the residual
-        pfs = np.vstack([pfs, residual])
+        pfs = np.vstack([pfs[:i, :], residual[np.newaxis, :]])
+        ams = ams[:i, :]
+        fms = fms[:i, :]
 
-        # whether to return all the information
         if return_all is True:
             return pfs, ams, fms
 
@@ -504,93 +488,91 @@ def extend(
     extd_r: Union[np.ndarray, float],
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Python implementation of the MATLAB `extend` routine from the EMD toolbox.
+    Mirror-extend the signal to reduce end effects (MATLAB ``extend`` in ``lmd_public.m``).
 
-    :param x: 1-D ndarray, Original signal.
-    :param indmin: 1-D array_like, Indices of local minima (0-based).
-    :param indmax: 1-D array_lik, Extension ratio.  0 → no extension.
-    :param extd_r: float, Extension ratio.  0 → no extension.
-    :return: - ext_indmin : ndarray, Indices of minima in the extended signal.
-             - ext_indmax : ndarray, Indices of maxima in the extended signal.
-             - ext_x : ndarray, Extended signal.
-             - cut_index : ndarray, Two-element array [start, end] giving indices to cut back to the original range in the extended signal.
+    Indices are **0-based** throughout (converted from the original 1-based MATLAB).
+
+    :return: ``ext_indmin``, ``ext_indmax``, ``ext_x``, ``cut_index`` (inclusive)
     """
-    x = np.asarray(x, dtype=float)
-    indmin = np.asarray(indmin, dtype=int)
-    indmax = np.asarray(indmax, dtype=int)
-
+    x = np.asarray(x, dtype=float).ravel()
+    indmin = np.asarray(indmin, dtype=int).ravel()
+    indmax = np.asarray(indmax, dtype=int).ravel()
     xlen = x.size
-    if extd_r == 0:
-        return indmin, indmax, x, np.array([0, xlen - 1])
 
-    # do not extend x
-    nbsym = int(np.ceil(extd_r * indmax.size))  # number of extrema to use
-    t = np.arange(xlen)
+    if extd_r == 0 or indmin.size == 0 or indmax.size == 0:
+        return indmin, indmax, x, np.array([0, xlen - 1], dtype=int)
 
-    # boundary conditions for interpolations :
+    nbsym = int(np.ceil(float(extd_r) * indmax.size))
+    t = np.arange(xlen)  # 0-based sample axis
 
-    # ------------------------------------------------------------
-    # 1. Left boundary
-    # ------------------------------------------------------------
-    if indmax[0] < indmin[0]:
-        # first extremum is a maximum
+    # ---- left end ---------------------------------------------------------
+    if indmax[0] < indmin[0]:  # first extremum is maximum
         if x[0] > x[indmin[0]]:
-            lmax = indmax[2 : min(indmax.size, nbsym + 1)][::-1]
-            lmin = indmin[1 : min(indmin.size, nbsym)][::-1]
-            lsym = indmax[0]
-        else:
             lmax = indmax[1 : min(indmax.size, nbsym + 1)][::-1]
-            lmin = np.r_[indmin[1 : min(indmin.size, nbsym)][::-1], 0]
+            lmin = indmin[0 : min(indmin.size, nbsym)][::-1]
+            lsym = int(indmax[0])
+        else:
+            lmax = indmax[0 : min(indmax.size, nbsym)][::-1]
+            lmin = np.r_[indmin[0 : min(indmin.size, max(nbsym - 1, 0))][::-1], 0]
             lsym = 0
-    else:  # first extremum is a minimum
+    else:  # first extremum is minimum
         if x[0] < x[indmax[0]]:
-            lmax = indmax[1 : min(indmax.size, nbsym)][::-1]
-            lmin = indmin[2 : min(indmin.size, nbsym + 1)][::-1]
-            lsym = indmin[0]
-        else:
-            lmax = np.r_[indmax[1 : min(indmax.size, nbsym)][::-1], 0]
+            lmax = indmax[0 : min(indmax.size, nbsym)][::-1]
             lmin = indmin[1 : min(indmin.size, nbsym + 1)][::-1]
+            lsym = int(indmin[0])
+        else:
+            lmax = np.r_[indmax[0 : min(indmax.size, max(nbsym - 1, 0))][::-1], 0]
+            lmin = indmin[0 : min(indmin.size, nbsym)][::-1]
             lsym = 0
 
-    # ------------------------------------------------------------
-    # 2. Right boundary
-    # ------------------------------------------------------------
-    if indmax[-1] < indmin[-1]:  # last extremum is a minimum
+    # ---- right end --------------------------------------------------------
+    # MATLAB 1-based slices → 0-based:
+    #   arr(max(end-k,1):end)   → arr[max(n-k-1, 0):]
+    #   arr(max(end-k,1):end-1) → arr[max(n-k-1, 0):-1]
+    nmax, nmin = indmax.size, indmin.size
+    if indmax[-1] < indmin[-1]:  # last extremum is minimum
         if x[-1] < x[indmax[-1]]:
-            rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
-            rmin = indmin[max(indmin.size - nbsym, 0) : -1][::-1]
-            rsym = indmin[-1]
+            # rmax = fliplr(indmax(max(end-nbsym+1,1):end))
+            # rmin = fliplr(indmin(max(end-nbsym,1):end-1))
+            rmax = indmax[max(nmax - nbsym, 0) :][::-1]
+            rmin = indmin[max(nmin - nbsym - 1, 0) : -1][::-1]
+            rsym = int(indmin[-1])
         else:
-            rmax = np.r_[xlen - 1, indmax[max(indmax.size - nbsym + 1, 0) :][::-1]]
-            rmin = indmin[max(indmin.size - nbsym, 0) :][::-1]
+            # rmax = [xlen, fliplr(indmax(max(end-nbsym+2,1):end))]
+            # rmin = fliplr(indmin(max(end-nbsym+1,1):end))
+            rmax = np.r_[xlen - 1, indmax[max(nmax - nbsym + 1, 0) :][::-1]]
+            rmin = indmin[max(nmin - nbsym, 0) :][::-1]
             rsym = xlen - 1
-    else:  # last extremum is a maximum
+    else:  # last extremum is maximum
         if x[-1] > x[indmin[-1]]:
-            rmax = indmax[max(indmax.size - nbsym, 0) : -1][::-1]
-            rmin = indmin[max(indmin.size - nbsym + 1, 0) :][::-1]
-            rsym = indmax[-1]
+            # rmax = fliplr(indmax(max(end-nbsym,1):end-1))
+            # rmin = fliplr(indmin(max(end-nbsym+1,1):end))
+            rmax = indmax[max(nmax - nbsym - 1, 0) : -1][::-1]
+            rmin = indmin[max(nmin - nbsym, 0) :][::-1]
+            rsym = int(indmax[-1])
         else:
-            rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
-            rmin = np.r_[xlen - 1, indmin[max(indmin.size - nbsym + 1, 0) :][::-1]]
+            # rmax = fliplr(indmax(max(end-nbsym+1,1):end))
+            # rmin = [xlen, fliplr(indmin(max(end-nbsym+2,1):end))]
+            rmax = indmax[max(nmax - nbsym, 0) :][::-1]
+            rmin = np.r_[xlen - 1, indmin[max(nmin - nbsym + 1, 0) :][::-1]]
             rsym = xlen - 1
 
-    # Mirror locations
-    tlmin = 2 * t[lsym] - t[lmin]
-    tlmax = 2 * t[lsym] - t[lmax]
-    trmin = 2 * t[rsym] - t[rmin]
-    trmax = 2 * t[rsym] - t[rmax]
+    tlmin = 2 * t[lsym] - t[lmin] if lmin.size else np.array([])
+    tlmax = 2 * t[lsym] - t[lmax] if lmax.size else np.array([])
+    trmin = 2 * t[rsym] - t[rmin] if rmin.size else np.array([])
+    trmax = 2 * t[rsym] - t[rmax] if rmax.size else np.array([])
 
-    # Ensure the extension reaches far enough
-    if tlmin.size and tlmin[0] > t[0] or tlmax.size and tlmax[0] > t[0]:
+    # ensure mirrored parts extend far enough
+    if (tlmin.size and tlmin[0] > t[0]) or (tlmax.size and tlmax[0] > t[0]):
         if lsym == indmax[0]:
-            lmax = indmax[1 : min(indmax.size, nbsym + 1)][::-1]
+            lmax = indmax[0 : min(indmax.size, nbsym)][::-1]
         else:
-            lmin = indmin[1 : min(indmin.size, nbsym + 1)][::-1]
+            lmin = indmin[0 : min(indmin.size, nbsym)][::-1]
         if lsym == 0:
             raise RuntimeError("Left extension bug")
         lsym = 0
 
-    if trmin.size and trmin[-1] < t[-1] or trmax.size and trmax[-1] < t[-1]:
+    if (trmin.size and trmin[-1] < t[-1]) or (trmax.size and trmax[-1] < t[-1]):
         if rsym == indmax[-1]:
             rmax = indmax[max(indmax.size - nbsym, 0) :][::-1]
         else:
@@ -599,37 +581,61 @@ def extend(
             raise RuntimeError("Right extension bug")
         rsym = xlen - 1
 
-    # ------------------------------------------------------------
-    # 3. Build extended signal
-    # ------------------------------------------------------------
-    l_end = max(np.max(lmax) if lmax.size else 0, np.max(lmin) if lmin.size else 0)
-    r_end = min(
-        np.min(rmax) if rmax.size else (xlen - 1),
-        np.min(rmin) if rmin.size else (xlen - 1),
+    l_end = int(
+        max(
+            int(np.max(lmax)) if lmax.size else 0,
+            int(np.max(lmin)) if lmin.size else 0,
+        )
+    )
+    r_end = int(
+        min(
+            int(np.min(rmax)) if rmax.size else (xlen - 1),
+            int(np.min(rmin)) if rmin.size else (xlen - 1),
+        )
     )
 
-    new_lmax = l_end + 1 - lmax
-    new_lmin = l_end + 1 - lmin
+    # MATLAB: new_lmax = l_end+1-lmax  (1-based) → 0-based: l_end - lmax
+    new_lmax = l_end - lmax
+    new_lmin = l_end - lmin
     new_rmax = rsym - rmax
     new_rmin = rsym - rmin
 
-    lx_len = l_end - lsym
+    lx_length = l_end - lsym
+    # MATLAB: lx = fliplr(x(lsym+1:l_end)); rx = fliplr(x(r_end:rsym-1));
     lx = x[lsym + 1 : l_end + 1][::-1]
     rx = x[r_end:rsym][::-1]
 
-    ext_x = np.r_[lx, x[lsym : rsym + 1], rx]
+    # MATLAB: ext_x = [lx, x(lsym:rsym), rx];
+    ext_x = np.concatenate([lx, x[lsym : rsym + 1], rx])
 
-    lx_shift = lx_len - lsym
-    ext_indmin = np.r_[
-        new_lmin, indmin + lx_shift + 1, new_rmin + lx_shift + 1 + rsym
-    ].astype(int)
-    ext_indmax = np.r_[
-        new_lmax, indmax + lx_shift + 1, new_rmax + lx_shift + 1 + rsym
-    ].astype(int)
+    # MATLAB (1-based):
+    #   ext_indmin = [new_lmin, indmin+lx_length-lsym+1, new_rmin+lx_length-lsym+1+rsym]
+    # 0-based shift for original extrema: + (lx_length - lsym)
+    shift = lx_length - lsym
+    ext_indmin = np.concatenate(
+        [
+            new_lmin.astype(int),
+            indmin + shift,
+            new_rmin.astype(int) + shift + rsym,
+        ]
+    )
+    ext_indmax = np.concatenate(
+        [
+            new_lmax.astype(int),
+            indmax + shift,
+            new_rmax.astype(int) + shift + rsym,
+        ]
+    )
 
-    cut_index = np.array([lx_shift + 1, xlen + lx_shift], dtype=int)
+    # MATLAB cut_index = [lx_length-lsym+2, length(x)+lx_length-lsym+1] (1-based inclusive)
+    # → 0-based inclusive: [shift, xlen + shift - 1]
+    cut_index = np.array([shift, xlen + shift - 1], dtype=int)
 
-    return ext_indmin, ext_indmax, ext_x, cut_index
+    # keep indices inside extended signal
+    ext_indmin = np.clip(ext_indmin, 0, ext_x.size - 1)
+    ext_indmax = np.clip(ext_indmax, 0, ext_x.size - 1)
+
+    return ext_indmin.astype(int), ext_indmax.astype(int), ext_x, cut_index
 
 
 def smooth(x: np.ndarray, span: int) -> np.ndarray:
