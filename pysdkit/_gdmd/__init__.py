@@ -6,7 +6,8 @@ Created on 2025/07/31
 
 Generalized Dispersion Mode Decomposition (GDMD),
 Variational Generalized Nonlinear Mode Decomposition (VGNMD),
-and Improved VGNMD (IVGNMD).
+Improved VGNMD (IVGNMD),
+and Adaptive Generalized Dispersive Mode Decomposition (AGDMD / AGNCMD).
 """
 
 from .gdmd import (
@@ -45,6 +46,26 @@ from .ivgnmd import (
     make_ivgnmd_demo_signal,
 )
 
+from .agncmd import (
+    AGNCMD,
+    AGDMD,
+    agncmd,
+    agdmd,
+    agdi,
+    ddgdi,
+    if_dn,
+    tvlp,
+    low_filter,
+    findev,
+    arccos_phase,
+    bandwidth_estimation,
+    dispersion_compensation,
+    agdmd_core,
+    make_agncmd_demo_signal,
+    spectrum_to_time_agdmd,
+    stft_agncmd,
+)
+
 __all__ = [
     "GDMD",
     "gdmd",
@@ -73,4 +94,21 @@ __all__ = [
     "mtdc_ridge",
     "voa_ivgnmd",
     "make_ivgnmd_demo_signal",
+    "AGNCMD",
+    "AGDMD",
+    "agncmd",
+    "agdmd",
+    "agdi",
+    "ddgdi",
+    "if_dn",
+    "tvlp",
+    "low_filter",
+    "findev",
+    "arccos_phase",
+    "bandwidth_estimation",
+    "dispersion_compensation",
+    "agdmd_core",
+    "make_agncmd_demo_signal",
+    "spectrum_to_time_agdmd",
+    "stft_agncmd",
 ]
