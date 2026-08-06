@@ -15,7 +15,7 @@ from pysdkit._lmd.rlmd import extr, extend, smooth
 
 def matlab_demo_signal(fs: float = 1000.0, n: int = 3000):
     """
-    Downsampled version of ``repo/RLMD/lmd_demo.m``:
+    Downsampled version:
 
     ``x1 = (2+cos(2*pi*0.5*t)).*cos(2*pi*5*t+15*t.^2)``
     ``x2 = cos(2*pi*2*t)``

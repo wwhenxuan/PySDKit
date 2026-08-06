@@ -64,6 +64,9 @@ from ._gdmd import VGNMD, vgnmd
 # Improved Variational Generalized Nonlinear Mode Decomposition
 from ._gdmd import IVGNMD, ivgnmd
 
+# Adaptive Generalized Dispersive Mode Decomposition (AGDMD / AGNCMD)
+from ._gdmd import AGNCMD, agncmd, AGDMD, agdmd
+
 # Variational Mode Decomposition
 from ._vmd import vmd, VMD
 
@@ -182,6 +185,7 @@ Swarm Decomposition                             |    SWD
 Generalized Dispersion Mode Decomposition       |    GDMD
 Variational Generalized Nonlinear Mode Dec.     |    VGNMD
 Improved VGNMD (crossed chirp / dispersive)     |    IVGNMD
+Adaptive Generalized Dispersive Mode Dec.      |    AGNCMD / AGDMD
 Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
@@ -237,6 +241,10 @@ __all__ = [
     "vgnmd",
     "IVGNMD",
     "ivgnmd",
+    "AGNCMD",
+    "agncmd",
+    "AGDMD",
+    "agdmd",
     "vmd",
     "VMD",
     "ACMD",
