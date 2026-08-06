@@ -12,6 +12,9 @@ requires-python = ">=3.8"
 authors = [
     { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
     { name = "RuiZhe Wang", email = "3133986068@qq.com" },
+    { name = "Rongkun Zhu", email = "mrpigzrk@gmail.com"},
+    { name = "Kai Wu", email = "kwu@xidian.edu.cn"},
+    { name = "Lei Wang", email = "wang_lei4759@163.com"},
     { name = "josefinez" },
     { name = "Deeksha Manjunath" },
     { name = "Yuan Feng" },
@@ -20,6 +23,8 @@ authors = [
 ]
 maintainers = [
     { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
+    { name = "RuiZhe Wang", email = "3133986068@qq.com" },
+    { name = "Kai Wu", email = "kwu@xidian.edu.cn"},
 ]
 keywords = [
     "signal decomposition",
