@@ -128,6 +128,10 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 | [`AVNCMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_vncmd/avncmd.py) (Adaptive Variational Nonlinear Chirp Mode Decomposition) | [[paper]](https://ieeexplore.ieee.org/abstract/document/9746147) |         [[code]](https://github.com/HauLiang/AVNCMD)         |   ✔️   |
 | [`ACMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_vmd/acmd.py) (Adaptive Chirp Mode Decomposition) |                         [[paper]]()                          | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/121373-data-driven-adaptive-chirp-mode-decomposition?s_tid=srchtitle) |   ✔️   |
 | [`BA-ACMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_vmd/ba_acmd.py) (Bandwidth-aware adaptive chirp mode decomposition) | [[paper]](https://journals.sagepub.com/doi/abs/10.1177/14759217231174699) | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/132792-bandwidth-aware-adaptive-chirp-mode-decomposition-ba-acmd?s_tid=srchtitle) |   ✖️   |
+|                                                              |                                                              |                                                              |       |
+|                                                              |                                                              |                                                              |       |
+|                                                              |                                                              |                                                              |       |
+|                                                              |                                                              |                                                              |       |
 | [`JMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_jmd/jmd.py) (Jump Plus AM-FM Mode Decomposition) |         [[paper]](https://arxiv.org/abs/2407.07800)          | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/169388-jump-plus-am-fm-mode-decomposition-jmd?s_tid=prof_contriblnk) |   ️✔️   |
 | [`MJMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_jmd/mjmd.py) (Multivariate Jump Plus AM-FM Mode Decomposition) |         [[paper]](https://arxiv.org/abs/2407.07800)          | [[code]](https://www.mathworks.com/matlabcentral/fileexchange/169393-multivariate-jump-plus-am-fm-mode-decomposition-mjmd?s_tid=prof_contriblnk) |   ✔️   |
 | [`SJMD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_jmd/sjmd.py) / `SMJMD` (Successive Jump and Mode Decomposition) |         [[paper]](https://arxiv.org/abs/2504.08453)          |                          [[code]]()                          |   ✔️   |
@@ -135,7 +139,9 @@ plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
 |   [`STNBMD`]() (Short-Time Narrow-Band Mode Decomposition)   | [[paper]](https://www.sciencedirect.com/science/article/pii/S0022460X16002443?via%3Dihub) | [[code]](https://ww2.mathworks.cn/matlabcentral/fileexchange/56226-short-time-narrow-band-mode-decomposition-stnbmd-toolbox) |   ✖️   |
 | [`SWD`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/_osd/swd.py) (Swarm Decomposition) |   [[paper]](https://doi.org/10.1016/j.sigpro.2016.09.004)    |  [[code]](https://github.com/gkaposto/Swarm-Decomposition)   |   ✔️   |
 | [`STL`](https://github.com/wwhenxuan/PySDKit/blob/main/pysdkit/tsa/_stl.py) (Seasonal-Trend decomposition using LOESS) | [[paper]](https://www.nniiem.ru/file/news/2016/stl-statistical-model.pdf) | [[code]](https://www.statsmodels.org/stable/examples/notebooks/generated/stl_decomposition.html) |   ✔️   |
-| [`MSTL`]() (Multivariate Seasonal-Trend decomposition using LOESS) | [[paper]](https://arxiv.org/abs/2107.13462) | [[code]](https://github.com/KishManani/MSTL) |   ✔️   |
+| [`MSTL`]() (Multivariate Seasonal-Trend decomposition using LOESS) |         [[paper]](https://arxiv.org/abs/2107.13462)          |         [[code]](https://github.com/KishManani/MSTL)         |   ✔️   |
+
+
 
 ## Acknowledgements 🎖️ <a id="Acknowledgements"></a>
 
