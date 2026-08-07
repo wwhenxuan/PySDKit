@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/21 11:53:35
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Object-oriented interface for Principal Component Analysis (PCA)
 """
 
 import numpy as np

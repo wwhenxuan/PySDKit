@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 18 22:05:02 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Compute the derivative of a discrete time series y.
 """
 
 import numpy as np

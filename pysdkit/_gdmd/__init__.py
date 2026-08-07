@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
-Generalized Dispersion Mode Decomposition (GDMD),
-Variational Generalized Nonlinear Mode Decomposition (VGNMD),
-Improved VGNMD (IVGNMD),
-and Adaptive Generalized Dispersive Mode Decomposition (AGDMD / AGNCMD).
+GDMD, VGNMD, IVGNMD, and AGNCMD (AGDMD) exports.
 """
 
 from .gdmd import (

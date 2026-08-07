@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/06 00:19:23
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Hilbert Vibration Decomposition
 """
 
 import numpy as np

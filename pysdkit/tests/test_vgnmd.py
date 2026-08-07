@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/03
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Variational Generalized Nonlinear Mode Decomposition.
 """
+
 import unittest
 
 import numpy as np

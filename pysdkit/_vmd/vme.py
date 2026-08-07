@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/04/02 22:44:18
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Variational Mode Extraction, a useful decomposition algorithm to extract a specific mode from the signal.
 """
 
 import numpy as np

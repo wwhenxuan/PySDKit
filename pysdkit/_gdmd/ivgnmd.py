@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/05
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Improved Variational Generalized Nonlinear Mode Decomposition (IVGNMD).
 
 IVGNMD improves VGNMD for *crossed* chirp and dispersive modes by replacing
@@ -23,6 +19,7 @@ mechanical systems. Mechanical Systems and Signal Processing, 2025.
 
 MATLAB toolbox: ``IVGNMD.m``, ``SE.m``, ``TFSC.m``, ``TFST.m``, ``TFPTD.m``.
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple, Union

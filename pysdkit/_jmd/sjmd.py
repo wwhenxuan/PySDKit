@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/20
-@author: Rongkun Zhu
-@email: 25481568@life.hkbu.edu.hk
-
 Successive Jump and Mode Decomposition (SJMD / SMJMD).
 
 Faithful port of the authors' MATLAB ``SJMD.m``.

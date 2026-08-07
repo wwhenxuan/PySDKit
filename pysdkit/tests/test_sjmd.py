@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for SJMD / SMJMD.
+Synthetic 3-channel signal following ``SJMD_test.m`` structure.
 """
 
 import unittest

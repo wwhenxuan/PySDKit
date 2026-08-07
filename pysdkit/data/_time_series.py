@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/10 18:35:29
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-Generate time series test examples
+This function is adapted from the famous statistical analysis library in Python, statsmodels.
 """
 
 import numpy as np

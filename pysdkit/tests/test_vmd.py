@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/15 18:26:17
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Automated tests for Variational Mode Decomposition (VMD)
 """
 
 import unittest

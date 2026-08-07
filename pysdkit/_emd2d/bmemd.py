@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:18:18
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Bidimensional Multivariate Empirical Mode Decomposition (BMEMD)
 
 Xia, Y., Zhang, B., Pei, W., and Mandic, D. P. (2019).

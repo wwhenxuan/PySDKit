@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 11:38:53
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Calculate the permutation entropy of the input time series of signal.
 """
 
 import numpy as np

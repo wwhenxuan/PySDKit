@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/01/31 21:35:05
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Local Mean Decomposition (LMD) and Robust LMD (RLMD).
 """
 
 from .lmd import LMD

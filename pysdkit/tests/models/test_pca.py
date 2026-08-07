@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/22 15:21:32
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Test whether PCA runs normally.
 """
 
 import unittest

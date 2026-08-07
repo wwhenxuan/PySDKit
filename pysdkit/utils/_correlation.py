@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/06 10:41:14
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-用于计算信号的相关性
+Correlation function: R[i] = sum_n(x[n+i]*conj(y[n])).
 """
 
 import numpy as np

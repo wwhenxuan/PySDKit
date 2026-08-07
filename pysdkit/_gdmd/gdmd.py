@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Generalized Dispersion Mode Decomposition (GDMD).
 
 GDMD is a variational algorithm for separating wideband, dispersive /
@@ -19,6 +15,7 @@ Journal of Sound and Vibration, 2020.
 MATLAB reference:
 https://uk.mathworks.com/matlabcentral/fileexchange/81823-generalized-dispersive-mode-decomposition-gdmd?s_tid=FX_rc2_behav
 """
+
 from __future__ import annotations
 
 from typing import List, Optional, Tuple, Union

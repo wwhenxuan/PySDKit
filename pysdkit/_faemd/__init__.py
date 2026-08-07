@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/01 22:30:27
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Fast and Adaptive EMD (1-D / 2-D / 3-D).
 """
 
 from .faemd import FAEMD

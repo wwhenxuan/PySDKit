@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/10 13:14:41
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Moving Average decomposition.
 """
 
 import numpy as np

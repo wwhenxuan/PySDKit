@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/15 16:18:33
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Discover and run the full PySDKit unit-test suite.
 
 NOTE:

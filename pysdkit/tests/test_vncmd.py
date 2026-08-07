@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2026/07/31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
-Unit tests for Variational Nonlinear Chirp Mode Decomposition (VNCMD).
+Automated tests for VNCMD
 """
 
 import unittest

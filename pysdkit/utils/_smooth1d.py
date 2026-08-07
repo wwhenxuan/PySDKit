@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/6/3 15:31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Simple Moving Average
 """
 
 import numpy as np

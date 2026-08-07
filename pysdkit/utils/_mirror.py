@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/5/18 22:15
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Implements a signal mirroring expansion function.
 """
 
 import numpy as np

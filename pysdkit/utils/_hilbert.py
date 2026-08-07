@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 7 12:09:42 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Apply the Hilbert transform to a given numpy signal.
 """
 
 import numpy as np

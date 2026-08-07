@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/05
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Improved VGNMD (IVGNMD).
 """
+
 import unittest
 
 import numpy as np

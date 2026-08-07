@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/6/2 21:12
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Perform min-max normalization on the input signal
 """
 
 import numpy as np

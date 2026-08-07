@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 00:17:59
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Stores MSTL decomposition results (multiple seasonal components).
 """
 
 from __future__ import annotations

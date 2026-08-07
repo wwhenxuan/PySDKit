@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/22 17:46:28
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Generate synthetic data for testing Principal Component Analysis (PCA).
 """
 
 import numpy as np

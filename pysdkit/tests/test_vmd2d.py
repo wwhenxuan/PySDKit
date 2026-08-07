@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/20 22:44:31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Verify two-dimensional Variational Mode Decomposition (VMD2D)
 """
 
 import unittest

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/03
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Variational Generalized Nonlinear Mode Decomposition (VGNMD).
 
 VGNMD jointly separates *chirp* modes (time-varying IF) and *dispersive* modes
@@ -22,6 +18,7 @@ https://doi.org/10.1016/j.ymssp.2023.110913
 MATLAB toolbox accompanying the paper (``VGNMD.m``, ``ATFFC.m``, ``MTDC.m``,
 ``VOA.m``).
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union

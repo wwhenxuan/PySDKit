@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/20
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Orthogonalized Variational Mode Decomposition (OVMD).
 
 Marbona H., Rodríguez D., Martínez-Cava A., Valero E.,

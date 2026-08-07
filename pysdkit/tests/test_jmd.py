@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for JMD and MJMD.
+Unit tests for jmd.
 """
 
 import unittest

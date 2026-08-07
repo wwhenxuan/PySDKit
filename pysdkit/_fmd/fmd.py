@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/01/12 00:05:39
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Feature Mode Decomposition (FMD) class for decomposing a signal into a predefined
 """
 
 import numpy as np

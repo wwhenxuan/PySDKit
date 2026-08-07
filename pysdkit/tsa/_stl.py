@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 00:14:21
-@author: Ruizhe Wang
-@email: changewam@stu.xidian.edu.cn
+Stores STL decomposition results
 """
 
 import operator

@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Generalized Dispersion Mode Decomposition.
 """
+
 import unittest
 
 import numpy as np

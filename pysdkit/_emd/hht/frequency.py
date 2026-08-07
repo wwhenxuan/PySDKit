@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/06 10:30:01
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-Hilbert-transform for demodulation
+Perform Hilbert transform along the last axis of input signal.
 """
 
 import numpy as np

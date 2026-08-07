@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 18 12:11:34 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 MATLAB code source:
 https://www.mathworks.com/matlabcentral/fileexchange/64292-variational-nonlinear-chirp-mode-decomposition
 """

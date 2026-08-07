@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 20:55:47
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Adaptive Variational Nonlinear Chirp Mode Decomposition (AVNCMD).
 
 MATLAB reference: https://github.com/HauLiang/AVNCMD

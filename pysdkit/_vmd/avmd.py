@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/6/2 17:54
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method Based on Adaptive Chirp Mode Decomposition,
 """
 
 import numpy as np

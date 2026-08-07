@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/11 21:42:45
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Plot and optionally save an amplitude modulated (AM) signal with time on the x-axis and amplitude on the y-axis.
 """
 
 import numpy as np

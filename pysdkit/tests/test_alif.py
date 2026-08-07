@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for Adaptive Local Iterative Filtering (ALIF).
+Tests for ALIF helper routines.
 """
 
 import unittest

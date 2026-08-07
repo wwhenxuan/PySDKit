@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/23
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Swarm Decomposition.
 """
+
 import unittest
 
 import numpy as np

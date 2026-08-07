@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:32:06
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Multivariate Jump Plus AM-FM Mode Decomposition (MJMD).
 
 Faithful port of the authors' MATLAB ``MJMD.m``.

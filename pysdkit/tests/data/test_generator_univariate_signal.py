@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/18 11:17:41
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Verify various test modules that generate one-dimensional signals
 """
 
 import unittest

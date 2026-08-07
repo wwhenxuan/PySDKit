@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/02 17:00:47
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Variational Mode Decomposition for 2D Image
 """
 
 import numpy as np

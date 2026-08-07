@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/01 22:06:04
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Time Varying Filter based Empirical Mode Decomposition
 """
 
 import warnings

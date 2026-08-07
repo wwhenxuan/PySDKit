@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 5 22:09:45 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
 The following code is mainly used to find extreme points in the EMD algorithm
 """
 

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/04/15 22:55:28
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Non-stationary Fourier Mode Decomposition
 """
 
 import numpy as np

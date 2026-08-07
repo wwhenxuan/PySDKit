@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/24 19:07:29
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Shared order-statistics filtering and adaptive window sizing for FA-MVEMD.
 """
 

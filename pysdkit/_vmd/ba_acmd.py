@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:24:43
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Bandwidth-Aware Adaptive Chirp Mode Decomposition
 """
 
 import numpy as np

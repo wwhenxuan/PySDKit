@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/18 10:39:38
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Select a test case for a one-dimensional univariate signal based on the input `case`
 """
 
 import numpy as np

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for Serial Empirical Mode Decomposition (SEMD).
+Automated tests for Serial-EMD.
 """
 
 import unittest

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/01 22:33:51
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Bidimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD2D)
 """
 
 from __future__ import annotations

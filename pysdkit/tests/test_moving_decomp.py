@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/15 23:21:53
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Moving_Decomp test
 """
 
 import unittest

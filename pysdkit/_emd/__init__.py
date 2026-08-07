@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/03 18:36:18
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Empirical Mode Decomposition family (EMD, EEMD, CEEMDAN, …).
 """
 
 from ._splines import akima, cubic, pchip, cubic_hermite, cubic_spline_3pts

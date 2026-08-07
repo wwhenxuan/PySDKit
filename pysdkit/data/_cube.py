@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/11 00:19:03
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-Generate 3D cube test sample
+Generate a grid 3D cube given an input and output range
 """
 
 import numpy as np

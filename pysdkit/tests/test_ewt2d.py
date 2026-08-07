@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/21 23:40:33
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Test whether 2D Empirical Wavelet Transform (EWT2D) runs normally.
 """
 
 import unittest

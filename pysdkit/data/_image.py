@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/02 13:01:46
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-Generate samples for testing 2D image data
+Load a sample 2D grayscale image for testing, the size is [256, 256]
 """
 
 import numpy as np

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 8 21:45:02 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Generate a Cosine signal with Gaussian noise and a sinusoidal component.
 """
 
 import numpy as np

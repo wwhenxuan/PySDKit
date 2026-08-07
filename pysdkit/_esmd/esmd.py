@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 21:04:29
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Esmd module.
 """
 
 import numpy as np

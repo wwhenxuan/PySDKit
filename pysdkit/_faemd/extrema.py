@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/24 13:20:36
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-要不要考虑将这个函数移动到utils中
+Gets the global extrema points from a time series
 """
 
 import numpy as np

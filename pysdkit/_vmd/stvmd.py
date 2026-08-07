@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2026/07/30
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Short-Time Variational Mode Decomposition (STVMD).
 
 Jia, H. et al. Short-time variational mode decomposition,

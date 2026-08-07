@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/06
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Unit tests for Adaptive Generalized Dispersive Mode Decomposition
 (AGDMD / AGNCMD).
 """
+
 import unittest
 
 import numpy as np

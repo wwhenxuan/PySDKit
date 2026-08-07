@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/01
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Singular Spectral Analysis (SSA).
 """
 
 import unittest

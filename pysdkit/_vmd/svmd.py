@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/6/2 17:54
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Successive Variational Mode Decomposition (SVMD).
 
 Unlike classical VMD, which extracts K modes concurrently and therefore

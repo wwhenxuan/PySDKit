@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/01 22:30:40
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Fast and Adaptive Empirical Mode Decomposition (1-D / multivariate 1-D)
 """
 
 from __future__ import annotations

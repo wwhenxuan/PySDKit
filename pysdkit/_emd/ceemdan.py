@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/04 15:19:08
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Complete Ensemble Empirical Mode Decomposition with Adaptive Noise
 """
 
 import numpy as np

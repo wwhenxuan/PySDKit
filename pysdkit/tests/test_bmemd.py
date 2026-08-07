@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for Bidimensional Multivariate Empirical Mode Decomposition (BMEMD).
+Automated tests for BMEMD.
 """
 
 import unittest

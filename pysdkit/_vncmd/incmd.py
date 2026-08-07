@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 12:31:39
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Iterative nonlinear chirp mode decomposition.
 """
 
 import numpy as np

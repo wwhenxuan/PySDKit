@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 4 21:58:54 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py
 """
 

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/02 17:00:39
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+2-D Variational Mode Decomposition (VMD2D / CVMD2D).
 """
 
 from .vmd2d import VMD2D

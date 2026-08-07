@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:22:12
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Two-dimensional Empirical Wavelet Transform (EWT2D).
 
 This module extends the 1D Empirical Wavelet Transform of Gilles (2013) to images.

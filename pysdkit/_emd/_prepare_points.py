@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 8 22:53:11 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
 The following code is mainly used to Performs extrapolation on edges by adding extra extrema in the EMD algorithm
 
 Code taken from https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD.py

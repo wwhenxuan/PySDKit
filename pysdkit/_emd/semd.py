@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2026/08/01
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Serial-EMD (SEMD): fast multi-signal EMD via 1-D serialization.
 
 Zhang, J., Feng, F., Marti-Puig, P., Caiafa, C. F., Sun, Z., Duan, F.,

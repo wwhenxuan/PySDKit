@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/02 16:47:10
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Visualize univariate and multivariate 2D images.
 """
 
 import numpy as np

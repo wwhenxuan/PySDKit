@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/02 00:13:28
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-这部分代码等待进行优化
+获取输入信号的极值点
 """
 
 import numpy as np

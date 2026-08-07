@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/04
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Unit tests for Compact / 2D-TV Variational Mode Decomposition.
 """
+
 import unittest
 
 import numpy as np

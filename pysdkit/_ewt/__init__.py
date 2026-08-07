@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/7/12 13:41
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Empirical Wavelet Transform (1-D and 2-D).
 """
 
 from .ewt import ewt

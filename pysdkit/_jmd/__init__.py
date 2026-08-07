@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:32:00
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Jump Plus AM-FM Mode Decomposition family.
 """
 
 from .jmd import JMD

@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:31:52
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Jump Plus AM-FM Mode Decomposition (JMD).
 
 Faithful port of the authors' MATLAB ``JMD.m``.

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/7/22 22:56
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Synthetic / example signal and image data generators.
 """
 
 __all__ = [

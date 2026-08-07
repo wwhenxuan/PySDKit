@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/20
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Adaptive Polymorphic Mode Decomposition (APMD).
 
 Huang Z. and Liu J., Digital Signal Processing, 161:104913, 2025.

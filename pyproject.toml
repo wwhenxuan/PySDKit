@@ -21,11 +21,6 @@ authors = [
     { name = "WenTong Zhao", email = "23049200290@stu.xidian.edu.cn" },
     { name = "JacktheFowler" },
 ]
-maintainers = [
-    { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
-    { name = "RuiZhe Wang", email = "3133986068@qq.com" },
-    { name = "Kai Wu", email = "kwu@xidian.edu.cn"},
-]
 keywords = [
     "signal decomposition",
     "signal processing",

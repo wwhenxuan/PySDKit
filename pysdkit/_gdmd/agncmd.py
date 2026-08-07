@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/08/06
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Adaptive Generalized Dispersive Mode Decomposition (AGDMD / AGNCMD).
 
 AGDMD extends GDMD with a fully data-driven pipeline that removes the need
@@ -22,6 +18,7 @@ Paper (MATLAB toolbox name ``AGDMD``; package alias ``AGNCMD``)::
     approach for nonlinear dispersive component extraction in mechanical
     systems. Journal of Sound and Vibration, 2025.
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple, Union

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/01 22:33:42
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Tridimensional Fast and Adaptive Empirical Mode Decomposition (FAEMD3D)
 """
 
 from __future__ import annotations

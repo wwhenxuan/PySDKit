@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/21 15:34:55
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Serves as the base class for all algorithm supervised models
 """
 
 import numpy as np

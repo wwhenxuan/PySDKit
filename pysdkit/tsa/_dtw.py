@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 00:11:39
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Returns the DTW similarity distance between two 2-D timeseries numpy arrays.
 """
 
 from sys import maxsize as MAXSIZE

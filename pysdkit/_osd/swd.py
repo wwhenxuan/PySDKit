@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/23
-@author: Kai Wu
-@email: kwu@xidian.edu.cn
-
 Swarm Decomposition (SWD / SwD).
 
 A non-stationary signal decomposition method based on swarm intelligence.
@@ -16,7 +12,7 @@ longer contains a significant spectral peak.
 
 Apostolidis, G. K. and Hadjileontiadis, L. J. (2017).
 Swarm decomposition: A novel signal analysis using swarm intelligence.
-Signal Processing, 132, 40–50.
+Signal Processing, 132, 40-50.
 https://doi.org/10.1016/j.sigpro.2016.09.004
 
 MATLAB reference (encrypted ``.p`` toolbox):
@@ -29,8 +25,9 @@ SWD from the published sifting architecture and the GA-fitted maps
 ``M(ω̂)``, ``δ(ω̂)`` (Eq. 9).  Because those maps were calibrated to produce
 *particular frequency responses*, SwF is realised here as an adaptive
 band-pass around the target ``ω̂`` (bandwidth from ``δ``) followed by a
-stabilised swarm–prey hunting pass that refines the time-domain waveform.
+stabilised swarm-prey hunting pass that refines the time-domain waveform.
 """
+
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple, Union

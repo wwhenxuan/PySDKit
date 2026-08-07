@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/07/22
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Verify Successive Variational Mode Decomposition (SVMD).
 """
 
 import unittest

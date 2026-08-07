@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2026/07/30
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Verify Short-Time Variational Mode Decomposition (STVMD).
 """
 
 import unittest

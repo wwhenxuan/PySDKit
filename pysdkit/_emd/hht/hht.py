@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/06 10:29:05
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Perform Hilbert-Huang transform on the input signal
 """
 
 import numpy as np

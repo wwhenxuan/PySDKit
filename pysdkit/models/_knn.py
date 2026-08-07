@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/03/17 17:53:21
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+K-nearest neighbor classifier using dynamic time warping
 """
 
 import numpy as np

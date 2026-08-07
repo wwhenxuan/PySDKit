@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/01/11 10:33:21
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Adaptive Chirp Mode Decomposition
 """
 
 import numpy as np

@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2024/6/3 15:31
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
-This py includes a series of functional modules
+Perform min-max normalization on the input signal
 """
 
 import numpy as np

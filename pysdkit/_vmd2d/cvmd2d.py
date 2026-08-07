@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/12 11:06:23
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
 Compact / Two-Dimensional TV Variational Mode Decomposition (CVMD2D / 2D-TV-VMD).
 
 Zosso D., Dragomiretskiy K., Bertozzi A.L., Weiss P.S.
@@ -14,6 +10,7 @@ https://doi.org/10.1007/s10851-017-0710-z
 MATLAB reference:
 https://www.mathworks.com/matlabcentral/fileexchange/67285-two-dimensional-compact-variational-mode-decomposition-2d-tv-vmd
 """
+
 from __future__ import annotations
 
 from typing import Optional, Tuple, Union

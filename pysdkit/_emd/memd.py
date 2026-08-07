@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/04 13:10:33
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
 We refactored from https://github.com/mariogrune/MEMD-Python-
 """
 

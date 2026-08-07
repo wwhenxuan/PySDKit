@@ -1,13 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 4 11:59:21 2024
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
-
-可视化图像的函数需要再专门去写几个
-就不同可视化信号的放在一起了
-
-对分解后的频谱进行可视化
+Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
 """
 
 import numpy as np

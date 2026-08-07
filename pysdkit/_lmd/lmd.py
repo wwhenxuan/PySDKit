@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/01/31 21:35:18
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Classical Local Mean Decomposition (Smith LMD).
 """
 
 from __future__ import annotations

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/05 13:15:49
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Robust Empirical Mode Decomposition
 """
 
 import numpy as np

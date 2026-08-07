@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Unit tests for Bidimensional FAEMD (FAEMD2D)."""
+"""
+Automated tests for FAEMD2D.
+"""
 
 import unittest
 

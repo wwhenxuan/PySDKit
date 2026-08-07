@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/01/31 23:33:43
-@author: Whenxuan Wang
-@coauthor: Wentong Zhao
-@email: wwhenxuan@gmail.com
+Robust Local Mean Decomposition (RLMD).
 """
 
 import numpy as np

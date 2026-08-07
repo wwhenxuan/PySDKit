@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/06 18:26:39
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+Singular Spectral Analysis (SSA) algorithm
 """
 
 import numpy as np

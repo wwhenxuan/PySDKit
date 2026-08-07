@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for Orthogonalized Variational Mode Decomposition (OVMD).
+Automated tests for OVMD.
 """
 
 import unittest

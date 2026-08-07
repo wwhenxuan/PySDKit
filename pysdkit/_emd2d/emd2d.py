@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 2025/02/04 13:13:52
-@author: Whenxuan Wang
-@email: wwhenxuan@gmail.com
+**Empirical Mode Decomposition 2D** for images data.
 """
 
 import numpy as np
