@@ -43,6 +43,9 @@ from ._hvd import HVD
 # Intrinsic Time-Scale Decomposition
 from ._itd import ITD
 
+# Extreme-Point Symmetric Mode Decomposition
+from ._esmd import ESMD, esmd
+
 # Local Mean Decomposition
 from ._lmd import LMD
 
@@ -178,6 +181,7 @@ Empirical Mode Decomposition 2D for images      |    EMD2D
 Bidimensional Multivariate EMD                  |    BMEMD
 Hilbert Vibration Decomposition                 |    HVD
 Intrinsic Time-Scale Decomposition              |    ITD
+Extreme-Point Symmetric Mode Decomposition      |    ESMD
 Local Mean Decomposition                        |    LMD
 Robust Local Mean Decomposition                 |    RLMD
 Singular Spectral Analysis                      |    SSA
@@ -230,6 +234,8 @@ __all__ = [
     "BMEMD",
     "HVD",
     "ITD",
+    "ESMD",
+    "esmd",
     "LMD",
     "RLMD",
     "SSA",
