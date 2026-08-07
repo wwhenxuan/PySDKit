@@ -10,16 +10,20 @@ readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
 authors = [
-    { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
-    { name = "RuiZhe Wang", email = "3133986068@qq.com" },
-    { name = "Rongkun Zhu", email = "mrpigzrk@gmail.com"},
-    { name = "Kai Wu", email = "kwu@xidian.edu.cn"},
-    { name = "Lei Wang", email = "wang_lei4759@163.com"},
+    { name = "Whenxuan Wang" },
+    { name = "RuiZhe Wang" },
+    { name = "Rongkun Zhu" },
+    { name = "Kai Wu" },
+    { name = "Lei Wang" },
     { name = "josefinez" },
     { name = "Deeksha Manjunath" },
     { name = "Yuan Feng" },
-    { name = "WenTong Zhao", email = "23049200290@stu.xidian.edu.cn" },
+    { name = "WenTong Zhao" },
     { name = "JacktheFowler" },
+]
+maintainers = [
+    { name = "Whenxuan Wang", email = "wwhenxuan@gmail.com" },
+    { name = "RuiZhe Wang", email = "3133986068@qq.com" },
 ]
 keywords = [
     "signal decomposition",
