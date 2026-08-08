@@ -37,11 +37,11 @@ from ._emd2d import EMD2D
 # Bidimensional Multivariate Empirical Mode Decomposition
 from ._emd2d import BMEMD
 
-# Hilbert Vibration Decomposition
-from ._hvd import HVD
+# Hilbert Vibration Decomposition (time iterative decomposition)
+from ._tid import HVD
 
-# Intrinsic Time-Scale Decomposition
-from ._itd import ITD
+# Intrinsic Time-Scale Decomposition (time iterative decomposition)
+from ._tid import ITD
 
 # Extreme-Point Symmetric Mode Decomposition
 from ._esmd import ESMD, esmd
@@ -52,8 +52,8 @@ from ._lmd import LMD
 # Robust Local Mean Decomposition
 from ._lmd import RLMD
 
-# Singular Spectral Analysis
-from ._ssa import SSA
+# Singular Spectral Analysis (time iterative decomposition)
+from ._tid import SSA
 
 # Swarm Decomposition
 from ._osd import SWD, swd
@@ -106,8 +106,8 @@ from ._vncmd import INCMD
 # Adaptive Variational Nonlinear Chirp Mode Decomposition
 from ._vncmd import AVNCMD
 
-# Adaptive Local Iterative Filtering
-from ._alif import ALIF
+# Adaptive Local Iterative Filtering (time iterative decomposition)
+from ._tid import ALIF
 
 # Adaptive Polymorphic Mode Decomposition
 from ._apmd import APMD
