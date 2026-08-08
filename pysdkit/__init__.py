@@ -58,6 +58,9 @@ from ._tid import SSA
 # Swarm Decomposition
 from ._osd import SWD, swd
 
+# Optimization-based Signal Decomposition
+from ._osd import OSD
+
 # Generalized Dispersion Mode Decomposition
 from ._gdmd import GDMD, gdmd
 
@@ -186,6 +189,7 @@ Local Mean Decomposition                        |    LMD
 Robust Local Mean Decomposition                 |    RLMD
 Singular Spectral Analysis                      |    SSA
 Swarm Decomposition                             |    SWD
+Optimization-based Signal Decomposition         |    OSD
 Generalized Dispersion Mode Decomposition       |    GDMD
 Variational Generalized Nonlinear Mode Dec.     |    VGNMD
 Improved VGNMD (crossed chirp / dispersive)     |    IVGNMD
@@ -241,8 +245,8 @@ __all__ = [
     "SSA",
     "SWD",
     "swd",
-    "GDMD",
-    "gdmd",
+    "OSD",
+    "GDMD",    "gdmd",
     "VGNMD",
     "vgnmd",
     "IVGNMD",
