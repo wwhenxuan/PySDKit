@@ -3,4 +3,6 @@
 Feature Mode Decomposition (FMD / NFMD).
 """
 
-from .fmd import FMD
+from .fmd import CK, FMD, TT, max_IJ
+
+__all__ = ["FMD", "TT", "CK", "max_IJ"]
