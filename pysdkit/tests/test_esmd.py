@@ -16,7 +16,7 @@ from pathlib import Path
 import numpy as np
 
 from pysdkit import ESMD, esmd
-from pysdkit._esmd.esmd import (
+from pysdkit._emd.esmd import (
     find_extrema,
     midpoints_from_extrema,
     mean_curve,

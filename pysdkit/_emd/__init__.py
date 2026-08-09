@@ -26,3 +26,5 @@ from .efd import EFD
 from .hht import HHT
 
 from .semd import SEMD, concatenate_signals, deconcatenate_imfs, transition_bridge
+
+from .esmd import ESMD, esmd

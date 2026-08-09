@@ -44,7 +44,7 @@ from ._tid import HVD
 from ._tid import ITD
 
 # Extreme-Point Symmetric Mode Decomposition
-from ._esmd import ESMD, esmd
+from ._emd import ESMD, esmd
 
 # Local Mean Decomposition
 from ._lmd import LMD
