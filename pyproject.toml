@@ -68,5 +68,6 @@ include = ["pysdkit*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.txt", "*.npy"]
+"pysdkit.data" = ["*.txt", "*.npy"]
 "pysdkit._tid" = ["data/*.npy"]
 "pysdkit._tid.data" = ["*.npy"]
