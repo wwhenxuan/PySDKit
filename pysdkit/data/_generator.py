@@ -235,6 +235,30 @@ def test_emd(
     return t, noise_signal
 
 
+def test_fmd() -> Tuple[np.ndarray, np.ndarray, float]:
+    """
+    Load the official MATLAB FMD demo signal shipped with PySDKit.
+
+    Source: File Exchange demo ``x.mat`` accompanying
+    Miao et al., IEEE Trans. Ind. Electron., 2022 (FMD).
+    Sampling rate is 20 kHz; length is 20001 samples (~1 s).
+
+    :return: ``(t, x, fs)`` time axis, signal, and sampling frequency
+    """
+    from os import path
+
+    data_path = path.join(path.dirname(path.abspath(__file__)), "fmd_demo.npy")
+    if not path.isfile(data_path):
+        raise FileNotFoundError(
+            "Missing FMD demo data: {}. Reinstall PySDKit or restore "
+            "pysdkit/data/fmd_demo.npy".format(data_path)
+        )
+    x = np.load(data_path).astype(np.float64).ravel()
+    fs = 2.0e4
+    t = np.arange(x.size, dtype=float) / fs
+    return t, x, fs
+
+
 def test_hht(duration: float = 2.0, sampling_rate: int = 1000):
     """
     Generate data generation function to verify Hilbert-Huang transform.
