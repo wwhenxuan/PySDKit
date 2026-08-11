@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 
 from pysdkit import APMD
-from pysdkit._apmd.apmd import gausswin, matlab_smooth, nextpow2, optwin, sub_tfrstft
+from pysdkit._imd.apmd import gausswin, matlab_smooth, nextpow2, optwin, sub_tfrstft
 
 
 def _make_two_chirp(fs: float = 400.0, T: float = 0.4, seed: int = 0):

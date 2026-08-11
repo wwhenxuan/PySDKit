@@ -151,12 +151,16 @@ class OSD(object):
             ]
         elif name in ("l1_trend", "l1tf", "trend"):
             comps = [
-                MeanSquareSmall(size=t, weight=overrides.get("residual_weight", 1.0 / t)),
+                MeanSquareSmall(
+                    size=t, weight=overrides.get("residual_weight", 1.0 / t)
+                ),
                 SparseSecondDiffConvex(weight=overrides.get("trend_weight", 1.0)),
             ]
         elif name in ("nonconvex_square", "nonconvex", "finite_set"):
             comps = [
-                MeanSquareSmall(size=t, weight=overrides.get("residual_weight", 1.0 / t)),
+                MeanSquareSmall(
+                    size=t, weight=overrides.get("residual_weight", 1.0 / t)
+                ),
                 SmoothSecondDifference(weight=overrides.get("smooth_weight", 1.0)),
                 FiniteSet(
                     values=overrides.get("values", (-1.0, 1.0)),
@@ -169,7 +173,9 @@ class OSD(object):
                 "'convex_demo', 'l1_trend', 'nonconvex_square'.".format(name)
             )
         max_iter = overrides.get("max_iter", 200)
-        return OSD(components=comps, max_iter=max_iter, verbose=overrides.get("verbose", False))
+        return OSD(
+            components=comps, max_iter=max_iter, verbose=overrides.get("verbose", False)
+        )
 
     def fit_transform(
         self,

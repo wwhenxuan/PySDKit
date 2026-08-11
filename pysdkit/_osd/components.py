@@ -89,7 +89,9 @@ class MeanSquareSmall(Component):
     φ(x) = ||x||₂² / size
     """
 
-    def __init__(self, size: Optional[int] = None, weight: float = 1.0, **kwargs) -> None:
+    def __init__(
+        self, size: Optional[int] = None, weight: float = 1.0, **kwargs
+    ) -> None:
         super().__init__(weight=weight, **kwargs)
         self.size = size
         self._is_residual = True

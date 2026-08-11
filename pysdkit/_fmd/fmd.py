@@ -68,7 +68,9 @@ class FMD(object):
         self.filters: Optional[np.ndarray] = None
         self.peak_freqs: Optional[np.ndarray] = None
 
-    def __call__(self, x: np.ndarray, fs: Optional[Union[int, float]] = None) -> np.ndarray:
+    def __call__(
+        self, x: np.ndarray, fs: Optional[Union[int, float]] = None
+    ) -> np.ndarray:
         return self.fit_transform(x, fs)
 
     def __str__(self) -> str:
@@ -271,9 +273,7 @@ class FMD(object):
         return y_final, f_final, ck_iter, int(T_final)
 
 
-def _build_XmT(
-    x: np.ndarray, L: int, T: int, M: int
-) -> Tuple[np.ndarray, np.ndarray]:
+def _build_XmT(x: np.ndarray, L: int, T: int, M: int) -> Tuple[np.ndarray, np.ndarray]:
     """Build the delayed Toeplitz tensors and ``(X0 X0^T)^{-1}`` used by MCKD."""
     N = x.size
     XmT = np.zeros((L, N, M + 1), dtype=float)

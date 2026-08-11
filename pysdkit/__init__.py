@@ -112,8 +112,8 @@ from ._vncmd import AVNCMD
 # Adaptive Local Iterative Filtering (time iterative decomposition)
 from ._tid import ALIF
 
-# Adaptive Polymorphic Mode Decomposition
-from ._apmd import APMD
+# Adaptive Polymorphic Mode Decomposition / Impulsive Mode Decomposition
+from ._imd import APMD, IMD, imd
 
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
@@ -207,6 +207,7 @@ Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
 Adaptive Local Iterative Filtering              |    ALIF
 Adaptive Polymorphic Mode Decomposition         |    APMD
+Impulsive Mode Decomposition                    |    IMD
 Empirical Wavelet Transform                     |    EWT
 Empirical Wavelet Transform for 2D Image        |    EWT2D
 Jump Plus AM-FM Mode Decomposition              |    JMD
@@ -246,7 +247,8 @@ __all__ = [
     "SWD",
     "swd",
     "OSD",
-    "GDMD",    "gdmd",
+    "GDMD",
+    "gdmd",
     "VGNMD",
     "vgnmd",
     "IVGNMD",
@@ -272,6 +274,8 @@ __all__ = [
     "AVNCMD",
     "ALIF",
     "APMD",
+    "IMD",
+    "imd",
     "ewt",
     "EWT",
     "ewt2d",
