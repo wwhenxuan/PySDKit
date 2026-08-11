@@ -14,8 +14,8 @@ class VMD(Base):
     """
     Variational mode decomposition, object-oriented interface.
 
-    Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
-    IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
+    Original paper: Dragomiretskiy, K. and Zosso, D. (2014) "Variational Mode Decomposition",
+    IEEE Transactions on Signal Processing, 62(3), pp. 531-544. doi: 10.1109/TSP.2013.2288675.
 
     The goal of VMD is to decompose the input signal into a series of modes with sparse characteristics.
     The sparse characteristics here refer to the fact that all modes are narrowband signals concentrated near their respective center frequencies.
@@ -50,6 +50,7 @@ class VMD(Base):
         DC: bool = False,
         max_iter: int = 500,
         tol: float = 1e-6,
+        store_history: bool = True,
     ) -> None:
         """
         :param alpha: the balancing parameter of the data-fidelity constraint
@@ -61,6 +62,12 @@ class VMD(Base):
         :param DC: true if the first mode is put and kept at DC (0-freq)
         :param max_iter: Maximum number of iterations
         :param tol: tolerance of convergence criterion; typically around 1e-6
+        :param store_history: If True (default), keep spectral iterates for every
+            ADMM step with shape ``(max_iter, T, K)``. If False, keep only the
+            previous / current spectral buffers (``O(T * K)`` memory). Use
+            ``store_history=False`` for long signals to avoid large allocations.
+            Center-frequency history ``omega`` is always retained (cheap).
+            Decomposition quality is unchanged; only peak memory differs.
         """
         super().__init__()
         # parameters of VMD signal decomposition algorithm
@@ -71,6 +78,7 @@ class VMD(Base):
         self.DC = DC
         self.max_iter = max_iter
         self.tol = tol
+        self.store_history = bool(store_history)
 
         # The last input original signal
         self.signal = None
@@ -134,6 +142,7 @@ class VMD(Base):
         :param save_name: The name of the saved image file
         :param fs: sampling frequency for ``view=\"2d_freq\"``
         :param freq_max: spectrum x-limit for ``view=\"2d_freq\"``
+
         :return: The figure object for the plot
         """
         if self.u is not None and self.signal is not None:
@@ -191,70 +200,118 @@ class VMD(Base):
 
         # For future generalizations: individual alpha for each mode
         alpha = np.ones(self.K) * self.alpha
-        # matrix keeping track of every iterant // could be discarded for mem
-        u_hat_plus = np.zeros([self.max_iter, len(freqs), self.K], dtype=complex)
-        # Initialization of omega_k
+        # Initialization of omega_k (always keep full history; it is cheap)
         omega_plus = self.__init_omega(fs=fs)
         if self.DC:
             omega_plus[0, 0] = 0
-        # start with empty dual variables
-        lambda_hat = np.zeros(shape=[self.max_iter, len(freqs)], dtype=complex)
 
         sum_uk = 0  # accumulator
         convergence = (
             np.spacing(1) + self.tol
         )  # Determine whether the algorithm converges
+        n = 0
 
-        # Main loop for iterative updates
-        for n in range(0, self.max_iter - 1):
-            # update spectrum of first mode through Wiener filter of residuals
-            sum_uk = u_hat_plus[n, :, self.K - 1] + sum_uk - u_hat_plus[n, :, 0]
-            u_hat_plus[n + 1, :, 0] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
-                1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
-            )
+        if self.store_history:
+            # Full spectral history: O(max_iter * T * K) memory
+            u_hat_plus = np.zeros([self.max_iter, len(freqs), self.K], dtype=complex)
+            lambda_hat = np.zeros(shape=[self.max_iter, len(freqs)], dtype=complex)
 
-            # update first omega if not held at 0
-            if not self.DC:
-                omega_plus[n + 1, 0] = np.dot(
-                    freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
-                ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
-
-            # update of any other mode
-            for k in range(1, self.K):
-                # mode spectrum
-                sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
-                u_hat_plus[n + 1, :, k] = (
+            for n in range(0, self.max_iter - 1):
+                sum_uk = u_hat_plus[n, :, self.K - 1] + sum_uk - u_hat_plus[n, :, 0]
+                u_hat_plus[n + 1, :, 0] = (
                     f_hat_plus - sum_uk - lambda_hat[n, :] / 2
-                ) / (1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2)
-                # center frequencies
-                omega_plus[n + 1, k] = np.dot(
-                    freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
-                ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
+                ) / (1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2)
 
-            # Update Lagrange multipliers
-            lambda_hat[n + 1, :] = lambda_hat[n, :] + self.tau * (
-                np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus
-            )
+                if not self.DC:
+                    omega_plus[n + 1, 0] = np.dot(
+                        freqs[T // 2 : T],
+                        (abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2),
+                    ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
 
-            # Determine whether the algorithm has converged
-            for i in range(self.K):
-                convergence = convergence + (1 / T) * np.dot(
-                    (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
-                    np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])),
+                for k in range(1, self.K):
+                    sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
+                    u_hat_plus[n + 1, :, k] = (
+                        f_hat_plus - sum_uk - lambda_hat[n, :] / 2
+                    ) / (1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2)
+                    omega_plus[n + 1, k] = np.dot(
+                        freqs[T // 2 : T],
+                        (abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2),
+                    ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
+
+                lambda_hat[n + 1, :] = lambda_hat[n, :] + self.tau * (
+                    np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus
                 )
-            convergence = np.abs(convergence)
-            if convergence <= self.tol:
-                break
 
-        # discard empty space if converged early
-        niter = np.min([self.max_iter, n])
-        omega = omega_plus[:niter, :]
+                for i in range(self.K):
+                    convergence = convergence + (1 / T) * np.dot(
+                        (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
+                        np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])),
+                    )
+                convergence = np.abs(convergence)
+                if convergence <= self.tol:
+                    break
+
+            niter = np.min([self.max_iter, n])
+            omega = omega_plus[:niter, :]
+            u_spec = u_hat_plus[niter - 1]
+
+        else:
+            # Low-memory path: only previous / current spectral buffers
+            # Memory: O(T * K) instead of O(max_iter * T * K)
+            u_old = np.zeros([len(freqs), self.K], dtype=complex)
+            u_new = np.zeros([len(freqs), self.K], dtype=complex)
+            lambda_hat = np.zeros(len(freqs), dtype=complex)
+            u_spec = u_old
+
+            for n in range(0, self.max_iter - 1):
+                sum_uk = u_old[:, self.K - 1] + sum_uk - u_old[:, 0]
+                u_new[:, 0] = (f_hat_plus - sum_uk - lambda_hat / 2) / (
+                    1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
+                )
+
+                if not self.DC:
+                    omega_plus[n + 1, 0] = np.dot(
+                        freqs[T // 2 : T],
+                        (abs(u_new[T // 2 : T, 0]) ** 2),
+                    ) / np.sum(abs(u_new[T // 2 : T, 0]) ** 2)
+
+                for k in range(1, self.K):
+                    sum_uk = u_new[:, k - 1] + sum_uk - u_old[:, k]
+                    u_new[:, k] = (f_hat_plus - sum_uk - lambda_hat / 2) / (
+                        1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2
+                    )
+                    omega_plus[n + 1, k] = np.dot(
+                        freqs[T // 2 : T],
+                        (abs(u_new[T // 2 : T, k]) ** 2),
+                    ) / np.sum(abs(u_new[T // 2 : T, k]) ** 2)
+
+                lambda_hat = lambda_hat + self.tau * (
+                    np.sum(u_new, axis=1) - f_hat_plus
+                )
+
+                # Per-iteration residual between consecutive spectral iterates
+                convergence = np.spacing(1)
+                for i in range(self.K):
+                    delta = u_new[:, i] - u_old[:, i]
+                    convergence = convergence + (1 / T) * np.dot(delta, np.conj(delta))
+                convergence = np.abs(convergence)
+                u_spec = u_new
+
+                if convergence <= self.tol:
+                    break
+
+                # Roll buffers for the next iteration
+                u_old, u_new = u_new, u_old
+
+            niter = np.min([self.max_iter, n + 1])
+            omega = omega_plus[:niter, :]
+
         idxs = np.flip(np.arange(1, T // 2 + 1), axis=0)
 
         # signal reconstruction
         u_hat = np.zeros([T, self.K], dtype=complex)
-        u_hat[T // 2 : T, :] = u_hat_plus[niter - 1, T // 2 : T, :]
-        u_hat[idxs, :] = np.conj(u_hat_plus[niter - 1, T // 2 : T, :])
+        u_hat[T // 2 : T, :] = u_spec[T // 2 : T, :]
+        u_hat[idxs, :] = np.conj(u_spec[T // 2 : T, :])
         u_hat[0, :] = np.conj(u_hat[-1, :])
 
         u = np.zeros([self.K, len(t)])

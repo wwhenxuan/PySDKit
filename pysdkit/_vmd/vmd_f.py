@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Variational mode decomposition, object-oriented interface.
+Variational mode decomposition, functional interface.
 """
 
 import numpy as np
@@ -17,9 +17,10 @@ def vmd(
     DC: bool = False,
     max_iter: int = 500,
     tol: float = 1e-6,
+    store_history: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Variational mode decomposition, object-oriented interface.
+    Variational mode decomposition, functional interface.
     Original paper: Dragomiretskiy, K. and Zosso, D. (2014) ‘Variational Mode Decomposition’,
     IEEE Transactions on Signal Processing, 62(3), pp. 531–544. doi: 10.1109/TSP.2013.2288675.
 
@@ -33,6 +34,9 @@ def vmd(
     :param DC: true if the first mode is put and kept at DC (0-freq)
     :param max_iter: Maximum number of iterations
     :param tol: tolerance of convergence criterion; typically around 1e-6
+    :param store_history: If True (default), keep spectral iterates for every
+        ADMM step. If False, keep only previous / current buffers (much lower
+        peak memory for long signals). Decomposition quality is unchanged.
 
     :return: - u - the collection of decomposed modes,
              - u_hat   - spectra of the modes,
@@ -52,10 +56,6 @@ def vmd(
     T = len(fMirr)
     t = np.arange(1, T + 1) / T
 
-    # Time Domain 0 to T (of mirrored signal)
-    T = len(fMirr)
-    t = np.arange(1, T + 1) / T
-
     # Spectral Domain
     freqs = t - 0.5 - (1 / T)
 
@@ -66,8 +66,6 @@ def vmd(
 
     # For future generalizations: individual alpha for each mode
     alpha = np.ones(K) * alpha
-    # matrix keeping track of every iterant // could be discarded for mem
-    u_hat_plus = np.zeros([max_iter, len(freqs), K], dtype=complex)
     # Initialization of omega_k
     omega_plus = np.zeros([max_iter, K])
     if init.lower() == "uniform":
@@ -83,62 +81,100 @@ def vmd(
         raise ValueError
     if DC:
         omega_plus[0, 0] = 0
-    # start with empty dual variables
-    lambda_hat = np.zeros(shape=[max_iter, len(freqs)], dtype=complex)
 
     sum_uk = 0  # accumulator
-    convergence = np.spacing(1) + tol  # Determine whether the algorithm converges
+    convergence = np.spacing(1) + tol
+    n = 0
 
-    # Main loop for iterative updates
-    for n in range(0, max_iter - 1):
-        # update spectrum of first mode through Wiener filter of residuals
-        sum_uk = u_hat_plus[n, :, K - 1] + sum_uk - u_hat_plus[n, :, 0]
-        u_hat_plus[n + 1, :, 0] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
-            1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
-        )
+    if store_history:
+        u_hat_plus = np.zeros([max_iter, len(freqs), K], dtype=complex)
+        lambda_hat = np.zeros(shape=[max_iter, len(freqs)], dtype=complex)
 
-        # update first omega if not held at 0
-        if not DC:
-            omega_plus[n + 1, 0] = np.dot(
-                freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
-            ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
-
-        # update of any other mode
-        for k in range(1, K):
-            # mode spectrum
-            sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
-            u_hat_plus[n + 1, :, k] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
-                1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2
+        for n in range(0, max_iter - 1):
+            sum_uk = u_hat_plus[n, :, K - 1] + sum_uk - u_hat_plus[n, :, 0]
+            u_hat_plus[n + 1, :, 0] = (f_hat_plus - sum_uk - lambda_hat[n, :] / 2) / (
+                1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
             )
-            # center frequencies
-            omega_plus[n + 1, k] = np.dot(
-                freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
-            ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
 
-        # Update Lagrange multipliers
-        lambda_hat[n + 1, :] = lambda_hat[n, :] + tau * (
-            np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus
-        )
+            if not DC:
+                omega_plus[n + 1, 0] = np.dot(
+                    freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
+                ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, 0]) ** 2)
 
-        # Determine whether the algorithm has converged
-        for i in range(K):
-            convergence = convergence + (1 / T) * np.dot(
-                (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
-                np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])),
+            for k in range(1, K):
+                sum_uk = u_hat_plus[n + 1, :, k - 1] + sum_uk - u_hat_plus[n, :, k]
+                u_hat_plus[n + 1, :, k] = (
+                    f_hat_plus - sum_uk - lambda_hat[n, :] / 2
+                ) / (1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2)
+                omega_plus[n + 1, k] = np.dot(
+                    freqs[T // 2 : T], (abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
+                ) / np.sum(abs(u_hat_plus[n + 1, T // 2 : T, k]) ** 2)
+
+            lambda_hat[n + 1, :] = lambda_hat[n, :] + tau * (
+                np.sum(u_hat_plus[n + 1, :, :], axis=1) - f_hat_plus
             )
-        convergence = np.abs(convergence)
-        if convergence <= tol:
-            break
 
-    # discard empty space if converged early
-    niter = np.min([max_iter, n])
-    omega = omega_plus[:niter, :]
+            for i in range(K):
+                convergence = convergence + (1 / T) * np.dot(
+                    (u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i]),
+                    np.conj((u_hat_plus[n, :, i] - u_hat_plus[n - 1, :, i])),
+                )
+            convergence = np.abs(convergence)
+            if convergence <= tol:
+                break
+
+        niter = np.min([max_iter, n])
+        omega = omega_plus[:niter, :]
+        u_spec = u_hat_plus[niter - 1]
+    else:
+        u_old = np.zeros([len(freqs), K], dtype=complex)
+        u_new = np.zeros([len(freqs), K], dtype=complex)
+        lambda_hat = np.zeros(len(freqs), dtype=complex)
+        u_spec = u_old
+
+        for n in range(0, max_iter - 1):
+            sum_uk = u_old[:, K - 1] + sum_uk - u_old[:, 0]
+            u_new[:, 0] = (f_hat_plus - sum_uk - lambda_hat / 2) / (
+                1.0 + alpha[0] * (freqs - omega_plus[n, 0]) ** 2
+            )
+
+            if not DC:
+                omega_plus[n + 1, 0] = np.dot(
+                    freqs[T // 2 : T], (abs(u_new[T // 2 : T, 0]) ** 2)
+                ) / np.sum(abs(u_new[T // 2 : T, 0]) ** 2)
+
+            for k in range(1, K):
+                sum_uk = u_new[:, k - 1] + sum_uk - u_old[:, k]
+                u_new[:, k] = (f_hat_plus - sum_uk - lambda_hat / 2) / (
+                    1 + alpha[k] * (freqs - omega_plus[n, k]) ** 2
+                )
+                omega_plus[n + 1, k] = np.dot(
+                    freqs[T // 2 : T], (abs(u_new[T // 2 : T, k]) ** 2)
+                ) / np.sum(abs(u_new[T // 2 : T, k]) ** 2)
+
+            lambda_hat = lambda_hat + tau * (np.sum(u_new, axis=1) - f_hat_plus)
+
+            convergence = np.spacing(1)
+            for i in range(K):
+                delta = u_new[:, i] - u_old[:, i]
+                convergence = convergence + (1 / T) * np.dot(delta, np.conj(delta))
+            convergence = np.abs(convergence)
+            u_spec = u_new
+
+            if convergence <= tol:
+                break
+
+            u_old, u_new = u_new, u_old
+
+        niter = np.min([max_iter, n + 1])
+        omega = omega_plus[:niter, :]
+
     idxs = np.flip(np.arange(1, T // 2 + 1), axis=0)
 
     # signal reconstruction
     u_hat = np.zeros([T, K], dtype=complex)
-    u_hat[T // 2 : T, :] = u_hat_plus[niter - 1, T // 2 : T, :]
-    u_hat[idxs, :] = np.conj(u_hat_plus[niter - 1, T // 2 : T, :])
+    u_hat[T // 2 : T, :] = u_spec[T // 2 : T, :]
+    u_hat[idxs, :] = np.conj(u_spec[T // 2 : T, :])
     u_hat[0, :] = np.conj(u_hat[-1, :])
 
     u = np.zeros([K, len(t)])

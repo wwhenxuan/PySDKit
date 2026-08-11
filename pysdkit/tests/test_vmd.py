@@ -196,6 +196,32 @@ class VMDTest(unittest.TestCase):
             first=len(omega.shape), second=2, msg="Expecting two dimensions of omega"
         )
 
+    def test_store_history_false(self) -> None:
+        """Low-memory path should run and reconstruct comparably"""
+        time, signal = test_emd()
+
+        vmd_full = VMD(K=3, alpha=1000, tau=0.0, store_history=True)
+        vmd_low = VMD(K=3, alpha=1000, tau=0.0, store_history=False)
+
+        imfs_full = vmd_full.fit_transform(signal)
+        imfs_low = vmd_low.fit_transform(signal)
+
+        self.assertEqual(imfs_full.shape, imfs_low.shape)
+        recon_full = np.sum(imfs_full, axis=0)
+        recon_low = np.sum(imfs_low, axis=0)
+        # Both modes should reconstruct the input well
+        self.assertTrue(np.allclose(recon_full, signal, atol=0.35))
+        self.assertTrue(np.allclose(recon_low, signal, atol=0.35))
+        # And agree with each other on a coarse tolerance
+        self.assertTrue(np.allclose(recon_full, recon_low, atol=0.35))
+
+    def test_vmd_function_store_history(self) -> None:
+        """Functional API accepts store_history=False"""
+        time, signal = test_emd()
+        IMFs, _, omega = vmd_f(signal, alpha=1000, K=3, tau=0.0, store_history=False)
+        self.assertEqual(IMFs.shape[0], 3)
+        self.assertEqual(len(omega.shape), 2)
+
     def test_fmirror(self) -> None:
         """Verify the mirror-extension helper `fmirror`"""
         # Create an input signal
