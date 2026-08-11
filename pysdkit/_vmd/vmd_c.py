@@ -109,18 +109,22 @@ class VMD(Base):
     def plot_IMFs(
         self,
         max_imf: int = -1,
+        view: str = "2d",
         colors: Optional[List] = None,
         save_figure: bool = False,
         return_figure: bool = False,
-        dpi: int = 500,
+        dpi: int = 256,
         spine_width: float = 2,
         labelpad: float = 10,
         save_name: Optional[str] = None,
+        fs: Optional[float] = None,
+        freq_max: Optional[float] = None,
     ) -> None:
         """
         An easy way to visualize signal decomposition results
 
         :param max_imf: The number of decomposition modes to be plotted
+        :param view: ``\"2d\"`` / ``\"3d\"`` / ``\"2d_freq\"``
         :param colors: List of color strings for plotting
         :param save_figure: Whether to save the figure as an image
         :param return_figure: Whether to return the figure object
@@ -128,13 +132,16 @@ class VMD(Base):
         :param spine_width: The width of the visible axes spines
         :param labelpad: Controls the filling distance of the y-axis coordinate
         :param save_name: The name of the saved image file
+        :param fs: sampling frequency for ``view=\"2d_freq\"``
+        :param freq_max: spectrum x-limit for ``view=\"2d_freq\"``
         :return: The figure object for the plot
         """
         if self.u is not None and self.signal is not None:
-            plot_IMFs(
+            return plot_IMFs(
                 signal=self.signal,
                 IMFs=self.u,
                 max_imfs=max_imf,
+                view=view,
                 colors=colors,
                 save_figure=save_figure,
                 return_figure=return_figure,
@@ -142,6 +149,8 @@ class VMD(Base):
                 spine_width=spine_width,
                 labelpad=labelpad,
                 save_name=save_name,
+                fs=fs,
+                freq_max=freq_max,
             )
         else:
             raise ValueError

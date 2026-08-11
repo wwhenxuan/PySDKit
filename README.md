@@ -38,36 +38,32 @@ This project integrates simple signal processing methods, signal decomposition a
 4. Visualize and analyze the original signal and the intrinsic mode functions IMFs obtained by decomposition.
 
 ~~~python
+import numpy as np
 from pysdkit import EMD
-from pysdkit.data import test_emd
 from pysdkit.plot import plot_IMFs
 
-t, signal = test_emd()
+t = np.linspace(0, 1, 1000)
+signal = np.sin(2 * np.pi * 5 * t) + 0.7 * np.sin(2 * np.pi * 25 * t) + 0.45 * np.sin(2 * np.pi * 80 * t)
 
-# create an instance for signal decomposition
 emd = EMD()
-# implement signal decomposition
-IMFs = emd.fit_transform(signal, max_imfs=2)
-plot_IMFs(signal, IMFs)
+IMFs = emd.fit_transform(signal, max_imfs=3)
+plot_IMFs(signal, IMFs, view="2d_freq", fs=1000, freq_max=150)
 ~~~
 
-![example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/example.jpg)
+![example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/decomposition_demo.jpg)
 
 The EMD in the above example is the most classic [`empirical mode decomposition`](https://www.mathworks.com/help/signal/ref/emd.html) algorithm in signal decomposition. For more complex signals, you can try other algorithms such as variational mode decomposition ([`VMD`](https://ieeexplore.ieee.org/abstract/document/6655981)).
 
 ~~~python
-import numpy as np
 from pysdkit import VMD
+from pysdkit.data import test_vmd
+from pysdkit.plot import plot_IMFs
 
-# load new signal
-signal = np.load("./example/example.npy")
+t, signal, fs = test_vmd()
 
-# use variational mode decomposition
 vmd = VMD(alpha=500, K=3, tau=0.0, tol=1e-9)
-IMFs = vmd.fit_transform(signal=signal)
-print(IMFs.shape)
-
-vmd.plot_IMFs(save_figure=True)
+IMFs = vmd.fit_transform(signal)
+plot_IMFs(signal, IMFs, view="2d_freq", fs=fs, freq_max=200)
 ~~~
 
 ![vmd_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/vmd_example.jpg)

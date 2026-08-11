@@ -6,7 +6,7 @@ Visualizes the numpy array of intrinsic mode functions derived from the decompos
 import numpy as np
 import matplotlib.pyplot as plt
 
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from pysdkit.plot._functions import generate_random_hex_color
 from pysdkit.plot._functions import set_themes
@@ -34,6 +34,8 @@ def plot_IMFs(
     spine_width: float = 2,
     labelpad: float = 10,
     save_name: Optional[str] = None,
+    fs: Optional[float] = None,
+    freq_max: Optional[float] = None,
 ) -> Optional[plt.Figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -47,7 +49,8 @@ def plot_IMFs(
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted
-    :param view: The view of the figure, choice ["2d", "3d"]
+    :param view: The view of the figure, choice ``["2d", "3d", "2d_freq"]``
+                 (``2d_freq``: time + frequency columns for univariate signals)
     :param colors: List of color strings for plotting
     :param save_figure: Whether to save the figure as an image
     :param return_figure: Whether to return the figure object
@@ -55,6 +58,8 @@ def plot_IMFs(
     :param spine_width: The width of the visible axes spines
     :param labelpad: Controls the filling distance of the y-axis coordinate
     :param save_name: The name of the saved image file
+    :param fs: sampling frequency for ``view="2d_freq"``
+    :param freq_max: spectrum x-axis upper limit for ``view="2d_freq"``
     :return: The figure object for the plot
     """
     # Get the selected visualization
@@ -98,6 +103,25 @@ def plot_IMFs(
             raise ValueError(
                 "The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]"
             )
+    elif view in ("2d_freq", "tf", "time_freq"):
+        if len(shape) != 1:
+            raise ValueError(
+                "view='2d_freq' currently supports only univariate signals with shape [seq_len, ]"
+            )
+        return plot_2D_IMFs_with_frequency(
+            signal=signal,
+            IMFs=IMFs,
+            max_imfs=max_imfs,
+            colors=colors,
+            fs=fs,
+            freq_max=freq_max,
+            save_figure=save_figure,
+            return_figure=return_figure,
+            dpi=dpi,
+            spine_width=spine_width,
+            labelpad=labelpad,
+            save_name=save_name,
+        )
     elif view == "3d":
         # Visualization in 3D space
         if len(shape) == 1:
@@ -130,7 +154,7 @@ def plot_IMFs(
                 "The shape of the input signal must be the univariate with [seq_len, ] or multivariate with [n_vars, seq_len]"
             )
     else:
-        raise ValueError("View must be either `2d` or `3d`")
+        raise ValueError("View must be either `2d`, `3d`, or `2d_freq`")
 
 
 def plot_2D_IMFs(
@@ -241,6 +265,162 @@ def plot_2D_IMFs(
     # Return the figure if requested
     if return_figure is True:
         return fig
+
+
+def plot_2D_IMFs_with_frequency(
+    signal: np.ndarray,
+    IMFs: np.ndarray,
+    max_imfs: Optional[int] = -1,
+    colors: Optional[List] = None,
+    fs: Optional[float] = None,
+    freq_max: Optional[float] = None,
+    save_figure: Optional[bool] = False,
+    return_figure: Optional[bool] = False,
+    dpi: Optional[int] = 64,
+    fontsize: float = 14,
+    spine_width: float = 2,
+    labelpad: float = 10,
+    save_name: Optional[str] = None,
+) -> Optional[plt.Figure]:
+    """
+    Plot IMFs in the time domain (left) and their spectra (right), row-aligned.
+
+    Each row shows one series: the original signal on the first row, then IMF-0,
+    IMF-1, …  The left column is the waveform; the right column is the
+    corresponding single-sided amplitude spectrum, so time / frequency
+    components stay visually one-to-one.
+
+    :param signal: original 1-D signal
+    :param IMFs: decomposed modes, shape ``(n_imfs, N)``
+    :param max_imfs: number of IMFs to show (``-1`` → all)
+    :param colors: color list (row 0 = signal, then each IMF)
+    :param fs: sampling frequency (Hz); default ``N`` (relative frequency index)
+    :param freq_max: optional upper frequency limit for the spectrum axes
+    :param save_figure: whether to save the figure
+    :param return_figure: whether to return the figure object
+    :param dpi: save resolution
+    :param fontsize: axis label font size
+    :param spine_width: spine line width
+    :param labelpad: y-label padding
+    :param save_name: output path / basename
+    :return: figure when ``return_figure`` is True
+    """
+    set_themes(choice="plot_imfs")
+
+    signal = np.asarray(signal, dtype=float).ravel()
+    IMFs = np.asarray(IMFs, dtype=float)
+    if IMFs.ndim != 2:
+        raise ValueError("IMFs must have shape (n_imfs, N)")
+    if signal.size != IMFs.shape[1]:
+        raise ValueError("signal length must match IMFs.shape[1]")
+
+    if max_imfs == -1:
+        n_imfs = IMFs.shape[0]
+    else:
+        n_imfs = min(int(max_imfs), IMFs.shape[0])
+    n_rows = n_imfs + 1
+
+    length = IMFs.shape[1]
+    padding = max(int(length / 50), 1)
+    fs_val = float(length if fs is None else fs)
+    if fs_val <= 0:
+        raise ValueError("fs must be positive")
+
+    if colors is None:
+        colors = list(COLORS)
+    else:
+        colors = list(colors)
+    while len(colors) <= n_rows:
+        colors.append(generate_random_hex_color())
+
+    fig, axes = plt.subplots(
+        nrows=n_rows,
+        ncols=2,
+        figsize=(12, 2 * n_rows - 1),
+        dpi=256,
+        squeeze=False,
+        gridspec_kw={"width_ratios": [1.35, 1.0], "wspace": 0.18, "hspace": 0.25},
+    )
+    fig.tight_layout()
+
+    def _spectrum(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        amp = np.abs(np.fft.rfft(x)) / max(x.size, 1)
+        freq = np.fft.rfftfreq(x.size, d=1.0 / fs_val)
+        if amp.size > 1:
+            amp = amp.copy()
+            amp[1:] = 2.0 * amp[1:]
+        return freq, amp
+
+    series = [signal] + [IMFs[i] for i in range(n_imfs)]
+    ylabels = ["Signal"] + [f"IMF-{i}" for i in range(n_imfs)]
+
+    for i in range(n_rows):
+        ax_t, ax_f = axes[i, 0], axes[i, 1]
+        color = colors[i]
+        y = series[i]
+
+        # ---- time domain (left) ----
+        ax_t.axhline(y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width)
+        ax_t.plot(y, color=color, lw=1.2)
+        ax_t.set_ylabel(ylabels[i], fontsize=fontsize, labelpad=labelpad)
+        ax_t.set_xlim(-padding, length + padding)
+
+        for spine_name, spine in ax_t.spines.items():
+            if spine_name != "left":
+                spine.set_visible(False)
+            else:
+                spine.set_visible(True)
+                spine.set_linewidth(spine_width)
+
+        if i != n_rows - 1:
+            ax_t.set_xticks([])
+        else:
+            ax_t.set_xlabel("Sample", fontsize=fontsize)
+
+        # ---- frequency domain (right) ----
+        freq, amp = _spectrum(y)
+        ax_f.plot(freq, amp, color=color, lw=1.2)
+        ax_f.set_xlim(0.0, float(freq_max) if freq_max is not None else float(freq[-1]))
+        ax_f.set_ylim(bottom=0.0)
+
+        for spine_name, spine in ax_f.spines.items():
+            if spine_name not in ("left", "bottom"):
+                spine.set_visible(False)
+            else:
+                spine.set_visible(True)
+                spine.set_linewidth(spine_width)
+
+        if i != n_rows - 1:
+            ax_f.set_xticks([])
+        else:
+            ax_f.set_xlabel("Frequency (Hz)", fontsize=fontsize)
+
+    axes[-1, 0].spines["bottom"].set_position(("axes", -0.15))
+    axes[-1, 0].spines["bottom"].set_visible(True)
+    axes[-1, 0].spines["bottom"].set_linewidth(spine_width)
+    axes[-1, 1].spines["bottom"].set_position(("axes", -0.15))
+    axes[-1, 1].spines["bottom"].set_visible(True)
+    axes[-1, 1].spines["bottom"].set_linewidth(spine_width)
+
+    axes[0, 0].set_title("Time domain", fontsize=fontsize)
+    axes[0, 1].set_title("Frequency domain", fontsize=fontsize)
+
+    saved = False
+    if save_figure is True:
+        if save_name is not None:
+            for formate in [".jpg", ".pdf", ".png", ".bmp"]:
+                if formate in save_name:
+                    fig.savefig(save_name, dpi=dpi, bbox_inches="tight")
+                    saved = True
+                    break
+            if saved is False:
+                fig.savefig(save_name + ".jpg", dpi=dpi, bbox_inches="tight")
+        else:
+            fig.savefig("plot_imfs_with_frequency.jpg", dpi=dpi, bbox_inches="tight")
+
+    if return_figure is True:
+        return fig
+    return None
 
 
 def plot_3D_IMFs(

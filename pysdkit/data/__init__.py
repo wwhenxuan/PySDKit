@@ -14,6 +14,7 @@ __all__ = [
     "generate_exponential_signal",
     "test_emd",
     "test_fmd",
+    "test_vmd",
     "test_hht",
     "add_noise",
     "test_univariate_signal",
@@ -50,6 +51,9 @@ from ._generator import test_emd
 
 # Official MATLAB FMD demo vibration record
 from ._generator import test_fmd
+
+# Packaged VMD multi-component demo signal
+from ._generator import test_vmd
 
 # Generate the test function for HHT
 from ._generator import test_hht

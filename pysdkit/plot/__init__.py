@@ -4,7 +4,7 @@ Some auxiliary function modules for data visualization in the PySDKit library
 """
 
 # Visualize the original input signal and the decomposed IMFs on a 2D plane
-from ._plot_imfs import plot_IMFs
+from ._plot_imfs import plot_IMFs, plot_2D_IMFs, plot_2D_IMFs_with_frequency
 
 # Plot the spectrum of each decomposed IMF separately
 from ._fourier_spectra import plot_IMFs_amplitude_spectra
