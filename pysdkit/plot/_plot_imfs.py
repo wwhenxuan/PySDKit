@@ -36,6 +36,7 @@ def plot_IMFs(
     save_name: Optional[str] = None,
     fs: Optional[float] = None,
     freq_max: Optional[float] = None,
+    show_alignment: bool = False,
 ) -> Optional[plt.Figure]:
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
@@ -60,6 +61,7 @@ def plot_IMFs(
     :param save_name: The name of the saved image file
     :param fs: sampling frequency for ``view="2d_freq"``
     :param freq_max: spectrum x-axis upper limit for ``view="2d_freq"``
+    :param show_alignment: for multivariate 2D plots, append an Align column
     :return: The figure object for the plot
     """
     # Get the selected visualization
@@ -97,6 +99,7 @@ def plot_IMFs(
                 dpi=dpi,
                 spine_width=spine_width,
                 save_name=save_name,
+                show_alignment=show_alignment,
             )
         else:
             # The output data is in the wrong format
@@ -516,58 +519,105 @@ def plot_multi_IMFs(
     IMFs: np.ndarray,
     max_imfs: Optional[int] = -1,
     colors: Optional[List] = None,
+    channel_colors: Optional[List] = None,
     save_figure: Optional[bool] = False,
     return_figure: Optional[bool] = False,
     dpi: Optional[int] = 64,
     fontsize: float = 8,
     spine_width: float = 2,
     save_name: Optional[str] = None,
+    show_alignment: bool = False,
 ) -> Optional[plt.Figure]:
     """
-    Plotting a multivariate signal and its decomposed intrinsic mode functions
-    :param signal: The input original signal
-    :param IMFs: The intrinsic mode functions obtained after signal decomposition
+    Plotting a multivariate signal and its decomposed intrinsic mode functions.
+
+    Layout (when ``show_alignment=True``)::
+
+        | Var-0 | Var-1 | ... | Align |
+        |-------|-------|-----|-------|
+        | Signal channel panels ... | all channels overlaid |
+        | IMF-k channel panels ...  | all channels of IMF-k |
+
+    The rightmost **Align** column overlays every channel of the same mode
+    (paper-style mode-alignment check used in MVMD demos).
+
+    :param signal: The input original signal, shape ``(n_vars, seq_len)``
+    :param IMFs: Modes of shape ``(n_imfs, seq_len, n_vars)``
     :param max_imfs: The number of decomposition modes to be plotted
-    :param colors: List of color strings for plotting
+    :param colors: Row colors for per-channel panels (signal / IMF rows)
+    :param channel_colors: Colors used in the Align column (one per channel)
     :param save_figure: Whether to save the figure as an image
     :param return_figure: Whether to return the figure object
     :param dpi: The resolution of the saved image
     :param fontsize: The font size of the axis labels
     :param save_name: The name of the saved image file
     :param spine_width: The width of the visible axes spines
+    :param show_alignment: If True, append a rightmost alignment column
     :return: The figure object for the plot
     """
 
     # Set the matplotlib configs
     set_themes(choice="plot_imfs")
 
+    signal = np.asarray(signal, dtype=float)
+    IMFs = np.asarray(IMFs, dtype=float)
+    if signal.ndim != 2:
+        raise ValueError("signal must have shape (n_vars, seq_len)")
+    if IMFs.ndim != 3:
+        raise ValueError("IMFs must have shape (n_imfs, seq_len, n_vars)")
+
     # Get the number of elements and signal length of a multi-element signal
     n_vars, seq_len = signal.shape
+    if IMFs.shape[1] != seq_len or IMFs.shape[2] != n_vars:
+        raise ValueError(
+            "IMFs shape must be (n_imfs, seq_len, n_vars) matching the signal"
+        )
 
     # Edge padding
     padding = int(seq_len / 50)
 
     # Determine the number of rows
     if max_imfs == -1:
-        n_rows = IMFs.shape[0] + 1
+        n_imfs = IMFs.shape[0]
     else:
-        n_rows = min(max_imfs, IMFs.shape[0]) + 1
+        n_imfs = min(int(max_imfs), IMFs.shape[0])
+    n_rows = n_imfs + 1
 
-    # Reconstruct the input signal
+    # Reconstruct the input signal stack: (n_rows, seq_len, n_vars)
     signals = np.zeros(shape=(n_rows, seq_len, n_vars))
     signals[0, :, :] = signal.transpose(1, 0)
-    signals[1:, :, :] = IMFs
+    signals[1:, :, :] = IMFs[:n_imfs]
 
     # Set the colors for plotting
     if colors is None:
-        colors = COLORS
+        colors = list(COLORS)
+    else:
+        colors = list(colors)
     # Add random colors if there are not enough colors in the list
     while len(colors) <= n_rows:
         colors.append(generate_random_hex_color())
 
-    # Create the figure and axes for multi-plotting
+    if channel_colors is None:
+        channel_colors = [
+            "#1f4e79",
+            "#c45c26",
+            "#2a9d8f",
+            "#6c5ce7",
+            "#d63031",
+            "#00b894",
+        ]
+    else:
+        channel_colors = list(channel_colors)
+    while len(channel_colors) < n_vars:
+        channel_colors.append(generate_random_hex_color())
+
+    n_cols = n_vars + (1 if show_alignment else 0)
     fig, ax = plt.subplots(
-        nrows=n_rows, ncols=n_vars, figsize=(3 * n_vars, 1.5 * n_rows - 1), dpi=256
+        nrows=n_rows,
+        ncols=n_cols,
+        figsize=(3 * n_vars + (3.2 if show_alignment else 0), 1.5 * n_rows - 1),
+        dpi=256,
+        squeeze=False,
     )
     fig.tight_layout()
 
@@ -603,7 +653,33 @@ def plot_multi_IMFs(
             if row != n_rows - 1:
                 ax[row, col].set_xticks([])
 
-    for col in range(n_vars):
+        if show_alignment:
+            ax_a = ax[row, n_vars]
+            ax_a.axhline(
+                y=0, color="gray", linestyle="-", alpha=0.6, linewidth=spine_width
+            )
+            for c in range(n_vars):
+                ax_a.plot(
+                    signals[row, :, c],
+                    color=channel_colors[c],
+                    lw=0.9,
+                    alpha=0.9,
+                    label=f"ch{c + 1}",
+                )
+            ax_a.set_xlim(-padding, seq_len + padding)
+            ax_a.tick_params(axis="both", which="major", labelsize=8)
+            for spine_name, spine in ax_a.spines.items():
+                if spine_name != "left":
+                    spine.set_visible(False)
+                else:
+                    spine.set_visible(True)
+                    spine.set_linewidth(spine_width)
+            if row != n_rows - 1:
+                ax_a.set_xticks([])
+            if row == 0:
+                ax_a.legend(fontsize=7, loc="upper right", frameon=False)
+
+    for col in range(n_cols):
         # Open the bottom spine of the last axes and set its position
         ax[-1, col].spines["bottom"].set_position(("axes", -0.1))
         ax[-1, col].spines["bottom"].set_visible(True)
@@ -619,6 +695,8 @@ def plot_multi_IMFs(
     # Setting the number of variations
     for col in range(n_vars):
         ax[0, col].set_title(f"Var-{col}", fontsize=fontsize + 1)
+    if show_alignment:
+        ax[0, n_vars].set_title("Align", fontsize=fontsize + 1)
 
     # Save the figure if requested
     saved = False
@@ -637,6 +715,7 @@ def plot_multi_IMFs(
     # Return the figure if requested
     if return_figure is True:
         return fig
+    return None
 
 
 def plot_multi_3D_IMFs(

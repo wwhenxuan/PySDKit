@@ -1,6 +1,6 @@
-# PySDKit: signal decomposition in Python
-
 <div align="center">
+
+# PySDKit: signal decomposition in Python
 
 [![PyPI version](https://badge.fury.io/py/PySDKit.svg)](https://pypi.org/project/PySDKit/) 
 ![License](https://img.shields.io/github/license/wwhenxuan/PySDKit)
@@ -68,16 +68,27 @@ plot_IMFs(signal, IMFs, view="2d_freq", fs=fs, freq_max=fs / 2)
 
 ![vmd_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/vmd_example.jpg)
 
-Better observe the characteristics of the decomposed intrinsic mode function in the frequency domain.
+For multichannel recordings, algorithms such as multivariate VMD ([`MVMD`](https://doi.org/10.1109/TSP.2019.2951223)) keep shared oscillations **mode-aligned** across channels:
 
 ~~~python
-from pysdkit.plot import plot_IMFs_amplitude_spectra
+import numpy as np
+from pysdkit import MVMD
+from pysdkit.plot import plot_IMFs
 
-# frequency domain visualization
-plot_IMFs_amplitude_spectra(IMFs, smooth="exp")   # use exp smooth
+t = np.arange(0, 1, 0.001)
+# ch1: 2+36 Hz, ch2: 24+36 Hz, ch3: 80+36 Hz (36 Hz shared)
+signal = np.vstack([
+    np.cos(2*np.pi*2*t) + np.cos(2*np.pi*36*t),
+    np.cos(2*np.pi*24*t) + np.cos(2*np.pi*36*t),
+    np.cos(2*np.pi*80*t) + np.cos(2*np.pi*36*t),
+])
+
+mvmd = MVMD(alpha=2000, K=4, tau=0.0, init="uniform")
+IMFs = mvmd.fit_transform(signal)   # shape: (K, T, C)
+plot_IMFs(signal, IMFs)             # per-channel panels
 ~~~
 
-![frequency_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/frequency_example.jpg)
+![mvmd_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/mvmd_example.jpg)
 
 ## Target 🎯 <a id="Target"></a>
 
