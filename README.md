@@ -61,9 +61,9 @@ from pysdkit.plot import plot_IMFs
 
 t, signal, fs = test_vmd()
 
-vmd = VMD(alpha=500, K=3, tau=0.0, tol=1e-9)
+vmd = VMD(alpha=2000, K=4, tau=0.0, tol=1e-7)
 IMFs = vmd.fit_transform(signal)
-plot_IMFs(signal, IMFs, view="2d_freq", fs=fs, freq_max=200)
+plot_IMFs(signal, IMFs, view="2d_freq", fs=fs, freq_max=fs / 2)
 ~~~
 
 ![vmd_example](https://raw.githubusercontent.com/wwhenxuan/PySDKit/main/images/vmd_example.jpg)
