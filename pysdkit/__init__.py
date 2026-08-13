@@ -112,6 +112,9 @@ from ._vncmd import AVNCMD
 # Adaptive Local Iterative Filtering (time iterative decomposition)
 from ._tid import ALIF
 
+# Variational Time-Frequency Mode Tracking Decomposition (TFA)
+from ._tfa import VTFMTD, vtfmtd
+
 # Adaptive Polymorphic Mode Decomposition / Impulsive Mode Decomposition
 from ._imd import APMD, IMD, imd
 
@@ -193,7 +196,7 @@ Optimization-based Signal Decomposition         |    OSD
 Generalized Dispersion Mode Decomposition       |    GDMD
 Variational Generalized Nonlinear Mode Dec.     |    VGNMD
 Improved VGNMD (crossed chirp / dispersive)     |    IVGNMD
-Adaptive Generalized Dispersive Mode Dec.      |    AGNCMD / AGDMD
+Adaptive Generalized Dispersive Mode Dec.       |    AGNCMD / AGDMD
 Variational Mode Decomposition                  |    VMD
 Multivariate Variational Mode Decomposition     |    MVMD
 Variational Mode Extraction                     |    VME
@@ -206,6 +209,7 @@ Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
 Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
 Adaptive Local Iterative Filtering              |    ALIF
+Variational TF Mode Tracking Decomposition      |    VTFMTD
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Impulsive Mode Decomposition                    |    IMD
 Empirical Wavelet Transform                     |    EWT
@@ -273,6 +277,8 @@ __all__ = [
     "INCMD",
     "AVNCMD",
     "ALIF",
+    "VTFMTD",
+    "vtfmtd",
     "APMD",
     "IMD",
     "imd",
