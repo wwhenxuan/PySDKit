@@ -109,6 +109,9 @@ from ._vncmd import INCMD
 # Adaptive Variational Nonlinear Chirp Mode Decomposition
 from ._vncmd import AVNCMD
 
+# Short-Time Narrow-Banded Mode Decomposition
+from ._vncmd import STNBMD, stnbmd
+
 # Adaptive Local Iterative Filtering (time iterative decomposition)
 from ._tid import ALIF
 
@@ -208,6 +211,7 @@ Compact VMD for 2D Image                        |    CVMD2D
 Variational Nonlinear Chirp Mode Decomposition  |    VNCMD
 Iterative Nonlinear Chirp Mode Decomposition    |    INCMD
 Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
+Short-Time Narrow-Banded Mode Decomposition     |    STNBMD
 Adaptive Local Iterative Filtering              |    ALIF
 Variational TF Mode Tracking Decomposition      |    VTFMTD
 Adaptive Polymorphic Mode Decomposition         |    APMD
@@ -276,6 +280,8 @@ __all__ = [
     "VNCMD",
     "INCMD",
     "AVNCMD",
+    "STNBMD",
+    "stnbmd",
     "ALIF",
     "VTFMTD",
     "vtfmtd",
