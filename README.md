@@ -158,3 +158,12 @@ plot_IMFs(signal, IMFs)             # per-channel panels
 ## Acknowledgements 🎖️ <a id="Acknowledgements"></a>
 
 We would like to thank the researchers in signal processing for providing us with valuable algorithms and promoting the continuous progress in this field. However, since the main programming language used in `signal processing` is `Matlab`, and `Python` is the main battlefield of `machine learning` and `deep learning`, the usage of signal decomposition in machine learning and deep learning is far less extensive than `wavelet transformation`. In order to further promote the organic combination of signal decomposition and machine learning, we developed `PySDKit`. We would like to express our gratitude to [PyEMD](https://github.com/laszukdawid/PyEMD), [Sktime](https://www.sktime.net/en/latest/index.html), [Scikit-learn](https://scikit-learn.org/stable/), [Scikit-Image](https://scikit-image.org/docs/stable/), [statsmodels](https://www.statsmodels.org/stable/index.html), [vmdpy](https://github.com/vrcarva/vmdpy),  [MEMD-Python-](https://github.com/mariogrune/MEMD-Python-),  [ewtpy](https://github.com/vrcarva/ewtpy), [EWT-Python](https://github.com/bhurat/EWT-Python), [PyLMD](https://github.com/shownlin/PyLMD), [pywt](https://github.com/PyWavelets/pywt), [SP_Lib](https://github.com/hustcxl/SP_Lib), [dsatools](https://github.com/MVRonkin/dsatools) and [signal-decomposition](https://github.com/cvxgrp/signal-decomposition).
+
+## Contributing
+
+This project exists thanks to all the people who contribute.
+
+<a href="https://github.com/wwhenxuan/PySDKit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=wwhenxuan/PySDKit" />
+</a>
+
