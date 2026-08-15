@@ -1,245 +1,406 @@
 # -*- coding: utf-8 -*-
 """
-Adaptive Chirp Mode Decomposition
+Adaptive Chirp Mode Decomposition (ACMD)
+
+Faithful port of the MATLAB package by Chen & Peng
+(File Exchange 69128), including TF helpers used by Test1 / Test2.
 """
+
+from __future__ import annotations
+
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy.linalg import norm
 from scipy.integrate import cumulative_trapezoid
-from scipy.sparse import spdiags, vstack, hstack, eye
+from scipy.signal import hilbert
+from scipy.sparse import csr_matrix, diags, eye as speye, hstack, vstack
 from scipy.sparse.linalg import spsolve
 
 from pysdkit._vmd.base import Base
 
-from typing import Optional, Tuple, Union
+
+# ---------------------------------------------------------------------------
+# Low-level helpers (MATLAB: Differ / SNR / addnoise / STFT / findridges / …)
+# ---------------------------------------------------------------------------
+
+
+def differ(y: np.ndarray, delta: float) -> np.ndarray:
+    """Central difference of a 1-D series (MATLAB ``Differ``)."""
+    y = np.asarray(y, dtype=float).ravel()
+    L = y.size
+    if L < 2:
+        return np.zeros_like(y)
+    mid = np.zeros(max(L - 2, 0), dtype=float)
+    for i in range(1, L - 1):
+        mid[i - 1] = (y[i + 1] - y[i - 1]) / (2.0 * delta)
+    return np.concatenate(
+        (
+            np.array([(y[1] - y[0]) / delta], dtype=float),
+            mid,
+            np.array([(y[-1] - y[-2]) / delta], dtype=float),
+        )
+    )
+
+
+def compute_snr(clean: np.ndarray, estimate: np.ndarray) -> float:
+    """Signal-to-noise ratio in dB (MATLAB ``SNR``)."""
+    clean = np.asarray(clean, dtype=float).ravel()
+    estimate = np.asarray(estimate, dtype=float).ravel()
+    ps = np.sum((clean - np.mean(clean)) ** 2)
+    pn = np.sum((clean - estimate) ** 2)
+    if pn <= 0.0:
+        return float("inf")
+    return float(10.0 * np.log10(ps / pn))
+
+
+def add_noise(
+    n: int,
+    mean: float = 0.0,
+    std: float = 1.0,
+    rng: Optional[np.random.Generator] = None,
+) -> np.ndarray:
+    """Unit-normalized Gaussian noise scaled to ``mean`` / ``std`` (MATLAB ``addnoise``)."""
+    rng = np.random.default_rng() if rng is None else rng
+    y = rng.standard_normal(n)
+    y = y / np.std(y)
+    y = y - np.mean(y)
+    return mean + std * y
+
+
+def second_order_difference(n: int):
+    """Sparse second-order difference operator ``(n-2) x n`` (MATLAB ``oper``)."""
+    e = np.ones(n)
+    data = np.vstack((e[:-2], -2.0 * e[1:-1], e[2:]))
+    return diags(data, [0, 1, 2], shape=(n - 2, n), format="csc")
+
+
+def curve_smooth(f: np.ndarray, beta: float) -> np.ndarray:
+    """
+    Smooth IF curve(s) with a second-order Tikhonov filter (MATLAB ``curvesmooth``).
+
+    ``f`` may be 1-D (one curve) or 2-D with shape ``(K, N)``.
+    """
+    f = np.asarray(f, dtype=float)
+    single = f.ndim == 1
+    if single:
+        f = f.reshape(1, -1)
+    k, n = f.shape
+    oper = second_order_difference(n)
+    opedoub = (oper.T @ oper).tocsc()
+    lhs = (2.0 / max(beta, 1e-30)) * opedoub + speye(n, format="csc")
+    out = np.zeros((k, n), dtype=float)
+    for i in range(k):
+        sol = spsolve(lhs, f[i])
+        if not np.all(np.isfinite(sol)):
+            sol = np.linalg.lstsq(lhs.toarray(), f[i], rcond=None)[0]
+        out[i] = sol
+    return out.ravel() if single else out
+
+
+def find_ridges(spec: np.ndarray, delta: int) -> np.ndarray:
+    """
+    Time-frequency ridge path (MATLAB ``findridges``).
+
+    :param spec: TF magnitude / complex spectrogram, shape ``(n_freq, n_time)``
+    :param delta: max frequency-bin jump between consecutive frames
+    :return: frequency-bin indices (1-based MATLAB style → 0-based here), length ``n_time``
+    """
+    mag = np.abs(np.asarray(spec))
+    m, n = mag.shape
+    index = np.zeros(n, dtype=int)
+    fmax, tmax = np.unravel_index(np.argmax(mag), mag.shape)
+    index[tmax] = fmax
+
+    f0 = fmax
+    for j in range(min(tmax + 1, n), n):
+        low = max(0, f0 - delta)
+        up = min(m - 1, f0 + delta)
+        f0 = low + int(np.argmax(mag[low : up + 1, j]))
+        index[j] = f0
+
+    f1 = fmax
+    for j in range(max(0, tmax - 1), -1, -1):
+        low = max(0, f1 - delta)
+        up = min(m - 1, f1 + delta)
+        f1 = low + int(np.argmax(mag[low : up + 1, j]))
+        index[j] = f1
+    return index
+
+
+def stft(
+    sig: np.ndarray,
+    samp_freq: float,
+    n_fft: int = 512,
+    win_len: int = 32,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Short-time Fourier transform matching MATLAB ``STFT.m`` in the ACMD package.
+
+    :return: ``(Spec, f)`` with ``Spec`` shape ``(n_fft, n_samples)`` after ``fftshift``
+    """
+    sig = np.asarray(sig, dtype=float).ravel()
+    if np.isrealobj(sig):
+        sig = hilbert(sig)
+    sig_len = sig.size
+    win_len = int(np.ceil(win_len / 2.0) * 2)
+    t_win = np.linspace(-1.0, 1.0, win_len)
+    sigma = 0.28
+    win_fun = (np.pi * sigma**2) ** (-0.25) * np.exp((- (t_win**2)) / (2.0 * sigma**2))
+    lh = (win_len - 1) / 2.0
+
+    spec = np.zeros((n_fft, sig_len), dtype=complex)
+    half_n = int(np.round(n_fft / 2.0)) - 1
+    for i_loop in range(sig_len):
+        tau_lo = -min(half_n, int(lh), i_loop)
+        tau_hi = min(half_n, int(lh), sig_len - i_loop - 1)
+        tau = np.arange(tau_lo, tau_hi + 1)
+        temp = i_loop + tau
+        temp1 = int(lh) + tau
+        r_sig = sig[temp] * np.conj(win_fun[temp1])
+        spec[: r_sig.size, i_loop] = r_sig
+
+    spec = np.fft.fftshift(np.fft.fft(spec, axis=0), axes=0)
+    f = np.linspace(-samp_freq / 2.0, samp_freq / 2.0, spec.shape[0])
+    return spec, f
+
+
+def tf_spectrum(
+    if_multi: np.ndarray,
+    ia_multi: np.ndarray,
+    band: Tuple[float, float],
+    fr_num: int = 1024,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Adaptive time-frequency spectrum from IF / IA (MATLAB ``TFspec``).
+
+    :param if_multi: shape ``(n_modes, n_samples)``
+    :param ia_multi: shape ``(n_modes, n_samples)``
+    :param band: ``(f_min, f_max)``
+    """
+    if_multi = np.atleast_2d(np.asarray(if_multi, dtype=float))
+    ia_multi = np.atleast_2d(np.asarray(ia_multi, dtype=float))
+    fbin = np.linspace(band[0], band[1], fr_num)
+    num, n = if_multi.shape
+    a_spec = np.zeros((fr_num, n), dtype=float)
+    delta = int(np.floor(fr_num * 0.001))
+    for kk in range(num):
+        temp = np.zeros((fr_num, n), dtype=float)
+        for ii in range(n):
+            index = int(np.argmin(np.abs(fbin - if_multi[kk, ii])))
+            lindex = max(index - delta, 0)
+            rindex = min(index + delta, fr_num - 1)
+            temp[lindex : rindex + 1, ii] = ia_multi[kk, ii]
+        a_spec += temp
+    return a_spec, fbin
+
+
+def _spsolve_safe(a, b: np.ndarray) -> np.ndarray:
+    """Sparse solve with dense lstsq fallback (MATLAB ``\\`` robustness)."""
+    x = spsolve(a, b)
+    if not np.all(np.isfinite(x)):
+        x = np.linalg.lstsq(a.toarray(), np.asarray(b, dtype=float).ravel(), rcond=None)[
+            0
+        ]
+    return np.asarray(x, dtype=float).ravel()
+
+
+# ---------------------------------------------------------------------------
+# ACMD class
+# ---------------------------------------------------------------------------
 
 
 class ACMD(Base):
     """
     Adaptive Chirp Mode Decomposition
 
-    Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method Based on Adaptive Chirp Mode Decomposition,
-    Chen S, Yang Y, Peng Z, et al, Journal of Sound and Vibration, 2018.
+    Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method
+    Based on Adaptive Chirp Mode Decomposition,
+    Chen S, Yang Y, Peng Z, et al., Journal of Sound and Vibration, 2018.
 
-    MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/69128-adaptive-chirp-mode-decomposition
+    MATLAB code: https://www.mathworks.com/matlabcentral/fileexchange/69128
     """
 
     def __init__(
         self,
         K: int,
-        fs: Optional[int] = None,
+        fs: Optional[float] = None,
         alpha0: float = 1e-3,
         beta: float = 1e-4,
         tol: float = 1e-8,
         max_iter: int = 300,
     ) -> None:
         """
-        :param K: the number of intrinsic mode functions obtained by decomposing the signal is also the number of decomposition rounds
-        :param fs: sampling frequency of inputs signal.
-        :param alpha0: penalty parameter controling the filtering bandwidth of ACMD;the smaller the alpha0 is, the narrower the bandwidth would be,
-               if this parameter is larger, it will help the algorithm to find correct modes even the initial IFs are too rough. But it will introduce more noise and also may increase the interference between the signal modes.
-        :param beta: penalty parameter controling the smooth degree of the IF increment during iterations;the smaller the beta is, the more smooth the IF increment would be.
-        :param tol: tolerance of convergence criterion; typically 1e-7, 1e-8, 1e-9...
-        :param max_iter: the maximum allowable iterations.
+        :param K: number of modes to extract recursively
+        :param fs: sampling frequency; if ``None``, uses ``len(signal)``
+        :param alpha0: bandwidth penalty (smaller → narrower filter)
+        :param beta: IF-increment smoothness penalty (smaller → smoother)
+        :param tol: relative-mode change convergence tolerance
+        :param max_iter: maximum iterations per mode
         """
         super().__init__()
-        self.K = K
+        self.K = int(K)
         self.fs = fs
-        self.alpha0 = alpha0
-        self.beta = beta
-        self.tol = tol
-        self.max_iter = max_iter
+        self.alpha0 = float(alpha0)
+        self.beta = float(beta)
+        self.tol = float(tol)
+        self.max_iter = int(max_iter)
+
+        self.imfs_: Optional[np.ndarray] = None
+        self.ifs_: Optional[np.ndarray] = None
+        self.ias_: Optional[np.ndarray] = None
 
     def __call__(
         self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-        """allow instances to be called like functions"""
+        """Allow instances to be called like functions."""
         return self.fit_transform(signal, return_all)
 
     def __str__(self) -> str:
-        """Get the full name and abbreviation of the algorithm"""
         return "Adaptive Chirp Mode Decomposition (ACMD)"
 
     @staticmethod
-    def init_IF1(signal: np.ndarray, SampFreq: int, N: int):
-        """Initial instantaneous frequency (IF) time series of a certain signal mode,a row vector"""
-        Spec = 2 * np.abs(np.fft.fft(signal)) / N  # 计算信号的 FFT
-        Spec = Spec[: len(Spec) // 2 + 1]  # 取频谱的前半部分
-        Freqbin = np.linspace(0, SampFreq / 2, len(Spec))  # 生成频率轴
-        # Component 1 extraction
-        findex1 = np.argmax(Spec)
-        # IF initialization by finding peak frequency of the Fourier spectrum
-        peakfre1 = Freqbin[findex1]
-        iniIF = peakfre1 * np.ones(N)
-        return iniIF
+    def init_IF1(signal: np.ndarray, SampFreq: float, N: int) -> np.ndarray:
+        """
+        Constant IF from the peak of the (one-sided) Fourier spectrum
+        (MATLAB Test1 initialization).
+        """
+        signal = np.asarray(signal, dtype=float).ravel()
+        spec = 2.0 * np.abs(np.fft.fft(signal)) / N
+        # MATLAB: Spec = Spec(1:round(end/2)); round half-away-from-zero
+        half = int(N / 2.0 + 0.5)
+        spec = spec[:half]
+        freq_bin = np.linspace(0.0, SampFreq / 2.0, len(spec))
+        peak_fre = float(freq_bin[int(np.argmax(spec))])
+        return peak_fre * np.ones(N, dtype=float)
 
     @staticmethod
-    def differ(y: np.ndarray, delta: float, dtype: np.dtype = np.float64) -> np.ndarray:
-        """
-        Compute the derivative of a discrete time series y.
-
-        :param y: The input time series.
-        :param delta: The sampling time interval of y.
-        :param dtype: The data type of numpy array
-        :return: numpy.ndarray: The derivative of the time series.
-        """
-        L = len(y)
-        ybar = np.zeros(L - 2, dtype=dtype)
-
-        for i in range(1, L - 1):
-            ybar[i - 1] = (y[i + 1] - y[i - 1]) / (2 * delta)
-
-        # Prepend and append the boundary differences
-        ybar = np.concatenate(
-            (
-                np.array([(y[1] - y[0]) / delta], dtype=dtype),
-                ybar,
-                np.array([(y[-1] - y[-2]) / delta], dtype=dtype),
-            )
-        )
-
-        return ybar
+    def differ(
+        y: np.ndarray, delta: float, dtype: np.dtype = np.float64
+    ) -> np.ndarray:
+        """Instance-accessible wrapper around module-level ``differ``."""
+        out = differ(y, delta)
+        return np.asarray(out, dtype=dtype)
 
     def iter(
-        self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: int
+        self, signal: np.ndarray, eIF: np.ndarray, N: int, fs: float
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Perform an algorithm decomposition"""
-        # Initialize
-        e = np.ones(N)
-        e2 = -2 * e
+        """
+        Extract one chirp mode (MATLAB ``ACMD.m``).
 
-        t = np.linspace(0, 1, N if self.fs is None else self.fs)
+        IF update: ``eIF ← eIF - ΔIF`` (full vector, not mean-centred BA-ACMD).
 
-        # Generate the second-order difference matrix `oper`
-        data = np.vstack((e[:-2], e2[1:-1], e[2:]))
-        diags = np.array([0, 1, 2])
-        oper = spdiags(data, diags, N - 2, N)
+        :return: ``(sest, IFest, IAest)``
+        """
+        signal = np.asarray(signal, dtype=float).ravel()
+        e_if = np.asarray(eIF, dtype=float).ravel().copy()
+        if signal.size != N or e_if.size != N:
+            raise ValueError("signal and eIF must both have length N")
 
-        # Generate the (K-2) x K zero matrix `spzeros`
-        spzeros = spdiags([np.zeros(N)], [0], N - 2, N)
+        # MATLAB: t = (0:N-1)/fs
+        t = np.arange(N, dtype=float) / float(fs)
 
-        # Compute the product of the transpose of `oper` and `oper`
-        opedoub = oper.T @ oper
+        oper = second_order_difference(N)
+        spzeros = csr_matrix((N - 2, N), dtype=float)
+        opedoub = (oper.T @ oper).tocsc()
+        phim = vstack((hstack((oper, spzeros)), hstack((spzeros, oper)))).tocsc()
+        phidoubm = (phim.T @ phim).tocsc()
 
-        # Generate the block matrix `phim`
-        phim = vstack((hstack((oper, spzeros)), hstack((spzeros, oper))))
+        if_hist = np.zeros((self.max_iter, N), dtype=float)
+        s_hist = np.zeros((self.max_iter, N), dtype=float)
+        y_hist = np.zeros((self.max_iter, 2 * N), dtype=float)
 
-        # Compute the product of the transpose of `phim` and `phim`
-        phidoubm = phim.T @ phim
-
-        # The collection of the obtained IF time series of the signal modes at each iteration
-        IFsetiter = np.zeros([self.max_iter, N])
-        # The collection of the obtained signal modes at each iteration
-        ssetiter = np.zeros([self.max_iter, N])
-        ysetiter = np.zeros([self.max_iter, 2 * N])
-
-        # Begin the iterations
-        n = 0  # iteration counter
-        sDif = self.tol + 1
+        n_it = 0
+        s_dif = self.tol + 1.0
         alpha = self.alpha0
+        ridge = 1e-10
+        eye_n = speye(N, format="csc")
+        eye_2n = speye(2 * N, format="csc")
 
-        pi = np.pi
+        while s_dif > self.tol and n_it < self.max_iter:
+            phase = cumulative_trapezoid(e_if, t, initial=0.0)
+            cosm = np.cos(2.0 * np.pi * phase)
+            sinm = np.sin(2.0 * np.pi * phase)
+            cm = diags(cosm, 0, shape=(N, N), format="csc")
+            sm = diags(sinm, 0, shape=(N, N), format="csc")
+            kerm = hstack((cm, sm))
+            kerdoubm = (kerm.T @ kerm).tocsc()
 
-        while sDif > self.tol and n < self.max_iter:
-            # Compute the cumulative trapezoidal integral
-            cumulative_integral = cumulative_trapezoid(eIF, t, initial=0)
+            a_mat = (1.0 / alpha) * phidoubm + kerdoubm + ridge * eye_2n
+            ym = _spsolve_safe(a_mat, kerm.T @ signal)
+            si = np.asarray(kerm @ ym).ravel()
+            s_hist[n_it, :] = si
+            y_hist[n_it, :] = ym
 
-            # Compute the cosine and sine functions
-            cosm = np.cos(2 * pi * cumulative_integral)
-            sinm = np.sin(2 * pi * cumulative_integral)
-            # Convert `cosm` and `sinm` to column vectors
-            cosm_col = cosm.reshape(-1, 1)
-            sinm_col = sinm.reshape(-1, 1)
+            ycm = ym[:N]
+            ysm = ym[N:]
+            ycm_bar = self.differ(ycm, 1.0 / fs)
+            ysm_bar = self.differ(ysm, 1.0 / fs)
+            denom = ycm**2 + ysm**2 + np.finfo(float).eps
+            delta_if = (ycm * ysm_bar - ysm * ycm_bar) / denom / (2.0 * np.pi)
+            smooth = (1.0 / max(self.beta, 1e-30)) * opedoub + eye_n
+            delta_if = _spsolve_safe(smooth, delta_if)
+            # MATLAB ACMD: eIF = eIF - deltaIF  (full trajectory)
+            e_if = e_if - delta_if
+            if_hist[n_it, :] = e_if
 
-            # Create sparse diagonal matrices `Cm` and `Sm`
-            Cm = spdiags(cosm_col[:, 0], 0, N, N).tocsc()
-            Sm = spdiags(sinm_col[:, 0], 0, N, N).tocsc()
-
-            # Assemble the kernel matrix `Kerm`
-            Kerm = hstack((Cm, Sm))
-
-            # Compute the product of the transpose of `Kerm` and `Kerm`
-            Kerdoubm = Kerm.T @ Kerm
-
-            # Update demodulated signals
-            A = 1 / alpha * phidoubm + Kerdoubm
-            B = Kerm.T * signal
-            # Solve A * x = B
-            ym = spsolve(A, B)  # the demodulated target signal
-            si = Kerm * ym  # the signal component
-            ssetiter[n, :] = si
-            ysetiter[n, :] = ym
-
-            # Update the IFs
-            ycm, ysm = (ym[:N].copy()).T, (
-                ym[N:].copy()
-            ).T  # the demodulated target signal
-            # Compute the derivatives of the functions
-            ycmbar, ysmbar = self.differ(ycm, 1 / fs), self.differ(ysm, 1 / fs)
-            # Obtain the frequency increment by arctangent demodulation
-            deltaIF = (ycm * ysmbar - ysm * ycmbar) / (ycm**2 + ysm**2) / (2 * pi)
-            # Smooth the frequency increment by low-pass filtering
-            deltaIF = spsolve(
-                (1 / self.beta * opedoub + eye(N, format="csr")), deltaIF.T
-            )
-            eIF = eIF - deltaIF  # update the IF
-            IFsetiter[n, :] = eIF
-
-            # Compute the convergence index
-            if n > 0:
-                sDif = (
-                    norm(ssetiter[n, :] - ssetiter[n - 1]) / norm(ssetiter[n - 1, :])
+            if n_it > 0:
+                s_dif = (
+                    norm(s_hist[n_it] - s_hist[n_it - 1])
+                    / (norm(s_hist[n_it - 1]) + np.finfo(float).eps)
                 ) ** 2
+            n_it += 1
 
-            n = n + 1
+        n_it = max(n_it - 1, 0)
+        sest = s_hist[n_it]
+        if_est = if_hist[n_it]
+        ycm = y_hist[n_it, :N]
+        ysm = y_hist[n_it, N:]
+        ia_est = np.sqrt(ycm**2 + ysm**2)
+        return sest, if_est, ia_est
 
-        # Maximum iteration
-        n = n - 1
-        # Estimated IF
-        IFest = IFsetiter[n, :]
-        # Estimated signal mode
-        sest = ssetiter[n, :]
-        ycm = ysetiter[n, :N]
-        ysm = ysetiter[n, N:]
-        # Estimated IA
-        IAest = np.sqrt(ycm**2 + ysm**2)
+    def extract_mode(
+        self, signal: np.ndarray, init_if: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Extract a single mode given an initial IF (direct MATLAB ``ACMD`` API).
 
-        return sest, IFest, IAest
+        :return: ``(sest, IFest, IAest)``
+        """
+        signal = np.asarray(signal, dtype=float).ravel()
+        init_if = np.asarray(init_if, dtype=float).ravel()
+        n = signal.size
+        fs = float(n if self.fs is None else self.fs)
+        return self.iter(signal, init_if, n, fs)
 
     def fit_transform(
         self, signal: np.ndarray, return_all: Optional[bool] = False
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray, np.ndarray]]:
-        """Start the ACMD algorithm"""
-        # Initialize
-        N = len(signal)  # K is the number of samples
-        if self.fs is None:
-            fs = N
-        else:
-            fs = self.fs
-        t = np.arange(0, N) / fs  # Time
+        """
+        Recursively extract ``K`` modes with Fourier-peak IF initialization
+        (MATLAB Test1 workflow).
+        """
+        signal = np.asarray(signal, dtype=float).ravel().copy()
+        n = signal.size
+        fs = float(n if self.fs is None else self.fs)
 
-        # Initialize arrays to store the results of each iteration
-        IMFs, IFests, IAests = (
-            np.zeros([self.K, N]),
-            np.zeros([self.K, N]),
-            np.zeros([self.K, N]),
-        )
+        imfs = np.zeros((self.K, n), dtype=float)
+        ifs = np.zeros((self.K, n), dtype=float)
+        ias = np.zeros((self.K, n), dtype=float)
+        residual = signal
 
-        # Begin iterative decomposition
         for ii in range(self.K):
-            # Initialize the peak frequency
-            eIF = self.init_IF1(signal=signal, SampFreq=fs, N=N)
-            # Perform a single decomposition
-            sest, IFest, IAest = self.iter(signal=signal, eIF=eIF, N=N, fs=fs)
-            # Record the results of this decomposition
-            IMFs[ii, :] = sest
-            IFests[ii, :] = IFest
-            IAests[ii, :] = IAest
-            # Use the residual from this decomposition as the input for the next iteration
-            signal = (
-                signal - sest
-            )  # obtain the residual signal by extracting the component from the raw signal
+            e_if = self.init_IF1(residual, fs, n)
+            sest, if_est, ia_est = self.iter(residual, e_if, n, fs)
+            imfs[ii] = sest
+            ifs[ii] = if_est
+            ias[ii] = ia_est
+            residual = residual - sest
 
-        if return_all is True:
-            return IMFs, IFests, IAests
-        return IMFs
+        self.imfs_ = imfs
+        self.ifs_ = ifs
+        self.ias_ = ias
+
+        if return_all:
+            return imfs, ifs, ias
+        return imfs
