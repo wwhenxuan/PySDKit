@@ -77,7 +77,7 @@ from ._gdmd import AGNCMD, agncmd, AGDMD, agdmd
 from ._vmd import vmd, VMD
 
 # Adaptive Chirp Mode Decomposition
-from ._vmd import ACMD
+from ._acmd import ACMD
 
 # Multivariate Variational Mode Decomposition
 from ._vmd import MVMD
