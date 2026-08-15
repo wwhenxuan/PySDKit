@@ -79,6 +79,9 @@ from ._vmd import vmd, VMD
 # Adaptive Chirp Mode Decomposition
 from ._acmd import ACMD
 
+# Bandwidth-Aware Adaptive Chirp Mode Decomposition
+from ._acmd import BA_ACMD
+
 # Multivariate Variational Mode Decomposition
 from ._vmd import MVMD
 
@@ -268,6 +271,7 @@ __all__ = [
     "vmd",
     "VMD",
     "ACMD",
+    "BA_ACMD",
     "MVMD",
     "VME",
     "OVMD",
