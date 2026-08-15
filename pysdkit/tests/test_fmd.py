@@ -14,7 +14,7 @@ import numpy as np
 from scipy.signal import hilbert
 
 from pysdkit import FMD
-from pysdkit._fmd.fmd import CK, TT, _build_XmT, max_IJ
+from pysdkit._tid.fmd import CK, TT, _build_XmT, max_IJ
 from pysdkit.data import test_emd, test_fmd
 
 

@@ -137,7 +137,7 @@ from ._jmd import MJMD
 from ._jmd import SJMD, SMJMD
 
 # Feature Mode Decomposition
-from ._fmd import FMD
+from ._tid import FMD
 
 # Moving Average Decomposition
 from .tsa import Moving_Decomp
