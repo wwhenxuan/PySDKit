@@ -30,13 +30,17 @@ from pysdkit._acmd.ba_acmd import (
 
 
 class DifferTest(unittest.TestCase):
+    """Tests for the discrete derivative helper ``differ`` (MATLAB ``Differ``)."""
+
     def test_constant_derivative_zero(self) -> None:
+        """A constant series should yield a numerically zero derivative."""
         y = np.ones(20)
         d = differ(y, 0.01)
         self.assertEqual(d.shape, y.shape)
         self.assertTrue(np.allclose(d, 0.0, atol=1e-12))
 
     def test_linear_slope(self) -> None:
+        """Interior samples of a unit-slope ramp should recover slope 1."""
         dt = 0.1
         y = np.arange(30, dtype=float) * dt
         d = differ(y, dt)
@@ -44,7 +48,10 @@ class DifferTest(unittest.TestCase):
 
 
 class NoiseAndSNRTest(unittest.TestCase):
+    """Tests for synthetic noise generation and SNR evaluation."""
+
     def test_add_noise_stats(self) -> None:
+        """``add_noise`` should approximately match the requested mean and std."""
         rng = np.random.default_rng(0)
         n = add_noise(5000, mean=0.0, std=0.2, rng=rng)
         self.assertEqual(n.size, 5000)
@@ -52,13 +59,17 @@ class NoiseAndSNRTest(unittest.TestCase):
         self.assertAlmostEqual(float(np.std(n)), 0.2, delta=0.05)
 
     def test_snr_positive_for_mild_noise(self) -> None:
+        """Mild additive noise should still yield a clearly positive SNR."""
         clean = np.sin(np.linspace(0, 20, 1000))
         noisy = clean + 0.01 * np.random.default_rng(1).standard_normal(1000)
         self.assertGreater(compute_snr(clean, noisy), 20.0)
 
 
 class ImpulseAndDemoSignalTest(unittest.TestCase):
+    """Tests for impulse-time detection and BA-ACMD demo signal generators."""
+
     def test_impulse_times_period(self) -> None:
+        """Detected impulse indices should follow the known shaft period."""
         fs = 1000.0
         t = np.arange(0, 1, 1 / fs)
         f0 = 10.0
@@ -69,6 +80,7 @@ class ImpulseAndDemoSignalTest(unittest.TestCase):
         self.assertTrue(np.all(np.abs(gaps - fs / f0) <= 2))
 
     def test_generate_demo_components_shapes(self) -> None:
+        """Each synthetic component must match the time axis and stay finite."""
         t = np.arange(0, 0.5, 1 / 2000.0)
         c1, c2, c3, c4 = generate_demo_components(t)
         for c in (c1, c2, c3, c4):
@@ -76,6 +88,7 @@ class ImpulseAndDemoSignalTest(unittest.TestCase):
             self.assertTrue(np.all(np.isfinite(c)))
 
     def test_generate_demo_signal_example2_length(self) -> None:
+        """Example-2 style demo should return matching ``t``/``x`` lengths and SNR."""
         t, x, snr, comps = generate_demo_signal(
             fs=5000.0, duration=1.0, noise_std=0.2, rng=np.random.default_rng(0)
         )
@@ -86,7 +99,10 @@ class ImpulseAndDemoSignalTest(unittest.TestCase):
 
 
 class GiniAndIFIATest(unittest.TestCase):
+    """Tests for Gini-of-squared-envelope and Hilbert IF/IA extraction."""
+
     def test_gini_impulsive_vs_tone(self) -> None:
+        """Impulsive trains should score a higher Gini index than a pure tone."""
         n = 2000
         tone = np.sin(2 * np.pi * 40 * np.arange(n) / 1000.0)
         impulse = np.zeros(n)
@@ -98,6 +114,7 @@ class GiniAndIFIATest(unittest.TestCase):
         self.assertGreater(g_imp, g_tone)
 
     def test_extract_if_ia_shapes(self) -> None:
+        """Hilbert IF/IA should match signal length and recover the tone IF."""
         fs = 1000.0
         t = np.arange(500) / fs
         y = np.cos(2 * np.pi * 40 * t)
@@ -109,19 +126,26 @@ class GiniAndIFIATest(unittest.TestCase):
 
 
 class BandwidthAlphaTest(unittest.TestCase):
+    """Tests for the bandwidth-to-``alpha0`` mapping used by BA-ACMD."""
+
     def test_alpha_increases_with_bandwidth(self) -> None:
+        """Wider normalized bandwidths should map to larger ``alpha0``."""
         a_small = bandwidth_to_alpha(0.05, ac=0.3)
         a_large = bandwidth_to_alpha(0.2, ac=0.3)
         self.assertGreater(a_large, a_small)
         self.assertGreater(a_small, 0.0)
 
     def test_ac05_branch(self) -> None:
+        """The ``ac=0.5`` power-law branch should return a finite positive alpha."""
         a = bandwidth_to_alpha(0.1, ac=0.5)
         self.assertTrue(np.isfinite(a) and a > 0.0)
 
 
 class CoefFourierTest(unittest.TestCase):
+    """Tests for over-complete Fourier fitting of spectrum trends."""
+
     def test_fit_smooth_series(self) -> None:
+        """Fourier trend fit should approximate a smooth target within tolerance."""
         x = np.linspace(0, 10, 256)
         y = np.exp(-0.2 * x) + 0.1 * np.sin(x)
         fit, inte = coef_overcomplete_fourier(y, samp_freq=1000.0, order_amp=8)
@@ -131,7 +155,10 @@ class CoefFourierTest(unittest.TestCase):
 
 
 class SpectrumTrendTest(unittest.TestCase):
+    """Tests for weighted spectrum-trend (WST) generation and band ranking."""
+
     def test_returns_ranked_intervals(self) -> None:
+        """WST pipeline must return spectrum arrays and valid frequency intervals."""
         fs = 2000.0
         t = np.arange(0, 0.5, 1 / fs)
         x = (
@@ -153,7 +180,10 @@ class SpectrumTrendTest(unittest.TestCase):
 
 
 class ACMDExtractTest(unittest.TestCase):
+    """Tests for BA-ACMD's single-mode ACMD extractor (mean-ΔIF update rule)."""
+
     def test_recovers_single_tone(self) -> None:
+        """``acmd_extract`` should reconstruct a tone with high correlation."""
         fs = 1000.0
         n = 400
         t = np.arange(n) / fs
@@ -174,12 +204,16 @@ class ACMDExtractTest(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(ia_est)))
 
     def test_init_if_length_mismatch(self) -> None:
+        """Mismatched signal / initial-IF lengths must raise ``ValueError``."""
         with self.assertRaises(ValueError):
             acmd_extract(np.ones(50), 100.0, np.ones(10), 1e-3)
 
 
 class BAACMDClassTest(unittest.TestCase):
+    """Tests for the ``BA_ACMD`` class construction and ``fit_transform`` API."""
+
     def test_str_and_call(self) -> None:
+        """``__call__`` should match ``fit_transform``; ``str`` mentions BA-ACMD."""
         ba = BA_ACMD(fs=1000.0, max_iter=20, ce=0.1)
         self.assertIn("BA-ACMD", str(ba))
         t = np.arange(0, 0.3, 1 / 1000.0)
@@ -190,15 +224,18 @@ class BAACMDClassTest(unittest.TestCase):
         self.assertTrue(np.allclose(a, b))
 
     def test_invalid_fs(self) -> None:
+        """Non-positive sampling frequency must raise ``ValueError``."""
         with self.assertRaises(ValueError):
             BA_ACMD(fs=-1)
 
     def test_short_signal_raises(self) -> None:
+        """Signals shorter than the minimum length must raise ``ValueError``."""
         ba = BA_ACMD(fs=1000.0)
         with self.assertRaises(ValueError):
             ba.fit_transform(np.ones(5))
 
     def test_fit_transform_attributes(self) -> None:
+        """``return_all=True`` should populate modes/IF/IA and WST attributes."""
         t, x, _, _ = generate_demo_signal(
             fs=2000.0, duration=0.25, noise_std=0.1, rng=np.random.default_rng(2)
         )
@@ -222,6 +259,7 @@ class BAACMDClassTest(unittest.TestCase):
         self.assertEqual(ba.sort_intervals.shape[1], 2)
 
     def test_compute_spectrum_trend_wrapper(self) -> None:
+        """Instance ``compute_spectrum_trend`` should return the five WST outputs."""
         t = np.arange(0, 0.4, 1 / 1500.0)
         x = np.sin(2 * np.pi * 70 * t)
         ba = BA_ACMD(fs=1500.0)

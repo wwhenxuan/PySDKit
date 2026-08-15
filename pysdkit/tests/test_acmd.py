@@ -40,19 +40,24 @@ def _test1_signal(fs: float = 1000.0):
 
 
 class DifferTest(unittest.TestCase):
+    """Tests for the discrete derivative helper ``differ`` (MATLAB ``Differ``)."""
+
     def test_constant_derivative_zero(self) -> None:
+        """A constant series should yield a numerically zero derivative."""
         y = np.ones(20)
         d = differ(y, 0.01)
         self.assertEqual(d.shape, y.shape)
         self.assertTrue(np.allclose(d, 0.0, atol=1e-12))
 
     def test_linear_slope(self) -> None:
+        """Interior samples of a unit-slope ramp should recover slope 1."""
         dt = 0.1
         y = np.arange(30, dtype=float) * dt
         d = differ(y, dt)
         self.assertTrue(np.allclose(d[1:-1], 1.0, atol=1e-10))
 
     def test_class_static_differ_matches_module(self) -> None:
+        """``ACMD.differ`` should match the module-level ``differ`` helper."""
         y = np.linspace(0, 1, 50)
         a = differ(y, 0.02)
         b = ACMD.differ(y, 0.02)
@@ -60,7 +65,10 @@ class DifferTest(unittest.TestCase):
 
 
 class NoiseAndSNRTest(unittest.TestCase):
+    """Tests for synthetic noise generation and SNR evaluation."""
+
     def test_add_noise_stats(self) -> None:
+        """``add_noise`` should approximately match the requested mean and std."""
         rng = np.random.default_rng(0)
         n = add_noise(5000, mean=0.0, std=0.2, rng=rng)
         self.assertEqual(n.size, 5000)
@@ -68,34 +76,44 @@ class NoiseAndSNRTest(unittest.TestCase):
         self.assertAlmostEqual(float(np.std(n)), 0.2, delta=0.05)
 
     def test_snr_perfect_is_inf(self) -> None:
+        """Identical clean/estimate pairs should report infinite SNR."""
         x = np.sin(np.linspace(0, 10, 200))
         self.assertEqual(compute_snr(x, x), float("inf"))
 
     def test_snr_positive_for_mild_noise(self) -> None:
+        """Mild additive noise should still yield a clearly positive SNR."""
         clean = np.sin(np.linspace(0, 20, 1000))
         noisy = clean + 0.01 * np.random.default_rng(1).standard_normal(1000)
         self.assertGreater(compute_snr(clean, noisy), 20.0)
 
 
 class SecondOrderAndSmoothTest(unittest.TestCase):
+    """Tests for the second-order difference operator and IF curve smoothing."""
+
     def test_oper_shape(self) -> None:
+        """Second-order difference matrix must be ``(N-2) x N``."""
         oper = second_order_difference(50)
         self.assertEqual(oper.shape, (48, 50))
 
     def test_curve_smooth_preserves_constant(self) -> None:
+        """Tikhonov smoothing of a constant IF should leave it unchanged."""
         f = 40.0 * np.ones(100)
         out = curve_smooth(f, beta=1e-4)
         self.assertEqual(out.shape, f.shape)
         self.assertTrue(np.allclose(out, 40.0, atol=1e-6))
 
     def test_curve_smooth_2d(self) -> None:
+        """``curve_smooth`` should accept stacked IF curves of shape ``(K, N)``."""
         f = np.vstack([np.ones(80), 2 * np.ones(80)])
         out = curve_smooth(f, beta=1e-6)
         self.assertEqual(out.shape, f.shape)
 
 
 class RidgeAndSTFTTest(unittest.TestCase):
+    """Tests for STFT ridge detection and the package STFT implementation."""
+
     def test_find_ridges_on_diagonal(self) -> None:
+        """Ridge indices on a diagonal energy path must stay in-band."""
         m, n = 40, 30
         spec = np.zeros((m, n))
         for j in range(n):
@@ -105,6 +123,7 @@ class RidgeAndSTFTTest(unittest.TestCase):
         self.assertTrue(np.all((idx >= 0) & (idx < m)))
 
     def test_stft_shapes(self) -> None:
+        """STFT must return a spectrogram of shape ``(n_fft, N)`` and matching ``f``."""
         fs = 200.0
         t = np.arange(0, 1, 1 / fs)
         x = np.cos(2 * np.pi * 40 * t)
@@ -116,7 +135,10 @@ class RidgeAndSTFTTest(unittest.TestCase):
 
 
 class TFSpectrumTest(unittest.TestCase):
+    """Tests for adaptive time-frequency spectrum construction from IF/IA."""
+
     def test_tf_spectrum_shapes(self) -> None:
+        """``tf_spectrum`` should paint IF ridges into a ``(fr_num, N)`` map."""
         ifs = np.vstack([30 * np.ones(50), 60 * np.ones(50)])
         ias = np.ones_like(ifs)
         a_spec, fbin = tf_spectrum(ifs, ias, band=(0.0, 100.0), fr_num=128)
@@ -126,16 +148,21 @@ class TFSpectrumTest(unittest.TestCase):
 
 
 class ACMDInitAndStrTest(unittest.TestCase):
+    """Tests for ACMD construction, string form, and Fourier-peak IF init."""
+
     def test_str(self) -> None:
+        """``str(ACMD(...))`` should identify the algorithm abbreviation."""
         self.assertIn("ACMD", str(ACMD(K=2, fs=1000)))
 
     def test_init_stores_params(self) -> None:
+        """Constructor arguments should be stored on the instance."""
         alg = ACMD(K=3, fs=500.0, alpha0=1e-6, beta=1e-9, tol=1e-7, max_iter=50)
         self.assertEqual(alg.K, 3)
         self.assertEqual(alg.fs, 500.0)
         self.assertEqual(alg.max_iter, 50)
 
     def test_init_if1_near_true_tone(self) -> None:
+        """Fourier-peak IF init should recover the tone frequency approximately."""
         fs = 1000.0
         n = 1000
         t = np.arange(n) / fs
@@ -146,7 +173,10 @@ class ACMDInitAndStrTest(unittest.TestCase):
 
 
 class ACMDIterAndExtractTest(unittest.TestCase):
+    """Tests for single-mode ACMD iteration and ``extract_mode``."""
+
     def test_extract_mode_shapes(self) -> None:
+        """``extract_mode`` outputs must match the input length and be finite."""
         fs = 500.0
         t = np.arange(0, 0.5, 1 / fs)
         x = np.cos(2 * np.pi * 40 * t)
@@ -159,6 +189,7 @@ class ACMDIterAndExtractTest(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(if_est)))
 
     def test_iter_recovers_constant_if_tone(self) -> None:
+        """ACMD on a pure tone should recover amplitude, IF, and usable SNR."""
         fs = 1000.0
         t = np.arange(0, 0.4, 1 / fs)
         f0 = 80.0
@@ -170,13 +201,17 @@ class ACMDIterAndExtractTest(unittest.TestCase):
         self.assertAlmostEqual(float(np.median(ia_est)), 1.0, delta=0.15)
 
     def test_iter_rejects_length_mismatch(self) -> None:
+        """``iter`` must raise when signal and initial IF lengths disagree."""
         alg = ACMD(K=1, fs=100.0)
         with self.assertRaises(ValueError):
             alg.iter(np.ones(10), np.ones(8), 10, 100.0)
 
 
 class ACMDFitTransformTest(unittest.TestCase):
+    """Tests for recursive multi-mode ``fit_transform`` / ``__call__``."""
+
     def test_fit_transform_k_modes(self) -> None:
+        """Extracting ``K=2`` modes should shrink residual energy on a chirp mix."""
         t, sig, *_ = _test1_signal(fs=500.0)
         # shorter / lower fs for speed: rebuild a compact two-tone mixture
         fs = 500.0
@@ -197,6 +232,7 @@ class ACMDFitTransformTest(unittest.TestCase):
         self.assertLess(np.linalg.norm(residual), 0.6 * np.linalg.norm(sig))
 
     def test_return_all_and_call(self) -> None:
+        """``__call__(..., return_all=True)`` should return IMFs, IFs, and IAs."""
         fs = 400.0
         t = np.arange(0, 0.5, 1 / fs)
         x = np.cos(2 * np.pi * 50 * t) + 0.7 * np.cos(2 * np.pi * 90 * t)
@@ -207,7 +243,7 @@ class ACMDFitTransformTest(unittest.TestCase):
         self.assertEqual(ias.shape, imfs.shape)
 
     def test_test1_reconstruction_quality(self) -> None:
-        """Closer to MATLAB Test1: two modes, fs=1000, expect usable SNR."""
+        """MATLAB Test1-scale mixture should achieve usable SNR and IF accuracy."""
         t, sig, sig1, sig2, if1, if2 = _test1_signal(fs=1000.0)
         alg = ACMD(K=2, fs=1000.0, alpha0=1e-3, beta=1e-4, tol=1e-8, max_iter=200)
         imfs, ifs, ias = alg.fit_transform(sig, return_all=True)
