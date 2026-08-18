@@ -3,9 +3,10 @@
 Time Varying Filter based Empirical Mode Decomposition
 """
 
+from typing import Optional, Tuple, Dict, Any
+
 import warnings
 import numpy as np
-from numpy import ndarray
 from scipy.interpolate import pchip_interpolate
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import spsolve
@@ -13,7 +14,6 @@ from scipy.sparse.linalg import spsolve
 from pysdkit.utils import inst_freq_local
 from pysdkit.utils import divide2exp
 
-from typing import Optional, Tuple, Dict, Any, Iterable, Union
 
 warnings.filterwarnings("ignore")
 
@@ -144,7 +144,7 @@ class TVF_EMD(object):
         bis_freq: np.ndarray,
         ind_remove_pad: np.ndarray,
         num_padding: int,
-    ) -> Union[None, int, float, complex, ndarray, Iterable]:
+    ) -> np.ndarray:
         """Remove unstable parts or 'noise' from the signal based on the extrema points of the input signal and certain rules, and smooth the signal through interpolation"""
         org_bis_freq = bis_freq.copy()
         flag_intermitt = 0
@@ -158,9 +158,11 @@ class TVF_EMD(object):
         # Handle intermittent changes in the input signal
         for i in range(1, len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i - 1], indmax_y[i + 1] + 1, dtype=int)
-            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(
-                bis_freq[time_span]
-            ) > 0.25:
+            span_min = np.min(bis_freq[time_span])
+            if (
+                span_min > 0
+                and (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
+            ):
                 # If the fluctuation value exceeds 0.25, it is considered an intermittent interval
                 zero_span = np.concatenate([zero_span, time_span])
         # The values in the intermittent intervals will be set to 0
@@ -170,9 +172,11 @@ class TVF_EMD(object):
         diff_bis_freq = np.zeros(bis_freq.shape)
         for i in range(len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i], indmax_y[i + 1] + 1, dtype=int)
-            if (np.max(bis_freq[time_span]) - np.min(bis_freq[time_span])) / np.min(
-                bis_freq[time_span]
-            ) > 0.25:
+            span_min = np.min(bis_freq[time_span])
+            if (
+                span_min > 0
+                and (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
+            ):
                 intermitt = np.concatenate([intermitt, [indmax_y[i]]])
                 diff_bis_freq[indmax_y[i]] = (
                     bis_freq[indmax_y[i + 1]] - bis_freq[indmax_y[i]]
@@ -224,13 +228,18 @@ class TVF_EMD(object):
             temp_bis_freq[-1] = bis_freq[-1]
 
         bis_freq = temp_bis_freq.copy()
-        if len(t[np.where(bis_freq != 0)[0]]) < 2:
-            return
+        # Keep `t` on the original (padded) grid: after edge-trim + remirror,
+        # `bis_freq` may be shorter; pchip below re-expands it onto `t`.
+        nz = np.where(bis_freq != 0)[0]
+        if len(nz) < 2 or nz[-1] >= len(t):
+            # Not enough knots to interpolate — fall back to a tiny positive cutoff
+            output_cutoff = np.full_like(org_bis_freq, 1e-12, dtype=float)
+            output_cutoff[np.where(output_cutoff > 0.45)[0]] = 0.45
+            output_cutoff[np.where(output_cutoff < 0)[0]] = 0
+            return output_cutoff
 
         # Signal smoothing using the pchip interpolation algorithm
-        bis_freq = pchip_interpolate(
-            t[np.where(bis_freq != 0)[0]], bis_freq[np.where(bis_freq != 0)[0]], t
-        )
+        bis_freq = pchip_interpolate(t[nz], bis_freq[nz], t)
         # Eliminate large fluctuations in frequency
         flip_bis_freq = np.flip(org_bis_freq)
         if (
@@ -447,10 +456,23 @@ class TVF_EMD(object):
                 y -= localmean
                 y = y[ind_remove_pad]
 
-            if stop:
-                # Record the result of this decomposition if the stopping criterion is met
-                imf[n, :] = y[ind_remove_pad]
-                temp_signal -= y[ind_remove_pad]
+            # Extract the current IMF (padded length may remain after early stop /
+            # max_iter exhaustion — always unpad before storing).
+            if len(ind_remove_pad) > 0 and len(y) == len(temp_signal) + 2 * num_padding:
+                imf_n = y[ind_remove_pad]
+            elif len(y) == len(temp_signal):
+                imf_n = y
+            else:
+                # Fallback: trim symmetrically if lengths drifted
+                pad = (len(y) - len(temp_signal)) // 2
+                imf_n = (
+                    y[pad : pad + len(temp_signal)]
+                    if pad > 0
+                    else y[: len(temp_signal)]
+                )
+
+            imf[n, :] = imf_n
+            temp_signal = temp_signal - imf_n
 
         return imf
 
@@ -527,7 +549,7 @@ def check_knots(
     return x, y, knots
 
 
-def spline_base(breaks: np.ndarray, n: int) -> Dict[str, Union[int, Any, Any]]:
+def spline_base(breaks: np.ndarray, n: int) -> Dict[str, Any]:
     """
     Generates B-spline base of order `n` for knots `breaks`
     This function comes from https://github.com/stfbnc/pytvfemd/tree/master
