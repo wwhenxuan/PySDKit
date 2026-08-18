@@ -86,7 +86,7 @@ from ._acmd import DD_ACMD
 from ._vmd import MVMD
 
 # Variational Mode Extraction, to extract a specific mode from the signal
-from ._vmd import VME
+from ._vmd import VME, vme
 
 # Orthogonalized Variational Mode Decomposition
 from ._vmd import OVMD
@@ -159,8 +159,7 @@ from ._emd import HHT
 
 
 def greet():
-    print(
-        r"""
+    print(r"""
  ____          ____   ____   _  __ _  _   
 |  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
 | |_) || | | |\___ \ | | | || ' / | || __|
@@ -170,14 +169,12 @@ def greet():
     
 A Python library for signal decomposition algorithms.
 https://github.com/wwhenxuan/PySDKit
-"""
-    )
+""")
 
 
 def print_functions():
     """"""
-    print(
-        """
+    print("""
 _______________________________________________________________
 Algorithm Name                                  | Abbreviation
 _______________________________________________________________
@@ -233,8 +230,7 @@ Seasonal-Trend decomposition using LOESS        |    STL
 Multiple Seasonal-Trend decomposition (LOESS)   |    MSTL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
-"""
-    )
+""")
 
 
 __all__ = [
@@ -277,6 +273,7 @@ __all__ = [
     "DD_ACMD",
     "MVMD",
     "VME",
+    "vme",
     "OVMD",
     "svmd",
     "SVMD",
