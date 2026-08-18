@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Empirical Wavelet Transform (1-D and 2-D).
+Empirical Wavelet Transform (1-D and 2-D) and Empirical Fourier Decomposition.
 """
 
 from .ewt import ewt
@@ -10,3 +10,7 @@ from .ewt import EWT
 from .ewt2d import ewt2d
 
 from .ewt2d import EWT2D
+
+from .efd import efd
+
+from .efd import EFD
