@@ -146,7 +146,7 @@ def stft(
     win_len = int(np.ceil(win_len / 2.0) * 2)
     t_win = np.linspace(-1.0, 1.0, win_len)
     sigma = 0.28
-    win_fun = (np.pi * sigma**2) ** (-0.25) * np.exp((- (t_win**2)) / (2.0 * sigma**2))
+    win_fun = (np.pi * sigma**2) ** (-0.25) * np.exp((-(t_win**2)) / (2.0 * sigma**2))
     lh = (win_len - 1) / 2.0
 
     spec = np.zeros((n_fft, sig_len), dtype=complex)
@@ -199,9 +199,9 @@ def _spsolve_safe(a, b: np.ndarray) -> np.ndarray:
     """Sparse solve with dense lstsq fallback (MATLAB ``\\`` robustness)."""
     x = spsolve(a, b)
     if not np.all(np.isfinite(x)):
-        x = np.linalg.lstsq(a.toarray(), np.asarray(b, dtype=float).ravel(), rcond=None)[
-            0
-        ]
+        x = np.linalg.lstsq(
+            a.toarray(), np.asarray(b, dtype=float).ravel(), rcond=None
+        )[0]
     return np.asarray(x, dtype=float).ravel()
 
 
@@ -275,9 +275,7 @@ class ACMD(Base):
         return peak_fre * np.ones(N, dtype=float)
 
     @staticmethod
-    def differ(
-        y: np.ndarray, delta: float, dtype: np.dtype = np.float64
-    ) -> np.ndarray:
+    def differ(y: np.ndarray, delta: float, dtype: np.dtype = np.float64) -> np.ndarray:
         """Instance-accessible wrapper around module-level ``differ``."""
         out = differ(y, delta)
         return np.asarray(out, dtype=dtype)

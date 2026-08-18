@@ -25,9 +25,6 @@ from ._emd import SEMD
 # Time Varying Filter based Empirical Mode Decomposition
 from ._emd import TVF_EMD
 
-# Empirical Fourier Decomposition
-from ._emd import EFD
-
 # Fast and Adaptive Empirical Mode Decomposition
 from ._faemd import FAEMD, FAEMD2D, FAEMD3D
 
@@ -130,6 +127,9 @@ from ._imd import APMD, IMD, imd
 # Empirical Wavelet Transform
 from ._ewt import ewt, EWT
 
+# Empirical Fourier Decomposition (spectrum segmentation + ideal filter bank)
+from ._ewt import efd, EFD
+
 # Empirical Wavelet Transform for 2D Images
 from ._ewt import ewt2d, EWT2D
 
@@ -188,7 +188,6 @@ Robust Empirical Mode Decomposition             |    REMD
 Multivariate Empirical Mode Decomposition       |    MEMD
 Serial Empirical Mode Decomposition             |    SEMD
 Time Varying Filter based EMD                   |    TVF_EMD
-Empirical Fourier Decomposition                 |    EFD
 Fast and Adaptive Empirical Mode Decomposition  |    FAEMD
 Bidimensional FAEMD                             |    FAEMD2D
 Tridimensional FAEMD                            |    FAEMD3D
@@ -223,6 +222,7 @@ Variational TF Mode Tracking Decomposition      |    VTFMTD
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Impulsive Mode Decomposition                    |    IMD
 Empirical Wavelet Transform                     |    EWT
+Empirical Fourier Decomposition                 |    EFD
 Empirical Wavelet Transform for 2D Image        |    EWT2D
 Jump Plus AM-FM Mode Decomposition              |    JMD
 Multivariate Jump Plus AM-FM Mode Decomposition |    MJMD
@@ -245,7 +245,6 @@ __all__ = [
     "MEMD",
     "SEMD",
     "TVF_EMD",
-    "EFD",
     "FAEMD",
     "FAEMD2D",
     "FAEMD3D",
@@ -298,6 +297,8 @@ __all__ = [
     "imd",
     "ewt",
     "EWT",
+    "efd",
+    "EFD",
     "ewt2d",
     "EWT2D",
     "JMD",

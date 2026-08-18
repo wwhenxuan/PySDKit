@@ -81,9 +81,7 @@ def gini_squared_envelope(signal: np.ndarray) -> float:
     return float(1.0 - 2.0 * temp / (np.linalg.norm(se, 1) + np.finfo(float).eps))
 
 
-def extract_if_ia(
-    y: np.ndarray, fs: float
-) -> Tuple[np.ndarray, np.ndarray]:
+def extract_if_ia(y: np.ndarray, fs: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Instantaneous frequency / amplitude via padded analytic signal
     (MATLAB ``IFIAextrc``).
@@ -190,15 +188,11 @@ def coef_overcomplete_fourier(
         if (j + 1) > half:
             k = (j + 1) - half
             tmatrix_inte[:, j] = (
-                -1.0
-                / (2.0 * np.pi * f0 * k)
-                * np.cos(2.0 * np.pi * f0 * k * dt)
+                -1.0 / (2.0 * np.pi * f0 * k) * np.cos(2.0 * np.pi * f0 * k * dt)
             )
 
     eye_m = np.eye(order_amp)
-    coeff = np.linalg.solve(
-        alpha * eye_m + tmatrix.T @ tmatrix, tmatrix.T @ f
-    )
+    coeff = np.linalg.solve(alpha * eye_m + tmatrix.T @ tmatrix, tmatrix.T @ f)
     fitf = tmatrix @ coeff
     finte = tmatrix_inte @ coeff
     return fitf, finte
@@ -232,9 +226,7 @@ def spectrum_trend_generate(
 
     # Local minima of the spectrum trend
     minima, _ = find_peaks(-spec_trend)
-    temp_index = np.concatenate(
-        ([0], minima.astype(int), [freq_bin.size - 1])
-    )
+    temp_index = np.concatenate(([0], minima.astype(int), [freq_bin.size - 1]))
 
     temp_frn = temp_index[:-1]
     temp_end = temp_index[1:]

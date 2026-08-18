@@ -107,9 +107,7 @@ def phase_arccos(g: np.ndarray) -> np.ndarray:
     return theta
 
 
-def low_filter(
-    sig: np.ndarray, cut_freq: float, samp_freq: float
-) -> np.ndarray:
+def low_filter(sig: np.ndarray, cut_freq: float, samp_freq: float) -> np.ndarray:
     """
     Linear-phase FIR low-pass with delay compensation (MATLAB ``low_filter``).
 
@@ -283,13 +281,19 @@ def generate_nonstationary_demo(
     """MATLAB Test (noisy non-stationary) mixture."""
     t = np.arange(0.0, duration, 1.0 / fs)
     a1 = 1.0 + 0.3 * np.cos(2.0 * np.pi * t)
-    sig1 = a1 * np.cos(2.0 * np.pi * (8 * t**3 + 16 * t**2 + 80 * t) + np.sin(10 * np.pi * t))
+    sig1 = a1 * np.cos(
+        2.0 * np.pi * (8 * t**3 + 16 * t**2 + 80 * t) + np.sin(10 * np.pi * t)
+    )
     if1 = 24 * t**2 + 32 * t + 80 + 5 * np.cos(10 * np.pi * t)
     a2 = 1.0 + 0.3 * np.cos(2.0 * np.pi * t + np.pi / 4)
-    sig2 = a2 * np.cos(2.0 * np.pi * (6 * t**3 + 12 * t**2 + 60 * t) + np.sin(10 * np.pi * t))
+    sig2 = a2 * np.cos(
+        2.0 * np.pi * (6 * t**3 + 12 * t**2 + 60 * t) + np.sin(10 * np.pi * t)
+    )
     if2 = 18 * t**2 + 24 * t + 60 + 5 * np.cos(10 * np.pi * t)
     a3 = 1.0 + 0.3 * np.cos(2.0 * np.pi * t + np.pi / 2)
-    sig3 = a3 * np.cos(2.0 * np.pi * (4 * t**3 + 8 * t**2 + 40 * t) + np.sin(10 * np.pi * t))
+    sig3 = a3 * np.cos(
+        2.0 * np.pi * (4 * t**3 + 8 * t**2 + 40 * t) + np.sin(10 * np.pi * t)
+    )
     if3 = 12 * t**2 + 16 * t + 40 + 5 * np.cos(10 * np.pi * t)
     clean = sig1 + sig2 + sig3
     noisy = clean + add_noise(clean.size, 0.0, noise_std, rng=rng)
@@ -318,7 +322,11 @@ def generate_close_modes_demo(
     sig3 = np.exp(-0.3 * t) * np.cos(2.0 * np.pi * (-60 * t**3 + 180 * t**2 + 80 * t))
     if3 = -180 * t**2 + 360 * t + 80
     clean = sig1 + sig2 + sig3
-    noisy = clean + add_noise(clean.size, 0.0, noise_std, rng=rng) if noise_std > 0 else clean.copy()
+    noisy = (
+        clean + add_noise(clean.size, 0.0, noise_std, rng=rng)
+        if noise_std > 0
+        else clean.copy()
+    )
     return {
         "t": t,
         "fs": fs,

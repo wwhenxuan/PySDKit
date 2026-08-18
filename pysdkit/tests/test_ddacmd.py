@@ -138,13 +138,17 @@ class NoiseAndDemoTest(unittest.TestCase):
 
     def test_stationary_demo_shapes(self) -> None:
         """Stationary demo must provide four modes aligned with the time axis."""
-        demo = generate_stationary_demo(fs=200.0, duration=0.5, noise_std=0.1, rng=np.random.default_rng(1))
+        demo = generate_stationary_demo(
+            fs=200.0, duration=0.5, noise_std=0.1, rng=np.random.default_rng(1)
+        )
         self.assertEqual(demo["modes"].shape[0], 4)
         self.assertEqual(demo["signal"].size, demo["t"].size)
 
     def test_nonstationary_and_close_demos(self) -> None:
         """Non-stationary and close-mode demos should each expose three chirps."""
-        a = generate_nonstationary_demo(fs=400.0, duration=0.5, noise_std=0.2, rng=np.random.default_rng(2))
+        a = generate_nonstationary_demo(
+            fs=400.0, duration=0.5, noise_std=0.2, rng=np.random.default_rng(2)
+        )
         b = generate_close_modes_demo(fs=400.0, duration=0.5, noise_std=0.0)
         self.assertEqual(a["modes"].shape[0], 3)
         self.assertEqual(b["ifs"].shape[0], 3)
