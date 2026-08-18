@@ -70,9 +70,9 @@ class HHT(object):
         elif self.algorithm == "REMD":
             return REMD(max_imfs=self.max_imfs)
         elif self.algorithm == "EEMD":
-            return EEMD(self.max_imfs)
+            return EEMD(max_imfs=self.max_imfs)
         elif self.algorithm == "CEEMDAN":
-            return CEEMDAN(self.max_imfs)
+            return CEEMDAN(max_imfs=self.max_imfs)
         else:
             raise ValueError("algorithm must be EMD, REMD, EEMD or CEEMDAN!")
 

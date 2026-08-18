@@ -67,11 +67,13 @@ class HHTTestCase(unittest.TestCase):
         """``_get_emd`` returns an EEMD instance for algorithm ``EEMD``."""
         emd = HHT(algorithm="EEMD", max_imfs=2)._get_emd()
         self.assertIsInstance(emd, EEMD)
+        self.assertEqual(emd.max_imfs, 2)
 
     def test_get_emd_ceemdan(self) -> None:
         """``_get_emd`` returns a CEEMDAN instance for algorithm ``CEEMDAN``."""
         emd = HHT(algorithm="CEEMDAN", max_imfs=2)._get_emd()
         self.assertIsInstance(emd, CEEMDAN)
+        self.assertEqual(emd.max_imfs, 2)
 
     def test_get_emd_invalid_algorithm(self) -> None:
         """Unknown algorithm names raise ``ValueError``."""
@@ -168,7 +170,7 @@ class HHTTestCase(unittest.TestCase):
 
     def test_hilbert_spectrum_shape(self) -> None:
         """``hilbert_spectrum`` returns a 2-D spectrogram and matching axes."""
-        imfs, envelopes, freqs = self.hht.fit_transform(
+        _, envelopes, freqs = self.hht.fit_transform(
             self.signal, fs=self.fs, return_all=True
         )
         spec, time_axis, freq_axis = self.hht.hilbert_spectrum(
@@ -191,22 +193,35 @@ class HHTTestCase(unittest.TestCase):
         np.testing.assert_allclose(time_axis, t_util)
         np.testing.assert_allclose(freq_axis, f_util)
 
+    def test_hilbert_spectrum_uses_stored_results(self) -> None:
+        """After ``fit_transform``, ``hilbert_spectrum`` can reuse stored envelopes."""
+        self.hht.fit_transform(self.signal, fs=self.fs, return_all=True)
+        spec, time_axis, freq_axis = self.hht.hilbert_spectrum(
+            freq_lim=(0.0, 80.0), freq_res=1.0, time_scale=2
+        )
+        self.assertEqual(spec.shape[0], time_axis.size)
+        self.assertEqual(spec.shape[1], freq_axis.size)
+
     def test_plot_spectrum_default(self) -> None:
         """``plot_spectrum`` builds a Hilbert spectrogram figure."""
         self.hht.fit_transform(self.signal, fs=self.fs, return_all=True)
         fig = self.hht.plot_spectrum(freq_lim=(0.0, 80.0), freq_res=1.0)
         self.assertIsNotNone(fig)
 
-    def test_plot_spectrum_linear_and_marginal(self) -> None:
-        """``plot_spectrum`` supports a linear scale and a marginal plot."""
-        self.hht.fit_transform(self.signal, fs=self.fs, return_all=True)
-        result = self.hht.plot_spectrum(
+    def test_plot_spectrum_with_explicit_arrays(self) -> None:
+        """``plot_spectrum`` accepts envelopes, frequencies and ``fs`` explicitly."""
+        _, envelopes, freqs = self.hht.fit_transform(
+            self.signal, fs=self.fs, return_all=True
+        )
+        fig = self.hht.plot_spectrum(
+            imfs_env=envelopes,
+            imfs_freq=freqs,
+            fs=self.fs,
             freq_lim=(0.0, 80.0),
             freq_res=1.0,
-            energy_scale="linear",
-            plot_marginal=True,
+            time_scale=1,
         )
-        self.assertIsNotNone(result)
+        self.assertIsNotNone(fig)
 
 
 class HilbertFrequencyTestCase(unittest.TestCase):
