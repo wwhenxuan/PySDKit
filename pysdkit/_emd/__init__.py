@@ -21,8 +21,6 @@ from .memd import MEMD
 
 from .tvf_emd import TVF_EMD
 
-from .efd import EFD
-
 from .hht import HHT
 
 from .semd import SEMD, concatenate_signals, deconcatenate_imfs, transition_bridge

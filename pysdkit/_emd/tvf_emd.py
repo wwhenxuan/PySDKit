@@ -3,10 +3,9 @@
 Time Varying Filter based Empirical Mode Decomposition
 """
 
-from typing import Optional, Tuple, Dict, Any
-
 import warnings
 import numpy as np
+from numpy import ndarray
 from scipy.interpolate import pchip_interpolate
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import spsolve
@@ -14,6 +13,7 @@ from scipy.sparse.linalg import spsolve
 from pysdkit.utils import inst_freq_local
 from pysdkit.utils import divide2exp
 
+from typing import Optional, Tuple, Dict, Any, Iterable, Union
 
 warnings.filterwarnings("ignore")
 
@@ -33,31 +33,26 @@ class TVF_EMD(object):
 
     def __init__(
         self,
-        max_imf: Optional[int] = 2,
+        max_imf: Optional[int] = 10,
         thresh_bwr: Optional[float] = 0.1,
         bsp_order: Optional[int] = 26,
         min_extrema: Optional[int] = 4,
         max_iter: Optional[int] = 100,
     ) -> None:
         """
-        :param max_imf: maximum number of imfs to be decomposed
-        :param thresh_bwr: instantaneous bandwidth threshold
-        :param bsp_order: b-spline order
-        :param min_extrema: stop the algorithm iteration when the number of remaining signal extrema is too low
-        :param max_iter: maximum number of iterations in one decomposition round
+        :param max_imf: maximum number of IMF rows (last used row is residual);
+            MATLAB ``tvf_emd`` default is 50
+        :param thresh_bwr: instantaneous bandwidth-ratio threshold
+        :param bsp_order: B-spline order (paper / MATLAB default 26)
+        :param min_extrema: stop when residual extrema count falls below this
+        :param max_iter: maximum inner sifting iterations per IMF
         """
         assert max_imf > 0, "max_imf must be greater than 0"
-        # Ensure the maximum number of IMFs to be decomposed is valid
-        self.max_imf = max_imf
-
-        self.thresh_bwr = thresh_bwr
-        self.bsp_order = bsp_order
-
-        # Minimum number of extrema
-        self.min_extrema = min_extrema
-
-        # Maximum number of iterations in one decomposition round
-        self.max_iter = max_iter
+        self.max_imf = int(max_imf)
+        self.thresh_bwr = float(thresh_bwr)
+        self.bsp_order = int(bsp_order)
+        self.min_extrema = int(min_extrema)
+        self.max_iter = int(max_iter)
 
     def __call__(self, signal: np.ndarray) -> np.ndarray:
         """allow instances to be called like functions"""
@@ -144,7 +139,7 @@ class TVF_EMD(object):
         bis_freq: np.ndarray,
         ind_remove_pad: np.ndarray,
         num_padding: int,
-    ) -> np.ndarray:
+    ) -> Union[None, int, float, complex, ndarray, Iterable]:
         """Remove unstable parts or 'noise' from the signal based on the extrema points of the input signal and certain rules, and smooth the signal through interpolation"""
         org_bis_freq = bis_freq.copy()
         flag_intermitt = 0
@@ -159,11 +154,9 @@ class TVF_EMD(object):
         for i in range(1, len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i - 1], indmax_y[i + 1] + 1, dtype=int)
             span_min = np.min(bis_freq[time_span])
-            if (
-                span_min > 0
-                and (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
+            if span_min > 0 and (
+                (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
             ):
-                # If the fluctuation value exceeds 0.25, it is considered an intermittent interval
                 zero_span = np.concatenate([zero_span, time_span])
         # The values in the intermittent intervals will be set to 0
         bis_freq[zero_span] = 0
@@ -173,9 +166,8 @@ class TVF_EMD(object):
         for i in range(len(indmax_y) - 1):
             time_span = np.arange(indmax_y[i], indmax_y[i + 1] + 1, dtype=int)
             span_min = np.min(bis_freq[time_span])
-            if (
-                span_min > 0
-                and (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
+            if span_min > 0 and (
+                (np.max(bis_freq[time_span]) - span_min) / span_min > 0.25
             ):
                 intermitt = np.concatenate([intermitt, [indmax_y[i]]])
                 diff_bis_freq[indmax_y[i]] = (
@@ -228,18 +220,17 @@ class TVF_EMD(object):
             temp_bis_freq[-1] = bis_freq[-1]
 
         bis_freq = temp_bis_freq.copy()
-        # Keep `t` on the original (padded) grid: after edge-trim + remirror,
-        # `bis_freq` may be shorter; pchip below re-expands it onto `t`.
-        nz = np.where(bis_freq != 0)[0]
-        if len(nz) < 2 or nz[-1] >= len(t):
-            # Not enough knots to interpolate — fall back to a tiny positive cutoff
-            output_cutoff = np.full_like(org_bis_freq, 1e-12, dtype=float)
-            output_cutoff[np.where(output_cutoff > 0.45)[0]] = 0.45
-            output_cutoff[np.where(output_cutoff < 0)[0]] = 0
+        # MATLAB returns the (unmodified) output_cutoff = original bis_freq
+        if len(t[np.where(bis_freq != 0)[0]]) < 2:
+            output_cutoff = org_bis_freq.copy()
+            output_cutoff[output_cutoff > 0.45] = 0.45
+            output_cutoff[output_cutoff < 0] = 0
             return output_cutoff
 
         # Signal smoothing using the pchip interpolation algorithm
-        bis_freq = pchip_interpolate(t[nz], bis_freq[nz], t)
+        bis_freq = pchip_interpolate(
+            t[np.where(bis_freq != 0)[0]], bis_freq[np.where(bis_freq != 0)[0]], t
+        )
         # Eliminate large fluctuations in frequency
         flip_bis_freq = np.flip(org_bis_freq)
         if (
@@ -271,210 +262,168 @@ class TVF_EMD(object):
 
     def fit_transform(self, signal: np.ndarray) -> np.ndarray:
         """
-        Execute the Time Varying Filter based Empirical Mode Decomposition algorithm
+        Execute Time Varying Filter based Empirical Mode Decomposition.
 
-        :param signal: 1D numpy ndarray signal to be decomposed
-        :return: IMF decomposition [num_imf, seq_len]
+        :param signal: 1-D real array
+        :return: IMF matrix ``(n_modes, n)``; the last row is the residual
+            (trailing unused rows are trimmed, as in MATLAB ``tvf_emd``)
         """
-        # Get the length of the signal
-        length = len(signal)
-
-        # Array to store the decomposed results
-        imf = np.zeros(shape=(self.max_imf, length))
-
-        # Create a copy of the signal
+        signal = np.asarray(signal, dtype=float).ravel()
+        length = int(signal.size)
+        imf = np.zeros((self.max_imf, length), dtype=float)
         temp_signal = signal.copy()
+        n_out = 0
 
-        # Start the algorithm iteration
         for n in range(self.max_imf):
-            # Get the extrema points of the input signal
             indmin, indmax = self.find_extrema(temp_signal)
 
-            # Record the result of the last iteration
+            # last allocated slot -> store residual and stop
             if n == self.max_imf - 1:
                 imf[n, :] = temp_signal
-                n += 1  # Increment the number of decompositions
+                n_out = n + 1
                 break
 
-            # Stop the iteration if the number of extrema is too low
-            if len(np.concatenate([indmin, indmax])) < self.min_extrema:
-                imf[n, :] = temp_signal  # Record the result
-                if len(np.where(temp_signal != 0)[0]) > 0:
-                    # Ensure the result is non-zero
-                    n += 1
+            # not enough extrema to continue
+            if (indmin.size + indmax.size) < self.min_extrema:
+                imf[n, :] = temp_signal
+                if np.any(temp_signal != 0):
+                    n_out = n + 1
                 break
 
-            # Calculate half the length of the signal for mirror extension
             num_padding = int(np.round(len(temp_signal) * 0.5))
             y = temp_signal.copy()
+            flag_stopiter = False
+            ind_remove_pad = np.arange(num_padding, num_padding + length, dtype=int)
+            localmean = np.zeros(length + 2 * num_padding, dtype=float)
 
-            # Flag to stop the iteration
-            stop = False
-            ind_remove_pad = []
             for niter in range(self.max_iter):
-                # Mirror extend the input signal
+                # symmetric padding (MATLAB: fliplr(y(2:num_padding+1)))
                 y = np.concatenate(
                     [
-                        np.flip(y[1 : 2 + num_padding - 1]),
+                        np.flip(y[1 : num_padding + 1]),
                         y,
                         np.flip(y[-num_padding - 1 : -1]),
                     ]
                 )
                 ind_remove_pad = np.arange(num_padding, len(y) - num_padding, dtype=int)
 
-                # Get the extrema points of the mirrored signal
                 indmin_y, indmax_y = self.find_extrema(y)
-                # Merge all extrema points and sort them
                 index_c_y = np.sort(np.concatenate([indmin_y, indmax_y]))
 
-                # Get the instantaneous amplitude and frequency of the input signal
                 inst_amp_0, inst_freq_0 = inst_freq_local(y)
-
-                # Instantaneous amplitudes and frequencies, and bisecting frequency
-                # Low-High Frequency (LHF) and Low-Low Frequency (LLF) components
-                a1, f1, a2, f2, bis_freq, inst_bwr, avg_freq = divide2exp(
-                    y, inst_amp_0, inst_freq_0
-                )
+                (
+                    _a1,
+                    _f1,
+                    _a2,
+                    _f2,
+                    bis_freq,
+                    inst_bwr,
+                    _avg_freq,
+                ) = divide2exp(y, inst_amp_0, inst_freq_0)
 
                 inst_bwr_2 = inst_bwr.copy()
                 for j in range(0, len(index_c_y) - 2, 2):
                     ind = np.arange(index_c_y[j], index_c_y[j + 2] + 1, dtype=int)
                     inst_bwr_2[ind] = np.mean(inst_bwr[ind])
 
+                bis_freq = np.asarray(bis_freq, dtype=float).copy()
                 bis_freq[inst_bwr_2 < self.thresh_bwr] = 1e-12
                 bis_freq[bis_freq > 0.5] = 0.45
                 bis_freq[bis_freq <= 0] = 1e-12
 
-                bis_freq = self._anti_mode_mixing(
-                    y, bis_freq, ind_remove_pad, num_padding
-                )
-                bis_freq = bis_freq[ind_remove_pad]
-                bis_freq = np.concatenate(
-                    [
-                        np.flip(bis_freq[1 : 2 + num_padding - 1]),
-                        bis_freq,
-                        np.flip(bis_freq[-num_padding - 1 : -1]),
-                    ]
-                )
+                # anti mode-mixing (applied twice, as in MATLAB)
+                for _ in range(2):
+                    bis_freq = self._anti_mode_mixing(
+                        y, bis_freq, ind_remove_pad.copy(), num_padding
+                    )
+                    bis_freq = bis_freq[ind_remove_pad]
+                    bis_freq = np.concatenate(
+                        [
+                            np.flip(bis_freq[1 : num_padding + 1]),
+                            bis_freq,
+                            np.flip(bis_freq[-num_padding - 1 : -1]),
+                        ]
+                    )
 
-                bis_freq = self._anti_mode_mixing(
-                    y, bis_freq, ind_remove_pad, num_padding
-                )
-                bis_freq = bis_freq[ind_remove_pad]
-                bis_freq = np.concatenate(
-                    [
-                        np.flip(bis_freq[1 : 2 + num_padding - 1]),
-                        bis_freq,
-                        np.flip(bis_freq[-num_padding - 1 : -1]),
-                    ]
-                )
-
+                # ----- stopping criteria (set flag; do not peel yet) -----
                 temp_inst_bwr = inst_bwr_2[ind_remove_pad]
-                ind_start = np.round(len(temp_inst_bwr) * 0.05).astype(int) - 1
-                ind_end = np.round(len(temp_inst_bwr) * 0.95).astype(int) - 1
+                # MATLAB 1-based round(..); convert to 0-based inclusive slice
+                ind_start = max(int(np.round(len(temp_inst_bwr) * 0.05)) - 1, 0)
+                ind_end = max(int(np.round(len(temp_inst_bwr) * 0.95)) - 1, ind_start)
+                mean_bwr = float(np.mean(temp_inst_bwr[ind_start : ind_end + 1]))
+                thr_iter = self.thresh_bwr + self.thresh_bwr / 4.0 * (niter + 1)
 
+                # MATLAB: (iter>=2 && mean<thr) || iter>=6 || (nimf>1 && mean<thr)
                 if (
-                    (
-                        (niter >= 1)
-                        and (
-                            np.mean(temp_inst_bwr[ind_start : ind_end + 1])
-                            < (self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1))
-                        )
-                    )
+                    (niter >= 1 and mean_bwr < thr_iter)
                     or (niter >= 5)
-                    or (
-                        (n > 0)
-                        and (
-                            np.mean(temp_inst_bwr[ind_start : ind_end + 1])
-                            < (self.thresh_bwr + self.thresh_bwr / 4 * (niter + 1))
-                        )
-                    )
+                    or (n > 0 and mean_bwr < thr_iter)
                 ):
-                    stop = True
-                    break
+                    flag_stopiter = True
 
-                if (
-                    len(
-                        np.where(
-                            temp_inst_bwr[ind_start : ind_end + 1] > self.thresh_bwr
-                        )[0]
-                    )
-                    / len(inst_bwr_2[ind_remove_pad])
-                ) < 0.2:
-                    stop = True
-                    break
+                frac_wide = np.count_nonzero(
+                    temp_inst_bwr[ind_start : ind_end + 1] > self.thresh_bwr
+                ) / max(len(inst_bwr_2[ind_remove_pad]), 1)
+                if frac_wide < 0.2:
+                    flag_stopiter = True
 
-                # Integral of the bisecting frequency
-                phi = np.zeros((len(bis_freq),))
+                # ----- local mean via time-varying B-spline filter -----
+                phi = np.zeros(len(bis_freq), dtype=float)
                 for i in range(len(bis_freq) - 1):
-                    phi[i + 1] = phi[i] + 2 * np.pi * bis_freq[i]
+                    phi[i + 1] = phi[i] + 2.0 * np.pi * bis_freq[i]
 
-                # Knots as the extrema of h(t) = cos(phi)
                 indmin_knot, indmax_knot = self.find_extrema(np.cos(phi))
                 index_c_knot = np.sort(np.concatenate([indmin_knot, indmax_knot]))
                 if len(index_c_knot) > 2:
-                    # Obtaining the LLF component
                     localmean = fit_spline(
-                        np.arange(0, len(y), dtype=int), y, index_c_knot, self.bsp_order
+                        np.arange(0, len(y), dtype=int),
+                        y,
+                        index_c_knot,
+                        self.bsp_order,
                     )
                 else:
-                    stop = True
+                    flag_stopiter = True
+
+                if len(index_c_knot) > 2:
+                    denom = np.min(np.abs(localmean[ind_remove_pad]))
+                    if denom > 0 and (
+                        np.max(np.abs(y[ind_remove_pad] - localmean[ind_remove_pad]))
+                        / denom
+                        < 1e-3
+                    ):
+                        flag_stopiter = True
+
+                    temp_residual = (y - localmean)[ind_remove_pad]
+                    trim_r = max(int(np.round(len(temp_residual) * 0.1)), 1)
+                    temp_residual = temp_residual[trim_r:-trim_r]
+                    localmean2 = localmean[ind_remove_pad]
+                    trim_m = max(int(np.round(len(localmean2) * 0.1)), 1)
+                    localmean2 = localmean2[trim_m:-trim_m]
+                    amp_ref = np.max(np.abs(inst_amp_0[ind_remove_pad])) + 1e-30
+                    if (
+                        np.abs(np.max(localmean2)) / amp_ref < 3.5e-2
+                        or np.abs(np.max(temp_residual)) / amp_ref < 1e-2
+                    ):
+                        flag_stopiter = True
+
+                if flag_stopiter:
+                    imf[n, :] = y[ind_remove_pad]
+                    temp_signal = temp_signal - imf[n, :]
+                    n_out = n + 1
                     break
 
-                if (
-                    np.max(np.abs(y[ind_remove_pad] - localmean[ind_remove_pad]))
-                    / np.min(np.abs(localmean[ind_remove_pad]))
-                    < 1e-3
-                ):
-                    stop = True
-                    break
+                y = (y - localmean)[ind_remove_pad]
 
-                # Sifting-like procedure, subtract LLF iteratively
-                # until the LHF component is narrow band
-                temp_residual = y - localmean
-                temp_residual = temp_residual[ind_remove_pad]
-                temp_residual = temp_residual[
-                    np.round(len(temp_residual) * 0.1).astype(int)
-                    - 1 : -np.round(len(temp_residual) * 0.1).astype(int)
-                ]
-                localmean2 = localmean[ind_remove_pad]
-                localmean2 = localmean2[
-                    np.round(len(localmean2) * 0.1).astype(int)
-                    - 1 : -np.round(len(localmean2) * 0.1).astype(int)
-                ]
-                if (
-                    np.abs(np.max(localmean2))
-                    / np.abs(np.max(inst_amp_0[ind_remove_pad]))
-                    < 3.5e-2
-                    or np.abs(np.max(temp_residual))
-                    / np.abs(np.max(inst_amp_0[ind_remove_pad]))
-                    < 1e-2
-                ):
-                    stop = True
-                    break
-
-                y -= localmean
-                y = y[ind_remove_pad]
-
-            # Extract the current IMF (padded length may remain after early stop /
-            # max_iter exhaustion — always unpad before storing).
-            if len(ind_remove_pad) > 0 and len(y) == len(temp_signal) + 2 * num_padding:
-                imf_n = y[ind_remove_pad]
-            elif len(y) == len(temp_signal):
-                imf_n = y
             else:
-                # Fallback: trim symmetrically if lengths drifted
-                pad = (len(y) - len(temp_signal)) // 2
-                imf_n = (
-                    y[pad : pad + len(temp_signal)]
-                    if pad > 0
-                    else y[: len(temp_signal)]
-                )
+                # exhausted max_iter without stop flag (rare): take current residual
+                imf[n, :] = y if y.size == length else y[ind_remove_pad]
+                temp_signal = temp_signal - imf[n, :]
+                n_out = n + 1
 
-            imf[n, :] = imf_n
-            temp_signal = temp_signal - imf_n
-
-        return imf
+        # MATLAB: imf(nimf:MAX_IMF,:)=[]  — drop unused trailing rows
+        if n_out == 0:
+            return np.zeros((1, length), dtype=float)
+        return imf[:n_out, :]
 
 
 def fit_spline(x: np.ndarray, y: np.ndarray, breaks: np.ndarray, n: int) -> np.ndarray:
@@ -549,7 +498,7 @@ def check_knots(
     return x, y, knots
 
 
-def spline_base(breaks: np.ndarray, n: int) -> Dict[str, Any]:
+def spline_base(breaks: np.ndarray, n: int) -> Dict[str, Union[int, Any, Any]]:
     """
     Generates B-spline base of order `n` for knots `breaks`
     This function comes from https://github.com/stfbnc/pytvfemd/tree/master
