@@ -31,6 +31,24 @@ class BMEMD(object):
     sifts until a MEMD-style stop criterion is met.  All channels share the
     same BIMF count, which enables multi-scale image fusion.
 
+    :param n_dir: int,
+        Number of projection directions (``>= 6``; MATLAB default 8).
+    :param max_imfs: int,
+        Maximum number of oscillatory BIMFs before the residue.
+    :param stop_crit: str,
+        ``"stop"`` or ``"fix_h"``.
+    :param stop_vec: sequence of float or None,
+        ``[sd, sd2, tol]`` for ``"stop"``.
+    :param stop_cnt: int,
+        Consecutive siftings for ``"fix_h"``.
+    :param max_iter: int,
+        Stored outer-iteration cap (MATLAB API).
+    :param max_sift: int,
+        Inner sifting cap per BIMF.
+
+    Input of :meth:`fit_transform` is ``(n_channels, H, W)``;
+    output is ``(K, n_channels, H, W)`` with the last slice the residue.
+
     Compared with :class:`~pysdkit._emd2d.emd2d.EMD2D`:
 
     * **EMD2D** is univariate 2-D EMD: one grayscale image ``(H, W)`` is
@@ -55,14 +73,25 @@ class BMEMD(object):
         max_sift: int = 50,
     ) -> None:
         """
-        :param n_dir: Number of projection directions (``>= 6``; MATLAB default 8)
-        :param max_imfs: Maximum number of oscillatory BIMFs before the residue
-        :param stop_crit: ``"stop"`` (sd / sd2 / tol) or ``"fix_h"``
-        :param stop_vec: ``[sd, sd2, tol]`` when ``stop_crit="stop"``;
-            default ``[0.01, 0.1, 0.01]`` (MATLAB BMEMD default)
-        :param stop_cnt: Fixed sifting count when ``stop_crit="fix_h"``
-        :param max_iter: Hard cap on outer BIMF extraction iterations
-        :param max_sift: Hard cap on inner sifting iterations per BIMF
+        Store BMEMD hyperparameters used by later sifting and fusion calls.
+
+        :param n_dir: int,
+            Number of projection directions (``>= 6``; MATLAB default 8).
+        :param max_imfs: int,
+            Maximum number of oscillatory BIMFs before the residue.
+        :param stop_crit: str,
+            ``"stop"`` (sd / sd2 / tol) or ``"fix_h"``.
+        :param stop_vec: sequence of float or None,
+            ``[sd, sd2, tol]`` when ``stop_crit="stop"``. ``None`` selects
+            ``[0.01, 0.1, 0.01]`` (MATLAB BMEMD default).
+        :param stop_cnt: int,
+            Consecutive successful siftings when ``stop_crit="fix_h"``.
+        :param max_iter: int,
+            Hard cap on outer BIMF extraction iterations (stored for API
+            compatibility with MATLAB; the Python loop uses ``max_imfs``).
+        :param max_sift: int,
+            Hard cap on inner sifting iterations per BIMF.
+        :return: None
         """
         if not isinstance(n_dir, (int, np.integer)) or n_dir < 6:
             raise ValueError("n_dir must be an integer >= 6")
@@ -87,26 +116,49 @@ class BMEMD(object):
         self.residue: Optional[np.ndarray] = None
 
     def __str__(self) -> str:
+        """
+        Return the full algorithm name and abbreviation.
+
+        :return: str,
+            ``"Bidimensional Multivariate Empirical Mode Decomposition (BMEMD)"``.
+        """
         return "Bidimensional Multivariate Empirical Mode Decomposition (BMEMD)"
 
     def __call__(
         self, images: np.ndarray, max_imfs: Optional[int] = None
     ) -> np.ndarray:
+        """
+        Allow a ``BMEMD`` instance to be called like a function.
+
+        :param images: ndarray,
+            Multi-channel stack of shape ``(n_channels, H, W)``.
+        :param max_imfs: int or None,
+            Optional override for the number of oscillatory BIMFs.
+        :return imfs: ndarray,
+            Decomposition of shape ``(K, n_channels, H, W)``. The last
+            slice along axis 0 is the residue.
+        """
         return self.fit_transform(images, max_imfs=max_imfs)
 
-    # ------------------------------------------------------------------ #
-    # Public API
-    # ------------------------------------------------------------------ #
     def fit_transform(
         self, images: np.ndarray, max_imfs: Optional[int] = None
     ) -> np.ndarray:
         """
-        Decompose a multi-channel image stack.
+        Decompose a multi-channel image stack into aligned BIMFs plus residue.
 
-        :param images: Array of shape ``(n_channels, H, W)`` with
-            ``2 <= n_channels <= 16``
-        :param max_imfs: Optional override for the number of oscillatory BIMFs
-        :return: ``(K, n_channels, H, W)`` where the last slice is the residue
+        Each channel is projected onto Hammersley / circular directions. 2-D
+        extrema of those scalar surfaces define envelopes that are interpolated
+        for **every** channel, so all images share the same BIMF count.
+
+        :param images: ndarray,
+            Stack of shape ``(n_channels, H, W)`` with ``2 <= n_channels <= 16``
+            and ``H, W >= 3``.
+        :param max_imfs: int or None,
+            Maximum number of oscillatory BIMFs. ``None`` uses ``self.max_imfs``.
+        :return imfs: ndarray,
+            Array of shape ``(K, n_channels, H, W)``. Oscillatory BIMFs occupy
+            slices ``0 .. K-2``; slice ``-1`` is the residue. Also stored on
+            ``self.imfs`` (oscillatory only) and ``self.residue``.
         """
         x = self._check_input(images)
         n_ch, height, width = x.shape
@@ -170,10 +222,16 @@ class BMEMD(object):
         local squared deviation from a moving mean (MATLAB ``local_var_img``).
         The residue is fused by intensity proportions.
 
-        :param images: ``(n_channels, H, W)`` input stack (used if ``imfs`` is None)
-        :param imfs: Optional precomputed BIMFs ``(K, n_channels, H, W)``
-        :param var_window: Odd window size for local variance (default 5)
-        :return: Fused grayscale image ``(H, W)``
+        :param images: ndarray,
+            Input stack ``(n_channels, H, W)``. Used only when ``imfs`` is
+            ``None`` (triggers :meth:`fit_transform`).
+        :param imfs: ndarray or None,
+            Precomputed BIMFs of shape ``(K, n_channels, H, W)``. ``None``
+            decomposes ``images`` first.
+        :param var_window: int,
+            Odd window size for the local-variance filter (default 5).
+        :return fused: ndarray,
+            Single grayscale image of shape ``(H, W)``.
         """
         if imfs is None:
             imfs = self.fit_transform(images)
@@ -199,11 +257,17 @@ class BMEMD(object):
 
         return fused
 
-    # ------------------------------------------------------------------ #
-    # Internals
-    # ------------------------------------------------------------------ #
     @staticmethod
     def _check_input(images: np.ndarray) -> np.ndarray:
+        """
+        Validate a BMEMD image stack and cast it to float.
+
+        :param images: array-like,
+            Candidate 3-D stack.
+        :return x: ndarray,
+            Float array of shape ``(n_channels, H, W)`` with
+            ``2 <= n_channels <= 16`` and ``H, W >= 3``.
+        """
         x = np.asarray(images, dtype=float)
         if x.ndim != 3:
             raise ValueError("BMEMD expects a 3-D array of shape (n_channels, H, W)")
@@ -216,9 +280,18 @@ class BMEMD(object):
 
     def _direction_vectors(self, n_dim: int) -> np.ndarray:
         """
-        Unit directions of shape ``(n_dir, n_dim)``.
+        Build unit projection directions (MATLAB ``get_dir`` / Hammersley).
 
-        Matches MATLAB ``get_dir`` / Hammersley construction in ``bmemd.m``.
+        * ``n_dim == 2``: equally spaced points on the unit circle.
+        * ``n_dim == 3``: Hammersley samples mapped onto the 2-sphere.
+        * ``n_dim > 3``: hyperspherical map of the Hammersley sequence
+          (same construction as :func:`pysdkit._emd.memd.unit_direction`).
+
+        :param n_dim: int,
+            Number of image channels.
+        :return dirs: ndarray,
+            Unit vectors of shape ``(n_dir, n_dim)``. Each row is one
+            projection direction.
         """
         ndir = self.n_dir
         dirs = np.zeros((ndir, n_dim), dtype=float)
@@ -255,9 +328,7 @@ class BMEMD(object):
         for it in range(ndir):
             b = 2.0 * seq[:, it] - 1.0
             # atan2(sqrt(flipud(cumsum(b(end:-1:2).^2))), b(1:end-1))
-            tht = np.arctan2(
-                np.sqrt(np.flipud(np.cumsum(b[:0:-1] ** 2))), b[: n_dim - 1]
-            )
+            tht = np.arctan2(np.sqrt(np.flip(np.cumsum(b[:0:-1] ** 2))), b[: n_dim - 1])
             dir_t = np.cumprod(np.concatenate(([1.0], np.sin(tht))))
             dir_t = np.asarray(dir_t[:n_dim], dtype=float)
             dir_t[: n_dim - 1] = np.cos(tht) * dir_t[: n_dim - 1]
@@ -266,18 +337,54 @@ class BMEMD(object):
 
     @staticmethod
     def _project(images: np.ndarray, direction: np.ndarray) -> np.ndarray:
-        """Pixel-wise projection ``Σ_c I_c * u_c`` → shape ``(H, W)``."""
+        """
+        Project a channel stack onto one direction at every pixel.
+
+        Computes ``Y(h, w) = Σ_c I_c(h, w) * u_c``.
+
+        :param images: ndarray,
+            Stack of shape ``(n_channels, H, W)``.
+        :param direction: ndarray,
+            Unit vector of length ``n_channels``.
+        :return surface: ndarray,
+            Scalar projection of shape ``(H, W)``.
+        """
         return np.tensordot(direction, images, axes=(0, 0))
 
     @staticmethod
     def _regional_extrema(surface: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Boolean maps of regional maxima / minima (MATLAB ``imregional*``)."""
+        """
+        Locate regional maxima and minima of a 2-D surface.
+
+        A pixel is a regional extremum if it equals the 3x3 maximum (resp.
+        minimum) filter of the surface, matching MATLAB ``imregionalmax`` /
+        ``imregionalmin`` on a 4-connected neighbourhood of size 3.
+
+        :param surface: ndarray,
+            Projected image of shape ``(H, W)``.
+        :return maxima: ndarray of bool,
+            ``True`` at regional maxima, shape ``(H, W)``.
+        :return minima: ndarray of bool,
+            ``True`` at regional minima, shape ``(H, W)``.
+        """
         maxima = maximum_filter(surface, size=3) == surface
         minima = minimum_filter(surface, size=3) == surface
         return maxima, minima
 
     def _stop_emd(self, residue: np.ndarray, directions: np.ndarray) -> bool:
-        """Stop if any projection has fewer than 3 maxima or minima."""
+        """
+        Decide whether BIMF extraction should stop for the current residue.
+
+        Extraction stops as soon as **any** projection has fewer than three
+        regional maxima or three regional minima (MATLAB ``stop_emd``).
+
+        :param residue: ndarray,
+            Current residual stack of shape ``(n_channels, H, W)``.
+        :param directions: ndarray,
+            Unit directions of shape ``(n_dir, n_channels)``.
+        :return stop_flag: bool,
+            ``True`` if no further oscillatory BIMF should be extracted.
+        """
         for d in directions:
             y = self._project(residue, d)
             maxima, minima = self._regional_extrema(y)
@@ -291,8 +398,22 @@ class BMEMD(object):
         """
         Average multivariate envelopes over all projection directions.
 
-        :return: ``(env_mean, nem_last, amp)`` where ``amp`` is the summed
-            envelope amplitude map used by the stop criterion.
+        For each direction, regional extrema of the projected surface are
+        interpolated (Clough–Tocher) independently on every channel, then
+        the envelopes are averaged. Requires at least three maxima and three
+        minima per projection.
+
+        :param mode: ndarray,
+            Current proto-BIMF of shape ``(n_channels, H, W)``.
+        :param directions: ndarray,
+            Unit directions of shape ``(n_dir, n_channels)``.
+        :return env_mean: ndarray,
+            Local-mean estimate of shape ``(n_channels, H, W)``.
+        :return nem: int,
+            Extrema count (maxima + minima) of the **last** projection,
+            used by the ``"stop"`` / ``"fix_h"`` criteria.
+        :return amp: ndarray,
+            Summed envelope-amplitude map of shape ``(H, W)``.
         """
         n_ch, height, width = mode.shape
         env_mean = np.zeros_like(mode)
@@ -328,7 +449,22 @@ class BMEMD(object):
         return env_mean, nem, amp
 
     def _stop_sifting(self, env_mean: np.ndarray, amp: np.ndarray, nem: int) -> bool:
-        """Return True if sifting should stop (MATLAB ``stop_sifting``)."""
+        """
+        Rilling-style sifting stop test (MATLAB ``stop_sifting``).
+
+        Forms ``sx = ||env_mean|| / amp`` and stops unless a sufficient
+        fraction of pixels still exceed ``sd`` / ``sd2`` **and** the last
+        projection had more than nine extrema.
+
+        :param env_mean: ndarray,
+            Envelope mean of shape ``(n_channels, H, W)``.
+        :param amp: ndarray,
+            Amplitude map of shape ``(H, W)``.
+        :param nem: int,
+            Extrema count of the last projection.
+        :return stop_flag: bool,
+            ``True`` if inner sifting of this BIMF should stop.
+        """
         sx = np.sqrt(np.sum(env_mean**2, axis=0))
         if np.any(amp):
             sx = sx / (amp + 1e-12)
@@ -348,8 +484,23 @@ def _surface_from_points(
     """
     Interpolate scattered extrema onto the full image grid.
 
-    Uses Clough–Tocher (Delaunay-based) interpolation as recommended in the
-    BMEMD paper, with nearest-neighbour fill for exterior / degenerate regions.
+    Uses Clough–Tocher (Delaunay) interpolation as recommended in the BMEMD
+    paper, with nearest-neighbour fill for exterior or degenerate pixels.
+    Duplicate ``(x, y)`` knots keep the first occurrence.
+
+    :param x: ndarray,
+        Column (horizontal) coordinates of extrema, shape ``(n_ext,)``.
+    :param y: ndarray,
+        Row (vertical) coordinates of extrema, shape ``(n_ext,)``.
+    :param z: ndarray,
+        Channel values at those extrema, shape ``(n_ext,)``.
+    :param xx_grid: ndarray,
+        Column-index mesh of shape ``(H, W)`` (``np.mgrid`` x-component).
+    :param yy_grid: ndarray,
+        Row-index mesh of shape ``(H, W)`` (``np.mgrid`` y-component).
+    :return surface: ndarray,
+        Interpolated envelope of shape ``(H, W)``. Falls back to the mean
+        of ``z`` when fewer than three unique points remain.
     """
     points = np.column_stack([x.astype(float), y.astype(float)])
     values = z.astype(float)
@@ -380,9 +531,12 @@ def local_var_img(images: np.ndarray, window: int = 5) -> np.ndarray:
     """
     Local squared deviation from a moving mean (MATLAB ``local_var_img``).
 
-    :param images: ``(H, W)`` or ``(C, H, W)``
-    :param window: Odd filter size
-    :return: Same shape as ``images``
+    :param images: ndarray,
+        Single image ``(H, W)`` or a channel stack ``(C, H, W)``.
+    :param window: int,
+        Side length of the uniform filter (must be ``>= 1``; typically odd).
+    :return var: ndarray,
+        ``(I - uniform_mean(I))^2`` with the same shape as ``images``.
     """
     x = np.asarray(images, dtype=float)
     w = int(window)
@@ -411,9 +565,22 @@ def fuse_images(
     **bmemd_kwargs,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Convenience wrapper: BMEMD decomposition + variance-weighted fusion.
+    Convenience wrapper: BMEMD decomposition plus variance-weighted fusion.
 
-    :return: ``(fused_image, imfs)``
+    :param images: ndarray,
+        Multi-channel stack of shape ``(n_channels, H, W)``.
+    :param n_dir: int,
+        Number of projection directions passed to :class:`BMEMD`.
+    :param max_imfs: int,
+        Maximum number of oscillatory BIMFs.
+    :param var_window: int,
+        Local-variance window used by :meth:`BMEMD.fuse`.
+    :param bmemd_kwargs: extra keyword arguments,
+        Forwarded to :class:`BMEMD` (for example ``stop_crit``, ``stop_vec``).
+    :return fused: ndarray,
+        Fused grayscale image of shape ``(H, W)``.
+    :return imfs: ndarray,
+        BIMFs of shape ``(K, n_channels, H, W)`` (last slice = residue).
     """
     bmemd = BMEMD(n_dir=n_dir, max_imfs=max_imfs, **bmemd_kwargs)
     imfs = bmemd.fit_transform(images)
