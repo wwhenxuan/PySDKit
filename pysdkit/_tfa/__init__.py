@@ -18,9 +18,11 @@ from .vtfmtd import (
     smooth_if,
     moving_average_if,
     omega_bins_to_hz,
+)
+from pysdkit.data._loaders import (
     load_dual_signal_noise,
-    load_single_nsignal,
     load_map2,
+    load_single_nsignal,
 )
 
 __all__ = [

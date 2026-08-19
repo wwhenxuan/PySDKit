@@ -22,9 +22,8 @@ from pysdkit._imd.imd import (
     segment_sparsity,
     cesm_pq_mean,
     band_split,
-    load_imd_input_sig,
-    load_imd_gearbox_snippet,
 )
+from pysdkit.data import load_imd_gearbox_snippet, load_imd_input_sig
 
 
 def _make_impulsive_mixture(

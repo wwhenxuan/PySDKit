@@ -22,7 +22,6 @@ from pysdkit._vmd.vme import (
     generate_vme_example2,
     generate_vme_example3a,
     generate_vme_example3b,
-    load_vme_ecg_055m,
     mirror_extend,
     onesided_fft,
     reconstruct_hermitian,
@@ -34,6 +33,7 @@ from pysdkit._vmd.vme import (
     update_dual,
     update_mode_spectrum,
 )
+from pysdkit.data import load_vme_ecg_055m
 
 
 def _corr(a: np.ndarray, b: np.ndarray) -> float:

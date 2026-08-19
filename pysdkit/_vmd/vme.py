@@ -14,46 +14,14 @@ Faithful Python port of the MATLAB File Exchange toolbox ``vme.m``
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 
+from pysdkit.data._loaders import load_vme_ecg_055m
 from pysdkit.utils import fft, fftshift, ifft, ifftshift
 
-_DATA_DIR = Path(__file__).resolve().parent / "data"
 _EPS = float(np.finfo(np.float64).eps)
-
-
-def load_vme_ecg_055m() -> Dict[str, Union[np.ndarray, float]]:
-    """
-    Load the packaged MIMIC record ``055m`` shipped with MATLAB VME.
-
-    The File Exchange archive stores ``val`` as ``int16`` of shape
-    ``(7, 7500)``.  Following ``VME_test_script.m``, channel 0 is the ECG
-    and the last channel is the simultaneous reference respiration.
-    Sampling rate is 125 Hz (paper: 4000 samples = 32 s).
-
-    :return: dict with ``val``, ``ecg``, ``respiration``, ``fs``, ``t``
-    """
-    path = _DATA_DIR / "ecg_055m.npy"
-    if not path.is_file():
-        raise FileNotFoundError(
-            f"Missing VME demo data: {path}. "
-            "Reinstall PySDKit or restore pysdkit/_vmd/data/"
-        )
-    val = np.asarray(np.load(path), dtype=np.float64)
-    if val.ndim != 2 or val.shape[0] < 1:
-        raise ValueError("ecg_055m.npy must have shape (n_channels, n_samples)")
-    fs = 125.0
-    t = np.arange(val.shape[1], dtype=float) / fs
-    return {
-        "val": val,
-        "ecg": val[0].copy(),
-        "respiration": val[-1].copy(),
-        "fs": fs,
-        "t": t,
-    }
 
 
 def generate_vme_example1(

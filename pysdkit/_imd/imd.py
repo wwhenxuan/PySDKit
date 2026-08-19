@@ -9,11 +9,12 @@ https://doi.org/10.1016/j.ymssp.2024.111227
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 from scipy.signal import hilbert
+
+from pysdkit.data._loaders import load_imd_gearbox_snippet, load_imd_input_sig
 
 
 def fft_bandpass(
@@ -198,27 +199,6 @@ def band_split(
     if not parts:
         return np.zeros((0, 2), dtype=float)
     return np.asarray(parts, dtype=float)
-
-
-def load_imd_input_sig() -> Dict[str, np.ndarray]:
-    """Load the packaged MATLAB ``InputSig`` demo (Fs = 12800 Hz, 2 s)."""
-    path = Path(__file__).resolve().parent / "data" / "input_sig.npy"
-    signal = np.load(path).astype(np.float64).ravel()
-    fs = 12800.0
-    t = np.arange(signal.size, dtype=float) / fs
-    return {"signal": signal, "fs": fs, "t": t}
-
-
-def load_imd_gearbox_snippet() -> Dict[str, np.ndarray]:
-    """
-    Load a short packaged snippet of the MCC5-THU gearbox CSV
-    (``gearbox_vibration_x``, first 4096 samples, Fs = 12800 Hz).
-    """
-    path = Path(__file__).resolve().parent / "data" / "gearbox_fault_snippet.npy"
-    signal = np.load(path).astype(np.float64).ravel()
-    fs = 12800.0
-    t = np.arange(signal.size, dtype=float) / fs
-    return {"signal": signal, "fs": fs, "t": t}
 
 
 class IMD(object):

@@ -10,9 +10,9 @@ from pysdkit import ALIF
 from pysdkit._tid import IterativeFiltering
 from pysdkit._tid.iterative_filtering import (
     get_mask_v1,
-    load_prefixed_filter,
     maxmins,
 )
+from pysdkit.data import load_prefixed_filter
 
 
 def _make_chirp_mixture(n: int = 512):

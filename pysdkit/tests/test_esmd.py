@@ -21,10 +21,10 @@ from pysdkit._emd.esmd import (
     midpoints_from_extrema,
     mean_curve,
     make_esmd_example3,
-    load_wind_demo,
     instantaneous_amplitude,
     instantaneous_frequency,
 )
+from pysdkit.data import load_wind_demo
 
 
 class ESMDHelpersTest(unittest.TestCase):

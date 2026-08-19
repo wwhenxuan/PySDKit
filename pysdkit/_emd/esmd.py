@@ -13,6 +13,8 @@ from typing import Dict, List, Optional, Tuple, Union
 import numpy as np
 from scipy.interpolate import CubicSpline, interp1d
 
+from pysdkit.data._loaders import load_wind_demo
+
 
 def find_extrema(x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -436,19 +438,6 @@ def make_esmd_example3(
         "trend": trend,
         "dt": float(t[1] - t[0]),
     }
-
-
-def load_wind_demo(path: str) -> Dict[str, np.ndarray]:
-    """
-    Load a wind-demo CSV/TXT file (column 0 = wind series, ``dt=0.05`` s).
-
-    :param path: path to a comma-separated file whose first column is the series
-    """
-    data = np.loadtxt(path, delimiter=",")
-    y = data[:, 0]
-    dt = 0.05
-    t = np.arange(y.size, dtype=float) * dt
-    return {"t": t, "signal": y, "dt": dt}
 
 
 class ESMD(object):

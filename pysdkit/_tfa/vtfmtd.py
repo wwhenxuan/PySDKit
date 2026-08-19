@@ -10,67 +10,13 @@ https://doi.org/10.1016/j.sigpro.2026.110603
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
 
-
-# ---------------------------------------------------------------------------
-# Packaged demo data
-# ---------------------------------------------------------------------------
-
-_DATA_DIR = Path(__file__).resolve().parent / "data"
-
-
-def _load_complex_npy(name: str) -> np.ndarray:
-    path = _DATA_DIR / name
-    if not path.is_file():
-        raise FileNotFoundError(
-            f"Missing VTFMTD demo data: {path}. "
-            "Reinstall PySDKit or restore pysdkit/_tfa/data/"
-        )
-    return np.asarray(np.load(path))
-
-
-def load_dual_signal_noise() -> Dict[str, Union[np.ndarray, float]]:
-    """
-    Load the packaged dual-component noisy complex demo
-    (MATLAB ``Dual_signal_noise.mat``).
-
-    Sampling rate is ``fs = 3000`` Hz and length is 3000 samples (1 s),
-    matching ``test1.m``.
-    """
-    signal = _load_complex_npy("dual_signal_noise.npy").astype(np.complex128).ravel()
-    fs = 3000.0
-    t = np.arange(1, signal.size + 1, dtype=float) / fs
-    return {"signal": signal, "fs": fs, "t": t, "K": 2}
-
-
-def load_single_nsignal() -> Dict[str, Union[np.ndarray, float]]:
-    """
-    Load the packaged single-component noisy micro-Doppler demo
-    (MATLAB ``Single_nsignal.mat``).
-
-    Sampling rate is ``fs = 8011`` Hz and length is 8011 samples (1 s),
-    matching ``test2.m``.
-    """
-    signal = _load_complex_npy("single_nsignal.npy").astype(np.complex128).ravel()
-    fs = 8011.0
-    t = np.arange(signal.size, dtype=float) / fs
-    return {"signal": signal, "fs": fs, "t": t, "K": 1}
-
-
-def load_map2() -> np.ndarray:
-    """Load the packaged MATLAB ``map2`` colormap (shape ``(64, 3)``)."""
-    return np.asarray(np.load(_DATA_DIR / "map2.npy"), dtype=float)
-
-
-# ---------------------------------------------------------------------------
-# STFT (MATLAB STFT.m)
-# ---------------------------------------------------------------------------
+from pysdkit.data._loaders import load_dual_signal_noise, load_map2, load_single_nsignal
 
 
 def stft(signal: np.ndarray, hlength: Optional[int] = None) -> np.ndarray:
@@ -262,11 +208,6 @@ def omega_bins_to_hz(omega_bins: np.ndarray, fs: float, n: int) -> np.ndarray:
     STFT row ``j`` (1-based) corresponds to frequency ``(j - 1) * fs / n``.
     """
     return (np.asarray(omega_bins, dtype=float) - 1.0) * (float(fs) / float(n))
-
-
-# ---------------------------------------------------------------------------
-# Core algorithm
-# ---------------------------------------------------------------------------
 
 
 def vtfmtd(

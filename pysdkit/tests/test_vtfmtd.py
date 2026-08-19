@@ -20,10 +20,8 @@ from pysdkit._tfa.vtfmtd import (
     smooth_if,
     moving_average_if,
     omega_bins_to_hz,
-    load_dual_signal_noise,
-    load_single_nsignal,
-    load_map2,
 )
+from pysdkit.data import load_dual_signal_noise, load_map2, load_single_nsignal
 
 
 class VTFMTDHelperTest(unittest.TestCase):

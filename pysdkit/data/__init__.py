@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Synthetic / example signal and image data generators.
+Synthetic generators and packaged demo-data loaders.
 """
 
 __all__ = [
@@ -31,6 +31,14 @@ __all__ = [
     "test_univariate_cube",
     "test_multivariate_cube",
     "test_pca",
+    "load_prefixed_filter",
+    "load_imd_input_sig",
+    "load_imd_gearbox_snippet",
+    "load_vme_ecg_055m",
+    "load_dual_signal_noise",
+    "load_single_nsignal",
+    "load_map2",
+    "load_wind_demo",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -50,10 +58,10 @@ from ._time_series import generate_time_series
 from ._generator import test_emd
 
 # Official MATLAB FMD demo vibration record
-from ._generator import test_fmd
+from ._loaders import test_fmd
 
 # Packaged VMD multi-component demo signal
-from ._generator import test_vmd
+from ._loaders import test_vmd
 
 # Generate the test function for HHT
 from ._generator import test_hht
@@ -98,3 +106,15 @@ from ._cube import test_multivariate_cube
 
 # Test case for Principal Component Analysis
 from ._models import test_pca
+
+# Packaged demo arrays used by ALIF, IMD, VME, VTFMTD and ESMD
+from ._loaders import (
+    load_prefixed_filter,
+    load_imd_input_sig,
+    load_imd_gearbox_snippet,
+    load_vme_ecg_055m,
+    load_dual_signal_noise,
+    load_single_nsignal,
+    load_map2,
+    load_wind_demo,
+)

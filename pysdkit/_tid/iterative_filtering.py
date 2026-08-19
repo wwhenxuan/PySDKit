@@ -7,29 +7,12 @@ MATLAB reference: IF_v8_3.m from https://github.com/Cicone/ALIF
 
 from __future__ import annotations
 
-import os
 import time
 from typing import Optional, Tuple, Union
 
 import numpy as np
 
-_FILTER_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "data",
-    "prefixed_double_filter.npy",
-)
-
-_MM_CACHE: Optional[np.ndarray] = None
-
-
-def load_prefixed_filter() -> np.ndarray:
-    """Load the prefixed double filter shipped with the package."""
-    global _MM_CACHE
-    if _MM_CACHE is None:
-        if not os.path.isfile(_FILTER_PATH):
-            raise FileNotFoundError("Missing ALIF filter data: {}".format(_FILTER_PATH))
-        _MM_CACHE = np.load(_FILTER_PATH).astype(np.float64).ravel()
-    return _MM_CACHE
+from pysdkit.data._loaders import load_prefixed_filter
 
 
 def get_mask_v1(y: np.ndarray, k: float) -> np.ndarray:

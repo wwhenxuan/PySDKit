@@ -15,10 +15,10 @@ from typing import Optional
 import numpy as np
 from scipy.interpolate import interp1d
 
+from pysdkit.data._loaders import load_prefixed_filter
 from pysdkit._tid.iterative_filtering import (
     IterativeFiltering,
     adaptive_average,
-    load_prefixed_filter,
     maxmins,
 )
 
