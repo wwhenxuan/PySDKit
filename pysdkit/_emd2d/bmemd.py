@@ -30,6 +30,18 @@ class BMEMD(object):
     multivariate envelopes by Delaunay-based surface interpolation, and
     sifts until a MEMD-style stop criterion is met.  All channels share the
     same BIMF count, which enables multi-scale image fusion.
+
+    Compared with :class:`~pysdkit._emd2d.emd2d.EMD2D`:
+
+    * **EMD2D** is univariate 2-D EMD: one grayscale image ``(H, W)`` is
+      sifted from its own spatial extrema (bivariate spline envelopes).
+    * **BMEMD** is multivariate 2-D MEMD: a stack ``(C, H, W)`` is projected
+      onto Hammersley / circular directions; extrema of the *projected*
+      surface define envelopes for **every** channel, so scales stay aligned.
+    * BMEMD therefore requires ``2 <= C <= 16`` and exposes :meth:`fuse` /
+      :func:`fuse_images` for variance-weighted multi-scale fusion.  EMD2D
+      has no fusion step and must not be used as a drop-in for multi-channel
+      data (run it per channel only if independent decompositions are OK).
     """
 
     def __init__(

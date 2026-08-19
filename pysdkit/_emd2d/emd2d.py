@@ -1,6 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-**Empirical Mode Decomposition 2D** for images data.
+**Empirical Mode Decomposition 2D (EMD2D)** for a single grayscale image.
+
+EMD2D is the bidimensional counterpart of classical Huang EMD: extrema of the
+**image itself** are interpolated into upper / lower envelopes
+(mirror padding + bivariate spline), and their mean is sifted out.
+
+Compared with :class:`~pysdkit._emd2d.bmemd.BMEMD`:
+
+* **EMD2D** takes one image ``(H, W)`` and returns IMFs ``(K, H, W)``.
+* **BMEMD** takes a multi-channel stack ``(C, H, W)`` (``2 <= C <= 16``),
+  projects it onto direction vectors (2-D MEMD), and returns jointly aligned
+  BIMFs ``(K, C, H, W)`` that can be fused with :meth:`BMEMD.fuse`.
+* Use EMD2D for a single texture / grayscale field. Use BMEMD when several
+  co-registered images must share the same scale index (e.g. RGB or
+  multi-sensor fusion).
+
+Python reference: https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD2d.py
 """
 
 import numpy as np
@@ -14,16 +30,19 @@ from typing import Optional, Tuple
 
 class EMD2D(object):
     """
-    **Empirical Mode Decomposition 2D** for images data.
+    **Empirical Mode Decomposition 2D** for a single grayscale image.
 
-    Method decomposes images into 2D representations of loose Intrinsic Mode Functions (IMFs).
+    The method decomposes one image into 2-D intrinsic mode functions (IMFs)
+    by sifting spatial envelopes. It is **not** a multi-channel algorithm:
+    each image is processed independently, so IMF counts need not match
+    across channels (see :class:`~pysdkit._emd2d.bmemd.BMEMD` for joint
+    multivariate 2-D EMD and image fusion).
 
     Threshold values that control goodness of the decomposition:
        * `mse_thr` --- proto-IMF check whether small mean square error.
-       * `mean_thr` --- proto-IMF chekc whether small mean value.
+       * `mean_thr` --- proto-IMF check whether small mean value.
 
     Python code: https://github.com/laszukdawid/PyEMD/blob/master/PyEMD/EMD2d.py
-    MATLAB code: https://www.mathworks.com/help/signal/ref/emd.html
     """
 
     def __init__(
