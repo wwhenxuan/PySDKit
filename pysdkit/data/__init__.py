@@ -39,6 +39,10 @@ __all__ = [
     "load_single_nsignal",
     "load_map2",
     "load_wind_demo",
+    "load_memd_syn_12channel",
+    "load_memd_syn_16channel",
+    "load_memd_syn_hex",
+    "load_memd_taichi_hex",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -117,4 +121,8 @@ from ._loaders import (
     load_single_nsignal,
     load_map2,
     load_wind_demo,
+    load_memd_syn_12channel,
+    load_memd_syn_16channel,
+    load_memd_syn_hex,
+    load_memd_taichi_hex,
 )

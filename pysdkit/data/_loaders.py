@@ -140,6 +140,56 @@ def test_fmd() -> Tuple[np.ndarray, np.ndarray, float]:
     return t, x, fs
 
 
+def _load_memd_multichannel(name: str) -> Dict[str, np.ndarray]:
+    """Load a packaged MEMD demo array stored as ``(n_channels, n_samples)``."""
+    signal = np.asarray(np.load(data_file(name)), dtype=np.float64)
+    if signal.ndim != 2:
+        raise ValueError("{} must be a 2-D array".format(name))
+    t = np.arange(signal.shape[1], dtype=float)
+    return {"signal": signal, "t": t}
+
+
+def load_memd_syn_12channel() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged MATLAB ``syn_12channel_inp.mat`` demo (``s12``).
+
+    Twelve-channel synthetic mixture of five tones plus noise on some
+    channels, length 1001, from the MEMD toolbox of Rehman & Mandic.
+    """
+    return _load_memd_multichannel("memd_syn_12channel.npy")
+
+
+def load_memd_syn_16channel() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged MATLAB ``syn_16channel_inp.mat`` demo (``s16``).
+
+    Sixteen-channel synthetic mixture of six tones plus noise on some
+    channels, length 1001, from the MEMD toolbox of Rehman & Mandic.
+    """
+    return _load_memd_multichannel("memd_syn_16channel.npy")
+
+
+def load_memd_syn_hex() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged MATLAB ``syn_hex_inp.mat`` demo (``s6``).
+
+    Hexavariate synthetic series used in Rehman & Mandic, Proc. R. Soc. A
+    466:1291–1302 (2010), Figure 3 (four sinusoids with a common scale).
+    """
+    return _load_memd_multichannel("memd_syn_hex.npy")
+
+
+def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).
+
+    Real-world hexavariate Tai-chi recording: two 3-D inertial body-sensor
+    streams (left wrist and left ankle) stacked into six channels of length
+    800. Stored as ``(6, 800)``.
+    """
+    return _load_memd_multichannel("memd_taichi_hex.npy")
+
+
 def test_vmd() -> Tuple[np.ndarray, np.ndarray, float]:
     """
     Load the packaged VMD demo signal (``vmd_example.npy``).
