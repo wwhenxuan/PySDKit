@@ -43,6 +43,9 @@ __all__ = [
     "load_memd_syn_16channel",
     "load_memd_syn_hex",
     "load_memd_taichi_hex",
+    "load_apitmemd_section_2b",
+    "load_apitmemd_section_3a",
+    "load_apitmemd_section_3b",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -125,4 +128,7 @@ from ._loaders import (
     load_memd_syn_16channel,
     load_memd_syn_hex,
     load_memd_taichi_hex,
+    load_apitmemd_section_2b,
+    load_apitmemd_section_3a,
+    load_apitmemd_section_3b,
 )

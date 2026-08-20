@@ -179,6 +179,67 @@ def load_memd_syn_hex() -> Dict[str, np.ndarray]:
     return _load_memd_multichannel("memd_syn_hex.npy")
 
 
+def load_apitmemd_section_2b() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged MATLAB ``data_section_2b.mat`` hexavariate P300 example.
+
+    Paper §2(b) reconstructs real-world P300 EEG with power imbalance across
+    electrodes.  Six channels (``ch1``–``ch6``) of length 360 at
+    ``fs = 1200`` Hz (0.3 s) are stored as ``apitmemd_section_2b.npy`` with
+    layout ``(6, 360)``.  Channels 1–3 / 4–6 are the two-subject grouping
+    used in the supplement.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = np.asarray(np.load(data_file("apitmemd_section_2b.npy")), dtype=np.float64)
+    if signal.ndim != 2:
+        raise ValueError("apitmemd_section_2b.npy must be a 2-D array")
+    fs = 1200.0
+    t = np.arange(signal.shape[1], dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
+def load_apitmemd_section_3a() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load a short packaged snippet of MATLAB ``data_section_3a.mat``.
+
+    The supplement record is four series (``y1``, ``y2``, ``s1``, ``s2``) of
+    length 286801 at ``fs = 1200`` Hz from Hemakom et al., Phil. Trans. R.
+    Soc. A 374:20150199 (2016), section 3a (cooperative SSVEP).  Only the
+    first 2048 samples (~1.7 s) are shipped as ``apitmemd_section_3a.npy``
+    with layout ``(4, 2048)``.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = np.asarray(np.load(data_file("apitmemd_section_3a.npy")), dtype=np.float64)
+    if signal.ndim != 2:
+        raise ValueError("apitmemd_section_3a.npy must be a 2-D array")
+    fs = 1200.0
+    t = np.arange(signal.shape[1], dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
+def load_apitmemd_section_3b() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged MATLAB ``data_section_3b.mat`` single-shot P300 trials.
+
+    Paper §3(b) uses cooperative two-person P300 detection.  The supplement
+    stores ten hexavariate responses (``response1``–``response10``, each
+    ``ch1``–``ch6``) of length 240 at ``fs = 1200`` Hz (0.2 s).  Packed as
+    ``apitmemd_section_3b.npy`` with layout ``(10, 6, 240)``.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = np.asarray(np.load(data_file("apitmemd_section_3b.npy")), dtype=np.float64)
+    if signal.ndim != 3:
+        raise ValueError(
+            "apitmemd_section_3b.npy must have shape (n_trials, n_channels, n_samples)"
+        )
+    fs = 1200.0
+    t = np.arange(signal.shape[-1], dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
 def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
     """
     Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).
