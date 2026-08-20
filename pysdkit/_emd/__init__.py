@@ -19,6 +19,8 @@ from .remd import REMD
 
 from .memd import MEMD
 
+from .apitmemd import APITMEMD
+
 from .tvf_emd import TVF_EMD
 
 from .hht import HHT
