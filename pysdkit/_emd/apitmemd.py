@@ -12,8 +12,6 @@ Hemakom, A., Goverdovsky, V., Looney, D. and Mandic, D. P.
 "Adaptive-projection intrinsically transformed multivariate empirical mode
 decomposition in cooperative brain–computer interface applications."
 Phil. Trans. R. Soc. A 374:20150199 (2016).
-
-MATLAB: ``repo/APITMEMD/apitmemd.m``
 """
 
 from __future__ import annotations

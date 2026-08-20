@@ -21,6 +21,10 @@ from .memd import MEMD
 
 from .apitmemd import APITMEMD
 
+from .nstemd import NSTEMD
+
+from .online_emd import OnlineEMD
+
 from .tvf_emd import TVF_EMD
 
 from .hht import HHT
