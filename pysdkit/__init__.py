@@ -22,6 +22,12 @@ from ._emd import MEMD
 # Adaptive-Projection Intrinsically Transformed MEMD
 from ._emd import APITMEMD
 
+# Nonuniformly Sampled Trivariate Empirical Mode Decomposition
+from ._emd import NSTEMD
+
+# Online Empirical Mode Decomposition
+from ._emd import OnlineEMD
+
 # Serial Empirical Mode Decomposition
 from ._emd import SEMD
 
@@ -190,6 +196,8 @@ Complete Ensemble EMD with Adaptive Noise       |    CEEMDAN
 Robust Empirical Mode Decomposition             |    REMD
 Multivariate Empirical Mode Decomposition       |    MEMD
 Adaptive-Projection Intrinsically Transformed MEMD | APITMEMD
+Nonuniformly Sampled Trivariate EMD             |    NSTEMD
+Online Empirical Mode Decomposition             |    OnlineEMD
 Serial Empirical Mode Decomposition             |    SEMD
 Time Varying Filter based EMD                   |    TVF_EMD
 Fast and Adaptive Empirical Mode Decomposition  |    FAEMD
@@ -248,6 +256,8 @@ __all__ = [
     "REMD",
     "MEMD",
     "APITMEMD",
+    "NSTEMD",
+    "OnlineEMD",
     "SEMD",
     "TVF_EMD",
     "FAEMD",

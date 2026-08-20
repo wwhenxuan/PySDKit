@@ -87,9 +87,9 @@ def common_dtype(x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     :param y: Input 1D Signal 2 - Numpy Array
     :return: Output two array with same common dtype - Numpy Array
     """
-    # 获取两者的公共数据类型 get the common data type of both
+    # get the common data type of both
     dtype = np.result_type(x.dtype, y.dtype)
-    # 使两者的类型保持一致 make the two types consistent
+    # make the two types consistent
     if x.dtype != dtype:
         x = x.astype(dtype)
     if y.dtype != dtype:

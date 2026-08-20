@@ -240,6 +240,23 @@ def load_apitmemd_section_3b() -> Dict[str, Union[np.ndarray, float]]:
     return {"signal": signal, "fs": fs, "t": t}
 
 
+def load_oemd_ecg() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged MIT-BIH Normal Sinus Rhythm ECG used by Online EMD.
+
+    Fontugne, Borgnat and Flandrin, ICASSP 2017, Figure 5.  The MATLAB
+    companion ships ``data/ecg.mat`` (variable ``ecg``, 1280 ``int16``
+    samples).  Stored here as ``oemd_ecg.npy``.  MIT-BIH NSRDB is sampled
+    at 128 Hz, so the record is 10 s.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = _load_float1d("oemd_ecg.npy")
+    fs = 128.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
 def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
     """
     Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).

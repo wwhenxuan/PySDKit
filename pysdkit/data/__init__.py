@@ -46,6 +46,7 @@ __all__ = [
     "load_apitmemd_section_2b",
     "load_apitmemd_section_3a",
     "load_apitmemd_section_3b",
+    "load_oemd_ecg",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -131,4 +132,5 @@ from ._loaders import (
     load_apitmemd_section_2b,
     load_apitmemd_section_3a,
     load_apitmemd_section_3b,
+    load_oemd_ecg,
 )
