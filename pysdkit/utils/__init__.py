@@ -111,3 +111,16 @@ from ._diagnalization import diagonal_average
 
 # Extract the specified diagonal from a matrix
 from ._diagnalization import get_diagonal
+
+# Fast Kurtogram (Antoni, MSSP 2007) — analytic filter-bank tree
+from ._kurtogram import (
+    analytic_filters,
+    dbfb,
+    fast_kurtogram,
+    find_wav_kurt,
+    kurt,
+    max_ij,
+    plot_kurtogram,
+    prewhiten_ar,
+    tbfb,
+)
