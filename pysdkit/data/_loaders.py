@@ -257,6 +257,55 @@ def load_oemd_ecg() -> Dict[str, Union[np.ndarray, float]]:
     return {"signal": signal, "fs": fs, "t": t}
 
 
+def load_fast_kurtogram_x() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged Fast Kurtogram demo record (Antoni, MSSP 2007).
+
+    MATLAB ``x.mat`` from Pack Kurtogram V4 ``demo_Fast_Kurtogram.m``:
+    weak repetitive transients hidden in stationary noise, theoretically
+    in the band ``[0.15, 0.19]`` at normalised sampling frequency ``Fs = 1``.
+    Stored as ``fast_kurtogram_x.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = _load_float1d("fast_kurtogram_x.npy")
+    fs = 1.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
+def load_sst_float() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged float-drift record used by multivariate SST.
+
+    MATLAB ``float.mat`` (variable ``x``) from Ahrabian et al., Signal
+    Processing 106 (2015), ``example_code.m`` (real-world simulation 1).
+    Stored as ``sst_float.npy`` with layout ``(2, 1116)``.
+
+    :return: dict with ``signal``
+    """
+    signal = np.asarray(np.load(data_file("sst_float.npy")), dtype=np.float64)
+    if signal.ndim != 2:
+        raise ValueError("sst_float.npy must be a 2-D array")
+    return {"signal": signal}
+
+
+def load_sst_doppler() -> Dict[str, np.ndarray]:
+    """
+    Load the packaged bivariate Doppler-radar record used by multivariate SST.
+
+    MATLAB ``doppler_car.mat`` (variable ``x``) from Ahrabian et al.,
+    Signal Processing 106 (2015), ``example_code.m`` (robotic-device
+    Doppler).  Stored as ``sst_doppler.npy`` with layout ``(2, 2127)``.
+
+    :return: dict with ``signal``
+    """
+    signal = np.asarray(np.load(data_file("sst_doppler.npy")), dtype=np.float64)
+    if signal.ndim != 2:
+        raise ValueError("sst_doppler.npy must be a 2-D array")
+    return {"signal": signal}
+
+
 def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
     """
     Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).

@@ -130,6 +130,9 @@ from ._tid import ALIF
 # Variational Time-Frequency Mode Tracking Decomposition (TFA)
 from ._tfa import VTFMTD, vtfmtd
 
+# Synchrosqueezing Transform
+from ._tfa import SST, sst
+
 # Adaptive Polymorphic Mode Decomposition / Impulsive Mode Decomposition
 from ._imd import APMD, IMD, imd
 
@@ -231,6 +234,7 @@ Adaptive Variational Nonlinear Chirp Mode Dec.  |    AVNCMD
 Short-Time Narrow-Banded Mode Decomposition     |    STNBMD
 Adaptive Local Iterative Filtering              |    ALIF
 Variational TF Mode Tracking Decomposition      |    VTFMTD
+Synchrosqueezing Transform                      |    SST
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Impulsive Mode Decomposition                    |    IMD
 Empirical Wavelet Transform                     |    EWT
@@ -308,6 +312,8 @@ __all__ = [
     "ALIF",
     "VTFMTD",
     "vtfmtd",
+    "SST",
+    "sst",
     "APMD",
     "IMD",
     "imd",
