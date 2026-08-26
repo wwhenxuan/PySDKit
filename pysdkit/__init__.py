@@ -133,6 +133,9 @@ from ._tfa import VTFMTD, vtfmtd
 # Synchrosqueezing Transform
 from ._tfa import SST, sst
 
+# Synchroextracting Transform
+from ._tfa import SET, set
+
 # Adaptive Polymorphic Mode Decomposition / Impulsive Mode Decomposition
 from ._imd import APMD, IMD, imd
 
@@ -235,6 +238,7 @@ Short-Time Narrow-Banded Mode Decomposition     |    STNBMD
 Adaptive Local Iterative Filtering              |    ALIF
 Variational TF Mode Tracking Decomposition      |    VTFMTD
 Synchrosqueezing Transform                      |    SST
+Synchroextracting Transform                     |    SET
 Adaptive Polymorphic Mode Decomposition         |    APMD
 Impulsive Mode Decomposition                    |    IMD
 Empirical Wavelet Transform                     |    EWT
@@ -314,6 +318,8 @@ __all__ = [
     "vtfmtd",
     "SST",
     "sst",
+    "SET",
+    "set",
     "APMD",
     "IMD",
     "imd",

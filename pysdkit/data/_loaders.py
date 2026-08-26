@@ -306,6 +306,38 @@ def load_sst_doppler() -> Dict[str, np.ndarray]:
     return {"signal": signal}
 
 
+def load_set_batdata2() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged bat echolocation record used by SET Example 3.
+
+    MATLAB ``batdata2.mat`` (variable ``data``, 400 samples) from Yu,
+    Yu and Xu, IEEE TIE 64(10) 2017, ``Example_3.m``.  Sampling rate
+    ``Fs = 1e6 / 7``.  Stored as ``set_batdata2.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = _load_float1d("set_batdata2.npy")
+    fs = 1.0e6 / 7.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
+def load_set_vibdata() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged vibration record used by SET Example 4.
+
+    MATLAB ``vibdata.mat`` (variable ``data``, 1024 samples) from Yu,
+    Yu and Xu, IEEE TIE 64(10) 2017, ``Example_4.m``.  Sampling rate
+    2000 Hz.  Stored as ``set_vibdata.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``
+    """
+    signal = _load_float1d("set_vibdata.npy")
+    fs = 2000.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t}
+
+
 def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
     """
     Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).

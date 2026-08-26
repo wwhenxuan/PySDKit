@@ -50,6 +50,8 @@ __all__ = [
     "load_sst_float",
     "load_sst_doppler",
     "load_fast_kurtogram_x",
+    "load_set_batdata2",
+    "load_set_vibdata",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -139,4 +141,6 @@ from ._loaders import (
     load_sst_float,
     load_sst_doppler,
     load_fast_kurtogram_x,
+    load_set_batdata2,
+    load_set_vibdata,
 )
