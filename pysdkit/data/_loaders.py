@@ -338,6 +338,55 @@ def load_set_vibdata() -> Dict[str, Union[np.ndarray, float]]:
     return {"signal": signal, "fs": fs, "t": t}
 
 
+def load_imckd_sig1() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged IMCKD demo record (Miao et al., MSSP 2017).
+
+    MATLAB ``sig1.mat`` (variable ``x``, 20001 samples) from
+    ``01 IMCKD/demo.m``.  Sampling rate 20 kHz; the demo overlays
+    period harmonics of ``20000/29`` samples (about 29 Hz).
+    Stored as ``deconv_sig1.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``, ``fault_hz``
+    """
+    signal = _load_float1d("deconv_sig1.npy")
+    fs = 20000.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t, "fault_hz": 29.0}
+
+
+def load_acycbd_sig2() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged ACYCBD demo record (Zhang, Miao, Lin, Yi, MSSP 2021).
+
+    MATLAB ``sig2.mat`` (variable ``x``, 20000 samples) from
+    ``02 ACYCBD/demo.m``.  Sampling rate 20 kHz, inner-race frequency
+    ``BPFI = 47`` Hz.  Stored as ``deconv_sig2.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``, ``bpfi``
+    """
+    signal = _load_float1d("deconv_sig2.npy")
+    fs = 20000.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t, "bpfi": 47.0}
+
+
+def load_smhd_sig3() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged SMHD demo record (Miao et al., Meas. Sci. Technol. 2016).
+
+    MATLAB ``sig3.mat`` (variable ``x``, 20001 samples) from
+    ``03 SMHD/demo.m``.  Sampling rate 20 kHz; the demo marks
+    ``BPFI = 38`` Hz.  Stored as ``deconv_sig3.npy``.
+
+    :return: dict with ``signal``, ``fs``, ``t``, ``bpfi``
+    """
+    signal = _load_float1d("deconv_sig3.npy")
+    fs = 20000.0
+    t = np.arange(signal.size, dtype=float) / fs
+    return {"signal": signal, "fs": fs, "t": t, "bpfi": 38.0}
+
+
 def load_memd_taichi_hex() -> Dict[str, np.ndarray]:
     """
     Load the packaged MATLAB ``taichi_hex_inp.mat`` demo (``taichi_final``).

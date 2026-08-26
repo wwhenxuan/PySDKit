@@ -52,6 +52,9 @@ __all__ = [
     "load_fast_kurtogram_x",
     "load_set_batdata2",
     "load_set_vibdata",
+    "load_imckd_sig1",
+    "load_acycbd_sig2",
+    "load_smhd_sig3",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -143,4 +146,7 @@ from ._loaders import (
     load_fast_kurtogram_x,
     load_set_batdata2,
     load_set_vibdata,
+    load_imckd_sig1,
+    load_acycbd_sig2,
+    load_smhd_sig3,
 )
