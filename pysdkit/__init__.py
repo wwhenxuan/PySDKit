@@ -174,8 +174,7 @@ from ._emd import HHT
 
 
 def greet():
-    print(
-        r"""
+    print(r"""
  ____          ____   ____   _  __ _  _   
 |  _ \  _   _ / ___| |  _ \ | |/ /(_)| |_ 
 | |_) || | | |\___ \ | | | || ' / | || __|
@@ -185,14 +184,12 @@ def greet():
     
 A Python library for signal decomposition algorithms.
 https://github.com/wwhenxuan/PySDKit
-"""
-    )
+""")
 
 
 def print_functions():
     """"""
-    print(
-        """
+    print("""
 _______________________________________________________________
 Algorithm Name                                  | Abbreviation
 _______________________________________________________________
@@ -253,8 +250,7 @@ Seasonal-Trend decomposition using LOESS        |    STL
 Multiple Seasonal-Trend decomposition (LOESS)   |    MSTL
 Hilbert-Huang Transform                         |    HHT
 _______________________________________________________________
-"""
-    )
+""")
 
 
 __all__ = [

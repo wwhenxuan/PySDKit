@@ -2,9 +2,9 @@
 """
 Load packaged demo arrays and related example files.
 
-All ``.npy`` assets live under ``pysdkit/data``. Algorithm modules should
-import these helpers from here (or from ``pysdkit.data``) rather than
-resolving files themselves.
+All ``.npy`` assets live under ``pysdkit/data/real_world``. Algorithm
+modules should import these helpers from here (or from ``pysdkit.data``)
+rather than resolving files themselves.
 """
 
 from __future__ import annotations
@@ -369,6 +369,109 @@ def load_acycbd_sig2() -> Dict[str, Union[np.ndarray, float]]:
     fs = 20000.0
     t = np.arange(signal.size, dtype=float) / fs
     return {"signal": signal, "fs": fs, "t": t, "bpfi": 47.0}
+
+
+def load_bss_beam() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged three-sensor beam record used by BSS Example 2.
+
+    MATLAB ``data_test.mat`` from Yu, Shock and Vibration 2019
+    (experiment 1 / Yang et al. SCA paper): channels ``x1, x2, x3``,
+    first 1280 samples, linearly detrended as in ``Example_2.m``.
+    Sampling rate 2560 Hz.  Stored as ``bss_beam.npy`` with layout
+    ``(3, 1280)``.
+
+    :return: dict with ``signal``, ``fs``, ``t``, ``mode_shape``
+    """
+    signal = np.asarray(np.load(data_file("bss_beam.npy")), dtype=np.float64)
+    if signal.ndim != 2 or signal.shape[0] != 3:
+        raise ValueError("bss_beam.npy must have shape (3, n_samples)")
+    fs = 2560.0
+    t = np.arange(signal.shape[1], dtype=float) / fs
+    mode_shape = np.array(
+        [
+            [1.0, 1.0, 1.0, 1.0],
+            [0.7625, 0.0747, -0.5937, -1.238],
+            [0.0025, -0.5344, 1.0722, -1.3099],
+        ],
+        dtype=float,
+    )
+    return {"signal": signal, "fs": fs, "t": t, "mode_shape": mode_shape}
+
+
+def load_bss_yk9() -> Dict[str, Union[np.ndarray, float]]:
+    """
+    Load the packaged cantilever record used by BSS Example 3.
+
+    MATLAB ``yk9_mean.mat`` from Yu, Shock and Vibration 2019
+    (experiment 2): displacement channels ``d_1, d_2, d_5``, first
+    1000 samples as in ``Example_3.m``.  Sampling rate is
+    ``8142 / (t_end - t_start)``.  Stored as ``bss_yk9.npy`` with
+    layout ``(3, 1000)``.
+
+    :return: dict with ``signal``, ``fs``, ``t``, ``mode_shape``
+    """
+    signal = np.asarray(np.load(data_file("bss_yk9.npy")), dtype=np.float64)
+    if signal.ndim != 2 or signal.shape[0] != 3:
+        raise ValueError("bss_yk9.npy must have shape (3, n_samples)")
+    fs = 8142.0 / (5.33 - 0.03252)
+    t = np.arange(signal.shape[1], dtype=float) / fs
+    mode_shape_full = np.array(
+        [
+            [1.0, 1.0, 1.0, 1.0, 1.0],
+            [0.1244, 0.1804, 0.3119, 0.9233, -0.3431],
+            [2.1046, 1.1760, 0.0262, -1.4827, -0.1384],
+            [3.8569, 0.5650, -0.8170, 0.8732, 0.6237],
+            [8.5515, -1.5033, 0.4697, -0.0618, -0.5077],
+        ],
+        dtype=float,
+    )
+    return {
+        "signal": signal,
+        "fs": fs,
+        "t": t,
+        "mode_shape": mode_shape_full[[0, 1, 4], :],
+        "mode_shape_full": mode_shape_full,
+    }
+
+
+def load_bmemd_source02() -> Dict[str, Union[np.ndarray, Tuple[str, str]]]:
+    """
+    Load the packaged BMEMD multi-focus pair ``source02_1`` / ``source02_2``.
+
+    Xia et al., IEEE Access 2019 (MATLAB ``IMG/source02_*.tif``).  Two
+    grayscale 224×224 frames stored as ``bmemd_source02.npy`` with layout
+    ``(2, 224, 224)`` uint8.
+
+    :return: dict with ``signal`` in ``[0, 1]`` of shape ``(2, H, W)``
+        and ``names``
+    """
+    raw = np.asarray(np.load(data_file("bmemd_source02.npy")))
+    if raw.ndim != 3 or raw.shape[0] != 2:
+        raise ValueError("bmemd_source02.npy must have shape (2, H, W)")
+    signal = raw.astype(np.float64)
+    if signal.max() > 1.0:
+        signal = signal / 255.0
+    return {"signal": signal, "names": ("source02_1", "source02_2")}
+
+
+def load_bmemd_source09() -> Dict[str, Union[np.ndarray, Tuple[str, str]]]:
+    """
+    Load the packaged BMEMD pair ``source09_1`` / ``source09_2``.
+
+    Xia et al., IEEE Access 2019 (MATLAB ``IMG/source09_*.tif``).  Stored
+    as ``bmemd_source09.npy`` with layout ``(2, 204, 268)`` uint8.
+
+    :return: dict with ``signal`` in ``[0, 1]`` of shape ``(2, H, W)``
+        and ``names``
+    """
+    raw = np.asarray(np.load(data_file("bmemd_source09.npy")))
+    if raw.ndim != 3 or raw.shape[0] != 2:
+        raise ValueError("bmemd_source09.npy must have shape (2, H, W)")
+    signal = raw.astype(np.float64)
+    if signal.max() > 1.0:
+        signal = signal / 255.0
+    return {"signal": signal, "names": ("source09_1", "source09_2")}
 
 
 def load_smhd_sig3() -> Dict[str, Union[np.ndarray, float]]:

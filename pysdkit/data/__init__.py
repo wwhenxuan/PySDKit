@@ -55,6 +55,10 @@ __all__ = [
     "load_imckd_sig1",
     "load_acycbd_sig2",
     "load_smhd_sig3",
+    "load_bss_beam",
+    "load_bss_yk9",
+    "load_bmemd_source02",
+    "load_bmemd_source09",
 ]
 
 # A series of functions for generating 1D NumPy signals
@@ -149,4 +153,8 @@ from ._loaders import (
     load_imckd_sig1,
     load_acycbd_sig2,
     load_smhd_sig3,
+    load_bss_beam,
+    load_bss_yk9,
+    load_bmemd_source02,
+    load_bmemd_source09,
 )

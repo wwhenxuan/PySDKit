@@ -8,6 +8,8 @@ import unittest
 import numpy as np
 
 from pysdkit import BMEMD
+from pysdkit.data import load_bmemd_source02, load_bmemd_source09
+from pysdkit.data._assets import DATA_DIR, REAL_WORLD_DIR, data_file
 from pysdkit._emd2d.bmemd import local_var_img, fuse_images
 
 
@@ -96,6 +98,29 @@ class BMEMDTest(unittest.TestCase):
             n_dir=6, max_imfs=2, stop_crit="fix_h", stop_cnt=2, max_sift=10
         ).fit_transform(images)
         self.assertTrue(np.allclose(imfs.sum(0), images, atol=1e-5))
+
+
+class BMEMDPackagedDataTest(unittest.TestCase):
+    """Xia et al. fusion pair shipped under ``pysdkit/data/real_world``."""
+
+    def test_source02_shape_and_range(self) -> None:
+        record = load_bmemd_source02()
+        signal = record["signal"]
+        self.assertEqual(signal.shape, (2, 224, 224))
+        self.assertTrue(np.all((signal >= 0.0) & (signal <= 1.0)))
+        self.assertEqual(record["names"], ("source02_1", "source02_2"))
+        self.assertEqual(data_file("bmemd_source02.npy").parent, REAL_WORLD_DIR)
+
+    def test_source09_shape_and_range(self) -> None:
+        record = load_bmemd_source09()
+        signal = record["signal"]
+        self.assertEqual(signal.shape, (2, 204, 268))
+        self.assertTrue(np.all((signal >= 0.0) & (signal <= 1.0)))
+        self.assertEqual(record["names"], ("source09_1", "source09_2"))
+
+    def test_npy_not_left_in_data_root(self) -> None:
+        leftover = sorted(p.name for p in DATA_DIR.glob("*.npy"))
+        self.assertEqual(leftover, [])
 
 
 if __name__ == "__main__":
