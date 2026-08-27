@@ -67,4 +67,4 @@ where = ["."]
 include = ["pysdkit*"]
 
 [tool.setuptools.package-data]
-"pysdkit.data" = ["*.npy", "*.txt"]
+"pysdkit.data" = ["*.txt", "real_world/*.npy"]

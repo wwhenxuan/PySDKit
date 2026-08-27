@@ -16,6 +16,7 @@
    pysdkit.utils._instantaneous
    pysdkit.utils._kernel_matrix
    pysdkit.utils._diagnalization
+   pysdkit.utils.bss
 
 utils.fft
 -----------------------
@@ -77,3 +78,9 @@ utils.diagnalization
 
 .. automodule:: pysdkit.utils._diagnalization
    :members: diagonal_average , get_diagonal
+
+utils.bss
+-----------------------
+
+.. automodule:: pysdkit.utils.bss
+   :members:
