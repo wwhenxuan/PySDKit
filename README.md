@@ -161,7 +161,10 @@ We would like to thank the researchers in signal processing for providing us wit
 
 ## Contributing 🤗
 
-This project exists thanks to all the people who contribute.
+This project exists thanks to all the people who contribute. Please read
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to add an algorithm, tests, and
+gallery examples (the same guide is in the
+[documentation](https://pysdkit.readthedocs.io/en/stable/development/index.html)).
 
 <a href="https://github.com/wwhenxuan/PySDKit/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=wwhenxuan/PySDKit" />
