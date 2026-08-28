@@ -109,6 +109,7 @@ templates_path = []
 source_suffix = {".rst": "restructuredtext"}
 
 html_logo = "_static/logo.png"
+html_favicon = "_static/favicon.png"
 
 language = "en"
 
@@ -126,7 +127,10 @@ html_css_files = ["theme_overrides.css", "custom.css"]
 html_theme_options = {
     "announcement": "",
     "logo": {
+        "image_light": "_static/logo.png",
+        "image_dark": "_static/logo.png",
         "text": "pysdkit",
+        "alt_text": "PySDKit",
         "link": "https://pysdkit.readthedocs.io/",
     },
     "header_links_before_dropdown": 6,
@@ -150,7 +154,6 @@ html_theme_options = {
     "show_version_warning_banner": False,
     "secondary_sidebar_items": {
         "**": ["page-toc", "sourcelink"],
-        "index": [],
     },
     "show_toc_level": 4,
     "collapse_navigation": True,

@@ -22,7 +22,7 @@ html[data-theme=light] {
   --pst-color-border-muted: rgba(23, 23, 26, 0.2);
   --pst-color-blockquote-notch: #677384;
   --pst-color-inline-code: #912583;
-  --pst-color-inline-code-links: #085d6c;
+  --pst-color-inline-code-links: #1d4ed8;
   --pst-color-target: #f3cf95;
   --pst-color-table: #14181e;
   --pst-color-table-row-hover-bg: #e8eaed;
@@ -35,7 +35,7 @@ html[data-theme=light] {
 }
 html[data-theme=light] {
   --pst-color-heading: var(--pst-color-text-base);
-  --pst-color-link: var(--pst-color-primary);
+  --pst-color-link: #1d4ed8;
   --pst-color-link-hover: var(--pst-color-secondary);
   --pst-color-table-outer-border: var(--pst-color-border);
   --pst-color-table-heading-bg: #f3f4f5;

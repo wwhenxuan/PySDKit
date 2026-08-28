@@ -52,3 +52,29 @@ html[data-theme="light"] .sphx-glr-thumbcontainer:hover {
 .sphx-glr-thumbcontainer .figure {
   margin: 0;
 }
+
+/* PyData maps card body/header to --pst-color-on-background (#9cccf8). */
+html[data-theme="light"] .bd-content .sd-card,
+html[data-theme="light"] .bd-content .sd-card .sd-card-body,
+html[data-theme="light"] .bd-content .sd-card .sd-card-header,
+html[data-theme="light"] .bd-content .sd-card .sd-card-footer {
+  background-color: #ffffff;
+}
+
+html[data-theme="light"] .sphx-glr-download a code,
+html[data-theme="light"] .sphx-glr-download code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Navbar project badge (circular PNG). */
+.navbar-brand img {
+  max-height: 2.2rem;
+  width: auto;
+}
+
+/* Hide the floating Read the Docs flyout so the header uses our logo.
+   You can also uncheck Addons → Flyout in the RTD dashboard. */
+readthedocs-flyout {
+  display: none !important;
+}

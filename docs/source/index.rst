@@ -3,40 +3,60 @@ PYSDKIT's documentation
 
 **Version**: |version|
 
-PySDKit is a Python library for **signal decomposition**: splitting a
-non-stationary recording into simpler modes (IMFs) that can be plotted,
-used as features, or fed to a downstream model.
+Welcome to **PySDKit**, a Python library for **signal decomposition**,
+developed with NumPy, SciPy, and Matplotlib. A non-stationary recording
+is treated as a sum of simpler modes (intrinsic mode functions). Those
+modes can be plotted, used as features, or fed to a downstream model,
+using the same ``fit_transform`` style as scikit-learn.
 
-Installation
-------------
+.. image:: ../../images/Logo_sd.png
+   :align: center
+   :width: 48%
+   :alt: Signal decomposition: a sensor recording split into IMFs and a Fourier spectrum
 
-.. code-block:: bash
-
-   pip install pysdkit
-
-Quick start
+Quick links
 -----------
 
-.. code-block:: python
+.. grid:: 1 1 2 2
+   :gutter: 3
 
-   import numpy as np
-   from pysdkit import EMD
-   from pysdkit.plot import plot_IMFs
+   .. grid-item-card:: :octicon:`rocket` Get started
+      :link: user_guide/index
+      :link-type: doc
 
-   t = np.linspace(0, 1, 1000)
-   signal = (
-       np.sin(2 * np.pi * 5 * t)
-       + 0.7 * np.sin(2 * np.pi * 25 * t)
-       + 0.45 * np.sin(2 * np.pi * 80 * t)
-   )
+      New to PySDKit? Install the package and learn the three-step
+      ``fit_transform`` API.
 
-   emd = EMD()
-   IMFs = emd.fit_transform(signal, max_imfs=3)
-   plot_IMFs(signal, IMFs, view="2d_freq", fs=1000, freq_max=150)
+   .. grid-item-card:: :octicon:`image` Examples
+      :link: auto_examples/index
+      :link-type: doc
 
-The same three-step pattern (import, instantiate, ``fit_transform``)
-applies to VMD, BMEMD, and the other algorithms listed in
-:doc:`API/modules`.
+      Browse the gallery of algorithm demos, figures, and downloadable
+      scripts.
+
+   .. grid-item-card:: :octicon:`repo` API reference
+      :link: API/modules
+      :link-type: doc
+
+      Public classes and functions you can import from :mod:`pysdkit`.
+
+   .. grid-item-card:: :octicon:`history` Release notes
+      :link: release_notes/index
+      :link-type: doc
+
+      What changed between versions. Filled from GitHub Releases.
+
+   .. grid-item-card:: :octicon:`tools` Contribute
+      :link: development/index
+      :link-type: doc
+
+      Add an algorithm, tests, or a gallery example.
+
+   .. grid-item-card:: :octicon:`people` About
+      :link: about/index
+      :link-type: doc
+
+      Project scope, citations, and where to find the source.
 
 .. toctree::
    :hidden:

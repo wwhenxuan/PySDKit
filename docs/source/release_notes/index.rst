@@ -6,6 +6,6 @@ built.  To add a version, publish a GitHub Release for the matching
 tag (Markdown body is enough); you do not need to edit this file.
 
 .. changelog::
-   :changelog-url: https://pysdkit.readthedocs.io/en/stable/release_notes/index.html
+   :changelog-url: https://github.com/wwhenxuan/PySDKit/releases/
    :github: https://github.com/wwhenxuan/PySDKit/releases/
    :pypi: https://pypi.org/project/PySDKit/

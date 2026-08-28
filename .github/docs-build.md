@@ -273,6 +273,7 @@ On Read the Docs: **Admin → Environment variables** →
 5. **RST warnings** from markdown→RST conversion (`unindent`, unmatched `` ` ``) do not fail the build unless you pass `-W`.
 6. **`autosectionlabel`** uses `autosectionlabel_prefix_document = True` because many examples share headings like “1. Imports”.
 7. **Release notes need GitHub** — `sphinx-github-changelog` calls the Releases API at build time. Public anonymous access works until you hit the rate limit (60/hour). On Read the Docs, set environment variable `SPHINX_GITHUB_CHANGELOG_TOKEN` (or `GITHUB_TOKEN`) to a PAT. Do not commit the token.
+8. **Read the Docs flyout** — the floating RTD logo is hidden in `theme_overrides.css` (`readthedocs-flyout`). If it still appears, uncheck **Settings → Addons → Flyout enabled** on the project dashboard. The navbar uses `_static/logo.png`, not that widget.
 
 ---
 
