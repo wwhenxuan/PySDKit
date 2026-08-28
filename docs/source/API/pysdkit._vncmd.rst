@@ -1,34 +1,35 @@
-pysdkit.vncmd
-========================
+pysdkit._vncmd
+==============
+
+Variational and iterative nonlinear chirp mode decomposition.
 
 .. automodule:: pysdkit._vncmd
+   :no-members:
+   :no-index:
 
 .. autosummary::
    :nosignatures:
 
-   pysdkit._vncmd.vncmd
-   pysdkit._vncmd.incmd
+   pysdkit.VNCMD
+   pysdkit.INCMD
+   pysdkit.AVNCMD
+   pysdkit.STNBMD
+   pysdkit.stnbmd
 
-vncmd.vncmd
------------------------------
-
-.. automodule:: pysdkit._vncmd.vncmd
-.. autoclass:: pysdkit._vncmd.vncmd.VNCMD
+.. autoclass:: pysdkit.VNCMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-vncmd.incmd
------------------------------
-
-.. automodule:: pysdkit._vncmd.incmd
-.. autoclass:: pysdkit._vncmd.incmd.INCMD
+.. autoclass:: pysdkit.INCMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
+
+.. autoclass:: pysdkit.AVNCMD
+   :members:
+   :show-inheritance:
+
+.. autoclass:: pysdkit.STNBMD
+   :members:
+   :show-inheritance:
+
+.. autofunction:: pysdkit.stnbmd

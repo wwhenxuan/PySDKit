@@ -1,26 +1,83 @@
 pysdkit
-================
+=======
 
-**A Python library for signal decomposition algorithms**
+A Python library for signal decomposition algorithms with a unified
+``fit_transform`` interface.
 
+Import algorithms from the package root:
 
-Subpackages
----------------
+.. code-block:: python
+
+   from pysdkit import EMD, VMD, BMEMD
+
+.. automodule:: pysdkit
+   :no-members:
+   :no-index:
 
 .. autosummary::
    :nosignatures:
 
-   pysdkit._emd
-   pysdkit._ewt
-   pysdkit._faemd
-   pysdkit._hvd
-   pysdkit._lmd
-   pysdkit._ssa
-   pysdkit._vmd
-   pysdkit._vmd2d
-   pysdkit._vncmd
-   pysdkit.data
-   pysdkit.entropy
-   pysdkit.plot
-   pysdkit.tsa
-   pysdkit.utils  
+   EMD
+   EEMD
+   CEEMDAN
+   REMD
+   MEMD
+   APITMEMD
+   NSTEMD
+   OnlineEMD
+   SEMD
+   TVF_EMD
+   ESMD
+   HHT
+   EMD2D
+   BMEMD
+   FAEMD
+   FAEMD2D
+   FAEMD3D
+   EWT
+   EFD
+   EWT2D
+   VMD
+   MVMD
+   VME
+   OVMD
+   SVMD
+   STVMD
+   VMD2D
+   CVMD2D
+   ACMD
+   BA_ACMD
+   DD_ACMD
+   VNCMD
+   INCMD
+   AVNCMD
+   STNBMD
+   HVD
+   ITD
+   SSA
+   ALIF
+   FMD
+   SST
+   SET
+   VTFMTD
+   LMD
+   RLMD
+   OSD
+   SWD
+   GDMD
+   VGNMD
+   IVGNMD
+   AGNCMD
+   AGDMD
+   APMD
+   IMD
+   JMD
+   MJMD
+   SJMD
+   SMJMD
+   Moving_Decomp
+   STL
+   MSTL
+
+Family pages (classes documented in full) are listed in
+:doc:`modules`.

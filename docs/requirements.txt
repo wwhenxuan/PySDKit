@@ -3,4 +3,9 @@ sphinx-copybutton
 sphinx_design>=0.5
 pydata-sphinx-theme>=0.16
 sphinx_gitstamp
-pysdkit
+sphinx-gallery>=0.18
+ipython
+nbformat
+pillow
+scikit-learn
+sphinx-github-changelog>=2.3

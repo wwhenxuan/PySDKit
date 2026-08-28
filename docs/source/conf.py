@@ -4,9 +4,14 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 from datetime import date
-import os
 import sys
 from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("agg")
+matplotlib.rcParams["savefig.dpi"] = 100
+matplotlib.rcParams["figure.max_open_warning"] = 40
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -16,16 +21,15 @@ project = "PYSDKIT"
 copyright = f"2025-{date.today().year}, the pysdkit team"
 author = "the pysdkit team"
 
-release = "0.4.15"
-version = "0.4.15"
-
-# -- General configuration ---------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
-
-# sys.path.append(str(Path('exts').resolve()))
 sys.path.insert(0, str(Path("..", "..").resolve()))
 
 import pysdkit
+
+release = pysdkit.__version__
+version = pysdkit.__version__
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
     "sphinx_copybutton",
@@ -38,27 +42,72 @@ extensions = [
     "sphinx_design",
     "sphinx.ext.napoleon",
     "sphinx_gitstamp",
+    "sphinx_gallery.gen_gallery",
+    "sphinx_github_changelog",
 ]
 
-apidoc_modules = [
-    {
-        "path": "../../pysdkit",
-        "destination": "source/API",
-        "exclude_patterns": ["**/test*"],
-        "max_depth": 4,
-        "follow_links": False,
-        "separate_modules": False,
-        "include_private": True,
-        "no_headings": False,
-        "module_first": False,
-        "implicit_namespaces": True,
-        "automodule_options": {"members", "show-inheritance", "undoc-members"},
-    },
+autosectionlabel_prefix_document = True
+
+# The gallery-cache GitHub Release is a prerelease; keep it off this page.
+sphinx_github_changelog_include_prereleases = False
+
+# Subsection paths are relative to this file (docs/source/conf.py).
+# First eight families are the ones we want at the top of Examples;
+# the rest stay A–Z by folder name.
+_GALLERY_SECTION_ORDER = [
+    "../../examples/emd",
+    "../../examples/emd_variants",
+    "../../examples/memd",
+    "../../examples/ewt",
+    "../../examples/faemd",
+    "../../examples/vmd",
+    "../../examples/vncmd",
+    "../../examples/gdmd",
+    "../../examples/acmd",
+    "../../examples/deconvolution",
+    "../../examples/image",
+    "../../examples/imd",
+    "../../examples/jmd",
+    "../../examples/lmd",
+    "../../examples/osd",
+    "../../examples/ssa",
+    "../../examples/temp_iter",
+    "../../examples/tfa",
+    "../../examples/tsa",
+    "../../examples/utils",
 ]
-templates_path = ["_templates"]
+
+# Gallery HTML/PNG is generated at build time (gitignored under
+# docs/source/auto_examples/). Read the Docs downloads a tarball from
+# the rolling GitHub Release tag gallery-cache, then hosts the figures;
+# do not commit that folder to GitHub.
+sphinx_gallery_conf = {
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "auto_examples",
+    "filename_pattern": r"\.py$",
+    "ignore_pattern": r"__init__\.py",
+    "subsection_order": _GALLERY_SECTION_ORDER,
+    "nested_sections": True,
+    "download_all_examples": True,
+    "reset_modules": ("matplotlib",),
+    "abort_on_example_error": False,
+    "min_reported_time": 1,
+    "matplotlib_animations": False,
+}
+
+autodoc_default_options = {
+    "members": True,
+    "imported-members": True,
+    "show-inheritance": True,
+    "undoc-members": False,
+    "private-members": False,
+    "special-members": False,
+}
+
+templates_path = []
 
 source_suffix = {".rst": "restructuredtext"}
-# __________________________________________________________________________
+
 html_logo = "_static/logo.png"
 
 language = "en"
@@ -75,8 +124,7 @@ html_static_path = ["_static"]
 html_css_files = ["theme_overrides.css", "custom.css"]
 
 html_theme_options = {
-    "announcement": "",  # You can specify an arbitrary URL that will be used as the HTML source for your announcement.
-    # Navigation bar
+    "announcement": "",
     "logo": {
         "text": "pysdkit",
         "link": "https://pysdkit.readthedocs.io/",
@@ -97,43 +145,34 @@ html_theme_options = {
         },
     ],
     "navbar_align": "content",
-    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
-    # "navbar_end": ["navbar-icon-links"],
-    # "navbar_persistent": ["search-button"],
-    # ______________________________________________________________________________________
-    "switcher": {
-        "json_url": (
-            "https://raw.githubusercontent.com/changewam/PySDKit/refs/heads/main/docs/source/_static/version_switcher.json"
-        ),  # the persistent location of the JSON file
-        "version_match": "dev" if "dev" in version else version,
-    },
-    "show_version_warning_banner": True,
-    # Secondary_sidebar
+    "show_version_warning_banner": False,
     "secondary_sidebar_items": {
         "**": ["page-toc", "sourcelink"],
         "index": [],
     },
     "show_toc_level": 4,
     "collapse_navigation": True,
-    # Footer
     "footer_start": ["copyright"],
     "footer_end": ["sphinx-version", "theme-version"],
-    # Color
     "pygments_light_style": "xcode",
     "pygments_dark_style": "monokai",
-    # Other
     "show_prev_next": False,
     "show_nav_level": 1,
     "back_to_top_button": True,
-    # "use_edit_page_button": True,
 }
 
 remove_from_toctrees = []
 
-# Custom sidebar templates, maps document names to template names.
-html_sidebars = {"index": [], "API/pysdkit.*": []}  # Hide sidebar in home page
+html_sidebars = {
+    "index": [],
+    "API/pysdkit.*": [],
+    # Gallery indexes: left "Section Navigation" duplicates the right TOC.
+    "auto_examples/index": [],
+    "auto_examples/*/index": [],
+    "release_notes/index": [],
+}
 html_show_sourcelink = False
 
-# Output file base name for HTML help builder.
-htmlhelp_basename = "scikitimagedoc"
+htmlhelp_basename = "pysdkitdoc"

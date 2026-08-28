@@ -10,3 +10,45 @@
 .bd-page-width {
   max-width: 88%;  /* default is 88rem */
 }
+
+/* Light-gray code surfaces (match scikit-image tables: #f3f4f5). */
+html[data-theme="light"] code.literal,
+html[data-theme="light"] :not(pre) > code {
+  background-color: #f3f4f5;
+}
+
+html[data-theme="light"] pre,
+html[data-theme="light"] div.highlight,
+html[data-theme="light"] div.highlight pre,
+html[data-theme="light"] .highlight {
+  background-color: #f3f4f5;
+}
+
+html[data-theme="light"] div.highlight button.copybtn {
+  background-color: #f3f4f5;
+}
+
+/* Active header tab: primary (#91a9f6) is too close to the light-blue bar. */
+html[data-theme="light"] .bd-header ul.navbar-nav > li.nav-item.current > .nav-link {
+  color: var(--pst-color-secondary);
+  font-weight: 600;
+}
+
+html[data-theme="light"] .bd-header ul.navbar-nav > li.nav-item.current > .nav-link:before {
+  border-bottom: 3px solid var(--pst-color-secondary);
+}
+
+/* Sphinx-Gallery thumbnail cards (scikit-image style). */
+html[data-theme="light"] .sphx-glr-thumbcontainer {
+  background: #ffffff;
+  border: 1px solid var(--pst-color-border);
+  box-shadow: 0 1px 3px var(--pst-color-shadow);
+}
+
+html[data-theme="light"] .sphx-glr-thumbcontainer:hover {
+  box-shadow: 0 2px 8px var(--pst-color-shadow);
+}
+
+.sphx-glr-thumbcontainer .figure {
+  margin: 0;
+}

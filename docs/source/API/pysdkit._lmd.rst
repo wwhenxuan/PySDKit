@@ -1,34 +1,22 @@
-﻿pysdkit.lmd
-========================
+﻿pysdkit._lmd
+============
+
+Local Mean Decomposition and its robust variant.
 
 .. automodule:: pysdkit._lmd
+   :no-members:
+   :no-index:
 
 .. autosummary::
    :nosignatures:
 
-   pysdkit._lmd.lmd
-   pysdkit._lmd.rlmd
+   pysdkit.LMD
+   pysdkit.RLMD
 
-lmd.lmd
------------------------------
-
-.. automodule:: pysdkit._lmd.lmd
-.. autoclass:: pysdkit._lmd.lmd.LMD
+.. autoclass:: pysdkit.LMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
-   :show-inheritance: 
-   :exclude-members: __dict__
+   :show-inheritance:
 
-lmd.rlmd
------------------------------
-
-.. automodule:: pysdkit._lmd.rlmd
-.. autoclass:: pysdkit._lmd.rlmd.RLMD
+.. autoclass:: pysdkit.RLMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
-   :show-inheritance: 
-   :exclude-members: __dict__
+   :show-inheritance:

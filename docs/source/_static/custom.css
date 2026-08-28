@@ -25,7 +25,7 @@ html[data-theme=light] {
   --pst-color-inline-code-links: #085d6c;
   --pst-color-target: #f3cf95;
   --pst-color-table: #14181e;
-  --pst-color-table-row-hover-bg: #d5b4fd;
+  --pst-color-table-row-hover-bg: #e8eaed;
   --pst-color-table-inner-border: #e5e7ea;
   --pst-color-background: #fefefe;
   --pst-color-on-background: #9cccf8;
@@ -37,10 +37,10 @@ html[data-theme=light] {
   --pst-color-heading: var(--pst-color-text-base);
   --pst-color-link: var(--pst-color-primary);
   --pst-color-link-hover: var(--pst-color-secondary);
-  --pst-color-table-outer-border: var(--pst-color-surface);
-  --pst-color-table-heading-bg: var(--pst-color-surface);
-  --pst-color-table-row-zebra-high-bg: var(--pst-color-on-background);
-  --pst-color-table-row-zebra-low-bg: var(--pst-color-surface);
+  --pst-color-table-outer-border: var(--pst-color-border);
+  --pst-color-table-heading-bg: #f3f4f5;
+  --pst-color-table-row-zebra-high-bg: #ffffff;
+  --pst-color-table-row-zebra-low-bg: #f3f4f5;
 }
 html[data-theme=light] .only-dark,
 html[data-theme=light] .only-dark ~ figcaption {

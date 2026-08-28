@@ -1,54 +1,54 @@
-﻿pysdkit.vmd
-=============
+﻿pysdkit._vmd
+============
+
+Variational Mode Decomposition and related 1-D variants.
 
 .. automodule:: pysdkit._vmd
+   :no-members:
+   :no-index:
 
 .. autosummary::
-    :nosignatures:
+   :nosignatures:
 
-   pysdkit._vmd.vmd_f
-   pysdkit._vmd.vmd_c
-   pysdkit._vmd.mvmd
-   pysdkit._vmd.acmd
-   
-vmd.vmd_f
----------------------------
+   pysdkit.VMD
+   pysdkit.vmd
+   pysdkit.MVMD
+   pysdkit.VME
+   pysdkit.vme
+   pysdkit.OVMD
+   pysdkit.SVMD
+   pysdkit.svmd
+   pysdkit.STVMD
+   pysdkit.stvmd
 
-.. automodule:: pysdkit._vmd.vmd_f
-    :members: vmd
-
-vmd.vmd_c
----------------------------
-
-.. automodule:: pysdkit._vmd.vmd_c
-.. autoclass:: pysdkit._vmd.vmd_c.VMD
+.. autoclass:: pysdkit.VMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-vmd.mvmd
----------------------------
+.. autofunction:: pysdkit.vmd
 
-.. automodule:: pysdkit._vmd.mvmd
-.. autoclass:: pysdkit._vmd.mvmd.MVMD
+.. autoclass:: pysdkit.MVMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-vmd.acmd
----------------------------
-
-.. automodule:: pysdkit._vmd.acmd
-.. autoclass:: pysdkit._vmd.acmd.ACMD
+.. autoclass:: pysdkit.VME
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
+
+.. autofunction:: pysdkit.vme
+
+.. autoclass:: pysdkit.OVMD
+   :members:
+   :show-inheritance:
+
+.. autoclass:: pysdkit.SVMD
+   :members:
+   :show-inheritance:
+
+.. autofunction:: pysdkit.svmd
+
+.. autoclass:: pysdkit.STVMD
+   :members:
+   :show-inheritance:
+
+.. autofunction:: pysdkit.stvmd

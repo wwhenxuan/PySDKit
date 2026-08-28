@@ -1,47 +1,27 @@
-﻿pysdkit.faemd
-========================
+﻿pysdkit._faemd
+==============
+
+Fast and Adaptive EMD in 1-D, 2-D and 3-D.
 
 .. automodule:: pysdkit._faemd
+   :no-members:
+   :no-index:
 
 .. autosummary::
    :nosignatures:
 
-   pysdkit._faemd.faemd
-   pysdkit._faemd.faemd2d
-   pysdkit._faemd.faemd3d
+   pysdkit.FAEMD
+   pysdkit.FAEMD2D
+   pysdkit.FAEMD3D
 
-faemd.faemd
------------------------------
-
-.. automodule:: pysdkit._faemd.faemd
-.. autoclass:: pysdkit._faemd.faemd.FAEMD
+.. autoclass:: pysdkit.FAEMD
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-faemd.faemd2d
------------------------------
-
-.. automodule:: pysdkit._faemd.faemd2d
-.. autoclass:: pysdkit._faemd.faemd2d.FAEMD2D
+.. autoclass:: pysdkit.FAEMD2D
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-faemd.faemd3d
------------------------------
-
-.. automodule:: pysdkit._faemd.faemd3d
-.. autoclass:: pysdkit._faemd.faemd3d.FAEMD3D
+.. autoclass:: pysdkit.FAEMD3D
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__

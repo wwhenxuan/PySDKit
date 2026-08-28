@@ -1,34 +1,22 @@
-﻿pysdkit.vmd2d
-========================
+﻿pysdkit._vmd2d
+==============
+
+Variational Mode Decomposition for images.
 
 .. automodule:: pysdkit._vmd2d
+   :no-members:
+   :no-index:
 
 .. autosummary::
    :nosignatures:
 
-   pysdkit._vmd2d.vmd2d
-   pysdkit._vmd2d.cvmd2d
+   pysdkit.VMD2D
+   pysdkit.CVMD2D
 
-vmd2d.vmd2d
------------------------------
-
-.. automodule:: pysdkit._vmd2d.vmd2d
-.. autoclass:: pysdkit._vmd2d.vmd2d.VMD2D
+.. autoclass:: pysdkit.VMD2D
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
-cvmd2d.cvmd2d
------------------------------
-
-.. automodule:: pysdkit._vmd2d.cvmd2d
-.. autoclass:: pysdkit._vmd2d.cvmd2d.CVMD2D
+.. autoclass:: pysdkit.CVMD2D
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__

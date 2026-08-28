@@ -1,25 +1,37 @@
-﻿pysdkit.ewt
-=============
+﻿pysdkit._ewt
+============
+
+Empirical Wavelet Transform (1-D and 2-D) and Empirical Fourier
+Decomposition.
 
 .. automodule:: pysdkit._ewt
+   :no-members:
+   :no-index:
 
 .. autosummary::
-    :nosignatures:
+   :nosignatures:
 
-   pysdkit._ewt.ewt
+   pysdkit.EWT
+   pysdkit.ewt
+   pysdkit.EFD
+   pysdkit.efd
+   pysdkit.EWT2D
+   pysdkit.ewt2d
 
-ewt.ewt
----------------------------
-
-.. automodule:: pysdkit._ewt.ewt
-    :members: ewt
-.. autoclass:: pysdkit._ewt.ewt.EWT
+.. autoclass:: pysdkit.EWT
    :members:
-   :undoc-members:
-   :private-members:
-   :special-members:
    :show-inheritance:
-   :exclude-members: __dict__
 
+.. autofunction:: pysdkit.ewt
 
-   
+.. autoclass:: pysdkit.EFD
+   :members:
+   :show-inheritance:
+
+.. autofunction:: pysdkit.efd
+
+.. autoclass:: pysdkit.EWT2D
+   :members:
+   :show-inheritance:
+
+.. autofunction:: pysdkit.ewt2d
