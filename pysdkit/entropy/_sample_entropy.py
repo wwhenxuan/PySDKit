@@ -7,7 +7,9 @@ import numpy as np
 from numpy import bool_
 from scipy.spatial.distance import pdist
 
-from typing import Optional, Tuple, Any, Union
+from typing import Optional, Tuple, Any, Union, List
+
+from pysdkit.entropy._coarse_grain import as_1d, embed, coarse_grain
 
 
 def sample_entropy(
@@ -148,6 +150,103 @@ def multiscale_sample_entropy(
         e = np.log(B / A)
 
     return e, A, B
+
+
+def _sample_entropy_counts(
+    y: np.ndarray, m: int, r: float
+) -> Tuple[int, int]:
+    """Pair counts (A: m+1, B: m) with Chebyshev radius ``r * std(y)``."""
+    y = as_1d(y)
+    n = len(y)
+    if n < m + 2:
+        return 0, 0
+    sigma = np.std(y, ddof=1) if n > 1 else 0.0
+    radius = r * sigma
+    templates_m = embed(y, m)
+    templates_m1 = embed(y, m + 1)
+    if templates_m.shape[0] < 2:
+        return 0, 0
+    b_count = int(np.sum(pdist(templates_m, metric="chebyshev") <= radius))
+    a_count = int(np.sum(pdist(templates_m1, metric="chebyshev") <= radius))
+    return a_count, b_count
+
+
+def composite_multiscale_sample_entropy(
+    x: np.ndarray,
+    m: Optional[int] = 2,
+    r: Optional[float] = 0.15,
+    scale: Optional[int] = 3,
+) -> np.ndarray:
+    """
+    Composite multiscale sample entropy (cMSE, Wu et al. 2013).
+
+    At scale ``s`` the ``s`` phase-shifted Costa grains are each scored with
+    sample entropy and then averaged.
+
+    Wu, S. D., Wu, C. W., Lin, S. G., Wang, C. C., & Lee, K. Y. (2013).
+    Time series analysis using composite multiscale entropy. Entropy,
+    15(3), 1069-1084.
+
+    :param x: 1-D input series.
+    :param m: Embedding dimension.
+    :param r: Tolerance as a fraction of each grain's standard deviation.
+    :param scale: Highest scale factor (returns length ``scale``).
+    :return: cMSE at scales ``1 .. scale``.
+    """
+    x = as_1d(x)
+    if scale < 1:
+        raise ValueError("scale must be an integer >= 1.")
+    values: List[float] = []
+    for s in range(1, scale + 1):
+        scores = []
+        for offset in range(s):
+            grain = coarse_grain(x, s, offset=offset)
+            if len(grain) < m + 2:
+                continue
+            scores.append(float(sample_entropy(grain, m, r)))
+        values.append(float(np.mean(scores)) if scores else float("nan"))
+    return np.asarray(values, dtype=float)
+
+
+def refined_composite_multiscale_sample_entropy(
+    x: np.ndarray,
+    m: Optional[int] = 2,
+    r: Optional[float] = 0.15,
+    scale: Optional[int] = 3,
+) -> np.ndarray:
+    """
+    Refined composite multiscale sample entropy (rcMSE, Wu et al. 2014).
+
+    Match counts ``A`` and ``B`` are pooled over the ``s`` phase-shifted
+    grains, then ``-log(sum A / sum B)``.
+
+    Wu, S. D., Wu, C. W., Lin, S. G., Lee, K. Y., & Peng, C. K. (2014).
+    Analysis of complex time series using refined composite multiscale
+    entropy. Physics Letters A, 378(20), 1369-1374.
+
+    :param x: 1-D input series.
+    :param m: Embedding dimension.
+    :param r: Tolerance as a fraction of each grain's standard deviation.
+    :param scale: Highest scale factor (returns length ``scale``).
+    :return: rcMSE at scales ``1 .. scale``.
+    """
+    x = as_1d(x)
+    if scale < 1:
+        raise ValueError("scale must be an integer >= 1.")
+    values: List[float] = []
+    for s in range(1, scale + 1):
+        a_sum = 0
+        b_sum = 0
+        for offset in range(s):
+            grain = coarse_grain(x, s, offset=offset)
+            a_count, b_count = _sample_entropy_counts(grain, m, r)
+            a_sum += a_count
+            b_sum += b_count
+        if a_sum == 0 or b_sum == 0:
+            values.append(float("nan"))
+        else:
+            values.append(float(-np.log(a_sum / b_sum)))
+    return np.asarray(values, dtype=float)
 
 
 if __name__ == "__main__":

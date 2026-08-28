@@ -29,4 +29,3 @@ kernels) are omitted.
    pysdkit.plot
    pysdkit.tsa
    pysdkit.utils
-   pysdkit.models

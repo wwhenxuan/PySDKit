@@ -333,7 +333,6 @@ __all__ = [
     "Moving_Decomp",
     "STL",
     "MSTL",
-    "models",
     "data",
     "entropy",
     "HHT",

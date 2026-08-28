@@ -28,6 +28,13 @@ html[data-theme="light"] div.highlight button.copybtn {
   background-color: #f3f4f5;
 }
 
+/* Autodoc class / function signatures (otherwise same white as the page). */
+html[data-theme="light"] dt.sig.sig-object {
+  background-color: #f3f4f5;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.25rem;
+}
+
 /* Active header tab: primary (#91a9f6) is too close to the light-blue bar. */
 html[data-theme="light"] .bd-header ul.navbar-nav > li.nav-item.current > .nav-link {
   color: var(--pst-color-secondary);

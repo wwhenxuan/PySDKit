@@ -33,8 +33,7 @@ Project layout
 Implementation lives under ``pysdkit/``.  Algorithm families use a
 leading underscore (``pysdkit/_emd``, ``pysdkit/_vmd``, …).  Shared
 helpers live beside them (``pysdkit.data``, ``pysdkit.plot``,
-``pysdkit.utils``, ``pysdkit.tsa``, ``pysdkit.entropy``,
-``pysdkit.models``).
+``pysdkit.utils``, ``pysdkit.tsa``, ``pysdkit.entropy``).
 
 **Put a new method in the family it resembles.**  If the principle is
 close to an existing package, add a module there and export it from that

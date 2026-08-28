@@ -8,6 +8,8 @@ import itertools
 
 from typing import Optional, Tuple, Union
 
+from pysdkit.entropy._coarse_grain import coarse_grain
+
 
 def permutation_entropy(
     y: np.ndarray, m: Optional[int] = 2, t: Optional[int] = 1
@@ -32,8 +34,14 @@ def permutation_entropy(
     :return: The permutation entropy of input and the histogram for the order distribution.
     """
 
-    # Get the length of the time series
+    y = np.asarray(y).ravel()
     ly = len(y)
+    if m < 2:
+        raise ValueError("Permutation order m must be an integer >= 2.")
+    if t < 1:
+        raise ValueError("Delay t must be a positive integer.")
+    if ly < t * (m - 1) + 1:
+        raise ValueError("Signal is too short for the requested permutation order.")
 
     # Generate all possible permutations
     permlist = list(itertools.permutations(range(m)))
@@ -68,16 +76,7 @@ def multi(Data: np.ndarray, S: int) -> np.ndarray:
     :param S: scale factor.
     :return: the coarse-grained time series at scale S
     """
-    # Get the length of the time series
-    L = len(Data)
-    # Determine how many segments the data will be divided into
-    J = L // S
-
-    # Coarse-grain the time series by taking the mean of each segment
-    M_Data = np.array([np.mean(Data[i * S : (i + 1) * S]) for i in range(J)])
-
-    # Return the coarse-grained time series
-    return M_Data
+    return coarse_grain(Data, S)
 
 
 def multiscale_permutation_entropy(

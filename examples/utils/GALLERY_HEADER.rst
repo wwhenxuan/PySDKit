@@ -1,4 +1,4 @@
 Utilities
 =========
 
-Kurtogram, blind source separation, and synthetic-data helpers.
+Kurtogram, entropy of modes, blind source separation, and synthetic-data helpers.
