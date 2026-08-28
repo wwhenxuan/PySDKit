@@ -289,7 +289,7 @@ ipython
 nbformat
 pillow
 scikit-learn
-sphinx-github-changelog>=2.3
+sphinx-github-changelog
 ```
 
 `ipython` + `nbformat` are for generated notebook downloads. `pillow` is for gallery image handling. `scikit-learn` is only for the EMD forecasting example. `sphinx-github-changelog` fills Release notes from GitHub. Pre-releases (including the `gallery-cache` asset) are omitted (`sphinx_github_changelog_include_prereleases = False`).

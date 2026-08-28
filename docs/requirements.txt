@@ -8,4 +8,4 @@ ipython
 nbformat
 pillow
 scikit-learn
-sphinx-github-changelog>=2.3
+sphinx-github-changelog
