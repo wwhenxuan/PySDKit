@@ -11,6 +11,7 @@ from matplotlib.colors import rgb2hex
 def set_themes(choice: str = "classic") -> dict:
     """
     创建绘图主题的函数
+
     :param choice: 使用的绘图主题名称
     :return: rcParams dict
     """
@@ -72,6 +73,7 @@ def set_chinese() -> None:
 def select_colors(number: int, base_cmap: str = "Set3") -> list:
     """
     根据输入所需的颜色数目返回一个颜色列表
+
     :param number: 使用的绘图颜色数目
     :param base_cmap: 指定的默认离散颜色映射类型
     :return: color list
@@ -86,6 +88,7 @@ def select_colors(number: int, base_cmap: str = "Set3") -> list:
 def generate_random_hex_color():
     """
     Generates a random hex color string using matplotlib.
+
     :return: str: A string representing a hex color code.
     This function generates a random color in RGB format with each color component
     being a random float between 0 and 1. Then, it uses matplotlib's rgb2hex

@@ -176,6 +176,7 @@ def plot_2D_IMFs(
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
+
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted
@@ -440,6 +441,7 @@ def plot_3D_IMFs(
     """
     Visualizes the numpy array of intrinsic mode functions derived from the decomposition of a signal.
     Can be used as a generic interface for plotting.
+
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted
@@ -730,6 +732,7 @@ def plot_multi_3D_IMFs(
 ) -> Optional[plt.Figure]:
     """
     Plot the results of multivariate signal decomposition in 3D
+
     :param signal: The input original signal
     :param IMFs: The intrinsic mode functions obtained after signal decomposition
     :param max_imfs: The number of decomposition modes to be plotted

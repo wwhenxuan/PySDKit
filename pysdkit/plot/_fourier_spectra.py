@@ -18,6 +18,7 @@ from pysdkit.utils import gaussian_smoothing, savgol_smoothing, exponential_smoo
 def max_min_normalization(x: np.ndarray) -> np.ndarray:
     """
     Perform min-max normalization on the input signal
+
     :param x: Input 1D sequence
     :return: Normalized sequence
     """

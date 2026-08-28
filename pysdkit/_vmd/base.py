@@ -35,6 +35,7 @@ class Base(object):
         Implements a signal mirroring expansion function.
         This function mirrors 'sym' elements at both the beginning and the end of the given array 'ts',
         to create a new extended array.
+
         :param ts: The one-dimensional numpy array to be mirrored.
         :param sym: The number of elements to mirror from both the start and the end of the array 'ts'.
                     This value must be less than or equal to half the length of the array.

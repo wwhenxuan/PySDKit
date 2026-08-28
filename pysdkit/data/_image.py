@@ -165,6 +165,7 @@ def test_image_1(
     Generate a single image test sample 1
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -254,6 +255,7 @@ def test_image_4(
     Generate a single image test sample 4
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -283,6 +285,7 @@ def test_image_5(
     Generate a single image test sample 5
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -312,6 +315,7 @@ def test_image_6(
     Generate a single image test sample 6
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
@@ -341,6 +345,7 @@ def test_uni_image_7(
     Generate a single image test sample 7
     the symbol function comes from:
     https://www.mathworks.com/matlabcentral/fileexchange/71270-fast-and-adaptive-multivariate-and-multidimensional-emd
+
     :param low: Minimum value of grid matrix
     :param high: Maximum value of grid matrix
     :param sampling_rate: The sampling rate of the grid matrix, which is the number of points in the matrix
