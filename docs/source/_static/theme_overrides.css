@@ -86,6 +86,11 @@ html[data-theme="light"] .sphx-glr-download code {
   letter-spacing: 0.02em;
 }
 
+html[data-theme="light"] .version-switcher__button {
+  border-color: rgba(0, 0, 0, 0.22);
+  font-weight: 600;
+}
+
 /* Hide the floating Read the Docs flyout so the header uses our logo.
    You can also uncheck Addons → Flyout in the RTD dashboard. */
 readthedocs-flyout {

@@ -1,8 +1,18 @@
 [
     {
+        "name": "dev",
+        "version": "latest",
+        "url": "https://pysdkit.readthedocs.io/en/latest/"
+    },
+    {
+        "name": "0.4.55 (stable)",
+        "version": "stable",
+        "url": "https://pysdkit.readthedocs.io/en/stable/",
+        "preferred": true
+    },
+    {
         "name": "0.4.55",
         "version": "0.4.55",
-        "url": "https://pysdkit.readthedocs.io/",
-        "preferred": true
+        "url": "https://pysdkit.readthedocs.io/en/0.4.55/"
     }
 ]

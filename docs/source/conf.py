@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 from datetime import date
+import os
 import sys
 from pathlib import Path
 
@@ -124,15 +125,29 @@ html_static_path = ["_static"]
 
 html_css_files = ["theme_overrides.css", "custom.css"]
 
+# All doc versions fetch this URL so old builds pick up new tags.
+# READTHEDOCS_VERSION is "latest", "stable", or the git tag (e.g. 0.4.55).
+_switcher_json = (
+    "https://pysdkit.readthedocs.io/en/latest/_static/version_switcher.json"
+)
+_version_match = os.environ.get("READTHEDOCS_VERSION") or "latest"
+
 html_theme_options = {
     "announcement": "",
     "logo": {
         "image_light": "_static/logo.png",
         "image_dark": "_static/logo.png",
-        "text": "PYSDKIT",
+        "text": "PySDKit",
         "alt_text": "PySDKit",
         "link": "https://pysdkit.readthedocs.io/",
     },
+    "switcher": {
+        "json_url": _switcher_json,
+        "version_match": _version_match,
+    },
+    # First deploy of the JSON on latest would otherwise fail the check.
+    "check_switcher": False,
+    "show_version_warning_banner": True,
     "header_links_before_dropdown": 6,
     "icon_links": [
         {
@@ -151,7 +166,7 @@ html_theme_options = {
     "navbar_align": "content",
     "navbar_start": ["navbar-logo"],
     "navbar_center": ["navbar-nav"],
-    "show_version_warning_banner": False,
+    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
     "secondary_sidebar_items": {
         "**": ["page-toc", "sourcelink"],
     },
