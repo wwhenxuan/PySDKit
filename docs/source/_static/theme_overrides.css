@@ -76,8 +76,14 @@ html[data-theme="light"] .sphx-glr-download code {
 
 /* Navbar project badge (circular PNG). */
 .navbar-brand img {
-  max-height: 2.2rem;
+  max-height: 2.85rem;
   width: auto;
+}
+
+.navbar-brand .logo__title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 /* Hide the floating Read the Docs flyout so the header uses our logo.

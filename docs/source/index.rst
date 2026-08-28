@@ -56,7 +56,7 @@ Quick links
       :link: about/index
       :link-type: doc
 
-      Project scope, citations, and where to find the source.
+      License, how to cite, maintainers, and related projects.
 
 .. toctree::
    :hidden:

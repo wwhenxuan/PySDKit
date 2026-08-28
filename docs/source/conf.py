@@ -129,7 +129,7 @@ html_theme_options = {
     "logo": {
         "image_light": "_static/logo.png",
         "image_dark": "_static/logo.png",
-        "text": "pysdkit",
+        "text": "PYSDKIT",
         "alt_text": "PySDKit",
         "link": "https://pysdkit.readthedocs.io/",
     },
