@@ -19,9 +19,9 @@ Classical **VMD** extracts ``K`` compact-spectrum modes **concurrently**.  That 
 
 .. epigraph::
 
-    M. Nazari, S. M. Sakhaei.  
-    *Successive Variational Mode Decomposition.*  
-    Signal Processing, 174:107610, 2020.  
+    M. Nazari, S. M. Sakhaei.
+    *Successive Variational Mode Decomposition.*
+    Signal Processing, 174:107610, 2020.
     https://doi.org/10.1016/j.sigpro.2020.107610
 """
 
@@ -273,7 +273,7 @@ for stopc in (2, 4):
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - VMD
 #      - SVMD
 #    * - --

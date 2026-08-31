@@ -56,7 +56,7 @@ Quick links
       :link: about/index
       :link-type: doc
 
-      License, how to cite, maintainers, and related projects.
+      License, how to cite, people, and related projects.
 
 .. toctree::
    :hidden:

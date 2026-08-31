@@ -12,7 +12,7 @@ MEMD). The paper introduces two realisations:
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **Undecimated MEMDFB**
      - **Decimated MEMDFB**
    * - Downsampling
@@ -146,6 +146,7 @@ print(MEMD())
 
 MEMD_KW = dict(n_dir=16, max_iter=80)
 
+
 def memd_split(x: np.ndarray, **kwargs) -> tuple[np.ndarray, np.ndarray]:
     """One analysis stage: first IMF (high) and residue (low).
 
@@ -167,6 +168,7 @@ def memd_split(x: np.ndarray, **kwargs) -> tuple[np.ndarray, np.ndarray]:
     residue = np.asarray(x, dtype=float) - imf
     return imf, residue
 
+
 def _tones(n: int = 400, fs: float = 200.0) -> tuple[np.ndarray, np.ndarray]:
     """Three-channel mixture with a shared 4 Hz tone (mode alignment)."""
     t = np.arange(n) / fs
@@ -174,6 +176,7 @@ def _tones(n: int = 400, fs: float = 200.0) -> tuple[np.ndarray, np.ndarray]:
     ch1 = np.cos(2 * np.pi * 4 * t) + 0.45 * np.sin(2 * np.pi * 11 * t)
     ch2 = 0.35 * np.cos(2 * np.pi * 4 * t) + 0.8 * np.cos(2 * np.pi * 18 * t)
     return t, np.vstack([ch0, ch1, ch2])
+
 
 t, x = _tones()
 imf_h, res_l = memd_split(x)
@@ -205,6 +208,7 @@ plt.show()
 # that numerically (small differences can appear because each split restarts
 # sifting on the current residue rather than continuing the original loop).
 
+
 def undecimated_octave(x: np.ndarray, depth: int, **kwargs):
     """Octave MEMDFB: return [IMF1, IMF2, ..., IMFdepth, residue]."""
     nodes = []
@@ -214,6 +218,7 @@ def undecimated_octave(x: np.ndarray, depth: int, **kwargs):
         nodes.append(imf)
     nodes.append(current)
     return nodes
+
 
 depth = 3
 octave = undecimated_octave(x, depth=depth)
@@ -251,6 +256,7 @@ plt.show()
 # because of MEMD’s mode-splitting (paper §3). The construction is still useful
 # as a template for the **decimated** packet in the next section.
 
+
 def undecimated_full_binary(x: np.ndarray, depth: int, **kwargs):
     """Full binary tree. nodes[(i, j)] has length T at every level i."""
     nodes = {(0, 0): np.asarray(x, dtype=float)}
@@ -261,6 +267,7 @@ def undecimated_full_binary(x: np.ndarray, depth: int, **kwargs):
             nodes[(i + 1, 2 * j)] = res
             nodes[(i + 1, 2 * j + 1)] = imf
     return nodes
+
 
 tree = undecimated_full_binary(x, depth=2)
 print("nodes", sorted(tree))
@@ -288,6 +295,7 @@ print(
 # and interleaves. This is Corollary 1: **perfect reconstruction with aliasing
 # cancelled**, for any tree.
 
+
 def _even_odd(x: np.ndarray):
     """x: (C, T) with T even -> even samples, odd samples."""
     x = np.asarray(x, dtype=float)
@@ -295,12 +303,14 @@ def _even_odd(x: np.ndarray):
         x = x[:, :-1]
     return x[:, 0::2], x[:, 1::2]
 
+
 def _interleave(even: np.ndarray, odd: np.ndarray) -> np.ndarray:
     c, n_half = even.shape
     y = np.empty((c, n_half * 2), dtype=float)
     y[:, 0::2] = even
     y[:, 1::2] = odd
     return y
+
 
 def interpolate_odd_to_even(odd: np.ndarray) -> np.ndarray:
     """Cubic spline: values on t=1,3,... -> values on t=0,2,..."""
@@ -313,6 +323,7 @@ def interpolate_odd_to_even(odd: np.ndarray) -> np.ndarray:
             t_even
         )
     return even
+
 
 def analysis_stage(x: np.ndarray, **kwargs):
     """One decimated analysis stage (paper Fig. 4).
@@ -332,6 +343,7 @@ def analysis_stage(x: np.ndarray, **kwargs):
     delta = x_even - x_even_hat
     return res_odd, delta, imf_odd
 
+
 def synthesis_stage(
     res_odd: np.ndarray, delta: np.ndarray, imf_odd: np.ndarray
 ) -> np.ndarray:
@@ -340,6 +352,7 @@ def synthesis_stage(
     x_even_hat = interpolate_odd_to_even(imf_odd) + interpolate_odd_to_even(res_odd)
     x_even = x_even_hat + delta
     return _interleave(x_even, x_odd)
+
 
 # Crop to even length
 x_even_len = x[:, : x.shape[1] - x.shape[1] % 2]
@@ -378,6 +391,7 @@ plt.show()
 # leaves back to the root. This is the **MEMD packet** of the paper: the tree
 # need not be octave, so the bands are no longer forced to be dyadic.
 
+
 def decimated_depth2(x: np.ndarray, **kwargs):
     """Full binary decimated tree of depth 2, plus all error nodes."""
     r10, d00, h11 = analysis_stage(x, **kwargs)  # level 1
@@ -393,10 +407,12 @@ def decimated_depth2(x: np.ndarray, **kwargs):
         "D00": d00,
     }
 
+
 def synthesise_depth2(nodes: dict) -> np.ndarray:
     low = synthesis_stage(nodes["X20"], nodes["D10"], nodes["X21"])
     high = synthesis_stage(nodes["X22"], nodes["D11"], nodes["X23"])
     return synthesis_stage(low, nodes["D00"], high)
+
 
 pkt = decimated_depth2(x_even_len)
 x_pkt = synthesise_depth2(pkt)
@@ -443,6 +459,7 @@ plt.show()
 # MEMD, then drop those channels from every IMF. Reconstruction of the original
 # channels is still the sum along the IMF axis.
 
+
 def na_memd(
     x: np.ndarray, n_noise: int = 2, noise_std: float = 0.2, seed: int = 0, **kwargs
 ):
@@ -452,6 +469,7 @@ def na_memd(
     stacked = np.vstack([x, noise])
     imfs = MEMD(**{**MEMD_KW, **kwargs}).fit_transform(stacked)  # (K, T, C+n_noise)
     return imfs[:, :, : x.shape[0]]
+
 
 na_imfs = na_memd(x, n_noise=2)
 print("NA-MEMD IMFs", na_imfs.shape)

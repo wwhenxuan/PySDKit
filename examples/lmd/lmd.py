@@ -4,7 +4,7 @@ Local Mean Decomposition (LMD)
 
 .. epigraph::
 
-    **Classical algorithm:** Smith, J. S. (2005). *The local mean decomposition and its application to EEG perception data.* Journal of the Royal Society Interface, 2(5), 443–454.  
+    **Classical algorithm:** Smith, J. S. (2005). *The local mean decomposition and its application to EEG perception data.* Journal of the Royal Society Interface, 2(5), 443–454.
     https://doi.org/10.1098/rsif.2005.0058
 
 .. epigraph::

@@ -14,11 +14,11 @@ BMEMD is a natural front-end for multi-scale **image fusion**.
 
 .. epigraph::
 
-    Y. Xia, B. Zhang, W. Pei, D. P. Mandic.  
+    Y. Xia, B. Zhang, W. Pei, D. P. Mandic.
     *Bidimensional Multivariate Empirical Mode Decomposition with Applications
     in Multi-Scale Image Fusion.* IEEE Access, 7:114261–114270, 2019.
 
-MATLAB codes:  
+MATLAB codes:
 https://github.com/z-bingo/Bidimensional-Multivariate-Empirical-Mode-Decomposition
 
 This notebook uses the pure PySDKit implementation (``pysdkit.BMEMD``).
@@ -33,7 +33,7 @@ This notebook uses the pure PySDKit implementation (``pysdkit.BMEMD``).
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - **EMD2D**
 #      - **BMEMD** (this notebook)
 #    * - Input
@@ -87,7 +87,7 @@ print(BMEMD())
 #
 #    P_{\theta_k}(i,j) = \sum_{\ell=1}^{n} u_{\theta_k}^{\ell}\, I_\ell(i,j).
 #
-# * **:math:`n=2`**: uniform samples on the circle  
+# * **:math:`n=2`**: uniform samples on the circle
 # * **:math:`n\ge 3`**: Hammersley low-discrepancy directions (same idea as MEMD)
 #
 # 2.2 Multivariate envelopes

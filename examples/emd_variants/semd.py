@@ -23,9 +23,9 @@ with serialized length :math:`L = MN + D(N-1)` and transition width :math:`D`.
 
 .. epigraph::
 
-    J. Zhang, F. Feng, P. Marti-Puig, C. F. Caiafa, Z. Sun, F. Duan, J. Solé-Casals.  
+    J. Zhang, F. Feng, P. Marti-Puig, C. F. Caiafa, Z. Sun, F. Duan, J. Solé-Casals.
     *Serial-EMD: Fast Empirical Mode Decomposition Method for Multi-dimensional
-    Signals Based on Serialization.* Information Sciences, 2021.  
+    Signals Based on Serialization.* Information Sciences, 2021.
     https://doi.org/10.1016/j.ins.2021.09.033
 
 This notebook uses the pure PySDKit implementation (``pysdkit.SEMD``) and does
@@ -188,6 +188,7 @@ plt.show()
 # local extrema.  Below we compare those envelopes on a window centred at the
 # first channel join — with a hard concatenation versus with the SEMD bridge.
 
+
 def local_envelopes(y: np.ndarray):
     """Upper / lower envelopes via the same spline routine used inside EMD."""
     emd = EMD()
@@ -195,6 +196,7 @@ def local_envelopes(y: np.ndarray):
     max_env, min_env, _, _ = emd.extract_max_min_spline(time, y)
     mean_env = 0.5 * (max_env + min_env)
     return max_env, min_env, mean_env
+
 
 def plot_envelopes(y, join_index, title, bridge_span=None):
     max_env, min_env, mean_env = local_envelopes(y)
@@ -214,6 +216,7 @@ def plot_envelopes(y, join_index, title, bridge_span=None):
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
     return fig
+
 
 plot_envelopes(
     hard, join_index=M, title="Envelopes on a HARD join — mean envelope is distorted"

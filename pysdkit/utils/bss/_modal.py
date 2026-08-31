@@ -40,9 +40,7 @@ def modal_assurance_criterion(left: np.ndarray, right: np.ndarray) -> np.ndarray
     return mac
 
 
-def sign_from_correlation(
-    sources: np.ndarray, observations: np.ndarray
-) -> np.ndarray:
+def sign_from_correlation(sources: np.ndarray, observations: np.ndarray) -> np.ndarray:
     """
     Column signs for the absolute mixing matrix (MATLAB ``corr``).
 

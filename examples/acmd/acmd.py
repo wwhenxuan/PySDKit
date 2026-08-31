@@ -15,8 +15,8 @@ This notebook reproduces the MATLAB demos:
 
 .. epigraph::
 
-    S. Chen, Y. Yang, Z. Peng, *et al.*  
-    *Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method Based on Adaptive Chirp Mode Decomposition.*  
+    S. Chen, Y. Yang, Z. Peng, *et al.*
+    *Detection of Rub-Impact Fault for Rotor-Stator Systems: A Novel Method Based on Adaptive Chirp Mode Decomposition.*
     Journal of Sound and Vibration, 2018.
 
 MATLAB code: `File Exchange 69128 <https://www.mathworks.com/matlabcentral/fileexchange/69128-adaptive-chirp-mode-decomposition>`_.

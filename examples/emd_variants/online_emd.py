@@ -24,7 +24,7 @@ sliding EMD).
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD**
      - **Online EMD** (this notebook)
    * - Input
@@ -110,12 +110,14 @@ print("N =", x.size, "samp[0] =", toy["samp"][0])
 
 COLORS = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.1, 0.6, 1.0]])
 
+
 def _segments(n):
     if n > 1501:
         return [0, 500, 1500, n]
     if n > 500:
         return [0, 500, n]
     return [0, n]
+
 
 def plot_oemd(oemd, title, incomplete=True, max_imfs=5):
     stages = oemd.stages
@@ -175,6 +177,7 @@ def plot_oemd(oemd, title, incomplete=True, max_imfs=5):
         ax.grid(True, alpha=0.25)
     fig.tight_layout()
     return fig
+
 
 snapshots = [500, 1500, x.size]
 figs = []

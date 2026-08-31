@@ -28,7 +28,7 @@ comparison. PySDKit still defaults to 64, matching ``nstemd.m``.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD**
      - **MEMD / TEMD**
      - **NS-TEMD** (this notebook)
@@ -108,6 +108,7 @@ print(
     np.mean(np.abs(ellip @ coeff[:, 0])),
 )
 
+
 def _draw_sphere(ax, pts, title, pc=None, color="C0"):
     u = np.linspace(0.0, 2.0 * np.pi, 36)
     v = np.linspace(0.0, np.pi, 18)
@@ -125,6 +126,7 @@ def _draw_sphere(ax, pts, title, pc=None, color="C0"):
     ax.set_ylabel("y")
     ax.set_zlabel("z")
     ax.set_box_aspect((1, 1, 1))
+
 
 pc1 = coeff[:, 0]
 fig = plt.figure(figsize=(12, 5))

@@ -23,8 +23,8 @@ fewer sifting iterations than plain EEMD.
 
 .. epigraph::
 
-    M. E. Torres, M. A. Colominas, G. Schlotthauer, P. Flandrin.  
-    *A Complete Ensemble Empirical Mode Decomposition with Adaptive Noise.*  
+    M. E. Torres, M. A. Colominas, G. Schlotthauer, P. Flandrin.
+    *A Complete Ensemble Empirical Mode Decomposition with Adaptive Noise.*
     IEEE ICASSP, 2011, pp. 4144–4147.
 
 This notebook uses ``pysdkit.CEEMDAN``.
@@ -273,7 +273,7 @@ plt.show()
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - EEMD
 #      - CEEMDAN
 #    * - Noise

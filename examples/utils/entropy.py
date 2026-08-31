@@ -75,6 +75,7 @@ fig.tight_layout()
 # pure sine's embedding-distance histogram is not always simpler than
 # Gaussian noise.
 
+
 def _pack(x):
     return {
         "PE": permutation_entropy(x, m=3, t=1)[0],

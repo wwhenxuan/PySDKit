@@ -4,8 +4,8 @@ Robust Local Mean Decomposition (RLMD)
 
 .. epigraph::
 
-    Liu Z., Jin Y., Zuo M.J., Feng Z.  
-    *Time-frequency representation based on robust local mean decomposition for multi-component AM-FM signal analysis.*  
+    Liu Z., Jin Y., Zuo M.J., Feng Z.
+    *Time-frequency representation based on robust local mean decomposition for multi-component AM-FM signal analysis.*
     Mechanical Systems and Signal Processing, 95:468–487, 2017.
 
 MATLAB reference: ``lmd_public.m` <https://www.mathworks.com/matlabcentral/fileexchange/66935-robust-local-mean-decomposition-rlmd>`_ / ``repo/RLMD/``.
@@ -111,6 +111,7 @@ _ = plot_IMFs(x, pfs)
 # 3.2 Estimated modes vs ground truth
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def best_match(true, pfs):
     corrs = [
         abs(float(np.corrcoef(true, pfs[k])[0, 1])) for k in range(pfs.shape[0] - 1)
@@ -121,6 +122,7 @@ def best_match(true, pfs):
     if float(np.corrcoef(true, est)[0, 1]) < 0:
         est = -est
     return k, est, corrs[k]
+
 
 fig, axes = plt.subplots(2, 1, figsize=(10, 5), sharex=True)
 for ax, true, name in zip(axes, [x1, x2], ["$x_1$", "$x_2$"]):

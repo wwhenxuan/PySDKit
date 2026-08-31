@@ -105,14 +105,17 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float)
     est = np.asarray(est, dtype=float)
     return np.linalg.norm(est - ref) / (np.linalg.norm(ref) + 1e-16)
 
+
 def mode_energies(mode_kc):
     # Energy of each channel for one mode of shape (T, C).
     return np.sum(mode_kc**2, axis=0)
+
 
 # Illustrate a bivariate mixture with one shared tone
 fs = 1000.0
@@ -399,6 +402,7 @@ plt.show()
 #
 # We keep each channel’s **native VMD mode order** (no post-hoc frequency sorting), then contrast it with MVMD, where every mode has a single :math:`\omega_k` shared by all channels.
 
+
 def channelwise_vmd(signal, alpha=2000, K=3, tau=0.0, max_iter=500, init="zero"):
     # Run univariate VMD on each channel; keep native mode order (no sorting).
     C, T = signal.shape
@@ -411,6 +415,7 @@ def channelwise_vmd(signal, alpha=2000, K=3, tau=0.0, max_iter=500, init="zero")
         out[:, :L, c] = u[:, :L]
         omegas.append(np.asarray(om[-1], dtype=float).real)
     return out, np.asarray(omegas)
+
 
 vmd_modes, vmd_omegas = channelwise_vmd(signal)
 print("Channel-wise VMD center frequencies [Hz] (native order):")
@@ -514,6 +519,7 @@ plt.show()
 #
 # We estimate a mode–mode correlation matrix by averaging absolute correlations across channels (a compact surrogate of the paper’s visualization).
 
+
 def mode_corr_matrix(modes):
     # modes: (K, T, C) -> KxK matrix of mean |corr| across channels.
     K, T, C = modes.shape
@@ -527,6 +533,7 @@ def mode_corr_matrix(modes):
         corr = G / np.outer(d + 1e-16, d + 1e-16)
         R += np.abs(corr)
     return R / C
+
 
 C, T, K = 4, 512, 3
 n_real = 6  # paper uses 100; keep moderate for notebook runtime
@@ -565,7 +572,7 @@ print("Max off-diagonal |corr|:", off.max())
 # ~~~~~~~~~~~~~~~~~~~
 #
 # * Channel 1: 5 Hz + 36 Hz
-# * Channel 2: 24 Hz + 36 Hz  
+# * Channel 2: 24 Hz + 36 Hz
 # (shared 36 Hz component — the same alignment pattern as the paper)
 
 t, sig = test_multivariate_signal(case=1, duration=1.0, sampling_rate=1000)

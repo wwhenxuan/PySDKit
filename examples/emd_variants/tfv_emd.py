@@ -21,9 +21,9 @@ The last returned row is the residual, so IMF rows sum back to the input.
 
 .. epigraph::
 
-    H. Li, Z. Li, W. Mo.  
-    *A time varying filter approach for empirical mode decomposition.*  
-    Signal Processing, 138:146–158, 2017.  
+    H. Li, Z. Li, W. Mo.
+    *A time varying filter approach for empirical mode decomposition.*
+    Signal Processing, 138:146–158, 2017.
     https://doi.org/10.1016/j.sigpro.2017.03.019
 
 MATLAB: ``repo/tvfemd/tvf_emd.m`` (File Exchange). This notebook uses ``pysdkit.TVF_EMD``.
@@ -241,7 +241,7 @@ print(TVF_EMD())
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - Classical EMD
 #      - TVF-EMD
 #    * - Local mean

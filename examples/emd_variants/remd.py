@@ -16,14 +16,14 @@ The envelope stage itself is also regularized by **mirror-extending extrema**
 
 .. epigraph::
 
-    D. Peng, Z. Liu, Y. Jin, Y. Qin.  
+    D. Peng, Z. Liu, Y. Jin, Y. Qin.
     *Improved EMD with a Soft Sifting Stopping Criterion and Its Application to
     Fault Diagnosis of Rotating Machinery.* Journal of Mechanical Engineering,
     55(10):122–132, 2019.  https://doi.org/10.3901/JME.2019.10.122
 
 .. epigraph::
 
-    Z. Liu, D. Peng, M. J. Zuo, J. Xia, Y. Qin.  
+    Z. Liu, D. Peng, M. J. Zuo, J. Xia, Y. Qin.
     *Improved Hilbert–Huang transform with soft sifting stopping criterion and its
     application to fault diagnosis of wheelset bearings.*
     ISA Transactions, 125:426–444, 2022.  https://doi.org/10.1016/j.isatra.2021.07.011
@@ -203,7 +203,7 @@ print(REMD())
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - Classical EMD
 #      - REMD / EMD-SSSC
 #    * - Local mean

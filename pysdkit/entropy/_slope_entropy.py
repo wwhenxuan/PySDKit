@@ -61,5 +61,5 @@ def slope_entropy(
     value = shannon(counts / counts.sum())
     if normalize:
         n_symbols = 2 * len(levels) + 1
-        value /= np.log(n_symbols ** n_slopes)
+        value /= np.log(n_symbols**n_slopes)
     return float(value)

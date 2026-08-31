@@ -26,8 +26,8 @@ components.
 
 .. epigraph::
 
-    Z. Wu and N. E. Huang.  
-    *Ensemble Empirical Mode Decomposition: A Noise-Assisted Data Analysis Method.*  
+    Z. Wu and N. E. Huang.
+    *Ensemble Empirical Mode Decomposition: A Noise-Assisted Data Analysis Method.*
     Advances in Adaptive Data Analysis, 1(1):1–41, 2009.
 
 This notebook uses ``pysdkit.EEMD``.
@@ -69,7 +69,7 @@ print(EEMD())
 # 2.3 Formal procedure
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# #. Choose ensemble size :math:`I` and noise amplitude :math:`\varepsilon`  
+# #. Choose ensemble size :math:`I` and noise amplitude :math:`\varepsilon`
 #    (in PySDKit: ``trials``, ``noise_width`` × signal range).
 # #. For :math:`i=1,\ldots,I`: form :math:`x^{(i)}=x+w^{(i)}` and run full EMD.
 # #. Align IMFs by order :math:`k` and average across trials.

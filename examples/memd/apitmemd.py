@@ -33,7 +33,7 @@ was demonstrated on cooperative SSVEP / P300 BCIs in the same paper.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **MEMD**
      - **APIT-MEMD** (this notebook)
    * - Directions
@@ -130,6 +130,7 @@ for a, pts in adapted.items():
     align = np.mean(np.abs(pts @ pc1))
     print("alpha={:g}: shape {}, mean |<d, PC1>| = {:.3f}".format(a, pts.shape, align))
 
+
 def _draw_sphere(ax, pts, title, pc=None, color="C0"):
     u = np.linspace(0.0, 2.0 * np.pi, 36)
     v = np.linspace(0.0, np.pi, 18)
@@ -147,6 +148,7 @@ def _draw_sphere(ax, pts, title, pc=None, color="C0"):
     ax.set_ylabel("y")
     ax.set_zlabel("z")
     ax.set_box_aspect((1, 1, 1))
+
 
 fig = plt.figure(figsize=(12, 10))
 axes = [fig.add_subplot(2, 2, k, projection="3d") for k in range(1, 5)]

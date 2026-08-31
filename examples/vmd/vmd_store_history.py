@@ -54,6 +54,7 @@ plt.show()
 
 import time
 
+
 def run_vmd(store_history: bool):
     vmd = VMD(
         alpha=alpha,
@@ -81,6 +82,7 @@ def run_vmd(store_history: bool):
         "n_omega": omega.shape[0],
         "store_history": store_history,
     }
+
 
 full = run_vmd(True)
 low = run_vmd(False)
@@ -261,6 +263,7 @@ print(
 #
 # The low-memory path uses a per-iteration residual and may stop earlier than the legacy accumulator. Below we set an extremely tight ``tol`` so both paths run essentially all ``max_iter`` steps, isolating buffering cost from early-stopping.
 
+
 def run_vmd_forced(store_history: bool, max_iter_run: int = 200, tol_run: float = 0.0):
     vmd = VMD(
         alpha=alpha,
@@ -278,6 +281,7 @@ def run_vmd_forced(store_history: bool, max_iter_run: int = 200, tol_run: float 
     x_ = signal[: recon.size]
     rel_err = np.linalg.norm(recon - x_) / (np.linalg.norm(x_) + 1e-12)
     return elapsed, rel_err, omega.shape[0], u
+
 
 t_full, e_full, n_full, u_full = run_vmd_forced(True)
 t_low, e_low, n_low, u_low = run_vmd_forced(False)

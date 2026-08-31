@@ -15,9 +15,9 @@ PySDKit exposes a single class SJMD that handles both:
 
 .. epigraph::
 
-    M. Nazari, A. R. Korshøj, N. ur Rehman.  
-    *Successive Jump and Mode Decomposition.*  
-    arXiv:2504.08453.  
+    M. Nazari, A. R. Korshøj, N. ur Rehman.
+    *Successive Jump and Mode Decomposition.*
+    arXiv:2504.08453.
     `https://arxiv.org/abs/2504.08453 <https://arxiv.org/abs/2504.08453>`_
 """
 

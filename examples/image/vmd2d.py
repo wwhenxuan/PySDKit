@@ -256,10 +256,12 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float)
     est = np.asarray(est, dtype=float)
     return np.linalg.norm(est - ref) / (np.linalg.norm(ref) + 1e-16)
+
 
 def show_modes(modes, titles=None, cmap="gray", vmax=None):
     # modes: (H, W, K)
@@ -275,8 +277,10 @@ def show_modes(modes, titles=None, cmap="gray", vmax=None):
     plt.tight_layout()
     return fig, axs
 
+
 def spectrum_mag(img):
     return np.abs(fftshift(fft2(img)))
+
 
 def final_omega(omega):
     # omega: (max_iter, 2, K) -> last written (2, K)
@@ -284,6 +288,7 @@ def final_omega(omega):
         if np.any(omega[i] != 0) or i == 0:
             return np.asarray(omega[i], dtype=float)
     return np.asarray(omega[-1], dtype=float)
+
 
 img = test_grayscale()
 print("Paper synthetic texture shape:", None if img is None else img.shape)
@@ -412,6 +417,7 @@ plt.show()
 #
 # We visualize each mode’s Fourier magnitude and overlay the estimated :math:`\boldsymbol{\omega}_k`. Successful 2D-VMD places each directional tone near its own spectral blob (paper Figs. 1–2, bottom-left spectra).
 
+
 def plot_mode_spectra(modes, omega_2k, title="Mode spectra"):
     K = modes.shape[2]
     fig, axs = plt.subplots(1, K, figsize=(2.6 * K, 2.7))
@@ -432,6 +438,7 @@ def plot_mode_spectra(modes, omega_2k, title="Mode spectra"):
     plt.suptitle(title, y=1.05)
     plt.tight_layout()
     plt.show()
+
 
 plot_mode_spectra(modes, w, title="Paper texture: mode spectra + estimated ω_k")
 

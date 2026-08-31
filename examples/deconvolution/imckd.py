@@ -34,7 +34,7 @@ iteration traces that MATLAB drew with ```plotyy``` are returned in
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **MCKD**
      - **IMCKD** (this notebook)
    * - Period :math:`T`

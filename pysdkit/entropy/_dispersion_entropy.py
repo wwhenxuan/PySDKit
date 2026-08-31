@@ -83,7 +83,5 @@ def multiscale_dispersion_entropy(
     values = []
     for s in range(1, scale + 1):
         grain = coarse_grain(y, s)
-        values.append(
-            dispersion_entropy(grain, m=m, c=c, tau=tau, normalize=normalize)
-        )
+        values.append(dispersion_entropy(grain, m=m, c=c, tau=tau, normalize=normalize))
     return np.asarray(values, dtype=float)

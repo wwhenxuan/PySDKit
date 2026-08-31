@@ -23,9 +23,9 @@ component.  Repeating the process on the residual yields a full decomposition.
 
 .. epigraph::
 
-    G. K. Apostolidis, L. J. Hadjileontiadis.  
-    *Swarm decomposition: A novel signal analysis using swarm intelligence.*  
-    Signal Processing, 132:40–50, 2017.  
+    G. K. Apostolidis, L. J. Hadjileontiadis.
+    *Swarm decomposition: A novel signal analysis using swarm intelligence.*
+    Signal Processing, 132:40–50, 2017.
     https://doi.org/10.1016/j.sigpro.2016.09.004
 """
 
@@ -126,6 +126,7 @@ plt.show()
 N = 499
 t = np.arange(N)
 
+
 def atom(t0, f0, T, A):
     win = np.zeros(N)
     a = max(0, int(np.ceil(t0 - T / 2 + 1)) - 1)
@@ -133,6 +134,7 @@ def atom(t0, f0, T, A):
     w = hann(max(b - a, 1), sym=False)
     win[a : a + len(w)] = w[: len(win[a:b])]
     return A * win * np.cos(f0 * (t - t0))
+
 
 a1 = atom(250, 0.2 * np.pi, 300, 0.7)
 a2 = atom(125, 0.6 * np.pi, 125, 1.5)
@@ -253,7 +255,7 @@ for pth in (0.05, 0.15, 0.3):
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - EMD
 #      - VMD
 #      - SWD

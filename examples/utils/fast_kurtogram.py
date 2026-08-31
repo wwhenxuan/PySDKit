@@ -29,7 +29,7 @@ explicit ``find_wav_kurt`` extracts the envelope.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **STFT SK**
      - **Fast kurtogram** (this notebook)
    * - Band tiling

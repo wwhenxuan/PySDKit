@@ -37,7 +37,7 @@ and still reconstructible: a real mode is simply
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **STFT**
      - **SST**
      - **SET** (this notebook)

@@ -13,12 +13,12 @@ This notebook explains **why VNCMD was introduced**, how its variational model d
 Contents
 --------
 
-#. What VMD cannot do well  
-#. Nonlinear chirp modes and demodulation  
-#. Variational model and ADMM-like updates  
-#. PySDKit API  
-#. Experiment 1: noise-free intersecting IFs (MATLAB demo 1)  
-#. Experiment 2: strong noise (MATLAB demo 2)  
+#. What VMD cannot do well
+#. Nonlinear chirp modes and demodulation
+#. Variational model and ADMM-like updates
+#. PySDKit API
+#. Experiment 1: noise-free intersecting IFs (MATLAB demo 1)
+#. Experiment 2: strong noise (MATLAB demo 2)
 #. Summary
 """
 
@@ -42,8 +42,8 @@ Contents
 #
 # **VNCMD** targets **nonlinear chirp modes** whose instantaneous frequency (IF) can vary strongly — including **crossing IFs** — by jointly estimating:
 #
-# * the mode waveforms :math:`s_k(t)`,  
-# * their instantaneous amplitudes :math:`a_k(t)`,  
+# * the mode waveforms :math:`s_k(t)`,
+# * their instantaneous amplitudes :math:`a_k(t)`,
 # * and their instantaneous frequencies :math:`f_k(t)`.
 
 # %%
@@ -80,8 +80,8 @@ Contents
 #
 # VNCMD solves a constrained variational problem that:
 #
-# #. Forces :math:`x_k,y_k` to be smooth (second-order difference operator :math:`\mathbf{D}`);  
-# #. Matches the residual :math:`g-\sum_k s_k` to a noise slack :math:`u` (with :math:`\|u\|_2\le\sqrt{N\sigma^2}` when :math:`\mathrm{var}=\sigma^2>0`);  
+# #. Forces :math:`x_k,y_k` to be smooth (second-order difference operator :math:`\mathbf{D}`);
+# #. Matches the residual :math:`g-\sum_k s_k` to a noise slack :math:`u` (with :math:`\|u\|_2\le\sqrt{N\sigma^2}` when :math:`\mathrm{var}=\sigma^2>0`);
 # #. Updates the IF by **arctangent demodulation**
 #
 # .. math::
@@ -98,10 +98,10 @@ Contents
 #
 # **Algorithm sketch (matches ``VNCMD.m``)**
 #
-# #. Initialize IF guesses :math:`\tilde f_k(t)` (constant ridges, or TF ridge detection).  
-# #. Build :math:`\sin/\cos` carriers; solve for :math:`x_k,y_k` with bandwidth weight :math:`\alpha`.  
-# #. Iterate: project noise :math:`u`, update :math:`x_k,y_k`, update IF, refresh carriers, dual ascent on :math:`\lambda`.  
-# #. Optional **restart** if the residual energy exceeds :math:`\|g\|_2`.  
+# #. Initialize IF guesses :math:`\tilde f_k(t)` (constant ridges, or TF ridge detection).
+# #. Build :math:`\sin/\cos` carriers; solve for :math:`x_k,y_k` with bandwidth weight :math:`\alpha`.
+# #. Iterate: project noise :math:`u`, update :math:`x_k,y_k`, update IF, refresh carriers, dual ascent on :math:`\lambda`.
+# #. Optional **restart** if the residual energy exceeds :math:`\|g\|_2`.
 #
 # .. list-table::
 #    :header-rows: 1
@@ -144,10 +144,12 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float)
     est = np.asarray(est, dtype=float)
     return float(np.linalg.norm(est - ref) / (np.linalg.norm(ref) + 1e-16))
+
 
 def snr_db(clean, estimate):
     clean = np.asarray(clean, dtype=float)
@@ -155,6 +157,7 @@ def snr_db(clean, estimate):
     return float(
         10 * np.log10(np.sum(clean**2) / (np.sum((clean - estimate) ** 2) + 1e-16))
     )
+
 
 # %%
 # 5. Experiment 1 — Noise-free intersecting IFs (MATLAB demo 1)
@@ -351,9 +354,9 @@ plt.show()
 #
 # **Takeaways**
 #
-# #. VNCMD extends variational decomposition from tones to **fast / crossing chirps**.  
-# #. Good **initial IFs** help, but constant guesses can still work (demo 1).  
-# #. Tune ``alpha`` (bandwidth) and ``beta`` (IF smoothness); set ``var`` to the noise variance when noise is significant.  
+# #. VNCMD extends variational decomposition from tones to **fast / crossing chirps**.
+# #. Good **initial IFs** help, but constant guesses can still work (demo 1).
+# #. Tune ``alpha`` (bandwidth) and ``beta`` (IF smoothness); set ``var`` to the noise variance when noise is significant.
 #
 # One-liner
 # ~~~~~~~~~

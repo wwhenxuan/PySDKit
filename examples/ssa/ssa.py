@@ -19,11 +19,11 @@ bandwidth prior.  It works entirely in a linear-algebra framework:
 
 .. epigraph::
 
-    Zhigljavsky, A. A.  
-    *Singular spectrum analysis for time series: Introduction to this special issue.*  
+    Zhigljavsky, A. A.
+    *Singular spectrum analysis for time series: Introduction to this special issue.*
     Statistics and its Interface, 3(3):255–258, 2010.
 
-MATLAB beginners’ guide:  
+MATLAB beginners’ guide:
 https://www.mathworks.com/matlabcentral/fileexchange/58967-singular-spectrum-analysis-beginners-guide
 """
 

@@ -77,7 +77,9 @@ class SampleEntropyTest(unittest.TestCase):
 
     def test_composite_shape(self) -> None:
         rng = np.random.RandomState(1)
-        values = composite_multiscale_sample_entropy(rng.randn(400), m=2, r=0.15, scale=3)
+        values = composite_multiscale_sample_entropy(
+            rng.randn(400), m=2, r=0.15, scale=3
+        )
         self.assertEqual(values.shape, (3,))
         self.assertTrue(np.any(np.isfinite(values)))
 

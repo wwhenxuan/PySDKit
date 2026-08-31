@@ -8,9 +8,9 @@ EMD-Based Time Series Forecasting
 
 That paper is a **survey** of hybrid EMD forecasting methods (EMD–ARIMA, EMD–SVR/LSSVR, EMD–ANN, …). Across those studies the same three-stage pipeline appears:
 
-#. **Decompose** a nonlinear / non-stationary series with EMD into IMFs + residue  
-#. **Forecast each component** with a classical predictor (AR / SVR / neural net, …)  
-#. **Aggregate** component forecasts by summation to recover the series forecast  
+#. **Decompose** a nonlinear / non-stationary series with EMD into IMFs + residue
+#. **Forecast each component** with a classical predictor (AR / SVR / neural net, …)
+#. **Aggregate** component forecasts by summation to recover the series forecast
 
 This notebook reproduces that hybrid framework with PySDKit’s ``EMD``, compares it against forecasting the raw series directly, and provides a full visualization workflow.
 
@@ -81,19 +81,23 @@ plt.rcParams.update(
 
 RNG = np.random.default_rng(42)
 
+
 def rmse(y_true, y_pred):
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
     return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
+
 def mae(y_true, y_pred):
     return float(np.mean(np.abs(np.asarray(y_true) - np.asarray(y_pred))))
+
 
 def mape(y_true, y_pred, eps=1e-8):
     y_true = np.asarray(y_true, dtype=float)
     y_pred = np.asarray(y_pred, dtype=float)
     denom = np.maximum(np.abs(y_true), eps)
     return float(np.mean(np.abs((y_true - y_pred) / denom)) * 100.0)
+
 
 def make_lagged(y, lags):
     y = np.asarray(y, dtype=float)
@@ -102,6 +106,7 @@ def make_lagged(y, lags):
         X.append(y[i - lags : i])
         t.append(y[i])
     return np.asarray(X), np.asarray(t)
+
 
 def build_model(kind="ar", lags=10, random_state=0):
     if kind == "ar":
@@ -126,6 +131,7 @@ def build_model(kind="ar", lags=10, random_state=0):
         )
     raise ValueError(kind)
 
+
 def recursive_forecast(series, horizon, lags=10, kind="ar", random_state=0):
     # Fit on `series`, then produce `horizon` recursive one-step predictions.
     series = np.asarray(series, dtype=float)
@@ -144,12 +150,14 @@ def recursive_forecast(series, horizon, lags=10, kind="ar", random_state=0):
         hist.append(p)
     return np.asarray(preds)
 
+
 @dataclass
 class ForecastResult:
     yhat: np.ndarray
     component_forecasts: np.ndarray  # (n_comp, horizon)
     imfs: np.ndarray
     residue: np.ndarray
+
 
 def emd_hybrid_forecast(
     train,
@@ -179,6 +187,7 @@ def emd_hybrid_forecast(
         imfs=imfs_arr,
         residue=residue,
     )
+
 
 # %%
 # 3. Synthetic nonlinear / non-stationary series
@@ -315,7 +324,7 @@ plt.show()
 #
 # We evaluate:
 #
-# * **Direct-AR / Direct-SVR / Direct-MLP**: forecast the raw series  
+# * **Direct-AR / Direct-SVR / Direct-MLP**: forecast the raw series
 # * **EMD-AR / EMD-SVR / EMD-MLP**: paper-style hybrid aggregation
 
 methods = {}
@@ -460,20 +469,20 @@ plt.show()
 #
 # **Visualization workflow in this notebook**
 #
-# #. Series construction / exploratory plot  
-# #. Train–test split  
-# #. EMD components on the training window  
-# #. Per-component forecasts  
-# #. Aggregation vs ground truth  
-# #. Hybrid vs direct baselines (AR / SVR / MLP)  
-# #. Error bars / residual diagnostics  
-# #. Optional rolling one-step protocol  
+# #. Series construction / exploratory plot
+# #. Train–test split
+# #. EMD components on the training window
+# #. Per-component forecasts
+# #. Aggregation vs ground truth
+# #. Hybrid vs direct baselines (AR / SVR / MLP)
+# #. Error bars / residual diagnostics
+# #. Optional rolling one-step protocol
 #
 # **Practical remarks from the survey**
 #
-# * EMD helps when the series mixes multiple time scales.  
-# * Component models can be heterogeneous (e.g. AR on highly autocorrelated IMFs, SVR on weakly correlated ones — see EMD–LSSVM–AR variants in the review).  
-# * Always avoid decomposing the future test segment before forecasting.  
+# * EMD helps when the series mixes multiple time scales.
+# * Component models can be heterogeneous (e.g. AR on highly autocorrelated IMFs, SVR on weakly correlated ones — see EMD–LSSVM–AR variants in the review).
+# * Always avoid decomposing the future test segment before forecasting.
 # * For noisy series, consider EEMD/CEEMDAN (also discussed in the review) before forecasting.
 #
 # Minimal usage pattern

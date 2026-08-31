@@ -24,7 +24,7 @@ This notebook mirrors the *sine + square wave* convex demo from
 
 .. epigraph::
 
-    B. Meyers, S. Boyd. *Signal Decomposition via Masked Proximal Operators.*  
+    B. Meyers, S. Boyd. *Signal Decomposition via Masked Proximal Operators.*
     https://web.stanford.edu/~boyd/papers/sig_decomp_mprox.html
 """
 

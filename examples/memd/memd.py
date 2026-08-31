@@ -26,7 +26,7 @@ including Hammersley directions, the Rilling ``"stop"`` criterion and the Huang
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD**
      - **MEMD** (this notebook)
      - **MVMD**
@@ -121,6 +121,7 @@ fig = plt.figure(figsize=(11, 5))
 ax0 = fig.add_subplot(1, 2, 1, projection="3d")
 ax1 = fig.add_subplot(1, 2, 2, projection="3d")
 
+
 def _draw_sphere(ax, pts, title):
     u = np.linspace(0.0, 2.0 * np.pi, 36)
     v = np.linspace(0.0, np.pi, 18)
@@ -134,6 +135,7 @@ def _draw_sphere(ax, pts, title):
     ax.set_ylabel("y")
     ax.set_zlabel("z")
     ax.set_box_aspect((1, 1, 1))
+
 
 _draw_sphere(ax0, grid_pts, "(a) spherical coordinates (cluster at poles)")
 _draw_sphere(ax1, hamm_pts, "(b) Hammersley sequence (quasi-uniform)")

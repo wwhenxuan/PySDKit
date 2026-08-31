@@ -12,9 +12,9 @@ PySDKit's ``VME`` is a faithful port of MATLAB ``vme.m`` (File Exchange 76003).
 
 .. epigraph::
 
-    M. Nazari, S. M. Sakhaei.  
-    *Variational Mode Extraction: A New Efficient Method to Derive Respiratory Signals from ECG.*  
-    IEEE Journal of Biomedical and Health Informatics, 22(4):1059–1067, 2018.  
+    M. Nazari, S. M. Sakhaei.
+    *Variational Mode Extraction: A New Efficient Method to Derive Respiratory Signals from ECG.*
+    IEEE Journal of Biomedical and Health Informatics, 22(4):1059–1067, 2018.
     https://doi.org/10.1109/JBHI.2017.2734074
 
 MATLAB toolbox: `File Exchange 76003 <https://www.mathworks.com/matlabcentral/fileexchange/76003-variational-mode-extraction-vme-m>`_.
@@ -95,6 +95,7 @@ print(VME())
 #    * - ``tol``
 #      - relative spectral-change tolerance (``1e-7`` in the MATLAB demo)
 
+
 def overlay_mode(t, mixture, reference, extracted, title):
     """MATLAB VME_test_script.m style: unit-peak overlay of reference vs. VME."""
     ref_n = reference / np.max(np.abs(reference))
@@ -111,6 +112,7 @@ def overlay_mode(t, mixture, reference, extracted, title):
     fig.tight_layout()
     return fig
 
+
 def run_demo(demo, alpha=20000.0):
     extractor = VME(
         alpha=alpha,
@@ -125,6 +127,7 @@ def run_demo(demo, alpha=20000.0):
     overlay_mode(demo["t"], demo["signal"], demo["reference"], mode, demo["name"])
     plt.show()
     return mode, omega_hz
+
 
 # %%
 # 4. MATLAB / paper Example 1

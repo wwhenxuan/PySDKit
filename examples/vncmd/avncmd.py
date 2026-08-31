@@ -10,9 +10,9 @@ We pay special attention to **how adaptivity works**: AVNCMD removes the need fo
 
 .. epigraph::
 
-    H. Liang, X. Ding, A. Jakobsson, X. Tu, Y. Huang.  
-    *Adaptive Variational Nonlinear Chirp Mode Decomposition.*  
-    IEEE ICASSP 2022.  
+    H. Liang, X. Ding, A. Jakobsson, X. Tu, Y. Huang.
+    *Adaptive Variational Nonlinear Chirp Mode Decomposition.*
+    IEEE ICASSP 2022.
     `DOI: 10.1109/ICASSP43922.2022.9746147 <https://doi.org/10.1109/ICASSP43922.2022.9746147>`_
 
 The implementation follows the authors' open MATLAB code: `HauLiang/AVNCMD <https://github.com/HauLiang/AVNCMD>`_.
@@ -24,7 +24,7 @@ The implementation follows the authors' open MATLAB code: `HauLiang/AVNCMD <http
 #
 # **Nonlinear chirp signals (NCSs)** have time-varying instantaneous amplitudes (IAs) and instantaneous frequencies (IFs). Classical Fourier tools only give global frequency content; STFT / SST improve time–frequency localization but can still struggle with strongly modulated wide-band modes.
 #
-# **Variational Nonlinear Chirp Mode Decomposition (VNCMD)** (Chen et al., 2017) is a powerful variational method: it demodulates each chirp into a pair of narrow-band signals :math:`(u_k, v_k)` and jointly estimates modes and IFs.  
+# **Variational Nonlinear Chirp Mode Decomposition (VNCMD)** (Chen et al., 2017) is a powerful variational method: it demodulates each chirp into a pair of narrow-band signals :math:`(u_k, v_k)` and jointly estimates modes and IFs.
 # Its main practical limitation is the **bandwidth parameter :math:`\alpha`**: performance depends heavily on this user-chosen constant, and a single fixed :math:`\alpha` rarely fits all NCSs.
 #
 # **AVNCMD** keeps the VNCMD demodulation geometry but replaces the fixed-:math:`\alpha` ridge regression by a **Bayesian / RVM-style sparse solve**, then **adaptively updates IFs and rebuilds the dictionary** from the data. Empirically this yields more accurate IAs/IFs without carefully tuning :math:`\alpha`.
@@ -75,7 +75,7 @@ The implementation follows the authors' open MATLAB code: `HauLiang/AVNCMD <http
 #
 #    \min_x\;\alpha\|g-Ax\|_2^2+\|Dx\|_2^2,
 #
-# where the dictionary :math:`A` is built from :math:`\cos\theta_k` and :math:`\sin\theta_k` (diagonal blocks).  
+# where the dictionary :math:`A` is built from :math:`\cos\theta_k` and :math:`\sin\theta_k` (diagonal blocks).
 # **Problem:** :math:`\alpha` must be chosen a priori and controls the trade-off between fidelity and smoothness.
 
 # %%
@@ -211,8 +211,9 @@ print(AVNCMD())
 # 4. Build a demo signal
 # ----------------------
 #
-# We use a shortened version of the official MATLAB ``Demo_AVNCMD.m``: two nonlinear chirps with decaying amplitudes.  
+# We use a shortened version of the official MATLAB ``Demo_AVNCMD.m``: two nonlinear chirps with decaying amplitudes.
 # Sampling rate is reduced (``fs=200``) so the notebook runs quickly; the structure matches the paper example.
+
 
 def make_demo_signal(fs: float = 200.0, T: float = 1.0):
     """Two-component nonlinear chirp (Demo_AVNCMD.m style)."""
@@ -229,6 +230,7 @@ def make_demo_signal(fs: float = 200.0, T: float = 1.0):
     g_2t = a2 * np.cos(2 * np.pi * (1 + 40 * t + 8 * t**2 - 2 * t**3 + 0.1 * t**4))
     signal = g_1t + g_2t
     return t, signal, g_1t, g_2t, f_1t, f_2t, a1, a2
+
 
 fs = 200.0
 t, signal, g_1t, g_2t, f_1t, f_2t, a1, a2 = make_demo_signal(fs=fs, T=1.0)
@@ -261,7 +263,7 @@ plt.show()
 # 5. Run AVNCMD
 # -------------
 #
-# Initial IFs are **constant seeds** near the true trajectories (28 Hz and 48 Hz), as in the MATLAB demo.  
+# Initial IFs are **constant seeds** near the true trajectories (28 Hz and 48 Hz), as in the MATLAB demo.
 # AVNCMD then adapts these curves iteration by iteration.
 #
 # Key parameters:
@@ -290,8 +292,10 @@ print(f"estMode: {estMode.shape}")
 print(f"estIA:   {estIA.shape}")
 print(f"outer iterations stored: {avncmd.estIF.shape[-1]} (incl. init)")
 
+
 def relative_error(est, ref):
     return np.linalg.norm(est - ref) / np.linalg.norm(ref)
+
 
 # Mode / IF labels may swap; pick the better matching assignment
 re_if_direct = relative_error(estIF[0], f_1t) + relative_error(estIF[1], f_2t)

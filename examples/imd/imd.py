@@ -382,7 +382,7 @@ print("functional API shape:", modes_fn.shape)
 # References
 # ----------
 #
-# #. B. Hou, M. Xie, H. Yan, D. Wang. *Impulsive mode decomposition.* Mechanical Systems and Signal Processing, **211**:111227, 2024. https://doi.org/10.1016/j.ymssp.2024.111227  
+# #. B. Hou, M. Xie, H. Yan, D. Wang. *Impulsive mode decomposition.* Mechanical Systems and Signal Processing, **211**:111227, 2024. https://doi.org/10.1016/j.ymssp.2024.111227
 #    (definition of impulsive mode; GM2to1 / Eqs. (2)–(4); Algorithms 1–2 / adaptive filterbank)
-# #. B. Hou et al. *Cycle-embedded sparsity measures as a generalized objective function of impulsive mode decomposition...* MSSP, **231**:112566, 2025.  
+# #. B. Hou et al. *Cycle-embedded sparsity measures as a generalized objective function of impulsive mode decomposition...* MSSP, **231**:112566, 2025.
 #    (CESM generalisation used in the MATLAB toolbox objective)

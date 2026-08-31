@@ -6,9 +6,9 @@ Variational Time-Frequency Mode Tracking Decomposition (VTFMTD)
 
 .. epigraph::
 
-    Dong, H., Shan, T., Yu, G., Shi, Y., Chen, Y.  
-    *Variational time-frequency mode tracking for micro-Doppler signature extraction.*  
-    Signal Processing, 246:110603, 2026.  
+    Dong, H., Shan, T., Yu, G., Shi, Y., Chen, Y.
+    *Variational time-frequency mode tracking for micro-Doppler signature extraction.*
+    Signal Processing, 246:110603, 2026.
     https://doi.org/10.1016/j.sigpro.2026.110603
 
 This notebook:

@@ -20,7 +20,7 @@ directional projections.
 
 .. epigraph::
 
-    M. R. Thirumalaisamy, P. J. Ansell.  
+    M. R. Thirumalaisamy, P. J. Ansell.
     *Fast and Adaptive Empirical Mode Decomposition for Multidimensional,
     Multivariate Signals.* IEEE SPL, 25(10):1550–1554, 2018.
 

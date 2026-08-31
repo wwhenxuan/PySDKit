@@ -12,16 +12,16 @@ EMD is the first widely used **fully adaptive** signal-decomposition method: the
 
 This notebook walks through the **complete sifting pipeline** with visualizations at every stage:
 
-#. Motivation and IMF definition  
-#. Algorithm overview (paper flow diagram)  
-#. Demo signal  
-#. Extremum detection  
-#. Upper / lower envelope construction  
-#. Local mean (low-frequency trend)  
-#. One sifting step: subtract the mean  
-#. Multiple sifting iterations until an IMF  
-#. Full EMD with PySDKit  
-#. Completeness and reconstruction  
+#. Motivation and IMF definition
+#. Algorithm overview (paper flow diagram)
+#. Demo signal
+#. Extremum detection
+#. Upper / lower envelope construction
+#. Local mean (low-frequency trend)
+#. One sifting step: subtract the mean
+#. Multiple sifting iterations until an IMF
+#. Full EMD with PySDKit
+#. Completeness and reconstruction
 #. Summary
 """
 
@@ -39,7 +39,7 @@ This notebook walks through the **complete sifting pipeline** with visualization
 #
 # An IMF :math:`x_n(t)` must satisfy (Zeiler et al. / Huang et al.):
 #
-# #. **Extremum–zero-crossing balance**: between two successive zero crossings there is only one extremum — equivalently, the numbers of local maxima and minima differ by at most one.  
+# #. **Extremum–zero-crossing balance**: between two successive zero crossings there is only one extremum — equivalently, the numbers of local maxima and minima differ by at most one.
 # #. **Zero local mean**: the mean of the upper and lower envelopes is (approximately) zero.
 #
 # An IMF may still have **amplitude and frequency modulation**; the zero-mean condition makes subsequent Hilbert analysis physically meaningful.
@@ -59,23 +59,23 @@ This notebook walks through the **complete sifting pipeline** with visualization
 #
 # Paper §II / Fig. 1. To extract the :math:`n`-th IMF from the current residue :math:`r_{n-1}(t)`:
 #
-# #. Initialize :math:`h_0(t):=r_{n-1}(t)`, :math:`k:=1`.  
-# #. **Find extrema** of :math:`h_{k-1}(t)`.  
-# #. **Interpolate** cubic-spline envelopes :math:`U_{k-1}(t)` (through maxima) and :math:`L_{k-1}(t)` (through minima).  
+# #. Initialize :math:`h_0(t):=r_{n-1}(t)`, :math:`k:=1`.
+# #. **Find extrema** of :math:`h_{k-1}(t)`.
+# #. **Interpolate** cubic-spline envelopes :math:`U_{k-1}(t)` (through maxima) and :math:`L_{k-1}(t)` (through minima).
 # #. **Local mean** (low-frequency trend):
 #
 # .. math::
 #
 #    m_{k-1}(t)=\frac{U_{k-1}(t)+L_{k-1}(t)}{2}.
 #
-#    (Some texts misprint this as a difference; the physically correct trend estimate is the **average** of the envelopes.)  
+#    (Some texts misprint this as a difference; the physically correct trend estimate is the **average** of the envelopes.)
 # #. **Sift**:
 #
 # .. math::
 #
 #    h_k(t)=h_{k-1}(t)-m_{k-1}(t).
 #
-# #. If :math:`h_k` is not yet an IMF, set :math:`k\leftarrow k+1` and repeat from step 1; otherwise set :math:`x_n:=h_k` and :math:`r_n:=r_{n-1}-x_n`.  
+# #. If :math:`h_k` is not yet an IMF, set :math:`k\leftarrow k+1` and repeat from step 1; otherwise set :math:`x_n:=h_k` and :math:`r_n:=r_{n-1}-x_n`.
 # #. Stop when :math:`r_n` is a monotonic / low-variation residuum; otherwise continue with :math:`n\leftarrow n+1`.
 #
 # The next cells implement and visualize steps 1–5 explicitly before calling the full PySDKit ``EMD`` class.
@@ -98,10 +98,12 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float)
     est = np.asarray(est, dtype=float)
     return np.linalg.norm(est - ref) / (np.linalg.norm(ref) + 1e-16)
+
 
 def find_extrema_simple(t, x):
     # Discrete extrema via first differences (same idea as EMD extrema_detection='simple').
@@ -121,6 +123,7 @@ def find_extrema_simple(t, x):
             min_idx = np.unique(np.r_[min_idx, len(x) - 1])
     return max_idx, min_idx
 
+
 def cubic_envelope(t, t_ext, x_ext):
     # Build a cubic spline through extrema; require >= 2 points.
     if len(t_ext) < 2:
@@ -134,6 +137,7 @@ def cubic_envelope(t, t_ext, x_ext):
         return np.full_like(t, np.nan, dtype=float)
     cs = CubicSpline(t_ext, x_ext, bc_type="not-a-knot", extrapolate=True)
     return cs(t)
+
 
 def one_sift_step(t, h):
     # One complete sifting iteration: extrema -> envelopes -> mean -> h - m.
@@ -150,6 +154,7 @@ def one_sift_step(t, h):
         "m": m,
         "h_new": h_new,
     }
+
 
 # %%
 # 3. Demo signal
@@ -289,8 +294,8 @@ print("The sifting step drives the prototype toward a zero-mean oscillation.")
 #
 # We repeat Steps A–D for several iterations and watch:
 #
-# * envelopes become more symmetric;  
-# * the local mean shrinks toward zero;  
+# * envelopes become more symmetric;
+# * the local mean shrinks toward zero;
 # * the prototype becomes a zero-mean oscillation (IMF candidate).
 
 n_show = 4
@@ -431,9 +436,9 @@ plt.show()
 #
 # **Key takeaways**
 #
-# #. EMD is **data-driven**: no preset frequencies or mother wavelet.  
-# #. Sifting is a local, iterative high-pass operation guided by envelopes.  
-# #. Completeness: :math:`x=\sum\mathrm{IMFs}+r`.  
+# #. EMD is **data-driven**: no preset frequencies or mother wavelet.
+# #. Sifting is a local, iterative high-pass operation guided by envelopes.
+# #. Completeness: :math:`x=\sum\mathrm{IMFs}+r`.
 # #. IMFs enable the **Hilbert–Huang Transform** (next example: ``hht.py``).
 #
 # One-liner

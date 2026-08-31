@@ -51,9 +51,7 @@ def _phi(y: np.ndarray, m: int, radius: float, tau: int) -> float:
     """Mean log of the fraction of Chebyshev matches, including self-matches."""
     templates = embed(y, m, tau)
     n_vec = templates.shape[0]
-    delta = np.max(
-        np.abs(templates[:, None, :] - templates[None, :, :]), axis=2
-    )
+    delta = np.max(np.abs(templates[:, None, :] - templates[None, :, :]), axis=2)
     counts = np.sum(delta <= radius, axis=1)
     frac = counts / n_vec
     frac = np.maximum(frac, np.finfo(float).tiny)

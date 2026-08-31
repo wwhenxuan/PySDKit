@@ -33,7 +33,7 @@ The estimated fundamental is then fed to CYCBD as
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **CYCBD**
      - **ACYCBD** (this notebook)
    * - Cyclic frequency

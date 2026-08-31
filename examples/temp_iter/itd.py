@@ -23,7 +23,7 @@ stop tests.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD**
      - **ITD** (this notebook)
    * - Local mean
@@ -184,6 +184,7 @@ plt.show()
 # the analytic-signal amplitude and a smoothed instantaneous frequency for
 # the first few PRCs.
 
+
 def inst_freq(mode: np.ndarray, fs: float) -> tuple[np.ndarray, np.ndarray]:
     z = hilbert(mode)
     amp = np.abs(z)
@@ -193,6 +194,7 @@ def inst_freq(mode: np.ndarray, fs: float) -> tuple[np.ndarray, np.ndarray]:
     kernel = np.ones(5) / 5.0
     freq_s = np.convolve(freq, kernel, mode="same")
     return amp, freq_s
+
 
 fs = 1.0 / (t[1] - t[0])
 n_show = min(4, prcs.shape[0] - 1)

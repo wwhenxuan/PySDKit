@@ -24,9 +24,9 @@ with the underdamped resonance kernel (paper Eq. 2)
 
 .. epigraph::
 
-    Y. Miao, B. Zhang, C. Li, J. Lin, D. Zhang.  
-    *Feature Mode Decomposition: New Decomposition Theory for Rotating Machinery Fault Diagnosis.*  
-    IEEE Transactions on Industrial Electronics, 70(2):1949–1962, 2023.  
+    Y. Miao, B. Zhang, C. Li, J. Lin, D. Zhang.
+    *Feature Mode Decomposition: New Decomposition Theory for Rotating Machinery Fault Diagnosis.*
+    IEEE Transactions on Industrial Electronics, 70(2):1949–1962, 2023.
     DOI: `10.1109/TIE.2022.3156156 <https://doi.org/10.1109/TIE.2022.3156156>`_
 
 MATLAB demo (File Exchange): ``FMD.m`` + ``x.mat``. This notebook uses

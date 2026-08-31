@@ -10,9 +10,9 @@ APMD is designed for **polymorphic** multi-component signals—mixtures that may
 
 .. epigraph::
 
-    Z. Huang, J. Liu.  
-    *Adaptive Polymorphic Mode Decomposition.*  
-    Digital Signal Processing, 161:104913, 2025.  
+    Z. Huang, J. Liu.
+    *Adaptive Polymorphic Mode Decomposition.*
+    Digital Signal Processing, 161:104913, 2025.
     `DOI: 10.1016/j.dsp.2024.104913 <https://doi.org/10.1016/j.dsp.2024.104913>`_
 
 Huang Z. and Liu J., Digital Signal Processing, 161:104913, 2025.
@@ -126,8 +126,9 @@ print(APMD())
 # 4. Build a demo signal
 # ----------------------
 #
-# We use a shortened mixture inspired by the paper demos: one amplitude-modulated tone and one nonlinear chirp, plus light noise.  
+# We use a shortened mixture inspired by the paper demos: one amplitude-modulated tone and one nonlinear chirp, plus light noise.
 # (Full MATLAB demos use :math:`f_s=5000` Hz and are much heavier; this notebook keeps :math:`N` modest so it runs quickly.)
+
 
 def make_demo_signal(fs: float = 500.0, T: float = 0.5, seed: int = 0):
     rng = np.random.default_rng(seed)
@@ -136,6 +137,7 @@ def make_demo_signal(fs: float = 500.0, T: float = 0.5, seed: int = 0):
     x2 = np.cos(2 * np.pi * (95.0 * t + 35.0 * t**2))
     signal = x1 + x2 + 0.03 * rng.standard_normal(t.size)
     return t, signal, x1, x2
+
 
 fs = 500.0
 t, signal, x1, x2 = make_demo_signal(fs=fs)
@@ -190,8 +192,10 @@ print(f"reconstruction RE (with residual): {recon_re:.3e}")
 
 cands = modes[:-1] if modes.shape[0] > 1 else modes
 
+
 def best_re(ref):
     return min(np.linalg.norm(c - ref) / np.linalg.norm(ref) for c in cands)
+
 
 print(f"best RE vs true AM mode:   {best_re(x1):.4f}")
 print(f"best RE vs true chirp mode:{best_re(x2):.4f}")

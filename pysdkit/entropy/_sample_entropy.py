@@ -152,9 +152,7 @@ def multiscale_sample_entropy(
     return e, A, B
 
 
-def _sample_entropy_counts(
-    y: np.ndarray, m: int, r: float
-) -> Tuple[int, int]:
+def _sample_entropy_counts(y: np.ndarray, m: int, r: float) -> Tuple[int, int]:
     """Pair counts (A: m+1, B: m) with Chebyshev radius ``r * std(y)``."""
     y = as_1d(y)
     n = len(y)

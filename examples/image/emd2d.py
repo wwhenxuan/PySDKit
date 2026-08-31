@@ -17,7 +17,7 @@ Both operate on **images**, but they solve different problems.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD2D** (this notebook)
      - **BMEMD**
    * - Input

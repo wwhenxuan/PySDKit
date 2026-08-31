@@ -6,9 +6,9 @@ This notebook walks through the theory and numerical examples from:
 
 .. epigraph::
 
-    Chen S., Wang K., Peng Z., Chang C., Zhai W.  
-    *Generalized dispersive mode decomposition: Algorithm and applications.*  
-    Journal of Sound and Vibration, 492:115800, 2021.  
+    Chen S., Wang K., Peng Z., Chang C., Zhai W.
+    *Generalized dispersive mode decomposition: Algorithm and applications.*
+    Journal of Sound and Vibration, 492:115800, 2021.
     https://doi.org/10.1016/j.jsv.2020.115800
 
 **Dispersive signals** (guided / Lamb waves, underwater acoustics, biomedical echoes, …)
@@ -112,7 +112,7 @@ print(GDMD())
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - Chirp model (time)
 #      - GDM (frequency)
 #    * - Carrier feature
@@ -265,11 +265,11 @@ print(GDMD())
 #
 # The paper and MATLAB demos use two initialisation patterns (both in PySDKit):
 #
-# #. **Joint multi-mode** (numerical Example 1)  
+# #. **Joint multi-mode** (numerical Example 1)
 #    Provide :math:`M` initial GD curves from TF ridges (SFFT + ridge tracking / RPRG),
 #    optionally smooth them, then run the joint solver once.
 #
-# #. **Successive extraction** (impulse / wheel-fault style)  
+# #. **Successive extraction** (impulse / wheel-fault style)
 #    For nearly **constant** GDs: take the envelope peak of the residual as a
 #    constant initial GD, extract one mode, subtract in the frequency domain,
 #    repeat.  In code: set ```K```` and omit ````init_gd```.
@@ -450,6 +450,7 @@ plt.show()
 fs2 = 2000.0
 t2 = np.arange(0.0, 0.25, 1.0 / fs2)
 
+
 def impulse_atom(t0, f0, decay, amp=1.0):
     return (
         amp
@@ -457,6 +458,7 @@ def impulse_atom(t0, f0, decay, amp=1.0):
         * np.sin(2 * np.pi * f0 * (t2 - t0))
         * (t2 >= t0)
     )
+
 
 m1 = impulse_atom(0.04, 180.0, 55.0, amp=1.0)
 m2 = impulse_atom(0.11, 260.0, 70.0, amp=0.85)

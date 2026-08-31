@@ -6,12 +6,12 @@ This notebook reproduces the theory and MATLAB demos of
 
 .. epigraph::
 
-    Zosso D., Dragomiretskiy K., Bertozzi A.L., Weiss P.S.  
-    *Two-Dimensional Compact Variational Mode Decomposition.*  
-    Journal of Mathematical Imaging and Vision, 58(2):294–320, 2017.  
+    Zosso D., Dragomiretskiy K., Bertozzi A.L., Weiss P.S.
+    *Two-Dimensional Compact Variational Mode Decomposition.*
+    Journal of Mathematical Imaging and Vision, 58(2):294–320, 2017.
     https://doi.org/10.1007/s10851-017-0710-z
 
-MATLAB reference: ``VMD_2D_TV.m`` / ``VMD_2D_TV_test.m``  
+MATLAB reference: ``VMD_2D_TV.m`` / ``VMD_2D_TV_test.m``
 (File Exchange: *Two-Dimensional Compact Variational Mode Decomposition*).
 
 **Idea.** Classical 2D-VMD recovers **spectrally narrow** modes, but sharp spatial
@@ -138,6 +138,7 @@ print(CVMD2D())
 # 3. Helper visualisation
 # -----------------------
 
+
 def show_modes(signal, u, A=None, omega=None, title="CVMD2D"):
     """Plot input, modes u_k (and A_k u_k), spectra, and centre frequencies."""
     K = u.shape[2]
@@ -180,6 +181,7 @@ def show_modes(signal, u, A=None, omega=None, title="CVMD2D"):
     fig.tight_layout()
     plt.show()
 
+
 def show_supports(A, title="supports $A_k$"):
     K = A.shape[2]
     fig, axes = plt.subplots(1, K, figsize=(2.4 * K, 2.6))
@@ -193,11 +195,12 @@ def show_supports(A, title="supports $A_k$"):
     fig.tight_layout()
     plt.show()
 
+
 # %%
 # 4. MATLAB case 1 — Jerome’s texture (``examples/texture.mat``)
 # --------------------------------------------------------------
 #
-# Parameters copied from ``VMD_2D_TV_test.m`` **case 1**.  
+# Parameters copied from ``VMD_2D_TV_test.m`` **case 1**.
 # The official MATLAB ``texture.mat`` is stored in this folder as ``examples/texture.mat``
 # (field ``f``). PySDKit’s ``test_grayscale()`` is the same texture and is used as a fallback.
 #
@@ -251,6 +254,7 @@ show_supports(A, title="spatial supports after TV phase")
 # carrying a pair of oriented cosines (shared support, two spectral submodes).
 # Here ``A_phase=[100,150]`` so the run ends in the **segmentation** (winner-takes-all) phase.
 
+
 def matlab_case4(H=128):
     """Port of VMD_2D_TV_test.m case 4 (downscaled by default)."""
     f1 = 40.0 * (H / 256.0)  # keep similar cycles across the domain
@@ -270,6 +274,7 @@ def matlab_case4(H=128):
     ) * M2
     f = v1 + v2
     return f - f.mean()
+
 
 crystal = matlab_case4(H=128 if FAST else 256)
 
@@ -320,6 +325,7 @@ plt.show()
 # ``A_phase=[100, Inf]`` the algorithm stops in the **TV** phase (supports may overlap),
 # which is the right model when regions are not a hard partition.
 
+
 def matlab_case8(H=128):
     X, Y = np.meshgrid(np.arange(1, H + 1) / H, np.arange(1, H + 1) / H)
     # scale chirp rates roughly with resolution
@@ -335,6 +341,7 @@ def matlab_case8(H=128):
     M3[:, H // 4 : 3 * H // 4] = 1.0
     f = F1 * M1 + F2 * M2 + F3 * M3
     return f - f.mean()
+
 
 chirps = matlab_case8(H=128 if FAST else 256)
 

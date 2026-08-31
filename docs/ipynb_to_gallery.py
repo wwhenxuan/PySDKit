@@ -200,7 +200,9 @@ def _convert_table(lines: list[str]) -> str:
 def _convert_blockquote(lines: list[str]) -> str:
     body = [re.sub(r"^\s*>\s?", "", line) for line in lines]
     converted = _convert_inline("\n".join(body)).strip()
-    indented = ["    " + line if line.strip() else "" for line in converted.splitlines()]
+    indented = [
+        "    " + line if line.strip() else "" for line in converted.splitlines()
+    ]
     return "\n\n.. epigraph::\n\n" + "\n".join(indented) + "\n"
 
 
@@ -256,12 +258,18 @@ def md_to_rst(md: str) -> str:
             out.append("")
             continue
 
-        if stripped.startswith("|") and i + 1 < n and (
-            TABLE_SEP_RE.match(lines[i + 1]) or lines[i + 1].strip().startswith("|")
+        if (
+            stripped.startswith("|")
+            and i + 1 < n
+            and (
+                TABLE_SEP_RE.match(lines[i + 1]) or lines[i + 1].strip().startswith("|")
+            )
         ):
             table_lines = [line]
             i += 1
-            while i < n and (lines[i].strip().startswith("|") or TABLE_SEP_RE.match(lines[i])):
+            while i < n and (
+                lines[i].strip().startswith("|") or TABLE_SEP_RE.match(lines[i])
+            ):
                 table_lines.append(lines[i])
                 i += 1
             out.append(_convert_table(table_lines))
@@ -312,7 +320,9 @@ def md_to_rst(md: str) -> str:
 
     text = "\n".join(out)
     for idx, body in enumerate(display_blocks):
-        text = text.replace(f"@@DISPLAYMATH{idx}@@", _rst_display_math(body).strip("\n"))
+        text = text.replace(
+            f"@@DISPLAYMATH{idx}@@", _rst_display_math(body).strip("\n")
+        )
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip() + "\n"
 
@@ -336,11 +346,19 @@ def strip_boilerplate(code: str) -> str:
     code = BOILERPLATE_RE.sub("", code)
     code = PYSDKIT_PATH_PRINT_RE.sub("", code)
     leftover = code
-    if "sys." not in leftover and not re.search(r"\bsys\b", leftover.replace("import sys", "")):
-        leftover = re.sub(r"^import sys\s*\n", "", leftover, count=1, flags=re.MULTILINE)
-    uses_path = bool(re.search(r"\bPath\b", leftover.replace("from pathlib import Path", "")))
+    if "sys." not in leftover and not re.search(
+        r"\bsys\b", leftover.replace("import sys", "")
+    ):
+        leftover = re.sub(
+            r"^import sys\s*\n", "", leftover, count=1, flags=re.MULTILINE
+        )
+    uses_path = bool(
+        re.search(r"\bPath\b", leftover.replace("from pathlib import Path", ""))
+    )
     if not uses_path:
-        leftover = re.sub(r"^from pathlib import Path\s*\n", "", leftover, count=1, flags=re.MULTILINE)
+        leftover = re.sub(
+            r"^from pathlib import Path\s*\n", "", leftover, count=1, flags=re.MULTILINE
+        )
     leftover = re.sub(r"\n{3,}", "\n\n", leftover)
     return leftover.strip() + ("\n" if leftover.strip() else "")
 
@@ -403,7 +421,9 @@ def convert_notebook(ipynb_path: Path) -> str:
 
 def write_gallery_header(path: Path, title: str, body: str) -> None:
     underline = "=" * len(title)
-    path.write_text(f"{title}\n{underline}\n\n{body.rstrip()}\n", encoding="utf-8", newline="\n")
+    path.write_text(
+        f"{title}\n{underline}\n\n{body.rstrip()}\n", encoding="utf-8", newline="\n"
+    )
 
 
 def convert_all(*, delete_ipynb: bool = True) -> list[Path]:

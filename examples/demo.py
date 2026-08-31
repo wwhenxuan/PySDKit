@@ -199,6 +199,7 @@ plt.show()
 #
 # Dragomiretskiy & Zosso extend VMD to 2D: each mode is compact around an unknown center frequency :math:`\boldsymbol{\omega}_k\in\mathbb{R}^2`, which suits textures and directional oscillations. Below we use ``test_grayscale()`` (paper-style synthetic texture) and ``test_univariate_image`` for a quick demo; full experiments live in ``examples/image/vmd2d.py``.
 
+
 def show_image_modes(img, modes, title=""):
     """modes: (H, W, K)"""
     K = modes.shape[2]
@@ -215,6 +216,7 @@ def show_image_modes(img, modes, title=""):
         fig.suptitle(title, y=1.05)
     plt.tight_layout()
     plt.show()
+
 
 img = test_grayscale()
 print("grayscale texture shape:", img.shape)

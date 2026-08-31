@@ -17,9 +17,9 @@ This notebook reproduces the MATLAB demo ``Example2.m`` with ``pysdkit.BA_ACMD``
 
 .. epigraph::
 
-    S. Chen, L. Guo, J. Fan, C. Yi, K. Wang, W. Zhai.  
-    *Bandwidth-aware adaptive chirp mode decomposition for railway bearing fault diagnosis.*  
-    Structural Health Monitoring, 23(2):876–902, 2024.  
+    S. Chen, L. Guo, J. Fan, C. Yi, K. Wang, W. Zhai.
+    *Bandwidth-aware adaptive chirp mode decomposition for railway bearing fault diagnosis.*
+    Structural Health Monitoring, 23(2):876–902, 2024.
     DOI: `10.1177/14759217231174699 <https://doi.org/10.1177/14759217231174699>`_
 
 MATLAB code: `File Exchange 132792 <https://www.mathworks.com/matlabcentral/fileexchange/132792>`_.

@@ -17,8 +17,8 @@ gives STL more flexibility than moving-average classical decomposition.
 
 .. epigraph::
 
-    R. B. Cleveland, W. S. Cleveland, J. E. McRae, I. Terpenning.  
-    *STL: A Seasonal-Trend Decomposition Procedure Based on Loess.*  
+    R. B. Cleveland, W. S. Cleveland, J. E. McRae, I. Terpenning.
+    *STL: A Seasonal-Trend Decomposition Procedure Based on Loess.*
     Journal of Official Statistics, 6:3–73, 1990.
 
 The implementation used below is the pure-NumPy / SciPy version shipped with
@@ -127,6 +127,7 @@ print(
     np.max(np.abs(res.observed - (res.seasonal + res.trend + res.resid))),
 )
 
+
 def plot_stl(result, title="STL decomposition"):
     comps = [
         ("observed", result.observed),
@@ -147,6 +148,7 @@ def plot_stl(result, title="STL decomposition"):
     axes[-1].set_xlabel("t")
     plt.tight_layout()
     return fig
+
 
 plot_stl(res)
 plt.show()

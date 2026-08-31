@@ -6,9 +6,9 @@ This notebook follows:
 
 .. epigraph::
 
-    Wang H., Chen S., Zhai W.  
-    *Variational generalized nonlinear mode decomposition: Algorithm and applications.*  
-    Mechanical Systems and Signal Processing, 206:110913, 2024.  
+    Wang H., Chen S., Zhai W.
+    *Variational generalized nonlinear mode decomposition: Algorithm and applications.*
+    Mechanical Systems and Signal Processing, 206:110913, 2024.
     https://doi.org/10.1016/j.ymssp.2023.110913
 
 and the accompanying MATLAB toolbox (``VGNMD.m``, ``ATFFC.m``, ``MTDC.m``, ``VOA.m``).
@@ -16,8 +16,8 @@ and the accompanying MATLAB toolbox (``VGNMD.m``, ``ATFFC.m``, ``MTDC.m``, ``VOA
 Motivation
 ----------
 
-ACMD recovers **chirp** modes (time-varying instantaneous frequency, IF).  
-GDMD recovers **dispersive** modes (frequency-varying group delay, GD).  
+ACMD recovers **chirp** modes (time-varying instantaneous frequency, IF).
+GDMD recovers **dispersive** modes (frequency-varying group delay, GD).
 Neither alone can separate a **mixture** of both — a *generalized nonlinear signal* (GNS).
 
 **VGNMD** does three things:
@@ -287,7 +287,7 @@ plt.show()
 # 5.3 Estimated IF / GD overlays
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# For chirp modes, ``features[k]`` stores the refined IF on the time axis.  
+# For chirp modes, ``features[k]`` stores the refined IF on the time axis.
 # For dispersive modes, it stores the refined GD on the frequency axis of the STFT.
 
 fig, ax = plt.subplots(figsize=(8, 5))

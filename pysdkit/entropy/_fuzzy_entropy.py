@@ -53,9 +53,7 @@ def fuzzy_entropy(
     return float(np.log(phi_m) - np.log(phi_m1))
 
 
-def _fuzzy_phi(
-    y: np.ndarray, m: int, width: float, n: float, tau: int
-) -> float:
+def _fuzzy_phi(y: np.ndarray, m: int, width: float, n: float, tau: int) -> float:
     templates = embed(y, m, tau)
     templates = templates - templates.mean(axis=1, keepdims=True)
     n_vec = templates.shape[0]

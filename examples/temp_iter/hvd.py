@@ -14,8 +14,8 @@ only the Hilbert transform / analytic signal — no spline envelopes as in EMD.
 
 .. epigraph::
 
-    M. Feldman.  
-    *Time-varying vibration decomposition and analysis based on the Hilbert transform.*  
+    M. Feldman.
+    *Time-varying vibration decomposition and analysis based on the Hilbert transform.*
     Journal of Sound and Vibration, 295(3–5):518–530, 2006.
 
 This notebook uses ``pysdkit.HVD`` and reproduces the spirit of the paper’s

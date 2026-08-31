@@ -10,7 +10,7 @@ Hilbert–Huang Transform (HHT)
 
 The **Hilbert–Huang Transform** combines:
 
-#. **EMD** — decompose a nonlinear / non-stationary signal into IMFs;  
+#. **EMD** — decompose a nonlinear / non-stationary signal into IMFs;
 #. **Hilbert spectral analysis** — compute instantaneous amplitude and frequency of each IMF, then form the time–frequency **Hilbert spectrum** :math:`H(t,f)`.
 
 This notebook provides detailed examples and visualizations with PySDKit’s ``HHT`` class.
@@ -18,14 +18,14 @@ This notebook provides detailed examples and visualizations with PySDKit’s ``H
 Contents
 --------
 
-#. From EMD to HHT  
-#. Hilbert transform and the analytic signal  
-#. Instantaneous amplitude and frequency  
-#. Why IMFs are required before Hilbert analysis  
-#. Experiment 1: AM–FM chirp mixture (``test_hht``)  
-#. Experiment 2: Hilbert spectrum visualization  
-#. Experiment 3: Nonlinear Duffing-type oscillator  
-#. Experiment 4: Comparison with a spectrogram  
+#. From EMD to HHT
+#. Hilbert transform and the analytic signal
+#. Instantaneous amplitude and frequency
+#. Why IMFs are required before Hilbert analysis
+#. Experiment 1: AM–FM chirp mixture (``test_hht``)
+#. Experiment 2: Hilbert spectrum visualization
+#. Experiment 3: Nonlinear Duffing-type oscillator
+#. Experiment 4: Comparison with a spectrogram
 #. Summary
 """
 
@@ -91,10 +91,12 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float)
     est = np.asarray(est, dtype=float)
     return np.linalg.norm(est - ref) / (np.linalg.norm(ref) + 1e-16)
+
 
 # Simple tone: visualize analytic signal
 fs0 = 500.0
@@ -333,10 +335,10 @@ plt.show()
 # 9. Summary
 # ----------
 #
-# #. **HHT = EMD + Hilbert analysis**: EMD supplies mono-component IMFs; Hilbert analysis extracts :math:`a_n(t)` and :math:`f_n(t)`.  
-# #. **Analytic signal**: :math:`z=x+j\mathcal{H}\{x\}=a e^{j\theta}` enables instantaneous features.  
-# #. **Hilbert spectrum** :math:`H(t,f)` accumulates IMF energy on the time–frequency plane.  
-# #. **Use cases**: chirps, nonlinear oscillators (Duffing), biomedical non-stationary recordings.  
+# #. **HHT = EMD + Hilbert analysis**: EMD supplies mono-component IMFs; Hilbert analysis extracts :math:`a_n(t)` and :math:`f_n(t)`.
+# #. **Analytic signal**: :math:`z=x+j\mathcal{H}\{x\}=a e^{j\theta}` enables instantaneous features.
+# #. **Hilbert spectrum** :math:`H(t,f)` accumulates IMF energy on the time–frequency plane.
+# #. **Use cases**: chirps, nonlinear oscillators (Duffing), biomedical non-stationary recordings.
 # #. **Practice with PySDKit**:
 #   * ``HHT(algorithm='EMD', max_imfs=...)``
 #   * ``fit_transform(..., fs=fs, return_all=True)`` → ``(imfs, envelopes, freqs)``

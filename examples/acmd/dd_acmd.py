@@ -10,9 +10,9 @@ come from **derivative normalization (IF-DN)** plus iterative **time-varying low
 
 .. epigraph::
 
-    H. Wang, S. Chen, W. Zhai.  
-    *Data-driven adaptive chirp mode decomposition with application to machine fault diagnosis under non-stationary conditions.*  
-    Mechanical Systems and Signal Processing, 2023.  
+    H. Wang, S. Chen, W. Zhai.
+    *Data-driven adaptive chirp mode decomposition with application to machine fault diagnosis under non-stationary conditions.*
+    Mechanical Systems and Signal Processing, 2023.
     DOI / MSSP: `S0888327022010652 <https://www.sciencedirect.com/science/article/abs/pii/S0888327022010652>`_
 
 MATLAB code: `File Exchange 121373 <https://www.mathworks.com/matlabcentral/fileexchange/121373>`_.
@@ -25,7 +25,7 @@ MATLAB code: `File Exchange 121373 <https://www.mathworks.com/matlabcentral/file
 # .. list-table::
 #    :header-rows: 1
 #
-#    * -  
+#    * -
 #      - **ACMD**
 #      - **DD-ACMD**
 #    * - Role
@@ -314,6 +314,7 @@ dd3 = DD_ACMD(
 imfs3, ini3, eif3, eia3 = dd3.fit_transform(sig3, return_all=True)
 print(f"Extracted K = {imfs3.shape[0]} modes")
 
+
 # Match each true chirp to the nearest estimated IF (skip near-zero trend if present)
 def _match_mode(true_if, eifs):
     errs = [
@@ -321,6 +322,7 @@ def _match_mode(true_if, eifs):
         for i in range(eifs.shape[0])
     ]
     return int(np.argmin(errs))
+
 
 fig, ax = plt.subplots(figsize=(8, 4))
 colors = ["C0", "C1", "C2"]

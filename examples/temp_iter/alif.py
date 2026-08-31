@@ -8,9 +8,9 @@ This notebook introduces the main ideas behind **Adaptive Local Iterative Filter
 
 .. epigraph::
 
-    A. Cicone, J. Liu, H. Zhou.  
-    *Adaptive Local Iterative Filtering for Signal Decomposition and Instantaneous Frequency analysis.*  
-    Applied and Computational Harmonic Analysis, 41(2):384–411, 2016.  
+    A. Cicone, J. Liu, H. Zhou.
+    *Adaptive Local Iterative Filtering for Signal Decomposition and Instantaneous Frequency analysis.*
+    Applied and Computational Harmonic Analysis, 41(2):384–411, 2016.
     `arXiv:1411.6051 <https://arxiv.org/abs/1411.6051>`_
 
 The implementation follows the authors' open MATLAB code: `Cicone/ALIF <https://github.com/Cicone/ALIF>`_.
@@ -24,7 +24,7 @@ The implementation follows the authors' open MATLAB code: `Cicone/ALIF <https://
 #
 # A powerful strategy is to first decompose a signal into simpler components—**Intrinsic Mode Functions (IMFs)**—and then analyze each component separately. Empirical Mode Decomposition (EMD; Huang et al., 1998) is the classical iterative approach, but it uses cubic-spline envelopes and can be sensitive to perturbations.
 #
-# **Iterative Filtering (IF)** keeps the same sifting framework as EMD, but replaces envelope averaging by convolution with a low-pass filter, which improves stability.  
+# **Iterative Filtering (IF)** keeps the same sifting framework as EMD, but replaces envelope averaging by convolution with a low-pass filter, which improves stability.
 # **ALIF** extends IF with two key ingredients:
 #
 # #. **Smooth compactly supported filters** (e.g., Fokker–Planck / FP filters)
@@ -66,7 +66,7 @@ The implementation follows the authors' open MATLAB code: `Cicone/ALIF <https://
 # 2.2 Two nested loops
 # ~~~~~~~~~~~~~~~~~~~~
 #
-# * **Inner loop**: with a fixed (or locally prescribed) filter length, iterate :math:`f\leftarrow f-L(f)` to extract one IMF.  
+# * **Inner loop**: with a fixed (or locally prescribed) filter length, iterate :math:`f\leftarrow f-L(f)` to extract one IMF.
 # * **Outer loop**: subtract the IMF from the residual and continue until the residual is essentially a trend.
 #
 # In classical IF, a common global mask-length estimate is (paper Eq. (5))
@@ -101,8 +101,8 @@ The implementation follows the authors' open MATLAB code: `Cicone/ALIF <https://
 # 2.4 Filters (FP filters)
 # ~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# The paper stresses that the kernel should be **compactly supported, smooth, and vanishing smoothly at both ends**, to avoid artificial oscillations during iteration.  
-# Such filters are constructed from Fokker–Planck equations and satisfy the derived sufficient conditions for IF convergence.  
+# The paper stresses that the kernel should be **compactly supported, smooth, and vanishing smoothly at both ends**, to avoid artificial oscillations during iteration.
+# Such filters are constructed from Fokker–Planck equations and satisfy the derived sufficient conditions for IF convergence.
 # PySDKit ships the same ``prefixed_double_filter`` used by the MATLAB reference implementation.
 
 # %%
@@ -153,6 +153,7 @@ plt.rcParams["grid.alpha"] = 0.3
 #
 # The component :math:`y` oscillates faster and is typically extracted first as IMF:math:`_1`.
 
+
 def make_alif_demo_signal(n: int = 512, D: float = 16.0):
     """Two nonlinear chirps + DC"""
     T = 2.0 * np.pi
@@ -161,6 +162,7 @@ def make_alif_demo_signal(n: int = 512, D: float = 16.0):
     y = np.cos(-0.5 * D / T * t**2 - 20.0 * t)
     f = x + y + 1.0
     return t, f, x, y
+
 
 t, signal, true_slow, true_fast = make_alif_demo_signal(n=512)
 print(
@@ -284,13 +286,13 @@ else:
 # 8. Takeaways
 # ------------
 #
-# * **IF** replaces EMD envelope averaging by a convolutional moving average :math:`L(f)=f*w`, and iterates :math:`f\leftarrow f-L(f)` to obtain IMFs.  
-# * **ALIF** further lets the mask length :math:`l(x)` **adapt to the data**, which is better suited to signals with strongly varying instantaneous frequency.  
+# * **IF** replaces EMD envelope averaging by a convolutional moving average :math:`L(f)=f*w`, and iterates :math:`f\leftarrow f-L(f)` to obtain IMFs.
+# * **ALIF** further lets the mask length :math:`l(x)` **adapt to the data**, which is better suited to signals with strongly varying instantaneous frequency.
 # * In PySDKit, use ``from pysdkit import ALIF``. The filter file ``prefixed_double_filter.npy`` is installed with the package.
 #
 # Further reading
 # ~~~~~~~~~~~~~~~
 #
-# #. Cicone, Liu, Zhou, ACHA 2016 / arXiv:1411.6051  
-# #. Cicone, *Nonstationary signal decomposition for dummies*, arXiv:1710.04844  
+# #. Cicone, Liu, Zhou, ACHA 2016 / arXiv:1411.6051
+# #. Cicone, *Nonstationary signal decomposition for dummies*, arXiv:1710.04844
 # #. Cicone & Zhou, FFT-based IF implementations, arXiv:1802.01359

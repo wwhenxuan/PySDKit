@@ -10,9 +10,9 @@ OVMD keeps the VMD ADMM / Wiener-filter framework, but adds **weak orthogonality
 
 .. epigraph::
 
-    H. Marbona, D. Rodríguez, A. Martínez-Cava, E. Valero.  
-    *Orthogonalized Variational Mode Decomposition.*  
-    Signal Processing, 239:110251, 2026.  
+    H. Marbona, D. Rodríguez, A. Martínez-Cava, E. Valero.
+    *Orthogonalized Variational Mode Decomposition.*
+    Signal Processing, 239:110251, 2026.
     `DOI: 10.1016/j.sigpro.2025.110251 <https://doi.org/10.1016/j.sigpro.2025.110251>`_
 """
 
@@ -141,8 +141,9 @@ print(OVMD())
 # 4. Build a demo signal
 # ----------------------
 #
-# A shortened mixture inspired by the paper example: several stationary tones (and light noise).  
+# A shortened mixture inspired by the paper example: several stationary tones (and light noise).
 # We intentionally choose **:math:`K` larger than the true number of components** to illustrate OVMD's robustness to over-segmentation.
+
 
 def make_demo(fs: float = 100.0, T: float = 8.0, seed: int = 0):
     rng = np.random.default_rng(seed)
@@ -160,6 +161,7 @@ def make_demo(fs: float = 100.0, T: float = 8.0, seed: int = 0):
     if signal.size % 2:
         t, signal, comps = t[:-1], signal[:-1], comps[:, :-1]
     return t, signal, comps
+
 
 fs = 100.0
 t, signal, comps = make_demo(fs=fs)
@@ -205,10 +207,12 @@ re_o = np.linalg.norm(u_o.sum(0) - signal) / np.linalg.norm(signal)
 re_v = np.linalg.norm(u_v.sum(0) - signal) / np.linalg.norm(signal)
 print(f"reconstruction RE  OVMD={re_o:.4e}  VMD={re_v:.4e}")
 
+
 def max_offdiag_corr(u):
     uc = u - u.mean(axis=1, keepdims=True)
     c = np.corrcoef(uc)
     return float(np.max(np.abs(c - np.eye(c.shape[0]))))
+
 
 print(
     f"max |off-diag corr|  OVMD={max_offdiag_corr(u_o):.4f}  VMD={max_offdiag_corr(u_v):.4f}"
@@ -222,9 +226,11 @@ plot_IMFs(signal, u_o)
 plt.suptitle(f"OVMD modes (K={K}, over-segmentation setting)", fontsize=12)
 plt.show()
 
+
 def corr_matrix(u):
     uc = u - u.mean(axis=1, keepdims=True)
     return np.corrcoef(uc)
+
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 4))
 for ax, u, title in zip(

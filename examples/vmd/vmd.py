@@ -125,11 +125,13 @@ plt.rcParams.update(
     }
 )
 
+
 def relative_error(ref, est):
     ref = np.asarray(ref, dtype=float).ravel()
     est = np.asarray(est, dtype=float).ravel()
     n = min(ref.size, est.size)
     return np.linalg.norm(est[:n] - ref[:n]) / (np.linalg.norm(ref[:n]) + 1e-16)
+
 
 # Illustrate the narrow-band intuition with a simple AM–FM signal
 fs = 1000.0

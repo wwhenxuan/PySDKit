@@ -47,12 +47,13 @@ Cite **two things** when a result depends on this library.
    Replace ``X.Y.Z`` with the installed version.  If a software paper
    (for example JOSS) appears later, prefer that citation.
 
-People
-------
+Developers
+----------
 
 PySDKit is an open-source project started in April 2024.  Releases,
-review, and the documentation are handled by the maintainers; algorithms
-and fixes come from a wider set of contributors.
+review, and the documentation are handled by the maintainers; academic
+guidance is listed as project **Support**.  Algorithms and fixes come
+from a wider set of contributors.
 
 .. list-table::
    :header-rows: 1
@@ -66,7 +67,10 @@ and fixes come from a wider set of contributors.
      - wwhenxuan@gmail.com
    * - `RuiZhe Wang <https://github.com/changewam>`_
      - Maintainer
-     - 3133986068@qq.com
+     - changewam6@gmail.com
+   * - `Dan Wang <https://web.xidian.edu.cn/danwang/>`_
+     - Support
+     - danwang@xidian.edu.cn
 
 Package metadata also lists Rongkun Zhu, Kai Wu, Lei Wang, josefinez,
 Deeksha Manjunath, Yuan Feng, WenTong Zhao, and JacktheFowler.  The

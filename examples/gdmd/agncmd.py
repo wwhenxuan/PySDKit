@@ -4,8 +4,8 @@ Adaptive Generalized Dispersive Mode Decomposition (AGDMD / AGNCMD)
 
 .. epigraph::
 
-    Wang H., Chen S., Zhai W.  
-    *Adaptive generalized dispersive mode decomposition: A data-driven approach for nonlinear dispersive component extraction in mechanical systems.*  
+    Wang H., Chen S., Zhai W.
+    *Adaptive generalized dispersive mode decomposition: A data-driven approach for nonlinear dispersive component extraction in mechanical systems.*
     Journal of Sound and Vibration, 2025.
 
 Idea
@@ -110,11 +110,13 @@ for k in range(egd.shape[0]):
 # 3.1 Frequency-domain modes vs ground truth
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def match_by_gd(egd_row, true_gds):
     maes = [
         float(np.mean(np.abs(egd_row - true_gds[j]))) for j in range(true_gds.shape[0])
     ]
     return int(np.argmin(maes))
+
 
 fig, axes = plt.subplots(3, 1, figsize=(10, 6.5), sharex=True)
 for k, ax in enumerate(axes):

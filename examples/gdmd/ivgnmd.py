@@ -6,9 +6,9 @@ This notebook follows:
 
 .. epigraph::
 
-    Wang H., Chen S., Zhai W.  
-    *Improved variational generalized nonlinear mode decomposition for separating crossed chirp modes and dispersive modes of non-stationary signals in mechanical systems.*  
-    Mechanical Systems and Signal Processing, 2025.  
+    Wang H., Chen S., Zhai W.
+    *Improved variational generalized nonlinear mode decomposition for separating crossed chirp modes and dispersive modes of non-stationary signals in mechanical systems.*
+    Mechanical Systems and Signal Processing, 2025.
     https://www.sciencedirect.com/science/article/pii/S0888327025001086
 
 and the accompanying MATLAB toolbox (``IVGNMD.m``, ``SE.m``, ``TFSC.m``, ``TFST.m``, ``VOA.m``).
@@ -26,11 +26,11 @@ glue several modes into one blob, so VGNMD can mis-type or miss modes.
 **IVGNMD** keeps ATFFC + VOA, but replaces per-cluster ridge picking with a
 **TF-skeleton** pipeline that cuts crossings and tracks each ridge independently:
 
-#. **ATFFC** — enhanced binary TFD  
-#. **SE** — improved skeleton extraction (thin / spur / boundary extend)  
-#. **TFSC** — cut junctions → uncrossed skeleton  
-#. **TFST** — weighted directional tracking → :math:`K` independent paths  
-#. **MTDC** — chirp vs dispersive on each path  
+#. **ATFFC** — enhanced binary TFD
+#. **SE** — improved skeleton extraction (thin / spur / boundary extend)
+#. **TFSC** — cut junctions → uncrossed skeleton
+#. **TFST** — weighted directional tracking → :math:`K` independent paths
+#. **MTDC** — chirp vs dispersive on each path
 #. **VOA** — ACMD (chirp) or GDMD (dispersive)
 """
 

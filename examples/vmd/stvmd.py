@@ -145,8 +145,10 @@ t = np.arange(N) / fs
 rng = np.random.default_rng(7)
 seq = rng.permutation(np.arange(8))
 
+
 def omega_t(tt):
     return seq[np.floor(tt).astype(int) % 8] + 13.0
+
 
 x1 = np.sin(2 * np.pi * omega_t(t) * t)
 x2 = 0.5 * np.sin(2 * np.pi * (2 * omega_t(t)) * t)

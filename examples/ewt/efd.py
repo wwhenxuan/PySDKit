@@ -11,7 +11,7 @@ classical **EMD**.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - EMD
      - EWT
      - EFD

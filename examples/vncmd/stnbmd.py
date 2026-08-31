@@ -4,8 +4,8 @@ Short-Time Narrow-Banded Mode Decomposition (STNBMD)
 
 .. epigraph::
 
-    McNeill, S.I. (2016). *Decomposing a signal into short-time narrow-banded modes.*  
-    Journal of Sound and Vibration, 373:325–339.  
+    McNeill, S.I. (2016). *Decomposing a signal into short-time narrow-banded modes.*
+    Journal of Sound and Vibration, 373:325–339.
     https://doi.org/10.1016/j.jsv.2016.03.015
 
 STNBMD decomposes a **single-channel** real signal into a sum of **AM–FM analytic sinusoids** whose amplitude and instantaneous frequency vary **slowly** (short-time narrow-banded modes). The author presents it as a **time-domain extension of VMD** that can track **time-varying / crossing frequencies** (e.g. order tracking without a tachometer).

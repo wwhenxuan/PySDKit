@@ -17,7 +17,7 @@ several seasonal components, then returning a shared trend and residual.
 
 .. epigraph::
 
-    K. Bandara, R. J. Hyndman, C. Bergmeir.  
+    K. Bandara, R. J. Hyndman, C. Bergmeir.
     *MSTL: A Seasonal-Trend Decomposition Algorithm for Time Series with
     Multiple Seasonal Patterns.* arXiv:2107.13462, 2021.
 
@@ -121,6 +121,7 @@ print("trend shape:   ", res.trend.shape)
 recon = res.seasonal.sum(0) + res.trend + res.resid
 print("max |reconstruction error|:", np.max(np.abs(res.observed - recon)))
 
+
 def plot_mstl(result, title="MSTL decomposition"):
     rows = [("observed", result.observed), ("trend", result.trend)]
     seas = result.seasonals
@@ -140,6 +141,7 @@ def plot_mstl(result, title="MSTL decomposition"):
     axes[-1].set_xlabel("t")
     plt.tight_layout()
     return fig
+
 
 plot_mstl(res)
 plt.show()

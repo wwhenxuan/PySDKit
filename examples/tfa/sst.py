@@ -18,7 +18,7 @@ whose inverse SST are the modes.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **EMD**
      - **SST** (this notebook)
    * - Main product

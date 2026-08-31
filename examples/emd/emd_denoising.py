@@ -10,10 +10,10 @@ Denoising via Empirical Mode Decomposition (EMD)
 
 This notebook reproduces the paper’s **EMD denoising** idea with PySDKit:
 
-#. Decompose a noisy observation into IMFs + residue  
-#. Preprocess IMFs (soft/hard thresholding, Savitzky–Golay, median, averaging)  
-#. Reconstruct :math:`\tilde x=\sum_j \tilde f_j + r_N`  
-#. Evaluate on WaveLab-style test signals (**Doppler**, **Blocks**, **Bumps**, **Heavysine**) at SNR ≈ 2 dB  
+#. Decompose a noisy observation into IMFs + residue
+#. Preprocess IMFs (soft/hard thresholding, Savitzky–Golay, median, averaging)
+#. Reconstruct :math:`\tilde x=\sum_j \tilde f_j + r_N`
+#. Evaluate on WaveLab-style test signals (**Doppler**, **Blocks**, **Bumps**, **Heavysine**) at SNR ≈ 2 dB
 
 We implement both the paper’s formulas and a **practical early-IMF** variant (noise level estimated from IMF:math:`_1`), because applying a MAD-based universal threshold independently to *every* IMF tends to wipe out large-amplitude signal modes.
 """
@@ -67,13 +67,13 @@ We implement both the paper’s formulas and a **practical early-IMF** variant (
 #
 #    \mathrm{MAD}=\mathrm{Median}\big\{\lvert z-\mathrm{Median}\{z\}\rvert\big\}.
 #
-# **Soft** (Eq. 8): :math:`\mathrm{sign}(z)\max(\lvert z\rvert-\tau,0)`.  
+# **Soft** (Eq. 8): :math:`\mathrm{sign}(z)\max(\lvert z\rvert-\tau,0)`.
 # **Hard** (Eq. 9): keep :math:`z` if :math:`\lvert z\rvert>\tau`, else 0.
 #
 # **Noise-level estimation choices used in this notebook**
 #
-# #. ``per_imf`` — paper-literal: compute :math:`\tilde\sigma_j` from each IMF separately  
-# #. ``from_imf1`` — wavelet-style: estimate :math:`\tilde\sigma` once from IMF:math:`_1` (finest / noisiest scale) and apply that :math:`\tau` only to the first :math:`k` IMFs; leave coarser IMFs and the residue untouched  
+# #. ``per_imf`` — paper-literal: compute :math:`\tilde\sigma_j` from each IMF separately
+# #. ``from_imf1`` — wavelet-style: estimate :math:`\tilde\sigma` once from IMF:math:`_1` (finest / noisiest scale) and apply that :math:`\tau` only to the first :math:`k` IMFs; leave coarser IMFs and the residue untouched
 #
 # Option 2 is usually much closer to the qualitative behaviour reported in the paper.
 
@@ -96,11 +96,13 @@ plt.rcParams.update(
 
 RNG = np.random.default_rng(42)
 
+
 def snr_db(clean, estimate):
     clean = np.asarray(clean, dtype=float)
     estimate = np.asarray(estimate, dtype=float)
     err = clean - estimate
     return float(10 * np.log10(np.sum(clean**2) / (np.sum(err**2) + 1e-16)))
+
 
 def add_awgn(clean, target_snr_db, rng=None):
     rng = RNG if rng is None else rng
@@ -109,20 +111,25 @@ def add_awgn(clean, target_snr_db, rng=None):
     p_noise = p_sig / (10 ** (target_snr_db / 10.0))
     return clean + rng.normal(0.0, np.sqrt(p_noise), size=clean.shape)
 
+
 def mad_sigma(x):
     x = np.asarray(x, dtype=float)
     return float(np.median(np.abs(x - np.median(x))) / 0.6745)
 
+
 def universal_threshold(sigma, T):
     return float(sigma * np.sqrt(2.0 * np.log(T)))
 
+
 def soft_threshold(x, tau):
     return np.sign(x) * np.maximum(np.abs(x) - tau, 0.0)
+
 
 def hard_threshold(x, tau):
     y = np.array(x, copy=True, dtype=float)
     y[np.abs(y) <= tau] = 0.0
     return y
+
 
 def cmse_change_index(imfs, residue):
     # Blind index k minimizing consecutive MSE of partial reconstructions.
@@ -137,6 +144,7 @@ def cmse_change_index(imfs, residue):
     for k in range(n - 1):
         cmses.append(np.mean((partial[k] - partial[k + 1]) ** 2))
     return int(np.argmin(cmses))  # threshold / discard IMFs 0..k
+
 
 def emd_denoise(
     noisy,
@@ -211,16 +219,19 @@ def emd_denoise(
         "recon": recon,
     }
 
+
 # %%
 # 3. Classical test signals (WaveLab / Donoho–Johnstone)
 # ------------------------------------------------------
 #
 # Paper §4: Doppler, Blocks, Bumps, Heavysine with :math:`T=2048`.
 
+
 def make_doppler(n=2048):
     t = np.arange(n) / n
     x = np.sqrt(t * (1 - t)) * np.sin((2 * np.pi * 1.05) / (t + 0.05))
     return t, x
+
 
 def make_blocks(n=2048):
     t = np.arange(n) / n
@@ -230,6 +241,7 @@ def make_blocks(n=2048):
     for p, h in zip(pos, hgt):
         x += (h / 2.0) * (1 + np.sign(t - p))
     return t, x
+
 
 def make_bumps(n=2048):
     t = np.arange(n) / n
@@ -243,10 +255,12 @@ def make_bumps(n=2048):
         x += h / (1.0 + ((t - p) / w) ** 2)
     return t, x
 
+
 def make_heavisine(n=2048):
     t = np.arange(n) / n
     x = 4 * np.sin(4 * np.pi * t) - np.sign(t - 0.3) - np.sign(0.72 - t)
     return t, x
+
 
 SIGNALS = {
     "Doppler": make_doppler,
@@ -399,6 +413,7 @@ print(
 #
 # Cyan = clean reference, black = denoised estimate.
 
+
 def show_recon_grid(method_key, title):
     fig, axs = plt.subplots(2, 2, figsize=(10, 5.8), sharex=True)
     for ax, name in zip(axs.ravel(), SIGNALS):
@@ -412,6 +427,7 @@ def show_recon_grid(method_key, title):
     plt.suptitle(title, y=1.02)
     plt.tight_layout()
     plt.show()
+
 
 show_recon_grid("soft", "EMD-Soft reconstructions")
 show_recon_grid("sg", "EMD-SG reconstructions (L=3, w=7)")
@@ -459,6 +475,7 @@ plt.show()
 #
 # The original clinical ECG file is not bundled here; we use a synthetic multi-beat ECG-like waveform under the same SNR condition.
 
+
 def synthetic_ecg(n=2048, fs=256.0, bpm=72.0):
     t = np.arange(n) / fs
     hr = bpm / 60.0
@@ -471,6 +488,7 @@ def synthetic_ecg(n=2048, fs=256.0, bpm=72.0):
         x -= 0.15 * np.exp(-0.5 * ((t - (c - 0.02)) / 0.01) ** 2)
         x -= 0.25 * np.exp(-0.5 * ((t - (c + 0.02)) / 0.012) ** 2)
     return t, x
+
 
 t_e, x_e = synthetic_ecg()
 y_e = add_awgn(x_e, target_snr_db=-9.0, rng=np.random.default_rng(1))
@@ -504,15 +522,15 @@ plt.show()
 #
 # **Paper pipeline**
 #
-# #. EMD decompose noisy :math:`y`  
-# #. Preprocess IMFs with :math:`\Gamma` (threshold / SG / median / average)  
+# #. EMD decompose noisy :math:`y`
+# #. Preprocess IMFs with :math:`\Gamma` (threshold / SG / median / average)
 # #. Reconstruct :math:`\tilde x=\sum\tilde f_j+r`
 #
 # **Implementation tips**
 #
-# * Prefer estimating :math:`\tilde\sigma` from **IMF:math:`_1`** and processing only early IMFs (``from_imf1`` / ``cmse``)  
-# * Literal per-IMF MAD thresholds often over-shrink signal-dominated modes  
-# * EMD-SG is strong when local polynomial smoothing fits the IMF morphology  
+# * Prefer estimating :math:`\tilde\sigma` from **IMF:math:`_1`** and processing only early IMFs (``from_imf1`` / ``cmse``)
+# * Literal per-IMF MAD thresholds often over-shrink signal-dominated modes
+# * EMD-SG is strong when local polynomial smoothing fits the IMF morphology
 # * Absolute SNRs differ from Table I across EMD codes; relative ranking is the useful check
 #
 # Minimal pattern

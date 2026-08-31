@@ -31,7 +31,7 @@ corrects the STFT edge taper.
 .. list-table::
    :header-rows: 1
 
-   * -  
+   * -
      - **SCA**
      - **BSS** (this notebook)
    * - Feature
@@ -100,6 +100,7 @@ print(BSS())
 #    column-normalised (absolute values; signs from ``corr`` in the
 #    experiments).
 
+
 def plot_channels(data, fs, title, ylabel="Amplitude"):
     data = np.asarray(data)
     n_rows = data.shape[0]
@@ -114,6 +115,7 @@ def plot_channels(data, fs, title, ylabel="Amplitude"):
     axes[-1].set_xlabel("Time (s)")
     fig.tight_layout()
     return fig
+
 
 def plot_spectra(data, fs, title, f_max=None):
     data = np.asarray(data)
@@ -131,6 +133,7 @@ def plot_spectra(data, fs, title, f_max=None):
     axes[-1].set_xlabel("Frequency (Hz)")
     fig.tight_layout()
     return fig
+
 
 def plot_energy_scatter(engine, title="Frequency-energy scatter"):
     energy = engine.energy_
@@ -150,6 +153,7 @@ def plot_energy_scatter(engine, title="Frequency-energy scatter"):
     axes[1].set_title("Peak detection")
     fig.tight_layout()
     return fig
+
 
 # %%
 # 3. Example 1 — five sources, two delayed observations
@@ -171,8 +175,10 @@ fs = 100.0
 time = np.arange(0.0, 10.0, 1.0 / fs)
 tones = [np.sin(2 * np.pi * freq * time) for freq in (3, 6, 10, 15, 20)]
 
+
 def delay(samples, shift=4):
     return np.concatenate([samples[shift:], samples[:shift]])
+
 
 weights_1 = (1.0, 0.8, 0.5, 0.3, 0.7)
 weights_2 = (0.5, 0.8, 0.95, 1.1, 0.15)

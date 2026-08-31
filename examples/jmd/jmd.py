@@ -13,9 +13,9 @@ Both methods jointly extract:
 
 .. epigraph::
 
-    M. Nazari, A. R. Korshøj, N. ur Rehman.  
-    *Jump Plus AM-FM Mode Decomposition.*  
-    IEEE Transactions on Signal Processing (arXiv:2407.07800).  
+    M. Nazari, A. R. Korshøj, N. ur Rehman.
+    *Jump Plus AM-FM Mode Decomposition.*
+    IEEE Transactions on Signal Processing (arXiv:2407.07800).
     `https://doi.org/10.48550/arXiv.2407.07800 <https://doi.org/10.48550/arXiv.2407.07800>`_
 """
 
@@ -77,6 +77,7 @@ print(MJMD(K=2))
 #
 # Two tones + a step jump + light noise (shortened form of the MATLAB ``JMD_test.m`` idea).
 
+
 def make_jmd_demo(n: int = 512, seed: int = 0):
     rng = np.random.default_rng(seed)
     t = np.arange(n, dtype=float) / n
@@ -87,6 +88,7 @@ def make_jmd_demo(n: int = 512, seed: int = 0):
     jump[2 * n // 3 :] -= 1.5
     signal = s1 + s2 + jump + 0.05 * rng.standard_normal(n)
     return t, signal, s1, s2, jump
+
 
 t, signal, s1, s2, jump_true = make_jmd_demo()
 fig = plot_signal(t, signal)
@@ -124,6 +126,7 @@ plt.show()
 #
 # Three channels sharing oscillatory frequencies, plus a common-time jump pattern (inspired by ``MJMD_test.m``).
 
+
 def make_mjmd_demo(n: int = 256, seed: int = 0):
     rng = np.random.default_rng(seed)
     t = np.arange(n, dtype=float) / n
@@ -138,6 +141,7 @@ def make_mjmd_demo(n: int = 256, seed: int = 0):
     jump[:, n // 2 :] += 1.5
     signal = x + jump + 0.05 * rng.standard_normal(x.shape)
     return t, signal, x, jump
+
 
 t_m, Sig, X_true, jump_m = make_mjmd_demo()
 C = Sig.shape[0]
