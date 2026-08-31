@@ -99,6 +99,18 @@ def mape(y_true, y_pred, eps=1e-8):
     return float(np.mean(np.abs((y_true - y_pred) / denom)) * 100.0)
 
 
+def join_forecast(t_hist, y_hist, t_fc, y_fc):
+    """Prepend the last history sample so the forecast line meets the train tail."""
+    t_hist = np.asarray(t_hist, dtype=float).ravel()
+    y_hist = np.asarray(y_hist, dtype=float).ravel()
+    t_fc = np.asarray(t_fc, dtype=float).ravel()
+    y_fc = np.asarray(y_fc, dtype=float).ravel()
+    return (
+        np.concatenate([t_hist[-1:], t_fc]),
+        np.concatenate([y_hist[-1:], y_fc]),
+    )
+
+
 def make_lagged(y, lags):
     y = np.asarray(y, dtype=float)
     X, t = [], []
@@ -238,7 +250,8 @@ print(f"Train length={len(train)}, test horizon H={HORIZON}, lags={LAGS}")
 
 fig, ax = plt.subplots(figsize=(10, 3.0))
 ax.plot(t_train, train, "k", lw=1.0, label="train")
-ax.plot(t_test, test, "C3", lw=1.2, label="test (to forecast)")
+t_te, y_te = join_forecast(t_train, train, t_test, test)
+ax.plot(t_te, y_te, "C3", lw=1.2, label="test (to forecast)")
 ax.axvline(t_train[-1], color="0.5", ls="--", lw=0.9)
 ax.legend(fontsize=9)
 ax.set_title("Train / test split")
@@ -303,14 +316,18 @@ for i in range(n_comp):
     axs[i].plot(
         t_train[-80:], comps_train[i][-80:], color="0.4", lw=1.0, label="train (tail)"
     )
-    axs[i].plot(
-        t_test, result_ar.component_forecasts[i], "C3", lw=1.2, label="forecast"
+    t_fc, y_fc = join_forecast(
+        t_train, comps_train[i], t_test, result_ar.component_forecasts[i]
     )
+    axs[i].plot(t_fc, y_fc, "C3", lw=1.2, label="forecast")
     axs[i].axvline(t_train[-1], color="0.5", ls="--", lw=0.8)
     axs[i].set_ylabel(labels[i])
     axs[i].legend(fontsize=7, loc="upper right")
+axs[-1].plot(t_train[-80:], train[-80:], color="0.4", lw=1.0, label="train (tail)")
 axs[-1].plot(t_test, test, "k", lw=1.2, label="true test")
-axs[-1].plot(t_test, result_ar.yhat, "C3", lw=1.3, label="EMD-AR aggregate")
+t_fc, y_fc = join_forecast(t_train, train, t_test, result_ar.yhat)
+axs[-1].plot(t_fc, y_fc, "C3", lw=1.3, label="EMD-AR aggregate")
+axs[-1].axvline(t_train[-1], color="0.5", ls="--", lw=0.8)
 axs[-1].legend(fontsize=8)
 axs[-1].set_ylabel("x")
 axs[-1].set_xlabel("Time index")
