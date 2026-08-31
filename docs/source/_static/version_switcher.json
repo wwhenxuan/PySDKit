@@ -5,10 +5,15 @@
         "url": "https://pysdkit.readthedocs.io/en/latest/"
     },
     {
-        "name": "0.4.56 (stable)",
+        "name": "0.5.0 (stable)",
         "version": "stable",
         "url": "https://pysdkit.readthedocs.io/en/stable/",
         "preferred": true
+    },
+    {
+        "name": "0.5.0",
+        "version": "0.5.0",
+        "url": "https://pysdkit.readthedocs.io/en/0.5.0/"
     },
     {
         "name": "0.4.56",
